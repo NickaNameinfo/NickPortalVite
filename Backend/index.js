@@ -15,7 +15,11 @@ app.use(express.json());
 require("./connectDB");
 
 const vendorRoutes = require("./src/routes/vendorRoutes");
+const categoryRoutes = require("./src/routes/categoriesRoutes");
+const productRoutes = require("./src/routes/productRoutes");
 
+app.use("/api/v1/product", productRoutes);
+app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/vendors", vendorRoutes);
 
 // handle error
