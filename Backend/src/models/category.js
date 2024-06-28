@@ -1,26 +1,16 @@
-"use strict";
+'use strict';
 module.exports = (sequelize, DataTypes) => {
-  const Category = sequelize.define(
-    "Category",
-    {
-      id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      category_name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      description: {
-        type: DataTypes.STRING,
-      },
-    },
-    {}
-  );
-  Category.associate = function (models) {
-    Category.hasMany(models.Product, { foreignKey: "category_id" });
+  const category = sequelize.define('category', {
+    name: DataTypes.STRING,
+    slug: DataTypes.STRING
+  }, {});
+  category.associate = function(models) {
+    // associations can be defined here 
+    models.category.hasMany(models.product, { foreignKey: 'categoryId' });
+    models.category.hasMany(models.subcategories, { foreignKey: 'categoryId' });
+    models.category.hasMany(models.subchildcategories, { foreignKey: 'categoryId' });
+
+
   };
-  return Category;
+  return category;
 };
