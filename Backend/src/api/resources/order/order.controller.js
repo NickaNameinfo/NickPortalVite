@@ -27,16 +27,18 @@ module.exports = {
         })
         .then((order) => {
           if (order) {
-            return db.addresses.create({
-              orderId: order.id,
-              custId: customerId,
-              fullname: deliveryAddress ? deliveryAddress.name : "",
-              phone: deliveryAddress ? deliveryAddress.phone : "",
-              discrict: deliveryAddress ? deliveryAddress.discrict : "",
-              city: deliveryAddress ? deliveryAddress.city : "",
-              states: deliveryAddress ? deliveryAddress.states : "",
-              shipping: deliveryAddress ? deliveryAddress.address : "",
-            }).then((p) => [order, p]);
+            return db.addresses
+              .create({
+                orderId: order.id,
+                custId: customerId,
+                fullname: deliveryAddress ? deliveryAddress.name : "",
+                phone: deliveryAddress ? deliveryAddress.phone : "",
+                discrict: deliveryAddress ? deliveryAddress.discrict : "",
+                city: deliveryAddress ? deliveryAddress.city : "",
+                states: deliveryAddress ? deliveryAddress.states : "",
+                shipping: deliveryAddress ? deliveryAddress.address : "",
+              })
+              .then((p) => [order, p]);
           }
         })
         .then(([order, p]) => {
@@ -87,10 +89,11 @@ module.exports = {
       }
     }
     try {
-      db.orders.findAll({
-        order: [["createdAt", "DESC"]],
-        include: [{ model: db.addresses }, { model: db.carts }],
-      })
+      db.orders
+        .findAll({
+          order: [["createdAt", "DESC"]],
+          include: [{ model: db.addresses }, { model: db.carts }],
+        })
         .then((list) => {
           res.status(200).json({ success: true, order: list });
         })
@@ -105,7 +108,8 @@ module.exports = {
   async statusUpdate(req, res, next) {
     try {
       const { id, status, deliverydate } = req.body;
-      db.orders.findOne({ where: { id: id } })
+      db.orders
+        .findOne({ where: { id: id } })
         .then((list) => {
           return db.orders.update(
             {
@@ -130,11 +134,12 @@ module.exports = {
 
   async getAllOrderListById(req, res, next) {
     try {
-      db.orders.findAll({
-        where: { custId: req.body.id },
-        order: [["createdAt", "DESC"]],
-        include: [{ model: db.addresses, include: [{ model: db.carts }] }],
-      })
+      db.orders
+        .findAll({
+          where: { custId: req.body.id },
+          order: [["createdAt", "DESC"]],
+          include: [{ model: db.addresses, include: [{ model: db.carts }] }],
+        })
         .then((list) => {
           res.status(200).json({ success: true, order: list });
         })
@@ -147,11 +152,12 @@ module.exports = {
   },
   async getAllOrderStatus(req, res, next) {
     try {
-      db.orders.findAll({
-        where: { status: req.body.status },
-        order: [["createdAt", "DESC"]],
-        include: [{ model: db.addresses, include: [{ model: db.carts }] }],
-      })
+      db.orders
+        .findAll({
+          where: { status: req.body.status },
+          order: [["createdAt", "DESC"]],
+          include: [{ model: db.addresses, include: [{ model: db.carts }] }],
+        })
         .then((list) => {
           res.status(200).json({ success: true, order: list });
         })
@@ -164,13 +170,14 @@ module.exports = {
   },
   async getAllOrderCount(req, res, next) {
     try {
-      db.orders.findAll({
-        attributes: [
-          "status",
-          [Sequelize.fn("COUNT", Sequelize.col("status")), "total"],
-        ],
-        group: ["status"],
-      })
+      db.orders
+        .findAll({
+          attributes: [
+            "status",
+            [Sequelize.fn("COUNT", Sequelize.col("status")), "total"],
+          ],
+          group: ["status"],
+        })
         .then((list) => {
           res.status(200).json({ success: true, data: list });
         })

@@ -6,6 +6,7 @@ import {
   Select,
   SelectItem,
   Button,
+  Textarea,
 } from "@nextui-org/react";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { useAddVendorsMutation } from "../Service.mjs";
@@ -19,16 +20,10 @@ const Add = () => {
   const onSubmit = async (data: any) => {
     let tempAPI = {
       ...data,
-      address_id: 1,
-      tax_id: 1,
+      areaId: 1,
     };
     console.log("datafrom data form", tempAPI);
-    const formData = new FormData();
-    for (const key in tempAPI) {
-      formData.append(key, tempAPI[key]);
-      console.log(formData);
-    }
-    const result = await addVendors(formData);
+    const result = await addVendors(tempAPI);
     if (result?.data?.success) {
       navigate("/Vendors/List");
     }
@@ -59,92 +54,11 @@ const Add = () => {
       <div>
         <div className="grid grid-cols-2 gap-4 mb-2">
           <Controller
-            name="vendor_name" // Changed to reflect a text input
+            name="storename" // Changed to reflect a text input
             control={control}
             rules={{ required: true }}
             render={({ field }) => (
-              <Input type="text" label="Name" size="lg" {...field} />
-            )}
-          />
-          <Controller
-            name="contact_person" // Changed to reflect a text input
-            control={control}
-            render={({ field }) => (
-              <Input type="text" label="Contact Person" size="lg" {...field} />
-            )}
-          />
-          <Controller
-            name="email_address" // Changed to reflect a text input
-            control={control}
-            render={({ field }) => (
-              <Input type="email" label="Email" size="lg" {...field} />
-            )}
-          />
-          <Controller
-            name="phone_number" // Changed to reflect a text input
-            control={control}
-            render={({ field }) => (
-              <Input type="number" label="Phone Number" size="lg" {...field} />
-            )}
-          />
-          <Controller
-            name="alternative_number" // Changed to reflect a text input
-            control={control}
-            render={({ field }) => (
-              <Input
-                type="number"
-                label="Alternative Number"
-                size="lg"
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="payment_terms" // Changed to reflect a text input
-            control={control}
-            render={({ field }) => (
-              <Input type="url" label="Payment Terms" size="lg" {...field} />
-            )}
-          />
-          <Controller
-            name="preferred_currency" // Changed to reflect a text input
-            control={control}
-            render={({ field }) => (
-              <Select label="Select an animal" {...field}>
-                {animals.map((animal) => (
-                  <SelectItem key={animal.key}>{animal.label}</SelectItem>
-                ))}
-              </Select>
-            )}
-          />
-          <Controller
-            name="services_provided" // Changed to reflect a text input
-            control={control}
-            render={({ field }) => (
-              <Select label="Select an animal" {...field}>
-                {animals.map((animal) => (
-                  <SelectItem key={animal.key}>{animal.label}</SelectItem>
-                ))}
-              </Select>
-            )}
-          />
-          <Controller
-            name="total_stores" // Changed to reflect a text input
-            control={control}
-            render={({ field }) => (
-              <Input type="number" label="Total Stores" size="lg" {...field} />
-            )}
-          />
-          <Controller
-            name="number_category" // Changed to reflect a text input
-            control={control}
-            render={({ field }) => (
-              <Input
-                type="number"
-                label="Category Count"
-                size="lg"
-                {...field}
-              />
+              <Input type="text" label="Store Name" size="lg" {...field} />
             )}
           />
           <Controller
@@ -152,38 +66,139 @@ const Add = () => {
             control={control}
             render={({ field }) => (
               <Select label="Select an Status" {...field}>
-                {animals.map((animal) => (
-                  <SelectItem key={animal.key}>{animal.label}</SelectItem>
-                ))}
+                <SelectItem key={1}>{"Active"}</SelectItem>
+                <SelectItem key={0}>{"InActive"}</SelectItem>
               </Select>
             )}
           />
           <Controller
-            name="vendor_image" // Changed to reflect a text input
+            name="shopaddress" // Changed to reflect a text input
+            control={control}
+            render={({ field }) => (
+              <Textarea label="Shop Address" size="lg" {...field} />
+            )}
+          />
+          <Controller
+            name="shopdesc" // Changed to reflect a text input
+            control={control}
+            render={({ field }) => (
+              <Textarea label="Discription" size="lg" {...field} />
+            )}
+          />
+          <div className="flex flex-col flex-wrap gap-4 border-b pb-2 mb-3">
+            <Chip color="secondary" variant="dot" className="bg-warning-50">
+              Owner Details
+            </Chip>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4 mb-2">
+          <Controller
+            name="ownername" // Changed to reflect a text input
+            control={control}
+            render={({ field }) => (
+              <Input type="text" label="Owner Name" size="lg" {...field} />
+            )}
+          />
+          <Controller
+            name="email" // Changed to reflect a text input
+            control={control}
+            render={({ field }) => (
+              <Input type="email" label="Email" size="lg" {...field} />
+            )}
+          />
+          <Controller
+            name="password" // Changed to reflect a text input
+            control={control}
+            render={({ field }) => (
+              <Input type="password" label="Password" size="lg" {...field} />
+            )}
+          />
+          <Controller
+            name="phone" // Changed to reflect a text input
+            control={control}
+            render={({ field }) => (
+              <Input type="number" label="Phone Number" size="lg" {...field} />
+            )}
+          />
+
+          <Controller
+            name="owneraddress" // Changed to reflect a text input
+            control={control}
+            render={({ field }) => (
+              <Textarea label="Owner Address" size="lg" {...field} />
+            )}
+          />
+        </div>
+        <div className="flex flex-col flex-wrap gap-4 border-b pb-2 mb-3">
+          <Chip color="danger" variant="dot" className="bg-warning-50">
+            Bank Details(Optional)
+          </Chip>
+        </div>
+        <div className="grid grid-cols-2 gap-4 mb-2">
+          <Controller
+            name="accountNo" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
               <Input
-                type="file"
-                color="primary"
-                variant="bordered"
-                onChange={(e) => {
-                  field.onChange(e.target.files[0]); // Don't forget to call field.onChange to update the form state
-                }}
+                type="number"
+                label="Accoutn Number"
+                size="lg"
+                {...field}
               />
             )}
           />
           <Controller
-            name="vendor_document" // Changed to reflect a text input
+            name="accountHolderName" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
               <Input
-                type="file"
-                color="primary"
-                variant="bordered"
-                onChange={(e) => {
-                  field.onChange(e.target.files[0]); // Don't forget to call field.onChange to update the form state
-                }}
+                type="text"
+                label="Accoutn Holder Name"
+                size="lg"
+                {...field}
               />
+            )}
+          />
+          <Controller
+            name="IFSC" // Changed to reflect a text input
+            control={control}
+            render={({ field }) => (
+              <Input type="text" label="IFSC" size="lg" {...field} />
+            )}
+          />
+          <Controller
+            name="bankName" // Changed to reflect a text input
+            control={control}
+            render={({ field }) => (
+              <Input type="text" label="Bank Name" size="lg" {...field} />
+            )}
+          />
+          <Controller
+            name="branch" // Changed to reflect a text input
+            control={control}
+            render={({ field }) => (
+              <Input type="text" label="Branch" size="lg" {...field} />
+            )}
+          />
+          <Controller
+            name="adharCardNo" // Changed to reflect a text input
+            control={control}
+            render={({ field }) => (
+              <Input type="text" label="Aadhar Number" size="lg" {...field} />
+            )}
+          />
+          <Controller
+            name="panCardNo" // Changed to reflect a text input
+            control={control}
+            render={({ field }) => (
+              <Input type="text" label="PAN Number" size="lg" {...field} />
+            )}
+          />
+          <Controller
+            name="GSTNo" // Changed to reflect a text input
+            control={control}
+            render={({ field }) => (
+              <Input type="text" label="GST No" size="lg" {...field} />
             )}
           />
         </div>

@@ -20,7 +20,7 @@ const { validateBody, schemas } = require('../../../middleware/validator');
 
 const vendorRouter = express.Router();
 // vendorRouter.route('/create').post(sanitize(),validateBody(schemas.vendorDetails),vendorController.index);
-vendorRouter.route('/create').post(sanitize(), jwtStrategy, vendorController.index);
+vendorRouter.route('/create').post(vendorController.index);
 vendorRouter.route('/list').get(sanitize(), jwtStrategy, vendorController.getAllvendor);
 vendorRouter.route('/product-list').get(sanitize(), vendorController.getAllVendorProduct);
 vendorRouter.route('/product/getAllProductById').post(sanitize(), vendorController.getProductByVendor);

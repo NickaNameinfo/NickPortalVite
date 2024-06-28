@@ -14,16 +14,18 @@ import { TableList } from "../../../Components/Table/TableList";
 
 const List = () => {
   const { data, error, refetch } = useGetVendorsQuery();
-  console.log(data, "data5234523452345", data?.["data"]?.["data"]);
+  console.log(data, "data5234523452345", data?.["data"]);
 
   React.useEffect(() => {
     refetch();
   }, []);
 
   const defaultCloumns = [
-    "vendor_name",
-    "contact_person",
-    "email_address",
+    "storename",
+    "shopaddress",
+    "ownername",
+    "phone",
+    "email",
     "actions",
   ];
 
@@ -35,20 +37,17 @@ const List = () => {
 
   const columns = [
     { name: "S.No", id: "id", sortable: true },
-    { name: "vendor_name", id: "vendor_name", sortable: true },
-    { name: "contact_person", id: "contact_person", sortable: true },
-    { name: "email_address", id: "email_address", sortable: true },
-    { name: "phone_number", id: "phone_number" },
-    { name: "alternative_number", id: "alternative_number" },
-    { name: "tax_id", id: "tax_id", sortable: true },
-    { name: "status", id: "status", sortable: true },
+    { name: "storename", id: "storename", sortable: true },
+    { name: "shopaddress", id: "shopaddress", sortable: true },
+    { name: "email", id: "email", sortable: true },
+    { name: "phone", id: "phone" },
     { name: "Actions", id: "actions" },
   ];
 
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
     switch (columnKey) {
-      case "vendor_name":
+      case "storename":
         return (
           <User
             avatarProps={{ radius: "lg", src: user.avatar }}
@@ -57,15 +56,6 @@ const List = () => {
           >
             {user.email}
           </User>
-        );
-      case "role":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">
-              {user.team}
-            </p>
-          </div>
         );
       case "status":
         return (
@@ -107,7 +97,7 @@ const List = () => {
           defaultCloumns={defaultCloumns}
           renderCell={renderCell}
           columns={columns}
-          tableItems={data?.["data"]?.["data"]}
+          tableItems={data?.["data"]}
         />
       )}
     </div>
