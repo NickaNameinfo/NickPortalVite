@@ -23,8 +23,8 @@ const Login = () => {
     console.log(result?.data, "result3452345");
     if (result) {
       authenticate(result?.data, () => {
-        window.location.reload();
         navigate("/Dashboard");
+        window.location.reload();
       });
     }
   };

@@ -24,13 +24,6 @@ export const _nav = [
       },
       {
         menuType: "single",
-        name: "Categories",
-        key: "Categories",
-        link: "/",
-        icons: <IconHome />,
-      },
-      {
-        menuType: "single",
         name: "Products",
         key: "Products",
         link: "/",
@@ -49,14 +42,7 @@ export const _nav = [
         menuType: "single",
         name: "Add",
         key: "Add",
-        link: "/",
-        icons: <IconHome />,
-      },
-      {
-        menuType: "single",
-        name: "List",
-        key: "List",
-        link: "/",
+        link: "/CategoriesAdd",
         icons: <IconHome />,
       },
     ],
@@ -72,7 +58,7 @@ export const _nav = [
         menuType: "single",
         name: "Add",
         key: "Add",
-        link: "/",
+        link: "/AddProducts",
         icons: <IconHome />,
       },
       {

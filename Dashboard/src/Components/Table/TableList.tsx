@@ -29,6 +29,7 @@ interface TableProps {
   columns: any;
   defaultCloumns: any;
   renderCell: any;
+  isStatusFilter: boolean;
 }
 
 export const TableList = (props: TableProps) => {
@@ -176,59 +177,58 @@ export const TableList = (props: TableProps) => {
             onValueChange={onSearchChange}
             size="sm"
           />
-          <div className="flex gap-3">
-            <Dropdown>
-              <DropdownTrigger className="hidden sm:flex">
-                <Button
-                  endContent={<ChevronDownIcon className="text-small" />}
-                  variant="flat"
+          {props.isStatusFilter && (
+            <div className="flex gap-3">
+              <Dropdown>
+                <DropdownTrigger className="hidden sm:flex">
+                  <Button
+                    endContent={<ChevronDownIcon className="text-small" />}
+                    variant="flat"
+                  >
+                    Status
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  disallowEmptySelection
+                  aria-label="Table Columns"
+                  closeOnSelect={false}
+                  selectedKeys={statusFilter}
+                  selectionMode="multiple"
+                  onSelectionChange={setStatusFilter}
                 >
-                  Status
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Table Columns"
-                closeOnSelect={false}
-                selectedKeys={statusFilter}
-                selectionMode="multiple"
-                onSelectionChange={setStatusFilter}
-              >
-                {statusOptions.map((status) => (
-                  <DropdownItem key={status.id} className="capitalize">
-                    {capitalize(status.name)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
-            <Dropdown>
-              <DropdownTrigger className="hidden sm:flex">
-                <Button
-                  endContent={<ChevronDownIcon className="text-small" />}
-                  variant="flat"
+                  {statusOptions.map((status) => (
+                    <DropdownItem key={status.id} className="capitalize">
+                      {capitalize(status.name)}
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              </Dropdown>
+              <Dropdown>
+                <DropdownTrigger className="hidden sm:flex">
+                  <Button
+                    endContent={<ChevronDownIcon className="text-small" />}
+                    variant="flat"
+                  >
+                    Columns
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  disallowEmptySelection
+                  aria-label="Table Columns"
+                  closeOnSelect={false}
+                  selectedKeys={visibleColumns}
+                  selectionMode="multiple"
+                  onSelectionChange={setVisibleColumns}
                 >
-                  Columns
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Table Columns"
-                closeOnSelect={false}
-                selectedKeys={visibleColumns}
-                selectionMode="multiple"
-                onSelectionChange={setVisibleColumns}
-              >
-                {props.columns.map((column: any) => (
-                  <DropdownItem key={column.uid} className="capitalize">
-                    {capitalize(column.name)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
-            <Button color="primary" endContent={<PlusIcon />}>
-              Add New
-            </Button>
-          </div>
+                  {props.columns.map((column: any) => (
+                    <DropdownItem key={column.uid} className="capitalize">
+                      {capitalize(column.name)}
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              </Dropdown>
+            </div>
+          )}
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">

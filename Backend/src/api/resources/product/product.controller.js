@@ -42,6 +42,7 @@ module.exports = {
   /* Add user api start here................................*/
 
   async addProduct(req, res, next) {
+    console.log(req.body, "fasdfas0d8f7a90s8d");
     try {
       const {
         categoryId,
@@ -62,18 +63,6 @@ module.exports = {
         total,
         netPrice,
       } = req.body;
-      const { originalname, buffer } = req.file;
-
-      const uploadParams = {
-        Bucket: BUCKET_NAME, // Replace with your S3 bucket name
-        Key: originalname,
-        Body: buffer,
-      };
-
-      const uploadCommand = new PutObjectCommand(uploadParams);
-      const result = await s3Client.send(uploadCommand);
-      const url = `https://${BUCKET_NAME}.s3.ap-south-1.amazonaws.com/${originalname}`;
-
       db.product
         .findOne({
           where: { name: name ? name : null },
@@ -81,9 +70,9 @@ module.exports = {
         .then((product) => {
           if (!product) {
             return db.product.create({
-              categoryId: categoryId,
-              subCategoryId: subCategoryId,
-              childCategoryId: childCategoryId,
+              categoryId: Number(categoryId),
+              subCategoryId: Number(subCategoryId),
+              childCategoryId: Number(childCategoryId),
               name: name,
               slug: slug,
               status: parseInt(status) ? "active" : "inactive",
@@ -98,7 +87,7 @@ module.exports = {
               discountPer: discountPer,
               total: total,
               netPrice: netPrice,
-              photo: url ? url : "",
+              photo: req?.files ? req?.files?.photo?.[0]?.path : "",
             });
           }
           throw new RequestError("Already exist product", 409);

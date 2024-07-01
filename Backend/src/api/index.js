@@ -11,7 +11,7 @@ const paymentRouter = require("./resources/payment").paymentRouter;
 const restRouter = express.Router();
 restRouter.use("/auth", authRouter);
 restRouter.use("/customer", customerRouter);
-restRouter.use("/location", locationRouter);
+restRouter.use("/location", locationRouter); 
 restRouter.use("/product", productRouter);
 restRouter.use("/vendor", vendorRouter);
 restRouter.use("/category", categoryRouter);
