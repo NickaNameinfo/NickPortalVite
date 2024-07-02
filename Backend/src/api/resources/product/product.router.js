@@ -25,7 +25,7 @@ productRouter
   .route("/add")
   .post(
     sanitize(),
-    jwtStrategy,
+    // jwtStrategy,
     upload.single("photo"),
     productController.addProduct
   );

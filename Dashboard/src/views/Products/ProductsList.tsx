@@ -1,6 +1,4 @@
-import { useGetCategoriesQuery, useAddCategoriesMutation } from "./Service.mjs";
-import { useNavigate } from "react-router-dom";
-import { Controller, useForm } from "react-hook-form";
+import { useGetProductsQuery } from "./Service.mjs";
 import {
   Button,
   Chip,
@@ -15,15 +13,20 @@ import React from "react";
 import { TableList } from "../../Components/Table/TableList";
 
 const ProductsList = () => {
-  const { data, error, refetch } = useGetCategoriesQuery();
-
-  const defaultCloumns = ["id", "name", "actions"];
-
+  const { data, error, refetch } = useGetProductsQuery();
+  console.log(data, "data769867");
+  const defaultCloumns = ["id", "name", "actions", "price", "sortDesc"];
   const columns = [
     { name: "S.No", id: "id", sortable: true },
     { name: "name", id: "name", sortable: true },
+    { name: "price", id: "price", sortable: true },
+    { name: "sortDesc", id: "sortDesc", sortable: true },
     { name: "Actions", id: "actions" },
   ];
+
+  React.useEffect(() => {
+    refetch();
+  }, []);
 
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
@@ -59,8 +62,10 @@ const ProductsList = () => {
         return cellValue;
     }
   }, []);
+
   return (
     <div>
+      <p>khgjhg</p>
       {data && (
         <TableList
           defaultCloumns={defaultCloumns}

@@ -42,7 +42,7 @@ module.exports = {
   /* Add user api start here................................*/
 
   async addProduct(req, res, next) {
-    console.log(req.body, "fasdfas0d8f7a90s8d");
+    console.log(req.file, "fasdfas0d8f7a90s8d");
     try {
       const {
         categoryId,
@@ -65,7 +65,7 @@ module.exports = {
       } = req.body;
       db.product
         .findOne({
-          where: { name: name ? name : null },
+          where: { name: slug ? slug : null },
         })
         .then((product) => {
           if (!product) {
@@ -87,7 +87,7 @@ module.exports = {
               discountPer: discountPer,
               total: total,
               netPrice: netPrice,
-              photo: req?.files ? req?.files?.photo?.[0]?.path : "",
+              photo: req?.file ? req?.file?.path : "",
             });
           }
           throw new RequestError("Already exist product", 409);
@@ -142,7 +142,7 @@ module.exports = {
           ],
         })
         .then((product) => {
-          res.status(200).json({ success: true, product });
+          res.status(200).json({ success: true, data: product });
         })
         .catch(function (err) {
           next(err);

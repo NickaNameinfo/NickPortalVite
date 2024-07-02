@@ -24,9 +24,9 @@ const AddProducts = () => {
   const onSubmit = async (data: any) => {
     let tempData = {
       ...data,
-      subCategoryId: 5,
-      childCategoryId: 4,
-      slug: "test1",
+      subCategoryId: 1,
+      childCategoryId: 1,
+      slug: 3,
     };
     console.log("datafrom data form", tempData);
     const formData = new FormData();
@@ -35,7 +35,10 @@ const AddProducts = () => {
       console.log(formData);
     }
     const result = await addProducts(formData);
-    console.log(result?.data, "result3452345");
+    if(result?.success){
+      navigate("/ProductsList")
+    }
+    console.log(result, "result3452345");
   };
 
   return (
@@ -49,13 +52,13 @@ const AddProducts = () => {
         <div>
           <div className="grid grid-cols-3 gap-4 mb-2">
             <Controller
-              name="selectedCategory" // Changed to reflect a text input
+              name="categoryId" // Changed to reflect a text input
               control={control}
               rules={{ required: true }}
               render={({ field }) => (
                 <Select label="Select an Status" {...field}>
-                  <SelectItem key={10}>Category1</SelectItem>
-                  <SelectItem key={2}>Category2</SelectItem>
+                  <SelectItem key={1}>Category1</SelectItem>
+                  <SelectItem key={1}>Category2</SelectItem>
                 </Select>
               )}
             />

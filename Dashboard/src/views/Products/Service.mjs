@@ -14,8 +14,8 @@ const axiosBaseQuery = fetchBaseQuery({
   },
 });
 
-export const CategoriesApi = createApi({
-  reducerPath: "Categories",
+export const ProductsApi = createApi({
+  reducerPath: "Products",
   baseQuery: axiosBaseQuery,
   endpoints: (builder) => ({
     addProduct: builder.mutation({
@@ -26,14 +26,13 @@ export const CategoriesApi = createApi({
       }),
     }),
     getProducts: builder.query({
-      query: (body) => ({
-        url: `/product/getAllproduct`,
+      query: () => ({
+        url: `/product/getAllproductList`,
         method: "GET",
-        body,
       }),
     }),
   }),
 });
 
-export const { useAddProductMutation, useGetProductsQuery } = CategoriesApi;
-export const { endpoints } = CategoriesApi;
+export const { useAddProductMutation, useGetProductsQuery } = ProductsApi;
+export const { endpoints } = ProductsApi;

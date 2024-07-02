@@ -29,7 +29,6 @@ export const CategoriesApi = createApi({
       query: (body) => ({
         url: `/category/getAllCategory`,
         method: "GET",
-        body,
       }),
     }),
   }),

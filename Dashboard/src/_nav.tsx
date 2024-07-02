@@ -65,7 +65,7 @@ export const _nav = [
         menuType: "single",
         name: "List",
         key: "List",
-        link: "/",
+        link: "/ProductsList",
         icons: <IconHome />,
       },
     ],
