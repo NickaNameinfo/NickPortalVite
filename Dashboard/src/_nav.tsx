@@ -24,9 +24,9 @@ export const _nav = [
       },
       {
         menuType: "single",
-        name: "Products",
-        key: "Products",
-        link: "/",
+        name: "Stock",
+        key: "Stock",
+        link: "/AddStock",
         icons: <IconHome />,
       },
     ],
