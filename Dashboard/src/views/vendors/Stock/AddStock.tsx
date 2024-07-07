@@ -8,6 +8,8 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Input,
+  Select,
+  SelectItem,
   User,
 } from "@nextui-org/react";
 import React from "react";
@@ -17,7 +19,7 @@ import { TableList } from "../../../Components/Table/TableList";
 const AddStock = () => {
   const { handleSubmit, control, reset } = useForm();
   const navigate = useNavigate();
-  const { data, error, refetch } = useGetStockQuery();
+  const { data, error, refetch } = useGetStockQuery(3);
   const [addStock] = useAddStockMutation();
   const [refresh, setRefresh] = React.useState(false);
 
@@ -25,11 +27,14 @@ const AddStock = () => {
 
   const onSubmit = async (formData: any) => {
     console.log(formData, "formData3452345234");
-    const result = await addStock(formData);
+    let tempApiParams = {
+      ...formData,
+      vendorId: 3,
+    };
+    const result = await addStock(tempApiParams);
     console.log(result?.data, "result3452345");
     if (result) {
       setRefresh(true);
-      reset();
     }
   };
 
@@ -41,25 +46,38 @@ const AddStock = () => {
     setRefresh((prev) => !prev);
   }, [data]);
 
-  const defaultCloumns = ["id", "name", "actions"];
+  const defaultCloumns = ["id", "stock", "actions", "category", "vendor"];
 
   const columns = [
     { name: "S.No", id: "id", sortable: true },
-    { name: "name", id: "name", sortable: true },
+    { name: "stock", id: "stock", sortable: true },
+    { name: "category", id: "category", sortable: true },
+    { name: "vendor", id: "vendor", sortable: true },
     { name: "Actions", id: "actions" },
   ];
 
-  const renderCell = React.useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
+  const renderCell = React.useCallback((items, columnKey, vendor) => {
+      const cellValue = items[columnKey];
+    console.log(items, "vendor34254");
     switch (columnKey) {
-      case "storename":
+      case "category":
         return (
           <User
-            avatarProps={{ radius: "lg", src: user.avatar }}
-            description={user.email}
-            name={cellValue}
+            avatarProps={{ radius: "lg", src: items?.category.email }}
+            description={items?.category.name}
+            name={items?.category.name}
           >
-            {user.email}
+            {items?.category.name}
+          </User>
+        );
+      case "vendor":
+        return (
+          <User
+            avatarProps={{ radius: "lg", src: items?.vendor.storename }}
+            description={items?.vendor.storename}
+            name={items?.vendor.storename}
+          >
+            {vendor?.vendor.storename}
           </User>
         );
       case "actions":
@@ -80,7 +98,7 @@ const AddStock = () => {
           </div>
         );
       default:
-        return cellValue;
+        return cellValue ? cellValue : "No Data";
     }
   }, []);
 
@@ -95,19 +113,22 @@ const AddStock = () => {
         <div>
           <div className="grid grid-cols-2 gap-4 mb-2">
             <Controller
-              name="name" // Changed to reflect a text input
+              name="categoryId" // Changed to reflect a text input
               control={control}
               rules={{ required: true }}
               render={({ field }) => (
-                <Input type="text" label="Name" size="lg" {...field} />
+                <Select label="Select an Status" {...field}>
+                  <SelectItem key={1}>{"Category1"}</SelectItem>
+                  <SelectItem key={1}>{"Category2"}</SelectItem>
+                </Select>
               )}
             />
             <Controller
-              name="slug" // Changed to reflect a text input
+              name="stock" // Changed to reflect a text input
               control={control}
               rules={{ required: true }}
               render={({ field }) => (
-                <Input type="text" label="Slug" size="lg" {...field} />
+                <Input type="text" label="Stock" size="lg" {...field} />
               )}
             />
           </div>

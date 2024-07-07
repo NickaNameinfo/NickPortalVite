@@ -98,6 +98,7 @@ const List = () => {
           renderCell={renderCell}
           columns={columns}
           tableItems={data?.["data"]}
+          isStatusFilter={false}
         />
       )}
     </div>

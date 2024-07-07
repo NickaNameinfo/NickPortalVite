@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
 const db = require("../../../models");
-
+ 
 module.exports = {
   /* Add user api start here................................*/
 

@@ -7,16 +7,17 @@ const locationRouter = require("./resources/location").locationRouter;
 const customerRouter = require("./resources/customer").customerRouter;
 const orderRouter = require("./resources/order").orderRouter;
 const paymentRouter = require("./resources/payment").paymentRouter;
+const vendorStockRouter = require("./resources/vendorStock").vendorStockRouter;
 
 const restRouter = express.Router();
 restRouter.use("/auth", authRouter);
 restRouter.use("/customer", customerRouter);
-restRouter.use("/location", locationRouter); 
+restRouter.use("/location", locationRouter);
 restRouter.use("/product", productRouter);
 restRouter.use("/vendor", vendorRouter);
 restRouter.use("/category", categoryRouter);
 restRouter.use("/order", orderRouter);
 restRouter.use("/payment", paymentRouter);
+restRouter.use("/vendorStock", vendorStockRouter);
 
 module.exports = { restRouter };
- 
