@@ -9,6 +9,7 @@ body {
     rgba(123, 108, 217, 0.39) 52.11%,
     rgba(56, 23, 254, 0.25) 103.45%
   );
+  height: 100vh;
 }
 :root {
   --primary-900: #d1e1ff;
@@ -86,6 +87,7 @@ body {
   --divider-gray: #c8c5c5;
   --addsub-white: #d9d9d9;
   --bg-white: #ffffff;
+  --bg-input: #e9f0ff;
 }
 
 @media (prefers-color-scheme: dark) {

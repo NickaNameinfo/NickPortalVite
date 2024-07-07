@@ -59,13 +59,13 @@ export const AppSidebar = () => {
               {/* <CardHeader className="p-0 m-0"></CardHeader> */}
               <CardBody className="p-0 m-0">
                 {/* <Image
-                  isZoomed
-                  alt="Here no Image"
-                  className="w-full object-cover max-h-[40px] min-w-[140px]"
-                  src="https://nextui-docs-v2.vercel.app/images/album-cover.png"
-                  // height={30}
-                  // width={140}
-                /> */}
+                isZoomed
+                alt="Here no Image"
+                className="w-full object-cover max-h-[40px] min-w-[140px]"
+                src="https://nextui-docs-v2.vercel.app/images/album-cover.png"
+                // height={30}
+                // width={140}
+              /> */}
               </CardBody>
             </Card>
           </div>
@@ -83,12 +83,12 @@ export const AppSidebar = () => {
           <div className="h-full px-3 pb-4 pt-0 overflow-y-auto custom-scrollbar">
             <div className="scroll-content h-fit left-0 top-0 transition-transform z-40">
               <ul role="list" className="space-y-2 font-medium list-disc">
-                {_nav?.map((result: any) =>
+                {_nav?.map((result) =>
                   result?.menuType === "single" ? (
                     <li className="bg-white rounded-xl">
                       <Link
-                        to={result?.link}
-                        className="mt-4 p-3 text-sm flex items-center text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                        to="#"
+                        className="mt-7 p-3 text-sm flex items-center text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                       >
                         <div className="flex justify-between w-full items-center">
                           {menuToggle ? (
@@ -96,35 +96,33 @@ export const AppSidebar = () => {
                               <IconHome />
                             </span>
                           ) : (
-                            <p>{result?.["name"]}</p>
+                            <p>For Me</p>
                           )}
-                          {result?.["isToggle"] && (
-                            <Switch
-                              color="secondary"
-                              // size="lg"
-                              defaultSelected
-                              classNames={{
-                                wrapper: "p-0 h-5 w-9 overflow-visible",
-                                thumb: cn(
-                                  "w-4 h-4 border-2 shadow-lg",
-                                  "group-data-[hover=true]:border-secondary",
-                                  //selected
-                                  "group-data-[selected=true]:ml-4  bg-secondary",
+                          <Switch
+                            color="secondary"
+                            // size="lg"
+                            defaultSelected
+                            classNames={{
+                              wrapper: "p-0 h-5 w-9 overflow-visible",
+                              thumb: cn(
+                                "w-4 h-4 border-2 shadow-lg",
+                                "group-data-[hover=true]:border-secondary",
+                                //selected
+                                "group-data-[selected=true]:ml-4  bg-secondary",
 
-                                  // pressed
-                                  "group-data-[pressed=true]:w-7",
-                                  "group-data-[selected]:group-data-[pressed]:ml-4"
-                                ),
-                              }}
-                              aria-label="Automatic updates"
-                            />
-                          )}
+                                // pressed
+                                "group-data-[pressed=true]:w-7",
+                                "group-data-[selected]:group-data-[pressed]:ml-4"
+                              ),
+                            }}
+                            aria-label="Automatic updates"
+                          />
                         </div>
                       </Link>
                     </li>
                   ) : (
                     <li
-                      className="rounded-xl hover:bg-gray-100 mt-3"
+                      className="rounded-xl hover:bg-gray-100"
                       style={{ backgroundColor: "var(--secondary-500)" }}
                     >
                       <Accordion
@@ -141,27 +139,27 @@ export const AppSidebar = () => {
                                   <IconHome />
                                 </span>
                               ) : (
-                                <p>{result?.["name"]}</p>
+                                <p>For Me</p>
                               )}
-                              <p className="rounded-md bg-white text-secondary px-1 leading-4 text-xs flex items-center">
-                                {result?.["menuItems"]?.length}
+                              <p className="rounded-full bg-secondary text-secondary border-1 px-1 py-0 leading-4 text-xs">
+                                3
                               </p>
                             </div>
                           }
                           className="text-black"
                         >
-                          <ul className="pl-4">
-                            {result?.["menuItems"]?.map(
-                              (subMenu: any, index: number) => (
-                                <div>
-                                  <Link to={subMenu?.link} key={index}>
-                                    <li className="flex justify-between pb-2.5  cursor-pointer">
-                                      <div>{subMenu?.name}</div>
-                                    </li>
-                                  </Link>
-                                </div>
-                              )
-                            )}
+                          <ul className="list-disc pl-10">
+                            {result?.["menuItems"]?.map((subMenu) => (
+                              <li className="flex justify-between pb-2.5">
+                                <div>Grocery</div>
+                                <Checkbox
+                                  className="m-0 p-0"
+                                  defaultSelected
+                                  size="md"
+                                  color="success"
+                                ></Checkbox>
+                              </li>
+                            ))}
                           </ul>
                         </AccordionItem>
                       </Accordion>

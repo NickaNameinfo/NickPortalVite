@@ -8,7 +8,7 @@ const AppContent = () => {
   return (
     <Suspense fallback={<Spinner color="primary" />}>
       <Routes>
-        {routes.map((route, idx) => {
+        {routes.map((route: any, idx) => {
           return (
             route.element && (
               <Route key={idx} path={route.path} element={<route.element />} />
