@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: linear-gradient(
+    108deg,
+    #e3deff -0.31%,
+    rgba(123, 108, 217, 0.39) 52.11%,
+    rgba(56, 23, 254, 0.25) 103.45%
+  );
+}
+:root {
+  --primary-900: #d1e1ff;
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  --gradient-primary: linear-gradient(
+    108deg,
+    #e3deff -0.31%,
+    rgba(123, 108, 217, 0.39) 52.11%,
+    rgba(56, 23, 254, 0.25) 103.45%
+  );
+  --gradient-secondary: linear-gradient(
+    111deg,
+    rgba(255, 250, 250, 0.29) 0.44%,
+    rgba(255, 255, 255, 0.2) 95.45%
+  );
+  --sidebarColor-main: #edeafd;
+  --sidebarColor-scrollBarColor: #c1b0fd;
+  --sidebarColor-toggleOff: #91c3f3;
+  --sidebarColor-toggleOn: #6ed371;
+  --sidebarColor-cardBG: #e7ffe980;
+  --sidebarColor-checkBoxBG: #b3ecb8;
+  --sidebarColor-uncheckBoxBG: #bbdbfb;
+  --sidebarColor-checkColor: #49a84c;
+  --sidebarColor-sideBarBG: rgba(237, 234, 253, 0.5);
+  --greenIcon: #49a84cb8;
+  --searchIcon: #8465f7;
+  --whatsApp: #49a84c;
+  --call: #2a9ef1;
+  --location: #8007f9;
+  --web: #fb3d13;
+  --share: #0fcec3;
+  --button-main: #4c86f9;
+  --button-secondary: #4c86f9;
+  --button-secondaryBG: #4c86f9;
+  --button-infoButton: #4c86f9;
+  --button-backgroundInfo: #4c86f9;
+  --button-backgroundMain: #4c86f9;
+  --textColor-main: #000000;
+  --textColor-secondary: #3b3939;
+  --textColor-timingColor: #5b5555;
+  --textColor-priceColor: #179d01;
+  --textColor-light: #b3b3b3;
+  --transparent-main: #3c3c3c80;
+  --transparent-secondary: #ff0700;
+  --fontWeight-400: 400;
+  --fontWeight-500: 500;
+  --fontWeight-600: 600;
+  --fontWeight-700: 700;
+  --cardIconColor-main: #6942cb;
+  --cardIconColor-disableIcon: #636060;
+  --card-boxShadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.1);
+  --card-whistleIcon: #ff0000;
+  --card-eyeIcon: #cfa007;
+  --card-addToCartIcon: #4c86f9;
+  --card-addToCartIcon: #4c86f9;
+  --borderRadius-2: 2px;
+  --borderRadius-4: 4px;
+  --borderRadius-5: 5px;
+  --borderRadius-10: 10px;
+  --borderRadius-15: 15px;
+  --borderRadius-20: 20px;
+  --borderRadius-25: 25px;
+  --borderRadius-28: 28px;
+  --borderRadius-50: 50px;
+  --favourite: #ff9900;
+  --cart-mainBG: #efefef;
+  --cart-secondaryBG: #e6e6e6;
+  --backdrop-filter: blur(2px);
+  --background-blur: rgba(237, 234, 253, 0.5);
+  --warning-900: #fef7e28a;
+  --secondary-500: #e7ffe980;
+  --background-white-50: rgba(255, 255, 255, 0.5);
+  --divider-gray: #c8c5c5;
+  --addsub-white: #d9d9d9;
+  --bg-white: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
