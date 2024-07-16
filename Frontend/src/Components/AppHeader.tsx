@@ -111,7 +111,7 @@ export const AppHeader = () => {
       <div className="flex justify-between mt-2">
         <div className="w-3/12  justify-between flex overflow-auto ms-2 me-5">
           <div className="flex items-center justify-around">
-            <Link to={"/Pages/Store"}>
+            <Link to={"/"}>
               <Tooltip
                 showArrow={false}
                 color="primary"
@@ -137,7 +137,7 @@ export const AppHeader = () => {
             </Link>
           </div>
           <div className="flex items-center justify-around">
-            <Link to={"/Pages/Product"}>
+            <Link to={"/ProductView"}>
               <Tooltip
                 showArrow={false}
                 color="primary"
@@ -163,7 +163,7 @@ export const AppHeader = () => {
             </Link>
           </div>
           <div className="flex items-center justify-around">
-            <Link to={"/Pages/Vendor"}>
+            <Link to={"/VendoreView"}>
               <Tooltip
                 showArrow={false}
                 color="primary"

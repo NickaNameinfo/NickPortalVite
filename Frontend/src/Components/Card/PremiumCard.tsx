@@ -24,7 +24,7 @@ import {
   IconsEye,
 } from "../Icons";
 import StoreHeaderCard from "./StoreHeaderCard";
-import { ProductDetail } from "../Product/ProductDetail";
+import { ProductDetail } from "../DetailsModales/ProductDetail";
 import { BuyCard } from "./BuyCard";
 import { useBoolean } from "../Common/CustomHooks";
 

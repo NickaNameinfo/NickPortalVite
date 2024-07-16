@@ -26,14 +26,14 @@ module.exports = {
         panCardNo,
         GSTNo,
       } = req.body;
-      console.log(id , "id452342")
-      console.log(areaId , "areaId3452345")
+      console.log(id, "id452342");
+      console.log(areaId, "areaId3452345");
 
       db.vendor
-        .findOne({ where: { id: id ? id : null} })
+        .findOne({ where: { id: id ? id : null } })
         .then((supplier) => {
           if (supplier) {
-            console.log(supplier , "supplier4234523")
+            console.log(supplier, "supplier4234523");
 
             return db.vendor.update(
               {
@@ -79,7 +79,7 @@ module.exports = {
             adharCardNo: adharCardNo,
             panCardNo: panCardNo,
             GSTNo: GSTNo,
-            areaId : areaId
+            areaId: areaId,
           });
         })
         .then((vendor) => {
@@ -141,12 +141,10 @@ module.exports = {
           }
         })
         .then((success) => {
-          res
-            .status(200)
-            .json({
-              success: true,
-              msg: "Successfully inserted product in VendorList",
-            });
+          res.status(200).json({
+            success: true,
+            msg: "Successfully inserted product in VendorList",
+          });
         })
         .catch(function (err) {
           next(err);
@@ -160,6 +158,32 @@ module.exports = {
     try {
       db.vendor
         .findAll({
+          include: [
+            {
+              model: db.area,
+              attributes: ["id", "name"],
+              include: [{ model: db.location, attributes: ["id", "name"] }],
+            },
+          ],
+        })
+        .then((list) => {
+          res.status(200).json({ success: true, data: list });
+        })
+        .catch(function (err) {
+          next(err);
+        });
+    } catch (err) {
+      throw new RequestError("Error");
+    }
+  },
+
+  //Get by Id
+  async getVendorStockById(req, res, next) {
+    try {
+      const { id } = req.params;
+      db.vendor
+        .findAll({
+          where: { id: id },
           include: [
             {
               model: db.area,
@@ -319,12 +343,10 @@ module.exports = {
           throw new RequestError("Product is not found");
         })
         .then((re) => {
-          return res
-            .status(200)
-            .json({
-              success: true,
-              status: "Successfully deleted Product from Vendor list",
-            });
+          return res.status(200).json({
+            success: true,
+            status: "Successfully deleted Product from Vendor list",
+          });
         })
         .catch((err) => {
           next(err);

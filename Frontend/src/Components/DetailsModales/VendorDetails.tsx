@@ -14,16 +14,25 @@ import {
 import React from "react";
 import { IconHeart, IconLocation, IconShare, IconTick } from "../Icons";
 import { BuyCard } from "../Card/BuyCard";
-import GroceryCard from "../Card/grocery";
 import { IconNxt, IconPrv } from "../../Icons";
+import { useGetVendorsByIdQuery } from "../../views/pages/Vendor/Service.mjs";
+import RelatedVendors from "../Card/RelatedVendors";
 
-interface ProductDetailProps {
+interface VendorDetailsProps {
   isOpen: any;
   onClose: any;
+  id: any;
 }
 
-export const ProductDetail = (props: ProductDetailProps) => {
+export const VendorDetails = (props: VendorDetailsProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { data, error, refetch } = useGetVendorsByIdQuery(props.id);
+  console.log(data?.data, "propsdata");
+
+  React.useEffect(() => {
+    refetch();
+  }, []);
+
   return (
     <>
       <Modal
@@ -38,7 +47,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {/* Product Detail */}
+                {/* Vendor Detail */}
               </ModalHeader>
               <ModalBody className="p-2">
                 <div className="grid xm:grid-cols-2 mm:grid-cols-2  sm:grid-cols-2 ml:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-3 gap-4">
@@ -204,7 +213,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
 
                 <div className=" sm:px-2 mt-3 flex justify-between items-center ">
                   <div className="font-semibold md:text-xl xm:text-md">
-                    Related Products
+                    Related Vendors
                   </div>
                   <div className="flex flex  items-center">
                     <Button
@@ -227,7 +236,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                     </Button>
                   </div>
                 </div>
-                <GroceryCard />
+                <RelatedVendors />
               </ModalBody>
               <ModalFooter className="pt-0 p-3 flex justify-between"></ModalFooter>
             </>
