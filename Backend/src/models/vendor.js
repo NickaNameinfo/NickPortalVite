@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
       adharCardNo: DataTypes.INTEGER,
       panCardNo: DataTypes.STRING,
       GSTNo: DataTypes.STRING,
+      website: DataTypes.STRING,
+      vendorImage: DataTypes.STRING,
+      openTime: DataTypes.STRING,
+      closeTime: DataTypes.STRING,
     },
     {}
   );

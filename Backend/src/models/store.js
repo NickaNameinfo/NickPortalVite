@@ -80,7 +80,23 @@ module.exports = (sequelize, DataTypes) => {
       GSTNo: {
         type: DataTypes.STRING,
         allowNull: true
-      }
+      },
+      website: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      storeImage: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      openTime: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      closeTime: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
     },
     {}
   );

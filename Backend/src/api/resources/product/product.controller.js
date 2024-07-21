@@ -62,6 +62,7 @@ module.exports = {
         discountPer,
         total,
         netPrice,
+        paymentMode
       } = req.body;
       db.product
         .findOne({
@@ -87,6 +88,7 @@ module.exports = {
               discountPer: discountPer,
               total: total,
               netPrice: netPrice,
+              paymentMode: paymentMode,
               photo: req?.file ? req?.file?.path : "",
             });
           }
@@ -172,6 +174,7 @@ module.exports = {
         discountPer,
         total,
         netPrice,
+        paymentMode
       } = req.body;
       db.product
         .findOne({ where: { id: productId } })
@@ -199,6 +202,7 @@ module.exports = {
                 discountPer: discountPer,
                 total: total,
                 netPrice: netPrice,
+                paymentMode: paymentMode,
                 photo: req.file ? req.file.location : product.photo,
               },
               { where: { id: product.id } }

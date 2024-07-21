@@ -5,27 +5,31 @@ const vendorController = require('./vendor.controller');
 const { sanitize } = require('../../../middleware/sanitizer');
 const { jwtStrategy } = require('../../../middleware/strategy');
 const { validateBody, schemas } = require('../../../middleware/validator');
-// var attachmentDir = path.join(path.dirname(require.main.filename), 'public', 'images','product')
+const path = require("path");
+const multer = require("multer");
 
-// var storage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//       cb(null, attachmentDir) 
-//     },
-//     filename: function (req, file, cb) {
-//       cb(null, Date.now() + path.extname(file.originalname))
-//     }
-//   })
-// var uploadAttachment = multer({ storage: storage, limits:{ fileSize: 10485760 }})
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "./uploads");
+    },
+    filename: function (req, file, cb) {
+        cb(
+            null,
+            `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
+        );
+    },
+});
 
+const upload = multer({ storage: storage });
 
 const vendorRouter = express.Router();
-// vendorRouter.route('/create').post(sanitize(),validateBody(schemas.vendorDetails),vendorController.index);
-vendorRouter.route('/create').post(vendorController.index);
+vendorRouter.route('/create').post(sanitize(),
+    upload.single("vendorImage"), vendorController.index);
 vendorRouter.route('/list').get(sanitize(), vendorController.getAllvendor);
 vendorRouter.route('/list/:id').get(sanitize(), vendorController.getVendorStockById);
 vendorRouter.route('/product-list').get(sanitize(), vendorController.getAllVendorProduct);
 vendorRouter.route('/product/getAllProductById').post(sanitize(), vendorController.getProductByVendor);
-vendorRouter.route('/update').post(sanitize(), vendorController.vendorUpdate);
+vendorRouter.route('/update').post(sanitize(), upload.single("vendorImage"), vendorController.vendorUpdate);
 vendorRouter.route('/delete').delete(sanitize(), vendorController.vendorDelete);
 vendorRouter.route('/product-delete').post(sanitize(), vendorController.vendorProductDelete);
 vendorRouter.route('/product-add').post(vendorController.vendorAddProduct);

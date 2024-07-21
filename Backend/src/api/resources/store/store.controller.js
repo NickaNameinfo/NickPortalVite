@@ -25,6 +25,9 @@ module.exports = {
         adharCardNo,
         panCardNo,
         GSTNo,
+        website,
+        openTime,
+        closeTime,
       } = req.body;
       console.log(id, "id452342");
       console.log(areaId, "areaId3452345");
@@ -57,6 +60,10 @@ module.exports = {
                 adharCardNo: adharCardNo ? adharCardNo : supplier.adharCardNo,
                 panCardNo: panCardNo ? panCardNo : supplier.panCardNo,
                 GSTNo: GSTNo ? GSTNo : supplier.GSTNo,
+                website: website ? website : supplier.website,
+                openTime: openTime ? openTime : supplier.openTime,
+                closeTime: closeTime ? closeTime : supplier.closeTime,
+                storeImage: req.file ? req.file.location : supplier.storeImage
               },
               { where: { id: id } }
             );
@@ -80,6 +87,11 @@ module.exports = {
             panCardNo: panCardNo,
             GSTNo: GSTNo,
             areaId: areaId,
+            website: website,
+            openTime: openTime,
+            closeTime: closeTime,
+            closeTime: closeTime,
+            storeImage: req?.file ? req?.file?.path : "",
           });
         })
         .then((store) => {

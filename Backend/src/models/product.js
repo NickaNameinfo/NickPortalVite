@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     photo: DataTypes.STRING,
     sortDesc: DataTypes.TEXT,
     desc: DataTypes.TEXT,
+    paymentMode: DataTypes.STRING,
   }, {});
   product.associate = function (models) {
     // associations can be defined here

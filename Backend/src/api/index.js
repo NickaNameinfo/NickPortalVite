@@ -9,6 +9,7 @@ const customerRouter = require("./resources/customer").customerRouter;
 const orderRouter = require("./resources/order").orderRouter;
 const paymentRouter = require("./resources/payment").paymentRouter;
 const vendorStockRouter = require("./resources/vendorStock").vendorStockRouter;
+const cartRouter = require("./resources/cart").cartRouter;
 
 const restRouter = express.Router();
 restRouter.use("/auth", authRouter);
@@ -21,5 +22,6 @@ restRouter.use("/category", categoryRouter);
 restRouter.use("/order", orderRouter);
 restRouter.use("/payment", paymentRouter);
 restRouter.use("/vendorStock", vendorStockRouter);
+restRouter.use("/cart", cartRouter);
 
 module.exports = { restRouter };
