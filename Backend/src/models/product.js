@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     unitSize: DataTypes.STRING,
     status: DataTypes.STRING,
     buyerPrice: DataTypes.INTEGER,
-    price: DataTypes.INTEGER, 
+    price: DataTypes.INTEGER,
     qty: DataTypes.INTEGER,
     discountPer: DataTypes.INTEGER,
     discount: DataTypes.INTEGER,
@@ -19,14 +19,14 @@ module.exports = (sequelize, DataTypes) => {
     photo: DataTypes.STRING,
     sortDesc: DataTypes.TEXT,
     desc: DataTypes.TEXT,
-
   }, {});
-  product.associate = function(models) {
+  product.associate = function (models) {
     // associations can be defined here
     models.product.belongsTo(models.subcategories, { foreignKey: 'subCategoryId' });
     models.product.hasMany(models.productphoto, { foreignKey: 'productId' });
     models.product.belongsTo(models.subchildcategories, { foreignKey: 'childCategoryId' });
-    models.product.hasMany(models.vendor_product, { foreignKey: 'productId' });  
+    models.product.hasMany(models.vendor_product, { foreignKey: 'productId' });
+    models.product.hasMany(models.store_product, { foreignKey: 'productId' });
   };
   return product;
 };
