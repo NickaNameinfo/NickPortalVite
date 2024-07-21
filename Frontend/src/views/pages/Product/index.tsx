@@ -4,7 +4,7 @@ import { useGetProductsQuery } from "./Service.mjs";
 
 const Product = () => {
   const { data, error, refetch } = useGetProductsQuery();
-  console.log(data?.data, "asdhfasodufh23");
+  console.log(data?.data, "useGetProductsQuery");
 
   return (
     <div>
