@@ -114,7 +114,8 @@ aside {
 }
 
 .bgnone {
-  background-color: rgba(255, 0, 0, 0);
+  // background-color: rgba(255, 0, 0, 0);
+  background-color: white !important;
 }
 .maincolor {
   color: var(--textColor-main);

@@ -75,20 +75,20 @@ export const ProductDetail = (props: ProductDetailProps) => {
                       </div>
                       <div className="flex items-center justify-between mt-2">
                         <div className="">
-                          <div className="flex justify-between items-center rounded-xl bg-gray-200 lg:h-unit-xl">
+                          <div className="flex justify-between items-center rounded-xl bg-gray-100 lg:h-unit-xl">
                             <Button
-                              className="bgnone p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
+                              className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
                               radius="full"
                               isIconOnly
                               size="md"
                             >
                               -
                             </Button>
-                            <p className="bgnone text-sm font-semibold p-0 m-0">
+                            <p className="bg-gray-100 text-sm font-semibold p-0 m-0">
                               133
                             </p>
                             <Button
-                              className="bgnone p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
+                              className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
                               radius="full"
                               isIconOnly
                               size={"md"}
