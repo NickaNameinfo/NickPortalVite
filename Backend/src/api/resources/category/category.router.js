@@ -8,7 +8,7 @@ const categoryRouter = express.Router();
 
 categoryRouter
   .route("/getAllCategory")
-  .get(sanitize(), jwtStrategy, categoryController.getCategoryList);
+  .get(sanitize(), categoryController.getCategoryList);
 categoryRouter
   .route("/getAllSubCategory")
   .get(sanitize(), jwtStrategy, categoryController.getSubCategoryList);
@@ -23,9 +23,7 @@ categoryRouter
     jwtStrategy,
     categoryController.addCategory
   );
-categoryRouter
-  .route("/list")
-  .get(sanitize(), jwtStrategy, categoryController.getList);
+categoryRouter.route("/list").get(sanitize(), categoryController.getList);
 categoryRouter
   .route("/getCategoryById")
   .get(sanitize(), jwtStrategy, categoryController.getCategoryById);

@@ -3,6 +3,7 @@ import * as React from "react";
 import "../style.scss";
 import { Card, CardBody, Image, useDisclosure } from "@nextui-org/react";
 import { StoreList } from "./StoreList";
+import { useGetProductsByIdQuery } from "../../views/pages/Product/Service.mjs";
 
 interface ProductViewCardProps {
   loadData: any[];
@@ -10,8 +11,16 @@ interface ProductViewCardProps {
 
 export const ProductViewCard = (props: ProductViewCardProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  console.log(props.loadData, "loadDatapi");
+  const [selectedProductId, setSelectedProductId] = React.useState(null);
 
+  const { data, error, refetch } = useGetProductsByIdQuery(selectedProductId, {
+    skip: !selectedProductId,
+  });
+  console.log(data, "useGetProductsByIdQuery");
+
+  const handleClick = (productId) => {
+    setSelectedProductId(productId);
+  };
   return (
     <div className="grid  mm:grid-cols-2 ml:grid-cols-2 sm:grid-cols-4  md:grid-cols-4  lg:grid-cols-5  xl:grid-cols-6 2xl:grid-cols-7 3xl:grid-cols-8 gap-2 mt-1">
       {props.loadData?.length > 0 &&
@@ -20,7 +29,10 @@ export const ProductViewCard = (props: ProductViewCardProps) => {
           return (
             <Card
               key={index}
-              onPress={() => onOpen()}
+              onPress={() => {
+                onOpen();
+                handleClick(product?.id);
+              }}
               className="Storecard py-2.5 px-2.5"
               isPressable
             >
@@ -154,7 +166,13 @@ export const ProductViewCard = (props: ProductViewCardProps) => {
           />
         </CardBody>
       </Card> */}
-      <StoreList isOpen={isOpen} onClose={onClose} />
+      <StoreList
+        isOpen={isOpen}
+        onClose={() => {
+          onClose();
+          setSelectedProductId(null);
+        }}
+      />
     </div>
   );
 };

@@ -23,9 +23,14 @@ import {
 import { NavSearchIcon } from "../Icons";
 import { InfoCard } from "./Card/InfoCard";
 import Login from "../views/pages/login/Login";
+import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
 
 export const AppHeader = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const { data: category, error, refetch } = useGetCategoryQuery();
+  console.log(category?.data, "useGetCategoryQuery");
+
   return (
     <>
       <div className="flex justify-between navBarStyle gap-4 items-center p-3">
@@ -234,11 +239,16 @@ export const AppHeader = () => {
                 className="cursor-pointer ml:h-[16px] ml:w-[18px] xm:h-[12px] xm:w-[16px]"
               />
             </Button>
+            {category?.data?.map((item) => {
+              console.log(item?.name, "itemkljnsdkldfkds");
+              return (
+                <Button size="sm" className="font-medium text-sm">
+                  {item?.name}
+                </Button>
+              );
+            })}
 
-            <Button size="sm" className="font-medium text-sm">
-              Preoduct{" "}
-            </Button>
-            <Button size="sm" className="font-medium text-sm">
+            {/* <Button size="sm" className="font-medium text-sm">
               vedar
             </Button>
             <Button size="sm" className="font-medium text-sm">
@@ -252,7 +262,7 @@ export const AppHeader = () => {
             </Button>
             <Button size="sm" className="font-medium text-sm">
               Small
-            </Button>
+            </Button> */}
             <Button
               radius="sm"
               // variant="shadow"
