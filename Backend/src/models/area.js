@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     // associations can be defined here
     models.area.belongsTo(models.location, { foreignKey: 'locationId' }); 
     models.area.hasMany(models.vendor, { foreignKey: 'areaId' });
-
+    models.area.hasMany(models.store, { foreignKey: 'areaId' });
   };
   return area;
 };
