@@ -29,7 +29,7 @@ vendorRouter.route('/list').get(sanitize(), vendorController.getAllvendor);
 vendorRouter.route('/list/:id').get(sanitize(), vendorController.getVendorStockById);
 vendorRouter.route('/product-list').get(sanitize(), vendorController.getAllVendorProduct);
 vendorRouter.route('/product/getAllProductById').post(sanitize(), vendorController.getProductByVendor);
-vendorRouter.route('/update').post(sanitize(), upload.single("vendorImage"), vendorController.vendorUpdate);
+vendorRouter.route('/update').post(upload.single("vendorImage"), vendorController.vendorUpdate);
 vendorRouter.route('/delete').delete(sanitize(), vendorController.vendorDelete);
 vendorRouter.route('/product-delete').post(sanitize(), vendorController.vendorProductDelete);
 vendorRouter.route('/product-add').post(vendorController.vendorAddProduct);
