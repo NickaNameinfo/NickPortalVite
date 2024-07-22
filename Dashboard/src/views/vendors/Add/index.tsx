@@ -9,25 +9,52 @@ import {
   Textarea,
 } from "@nextui-org/react";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
-import { useAddVendorsMutation } from "../Service.mjs";
-import { useNavigate } from "react-router-dom";
+import {
+  useAddVendorsMutation,
+  useGetVendorsByIDQuery,
+  useUpdateVendorsMutation,
+} from "../Service.mjs";
+import { useNavigate, useParams } from "react-router-dom";
+import * as React from "react";
 
 const Add = () => {
-  const { handleSubmit, control, reset } = useForm();
+  const { handleSubmit, control, reset, setValue, watch } = useForm();
+  const formData = watch();
+  console.log(formData, "Form data");
+
   const navigate = useNavigate();
   const [addVendors] = useAddVendorsMutation();
+  const [updateVendors] = useUpdateVendorsMutation();
+  const { id } = useParams();
+  const { data, error, refetch } = useGetVendorsByIDQuery(id ? id : null);
+
+  React.useEffect(() => {
+    if (data?.data.length > 0) {
+      reset(data?.data?.[0]);
+      setValue("status", data?.data?.[0]?.status.toString());
+      setValue("adharCardNo", Number(data?.data?.[0]?.adharCardNo));
+    }
+  }, [data]);
 
   const onSubmit = async (data: any) => {
     let tempAPI = {
       ...data,
       areaId: 1,
+      adharCardNo: Number(data?.adharCardNo),
     };
     console.log("datafrom data form", tempAPI);
-    const result = await addVendors(tempAPI);
-    if (result?.data?.success) {
-      navigate("/Vendors/List");
+    if (id) {
+      const result = await updateVendors(tempAPI);
+      if (result?.data?.success) {
+        navigate("/Vendors/List");
+      }
+    } else {
+      const result = await addVendors(tempAPI);
+      if (result?.data?.success) {
+        navigate("/Vendors/List");
+      }
+      console.log(data, "datadatadatadatadata", result);
     }
-    console.log(data, "datadatadatadatadata", result);
   };
   const animals = [
     { key: "cat", label: "Cat" },
@@ -65,7 +92,11 @@ const Add = () => {
             name="status" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Select label="Select an Status" {...field}>
+              <Select
+                label="Select an Status"
+                {...field}
+                selectedKeys={formData?.status}
+              >
                 <SelectItem key={1}>{"Active"}</SelectItem>
                 <SelectItem key={0}>{"InActive"}</SelectItem>
               </Select>
@@ -91,7 +122,7 @@ const Add = () => {
             </Chip>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-4 mb-2">
           <Controller
             name="ownername" // Changed to reflect a text input
@@ -205,7 +236,7 @@ const Add = () => {
         </div>
         <div className="text-center">
           <Button color="primary" type="submit">
-            Submit
+            {id ? "Update" : "Create"}
           </Button>
         </div>
       </div>

@@ -25,7 +25,7 @@ module.exports = {
         GSTNo,
         website,
         openTime,
-        closeTime
+        closeTime,
       } = req.body;
       console.log(id, "id452342");
       console.log(areaId, "areaId3452345");
@@ -60,8 +60,10 @@ module.exports = {
                 GSTNo: GSTNo ? GSTNo : supplier.GSTNo,
                 website: website ? website : supplier.website,
                 openTime: openTime ? openTime : supplier.openTime,
-                closeTime: closeTime ? closeTime: supplier.closeTime,
-                vendorImage :  req.file ? req.file.location : supplier.vendorImage,
+                closeTime: closeTime ? closeTime : supplier.closeTime,
+                vendorImage: req.file
+                  ? req.file.location
+                  : supplier.vendorImage,
               },
               { where: { id: id } }
             );
@@ -88,7 +90,7 @@ module.exports = {
             website: website,
             openTime: openTime,
             closeTime: closeTime,
-            vendorImage : req?.file ? req?.file?.path : "",
+            vendorImage: req?.file ? req?.file?.path : "",
           });
         })
         .then((vendor) => {
@@ -320,7 +322,7 @@ module.exports = {
   async vendorDelete(req, res, next) {
     try {
       db.vendor
-        .findOne({ where: { id: parseInt(req.query.id) } })
+        .findOne({ where: { id: req.params.id } })
         .then((data) => {
           if (data) {
             return db.vendor.destroy({ where: { id: data.id } });
