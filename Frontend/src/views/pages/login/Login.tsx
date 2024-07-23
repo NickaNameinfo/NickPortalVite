@@ -126,27 +126,27 @@ const Login = () => {
                     <Input
                       classNames={{
                         input: [
-                          "placeholder:text-default-700/50 dark:placeholder:text-white/60",
+                          "placeholder:text-white/20 dark:placeholder:text-white/20",
                         ],
                       }}
                       isRequired
                       autoFocus
                       label="Email Address"
                       labelPlacement="inside"
-                      color="primary"
-                      variant="bordered"
+                      color="default"
+                      variant="faded"
                     />
                     <Input
                       classNames={{
                         input: [
-                          "placeholder:text-default-700/50 dark:placeholder:text-white/60",
+                          "placeholder:text-white/20 dark:placeholder:text-white/20",
                         ],
                       }}
                       isRequired
                       label="Password"
                       labelPlacement="inside"
-                      color="primary"
-                      variant="bordered"
+                      color="default"
+                      variant="faded"
                       endContent={
                         <button
                           className="focus:outline-none"
@@ -156,12 +156,12 @@ const Login = () => {
                           {isVisible ? (
                             <EyeSlashFilledIcon
                               className="text-2xl text-default-400 pointer-events-none"
-                              fill="#4c86f9"
+                              fill="#8E99A4"
                             />
                           ) : (
                             <EyeFilledIcon
                               className="text-2xl text-default-400 pointer-events-none"
-                              fill="#4c86f9"
+                              fill="#8E99A4"
                             />
                           )}
                         </button>
@@ -172,6 +172,7 @@ const Login = () => {
 
                     <div className="flex justify-between">
                       <Checkbox
+                        color="default"
                         classNames={{
                           label: "text-small",
                         }}
@@ -179,8 +180,11 @@ const Login = () => {
                         Remember me
                       </Checkbox>
                       <Link
-                        className="cursor-pointer p-0 m-0"
-                        color="primary"
+                        className="cursor-pointer p-0 m-0 #7358D7"
+                        style={{
+                          color: "#7358D7",
+                        }}
+                        // color="foreground"
                         onPress={() => setIsForgetPassword(true)}
                         size="sm"
                       >
@@ -191,10 +195,16 @@ const Login = () => {
                 )}
 
                 <Button
-                  color="primary"
+                  // color=""
                   onPress={() => onClickLogin()}
                   size="sm"
                   className="p-0 m-0"
+                  style={{
+                    padding: 0,
+                    margin: 0,
+                    background:
+                      "linear-gradient(90deg, #c1b0fd 0%, #7358d7 101.38%)",
+                  }}
                 >
                   {isRegister
                     ? "Register"
@@ -211,7 +221,9 @@ const Login = () => {
                   </p>
                   <Link
                     className="cursor-pointer  p-0 m-0"
-                    color="primary"
+                    style={{
+                      color: "#7358D7",
+                    }}
                     onPress={() => onClickRegister()}
                     size="sm"
                   >

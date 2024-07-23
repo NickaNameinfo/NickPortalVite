@@ -6,17 +6,14 @@ export const ForgotPassword = () => {
     <>
       <Input
         classNames={{
-          input: [
-            "placeholder:text-default-700/50 dark:placeholder:text-white/60",
-          ],
+          input: ["placeholder:text-white/20 dark:placeholder:text-white/20"],
         }}
         isRequired
-        // isClearable
         autoFocus
         label="Email Address Or Mobile Number"
         labelPlacement="inside"
-        color="primary"
-        variant="bordered"
+        color="default"
+        variant="faded"
       />
     </>
   );

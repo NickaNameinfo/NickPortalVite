@@ -18,51 +18,68 @@ export const Register = () => {
           value={selected}
           onValueChange={setSelected}
         >
-          <Radio value="Customer">Customer</Radio>
-          <Radio value="Store">Store</Radio>
-          <Radio value="Vendor">Vendor</Radio>
+          <Radio value="Customer" color="default">
+            Customer
+          </Radio>
+          <Radio value="Store" color="default">
+            Store
+          </Radio>
+          <Radio value="Vendor" color="default">
+            Vendor
+          </Radio>
         </RadioGroup>
         <div className="grid grid-cols-2 gap-4 mb-2">
           <Input
+            classNames={{
+              input: [
+                "placeholder:text-white/20 dark:placeholder:text-white/20",
+              ],
+            }}
             isRequired
-            // isClearable
             autoFocus
             label="Enter Your Name"
             labelPlacement="inside"
-            color="primary"
-            variant="bordered"
+            color="default"
+            variant="faded"
           />
           <Input
+            classNames={{
+              input: [
+                "placeholder:text-white/20 dark:placeholder:text-white/20",
+              ],
+            }}
             isRequired
-            // isClearable
+            autoFocus
             label="Email Address"
             labelPlacement="inside"
-            color="primary"
-            variant="bordered"
+            color="default"
+            variant="faded"
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Input
             classNames={{
               input: [
-                "placeholder:text-default-700/50 dark:placeholder:text-white/60",
+                "placeholder:text-white/20 dark:placeholder:text-white/20",
               ],
             }}
+            isRequired
+            autoFocus
             label="Mobile Number"
-            variant="bordered"
-            color="primary"
-            type="number"
+            labelPlacement="inside"
+            color="default"
+            variant="faded"
           />
 
           <Input
             classNames={{
               input: [
-                "placeholder:text-default-700/50 dark:placeholder:text-white/60",
+                "placeholder:text-white/20 dark:placeholder:text-white/20",
               ],
             }}
             label="Password"
-            variant="bordered"
-            color="primary"
+            color="default"
+            variant="faded"
             endContent={
               <button
                 className="focus:outline-none"
@@ -72,12 +89,12 @@ export const Register = () => {
                 {isVisible ? (
                   <EyeSlashFilledIcon
                     className="text-2xl text-default-400 pointer-events-none"
-                    fill="#4c86f9"
+                    fill="#8E99A4"
                   />
                 ) : (
                   <EyeFilledIcon
                     className="text-2xl text-default-400 pointer-events-none"
-                    fill="#4c86f9"
+                    fill="#8E99A4"
                   />
                 )}
               </button>
@@ -94,7 +111,13 @@ export const Register = () => {
         >
           Accept the all{" "}
           <span>
-            <Link className="cursor-pointer" color="primary" size="sm">
+            <Link
+              className="cursor-pointer"
+              size="sm"
+              style={{
+                color: "#7358D7",
+              }}
+            >
               Terms & Conditions
             </Link>
           </span>
