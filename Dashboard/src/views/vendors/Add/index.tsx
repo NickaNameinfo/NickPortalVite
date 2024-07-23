@@ -18,14 +18,21 @@ import { useNavigate, useParams } from "react-router-dom";
 import * as React from "react";
 
 const Add = () => {
-  const { handleSubmit, control, reset, setValue, watch } = useForm();
+  const {
+    handleSubmit,
+    control,
+    reset,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm();
   const formData = watch();
   console.log(formData, "Form data");
 
   const navigate = useNavigate();
   const [addVendors] = useAddVendorsMutation();
   const [updateVendors] = useUpdateVendorsMutation();
-  const { id } = useParams();
+  const { id, type } = useParams();
   const { data, error, refetch } = useGetVendorsByIDQuery(id ? id : null);
 
   React.useEffect(() => {
@@ -33,8 +40,15 @@ const Add = () => {
       reset(data?.data?.[0]);
       setValue("status", data?.data?.[0]?.status.toString());
       setValue("adharCardNo", Number(data?.data?.[0]?.adharCardNo));
+    } else {
     }
   }, [data]);
+
+  React.useEffect(() => {
+    if (type === "Add") {
+      reset();
+    }
+  }, [type]);
 
   const onSubmit = async (data: any) => {
     let tempAPI = {
