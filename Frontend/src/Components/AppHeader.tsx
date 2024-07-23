@@ -129,7 +129,7 @@ export const AppHeader = () => {
                   isIconOnly
                   aria-label="Like"
                   className=" Iconwhatsup ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6"
-                  size="lg"
+                  size="md"
                 >
                   <Iconwhatsup
                     fill="#FFFFFF"
@@ -155,7 +155,7 @@ export const AppHeader = () => {
                   isIconOnly
                   aria-label="Like"
                   className="IconCall ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6"
-                  size="lg"
+                  size="md"
                 >
                   <IconCall
                     fill="#FFFFFF"
@@ -208,7 +208,7 @@ export const AppHeader = () => {
                   isIconOnly
                   aria-label="Like"
                   className=" ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6"
-                  size="lg"
+                  size="md"
                 >
                   <IconMap
                     fill="#FFFFFF"
