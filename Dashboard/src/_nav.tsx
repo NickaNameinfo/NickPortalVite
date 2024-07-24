@@ -71,6 +71,29 @@ export const _nav = [
     ],
   },
   {
+    menuType: "multiple",
+    name: "Stores",
+    key: "Stores",
+    link: "/",
+    icons: <IconHome />,
+    menuItems: [
+      {
+        menuType: "single",
+        name: "Add",
+        key: "Add",
+        link: "/Stores/Add",
+        icons: <IconHome />,
+      },
+      {
+        menuType: "single",
+        name: "List",
+        key: "List",
+        link: "/Stores/List",
+        icons: <IconHome />,
+      },
+    ],
+  },
+  {
     menuType: "single",
     name: "Customer",
     key: "Customer",
