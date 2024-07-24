@@ -13,17 +13,51 @@ import {
   User,
 } from "@nextui-org/react";
 import React from "react";
-import { useGetStockQuery, useAddStockMutation } from "./Service.mjs";
+import {
+  useGetStockQuery,
+  useAddStockMutation,
+  useDeleteStockMutation,
+} from "./Service.mjs";
 import { TableList } from "../../../Components/Table/TableList";
+import { useGetCategoriesQuery } from "../../Categories/Service.mjs";
 
 const AddStock = () => {
-  const { handleSubmit, control, reset } = useForm();
+  const {
+    handleSubmit,
+    control,
+    reset,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm();
+  const formData = watch();
+  console.log(formData, "formDatakmsfskdlfksfdsdf");
+  const [DeleteData] = useDeleteStockMutation();
   const navigate = useNavigate();
   const { data, error, refetch } = useGetStockQuery(3);
+  const {
+    data: categoryData,
+    error: categoryerror,
+    refetch: categoryrefetch,
+  } = useGetCategoriesQuery();
+  console.log(categoryData?.data, "categoryDatakdsflj");
+
   const [addStock] = useAddStockMutation();
   const [refresh, setRefresh] = React.useState(false);
 
   console.log(data, "data5234523452345", data?.data, refresh);
+  React.useEffect(() => {
+    if (refresh) {
+      refetch();
+      setValue("categoryId", 0);
+      setValue("stock", "");
+      setRefresh(false);
+    }
+  }, [refresh]);
+
+  React.useEffect(() => {
+    setRefresh((prev) => !prev);
+  }, [data]);
 
   const onSubmit = async (formData: any) => {
     console.log(formData, "formData3452345234");
@@ -32,19 +66,11 @@ const AddStock = () => {
       vendorId: 3,
     };
     const result = await addStock(tempApiParams);
-    console.log(result?.data, "result3452345");
-    if (result) {
+    console.log(result?.data?.success, "result3452345");
+    if (result?.data?.success) {
       setRefresh(true);
     }
   };
-
-  React.useEffect(() => {
-    refetch();
-  }, [refresh]);
-
-  React.useEffect(() => {
-    setRefresh((prev) => !prev);
-  }, [data]);
 
   const defaultCloumns = ["id", "stock", "actions", "category", "vendor"];
 
@@ -56,8 +82,19 @@ const AddStock = () => {
     { name: "Actions", id: "actions" },
   ];
 
+  const onDelete = async (deleteID) => {
+    if (deleteID) {
+      const result = await DeleteData(deleteID);
+      console.log(result, "DeleteData");
+
+      if (result?.data?.success) {
+        refetch();
+      }
+    }
+  };
+
   const renderCell = React.useCallback((items, columnKey, vendor) => {
-      const cellValue = items[columnKey];
+    const cellValue = items[columnKey];
     console.log(items, "vendor34254");
     switch (columnKey) {
       case "category":
@@ -90,9 +127,15 @@ const AddStock = () => {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem>View</DropdownItem>
+                {/* <DropdownItem>View</DropdownItem> */}
                 <DropdownItem>Edit</DropdownItem>
-                <DropdownItem>Delete</DropdownItem>
+                <DropdownItem
+                  onClick={() => {
+                    onDelete(items?.id);
+                  }}
+                >
+                  Delete
+                </DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -117,9 +160,13 @@ const AddStock = () => {
               control={control}
               rules={{ required: true }}
               render={({ field }) => (
-                <Select label="Select an Status" {...field}>
-                  <SelectItem key={1}>{"Category1"}</SelectItem>
-                  <SelectItem key={1}>{"Category2"}</SelectItem>
+                <Select label="Select Category" {...field}>
+                  <SelectItem key={0}>{"Select Category"}</SelectItem>
+                  {categoryData?.data?.map((item) => (
+                    <SelectItem key={item.id}>{item.name}</SelectItem>
+                  ))}
+                  {/* <SelectItem key={1}>{"Category1"}</SelectItem>
+                  <SelectItem key={1}>{"Category2"}</SelectItem> */}
                 </Select>
               )}
             />

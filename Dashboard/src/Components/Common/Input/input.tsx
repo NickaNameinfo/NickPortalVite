@@ -1,62 +1,55 @@
-import React from "react";
-import PropTypes from "prop-types";
 import { Input } from "@nextui-org/react";
 
-const InputNextUI = ({
-  classNames,
-  isRequired,
-  autoFocus,
-  label,
-  labelPlacement,
-  color,
-  variant,
-  ...props
-}) => {
-  // Merge custom classNames with default classNames
-  const combinedClassNames = {
-    ...classNames,
-    input: [
-      ...(classNames?.input || []),
-      "placeholder:text-white/20 dark:placeholder:text-white/20",
-    ].join(" "),
-  };
+export interface InputFieldProps {
+  label?: string;
+  onChange(e: any, value: any): void;
+  onClear(e: any, value: any): void;
+  onValueChange(e: any, value: any): void;
+  variant?: "flat" | "bordered" | "faded" | "underlined";
+  type?:
+    | "text"
+    | "search"
+    | "url"
+    | "tel"
+    | "email"
+    | "password"
+    | (string & {});
+  color?:
+    | "default"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning"
+    | "danger";
+  size?: "sm" | "md" | "lg";
+  radius?: "none" | "sm" | "md" | "lg" | "full";
+  validationBehavior?: "native" | "aria";
+  labelPlacement?: "inside" | "outside" | "outside-left";
+  isClearable: boolean;
+  isRequired: boolean;
+  isReadOnly: boolean;
+  isDisabled: boolean;
+  isInvalid: boolean;
+  disableAnimation: boolean;
+  startContent: any;
+  endContent: any;
+}
 
-  return (
-    <div className="input-container">
-      {label && labelPlacement === "inside" && (
-        <label className="input-label">{label}</label>
-      )}
+const InputNextUI = () => {
+  <>
+    <div className="w-100">
       <Input
-        className={combinedClassNames.input}
-        required={isRequired}
-        autoFocus={autoFocus}
-        aria-label={label}
-        {...props} // Pass down any other props
+        description="cbscb"
+        startContent={<p>fjvc</p>}
+        labelPlacement="inside"
+        placeholder="inpute"
+        type=""
+        onValueChange={(e) => {
+          console.log(e, "dkjbzv");
+        }}
       />
     </div>
-  );
-};
-
-InputNextUI.propTypes = {
-  classNames: PropTypes.object,
-  isRequired: PropTypes.bool,
-  autoFocus: PropTypes.bool,
-  label: PropTypes.string,
-  labelPlacement: PropTypes.string,
-  color: PropTypes.string,
-  variant: PropTypes.string,
-};
-
-InputNextUI.defaultProps = {
-  classNames: {
-    input: [],
-  },
-  isRequired: false,
-  autoFocus: false,
-  label: "Defualt Value",
-  labelPlacement: "inside",
-  color: "default",
-  variant: "faded",
+  </>;
 };
 
 export default InputNextUI;
