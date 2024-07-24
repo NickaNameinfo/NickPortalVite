@@ -16,6 +16,7 @@ import {
 } from "../Service.mjs";
 import { useNavigate, useParams } from "react-router-dom";
 import * as React from "react";
+import InputNextUI from "../../../Components/Common/Input/input";
 
 const Add = () => {
   const {
@@ -99,7 +100,20 @@ const Add = () => {
             control={control}
             rules={{ required: true }}
             render={({ field }) => (
-              <Input type="text" label="Store Name" size="lg" {...field} />
+              // <Input type="text" label="Store Name" size="lg" {...field} />
+              <InputNextUI
+                isRequired
+                labelPlacement="inside"
+                color="default"
+                variant="flat"
+                type="text"
+                label="Store Name"
+                size="md"
+                onChange={(value) => {
+                  console.log(value, "storename");
+                }}
+                {...field}
+              />
             )}
           />
           <Controller
@@ -142,28 +156,80 @@ const Add = () => {
             name="ownername" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Input type="text" label="Owner Name" size="lg" {...field} />
+              // <Input type="text" label="Owner Name" size="lg" {...field} />
+              <InputNextUI
+                isRequired
+                labelPlacement="inside"
+                color="default"
+                variant="flat"
+                type="text"
+                label="Owner Name"
+                size="md"
+                onChange={(value) => {
+                  console.log(value, "ownername");
+                }}
+                {...field}
+              />
             )}
           />
           <Controller
             name="email" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Input type="email" label="Email" size="lg" {...field} />
+              // <Input type="email" label="Email" size="lg" {...field} />
+              <InputNextUI
+                isRequired
+                labelPlacement="inside"
+                color="default"
+                variant="flat"
+                type="email"
+                label="Email"
+                size="md"
+                onChange={(value) => {
+                  console.log(value, "ownername");
+                }}
+                {...field}
+              />
             )}
           />
           <Controller
             name="password" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Input type="password" label="Password" size="lg" {...field} />
+              // <Input type="password" label="Password" size="lg" {...field} />
+              <InputNextUI
+                isRequired
+                labelPlacement="inside"
+                color="default"
+                variant="flat"
+                type="password"
+                label="Password"
+                size="md"
+                onChange={(value) => {
+                  console.log(value, "ownername");
+                }}
+                {...field}
+              />
             )}
           />
           <Controller
             name="phone" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Input type="number" label="Phone Number" size="lg" {...field} />
+              // <Input type="number" label="Phone Number" size="lg" {...field} />
+              <InputNextUI
+                isRequired
+                labelPlacement="inside"
+                color="default"
+                variant="flat"
+                type="number"
+                label="Phone Number"
+                size="md"
+                onChange={(value) => {
+                  console.log(value, "ownername");
+                }}
+                {...field}
+              />
             )}
           />
 
@@ -185,10 +251,23 @@ const Add = () => {
             name="accountNo" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Input
+              // <Input
+              //   type="number"
+              //   label="Accoutn Number"
+              //   size="lg"
+              //   {...field}
+              // />
+              <InputNextUI
+                isRequired
+                labelPlacement="inside"
+                color="default"
+                variant="flat"
                 type="number"
                 label="Accoutn Number"
-                size="lg"
+                size="md"
+                onChange={(value) => {
+                  console.log(value, "ownername");
+                }}
                 {...field}
               />
             )}
@@ -197,10 +276,23 @@ const Add = () => {
             name="accountHolderName" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Input
+              // <Input
+              //   type="text"
+              //   label="Accoutn Holder Name"
+              //   size="lg"
+              //   {...field}
+              // />
+              <InputNextUI
+                isRequired
+                labelPlacement="inside"
+                color="default"
+                variant="flat"
                 type="text"
                 label="Accoutn Holder Name"
-                size="lg"
+                size="md"
+                onChange={(value) => {
+                  console.log(value, "ownername");
+                }}
                 {...field}
               />
             )}
@@ -209,42 +301,120 @@ const Add = () => {
             name="IFSC" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Input type="text" label="IFSC" size="lg" {...field} />
+              // <Input type="text" label="IFSC" size="lg" {...field} />
+              <InputNextUI
+                isRequired
+                labelPlacement="inside"
+                color="default"
+                variant="flat"
+                type="text"
+                label="IFSC"
+                size="md"
+                onChange={(value) => {
+                  console.log(value, "ownername");
+                }}
+                {...field}
+              />
             )}
           />
           <Controller
             name="bankName" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Input type="text" label="Bank Name" size="lg" {...field} />
+              // <Input type="text" label="Bank Name" size="lg" {...field} />
+              <InputNextUI
+                isRequired
+                labelPlacement="inside"
+                color="default"
+                variant="flat"
+                type="text"
+                label="Bank Name"
+                size="md"
+                onChange={(value) => {
+                  console.log(value, "ownername");
+                }}
+                {...field}
+              />
             )}
           />
           <Controller
             name="branch" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Input type="text" label="Branch" size="lg" {...field} />
+              // <Input type="text" label="Branch" size="lg" {...field} />
+              <InputNextUI
+                isRequired
+                labelPlacement="inside"
+                color="default"
+                variant="flat"
+                type="text"
+                label="Branch"
+                size="md"
+                onChange={(value) => {
+                  console.log(value, "Branch");
+                }}
+                {...field}
+              />
             )}
           />
           <Controller
             name="adharCardNo" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Input type="text" label="Aadhar Number" size="lg" {...field} />
+              // <Input type="text" label="Aadhar Number" size="lg" {...field} />
+              <InputNextUI
+              isRequired
+              labelPlacement="inside"
+              color="default"
+              variant="flat"
+              type="text"
+              label="Aadhar Number"
+              size="md"
+              onChange={(value) => {
+                console.log(value, "Aadhar_Number");
+              }}
+              {...field}
+            />
             )}
           />
           <Controller
             name="panCardNo" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Input type="text" label="PAN Number" size="lg" {...field} />
+              // <Input type="text" label="PAN Number" size="lg" {...field} />
+              <InputNextUI
+              isRequired
+              labelPlacement="inside"
+              color="default"
+              variant="flat"
+              type="text"
+              label="PAN Number"
+              size="md"
+              onChange={(value) => {
+                console.log(value, "PAN_Number");
+              }}
+              {...field}
+            />
             )}
           />
           <Controller
             name="GSTNo" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Input type="text" label="GST No" size="lg" {...field} />
+              // <Input type="text" label="GST No" size="lg" {...field} />
+              <InputNextUI
+              isRequired
+              labelPlacement="inside"
+              color="default"
+              variant="flat"
+              type="text"
+              label="GST"
+              size="md"
+              onChange={(value) => {
+                console.log(value, "GST");
+              }}
+              {...field}
+            />
             )}
           />
         </div>
