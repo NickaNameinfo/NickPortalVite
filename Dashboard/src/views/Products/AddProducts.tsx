@@ -14,6 +14,7 @@ import {
 } from "@nextui-org/react";
 import React from "react";
 import { useAddProductMutation } from "./Service.mjs";
+import { useGetCategoriesQuery } from "../Categories/Service.mjs";
 
 const AddProducts = () => {
   const { handleSubmit, control, reset } = useForm();
@@ -21,11 +22,17 @@ const AddProducts = () => {
   const navigate = useNavigate();
   const [addProducts] = useAddProductMutation();
 
+  const {
+    data: categoryData,
+    error: categoryerror,
+    refetch: categoryrefetch,
+  } = useGetCategoriesQuery();
+
   const onSubmit = async (data: any) => {
     let tempData = {
       ...data,
-      subCategoryId: 1,
-      childCategoryId: 1,
+      subCategoryId: 3,
+      childCategoryId: 3,
       slug: 3,
     };
     console.log("datafrom data form", tempData);
@@ -35,8 +42,8 @@ const AddProducts = () => {
       console.log(formData);
     }
     const result = await addProducts(formData);
-    if(result?.success){
-      navigate("/ProductsList")
+    if (result?.success) {
+      navigate("/ProductsList");
     }
     console.log(result, "result3452345");
   };
@@ -57,8 +64,11 @@ const AddProducts = () => {
               rules={{ required: true }}
               render={({ field }) => (
                 <Select label="Select an Status" {...field}>
-                  <SelectItem key={1}>Category1</SelectItem>
-                  <SelectItem key={1}>Category2</SelectItem>
+                  {categoryData?.data?.map((item) => (
+                    <SelectItem key={item.id}>{item.name}</SelectItem>
+                  ))}
+                  {/* <SelectItem key={1}>Category1</SelectItem>
+                  <SelectItem key={1}>Category2</SelectItem> */}
                 </Select>
               )}
             />
