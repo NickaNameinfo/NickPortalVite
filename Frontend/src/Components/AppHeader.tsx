@@ -1,12 +1,4 @@
-import {
-  Button,
-  Input,
-  Pagination,
-  Select,
-  SelectItem,
-  Tooltip,
-  useDisclosure,
-} from "@nextui-org/react";
+import { Button, Input, Tooltip, useDisclosure } from "@nextui-org/react";
 import * as React from "react";
 import "./style.scss";
 import { Link } from "react-router-dom";
@@ -27,9 +19,33 @@ import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
 
 export const AppHeader = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [startIndex, setStartIndex] = React.useState(0);
+  const [sliderLabel, setSliderLabel] = React.useState([]);
+  const { data: category } = useGetCategoryQuery();
+  const itemsPerPage = 4;
+  console.log(sliderLabel, "sliderLabel");
 
-  const { data: category, error, refetch } = useGetCategoryQuery();
-  console.log(category?.data, "useGetCategoryQuery");
+  React.useEffect(() => {
+    if (category?.data) {
+      const labels = category.data.map((item) => item?.name);
+      setSliderLabel(labels);
+    } else {
+      setSliderLabel([]);
+    }
+  }, [category?.data]);
+
+  const displayedLabels =
+    sliderLabel?.slice(startIndex, startIndex + itemsPerPage) || [];
+
+  const handlePrev = () => {
+    setStartIndex(Math.max(startIndex - 1, 0));
+  };
+
+  const handleNext = () => {
+    setStartIndex((prevIndex) =>
+      Math.min(prevIndex + 1, sliderLabel?.length - itemsPerPage)
+    );
+  };
 
   return (
     <>
@@ -88,10 +104,10 @@ export const AppHeader = () => {
         <div className="flex justify-between">
           <div className="md:hidden">
             <Button
-              onPress={() => onOpen()}
+              onPress={onOpen}
               isIconOnly
               color="warning"
-              aria-label="Like"
+              aria-label="Search"
               className="bg-warning-900"
             >
               <NavSearchIcon />
@@ -228,54 +244,59 @@ export const AppHeader = () => {
               radius="sm"
               // variant="shadow"
               isIconOnly
-              aria-label="Like"
-              className=" Iconwhatsup ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6"
-              // size="lg"
+              aria-label="Previous"
+              className={`Iconwhatsup ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6 ${
+                startIndex === 0 ? "cursor-not-allowed" : "cursor-pointer"
+              }`}
+              onClick={handlePrev}
+              disabled={startIndex === 0}
             >
               <IconPrev
                 fill="#FFFFFF"
                 width="21px"
                 height="18px"
-                className="cursor-pointer ml:h-[16px] ml:w-[18px] xm:h-[12px] xm:w-[16px]"
+                className="ml:h-[16px] ml:w-[18px] xm:h-[12px] xm:w-[16px]"
               />
             </Button>
-            {category?.data?.map((item) => {
-              console.log(item?.name, "itemkljnsdkldfkds");
-              return (
-                <Button size="sm" className="font-medium text-sm">
-                  {item?.name}
-                </Button>
-              );
-            })}
-
-            {/* <Button size="sm" className="font-medium text-sm">
-              vedar
-            </Button>
-            <Button size="sm" className="font-medium text-sm">
-              call
-            </Button>
-            <Button size="sm" className="font-medium text-sm">
-              admin
-            </Button>
-            <Button size="sm" className="font-medium text-sm">
-              map
-            </Button>
-            <Button size="sm" className="font-medium text-sm">
-              Small
-            </Button> */}
+            <div className="w-[calc(100%_-_16px)] overflow-hidden">
+              <div
+                className="slider-container"
+                // style={{
+                //   transform: `translateX(-${
+                //     (startIndex * 100) / itemsPerPage
+                //   }%)`,
+                // }}
+              >
+                {displayedLabels.length > 0 &&
+                  displayedLabels.map((item, index) => (
+                    <div className="slider-item" key={index}>
+                      <Button
+                        size="sm"
+                        className="font-medium text-sm w-11/12 h-10"
+                      >
+                        {item}
+                      </Button>
+                    </div>
+                  ))}
+              </div>
+            </div>
             <Button
               radius="sm"
-              // variant="shadow"
               isIconOnly
-              aria-label="Like"
-              className=" Iconwhatsup ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6"
-              // size="lg"
+              aria-label="Next"
+              className={`Iconwhatsup ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6 ${
+                startIndex + itemsPerPage >= sliderLabel?.length
+                  ? "cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
+              onClick={handleNext}
+              disabled={startIndex + itemsPerPage >= sliderLabel?.length}
             >
               <IconNext
                 fill="#FFFFFF"
                 width="21px"
                 height="18px"
-                className="cursor-pointer ml:h-[16px] ml:w-[16px] xm:h-[12px] xm:w-[16px]"
+                className="ml:h-[16px] ml:w-[16px] xm:h-[12px] xm:w-[16px]"
               />
             </Button>
           </div>

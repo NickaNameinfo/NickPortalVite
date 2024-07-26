@@ -117,7 +117,7 @@ aside {
 }
 
 .bgnone {
-  background-color:white !important;
+  background-color: white !important;
 }
 .maincolor {
   color: var(--textColor-main);
@@ -150,4 +150,19 @@ aside {
 }
 .bg-input {
   background-color: var(--bg-input);
+}
+.appContentViewHeight {
+  height: calc(100vh - 35px);
+}
+.slider-container {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  overflow: hidden;
+  width: 100%; // Ensure the container takes full width
+}
+
+.slider-item {
+  min-width: 25%; // Adjust based on the number of items per view (25% for 4 items)
+  box-sizing: border-box;
+  padding: 0 10px; // Optional padding for spacing between items
 }
