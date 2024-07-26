@@ -63,7 +63,7 @@ module.exports = {
         },
         mytheme: {
           // custom theme
-          extend: "dark", // Extend from the dark theme
+          extend: "light", // Extend from the dark theme
           colors: {
             primary: {
               DEFAULT: "#4C86F9",

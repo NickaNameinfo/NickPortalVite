@@ -102,10 +102,9 @@ const Add = () => {
             render={({ field }) => (
               // <Input type="text" label="Store Name" size="lg" {...field} />
               <InputNextUI
-                isRequired
                 labelPlacement="inside"
                 color="default"
-                variant="flat"
+                variant="faded"
                 type="text"
                 label="Store Name"
                 size="md"
@@ -363,18 +362,18 @@ const Add = () => {
             render={({ field }) => (
               // <Input type="text" label="Aadhar Number" size="lg" {...field} />
               <InputNextUI
-              isRequired
-              labelPlacement="inside"
-              color="default"
-              variant="flat"
-              type="text"
-              label="Aadhar Number"
-              size="md"
-              onChange={(value) => {
-                console.log(value, "Aadhar_Number");
-              }}
-              {...field}
-            />
+                isRequired
+                labelPlacement="inside"
+                color="default"
+                variant="flat"
+                type="text"
+                label="Aadhar Number"
+                size="md"
+                onChange={(value) => {
+                  console.log(value, "Aadhar_Number");
+                }}
+                {...field}
+              />
             )}
           />
           <Controller
@@ -383,18 +382,18 @@ const Add = () => {
             render={({ field }) => (
               // <Input type="text" label="PAN Number" size="lg" {...field} />
               <InputNextUI
-              isRequired
-              labelPlacement="inside"
-              color="default"
-              variant="flat"
-              type="text"
-              label="PAN Number"
-              size="md"
-              onChange={(value) => {
-                console.log(value, "PAN_Number");
-              }}
-              {...field}
-            />
+                isRequired
+                labelPlacement="inside"
+                color="default"
+                variant="flat"
+                type="text"
+                label="PAN Number"
+                size="md"
+                onChange={(value) => {
+                  console.log(value, "PAN_Number");
+                }}
+                {...field}
+              />
             )}
           />
           <Controller
@@ -403,18 +402,18 @@ const Add = () => {
             render={({ field }) => (
               // <Input type="text" label="GST No" size="lg" {...field} />
               <InputNextUI
-              isRequired
-              labelPlacement="inside"
-              color="default"
-              variant="flat"
-              type="text"
-              label="GST"
-              size="md"
-              onChange={(value) => {
-                console.log(value, "GST");
-              }}
-              {...field}
-            />
+                isRequired
+                labelPlacement="inside"
+                color="default"
+                variant="flat"
+                type="text"
+                label="GST"
+                size="md"
+                onChange={(value) => {
+                  console.log(value, "GST");
+                }}
+                {...field}
+              />
             )}
           />
         </div>
