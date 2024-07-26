@@ -70,7 +70,7 @@ const Login = () => {
         isOpen={isOpen}
         onOpenChange={onCloseModal}
         placement="top-center"
-        size="lg"
+        size="sm"
         // closeButton={
         //   <>
         //     <IconCLose
@@ -131,7 +131,7 @@ const Login = () => {
                     <div className="my-2">
                       <div className="flex justify-center mb-4">
                         <Input
-                          className="max-w-md"
+                          className="max-w-xs"
                           classNames={{
                             label: "text-black/50 dark:text-white/50",
                             input: [
@@ -165,6 +165,7 @@ const Login = () => {
                       </div>
                       <div className="flex justify-center mt-3">
                         <Input
+                          className="max-w-xs"
                           classNames={{
                             label: "text-black/50 dark:text-white/50",
                             input: [
@@ -187,7 +188,7 @@ const Login = () => {
                             ],
                           }}
                           // isRequired
-                          className="max-w-md"
+
                           autoFocus
                           label="Enter Your Password"
                           labelPlacement="inside"
@@ -220,7 +221,7 @@ const Login = () => {
                     </div>
 
                     <div className="w-full flex">
-                      <div className="flex w-1/2 ps-4">
+                      <div className="flex w-1/2 ps-5">
                         <Checkbox
                           className="justify-center flex"
                           style={{
@@ -251,7 +252,7 @@ const Login = () => {
                   </>
                 )}
 
-                <div className="w-full justify-center px-4">
+                <div className="w-full justify-center px-5">
                   <Button
                     // color=""
                     onPress={() => onClickLogin()}
