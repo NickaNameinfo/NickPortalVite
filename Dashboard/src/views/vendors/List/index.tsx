@@ -18,7 +18,6 @@ import {
 } from "@nextui-org/react";
 import { TableList } from "../../../Components/Table/TableList";
 import { useNavigate } from "react-router-dom";
-import {} from "@nextui-org/react";
 
 const List = () => {
   const { data, error, refetch } = useGetVendorsQuery();

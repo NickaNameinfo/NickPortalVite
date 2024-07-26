@@ -47,7 +47,7 @@ export const VendorApi = createApi({
     deleteVendors: builder.mutation({
       query: (id) => ({
         url: `/vendor/delete/${id}`,
-        method: "POST",
+        method: "DELETE",
       }),
     }),
   }),

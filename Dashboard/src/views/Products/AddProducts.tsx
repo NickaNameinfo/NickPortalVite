@@ -31,8 +31,8 @@ const AddProducts = () => {
   const onSubmit = async (data: any) => {
     let tempData = {
       ...data,
-      subCategoryId: 3,
-      childCategoryId: 3,
+      subCategoryId: 2,
+      childCategoryId: 2,
       slug: 3,
     };
     console.log("datafrom data form", tempData);

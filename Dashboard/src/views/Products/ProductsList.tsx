@@ -65,7 +65,6 @@ const ProductsList = () => {
 
   return (
     <div>
-      <p>khgjhg</p>
       {data && (
         <TableList
           defaultCloumns={defaultCloumns}

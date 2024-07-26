@@ -332,7 +332,7 @@ module.exports = {
         .then((re) => {
           return res
             .status(200)
-            .json({ success: true, status: "deleted Product Successfully" });
+            .json({ success: true, status: "Deleted vendor successfully" });
         })
         .catch((err) => {
           next(err);

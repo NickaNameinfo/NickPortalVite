@@ -20,14 +20,14 @@ export const VendorStockApi = createApi({
   endpoints: (builder) => ({
     addStock: builder.mutation({
       query: (body) => ({
-        url: `/vendorStock/`,
+        url: `/vendorStock`,
         method: "POST",
         body,
       }),
     }),
     getStock: builder.query({
       query: (id) => ({
-        url: `/vendorStock/`,
+        url: `/vendorStock`,
         method: "GET",
       }),
     }),

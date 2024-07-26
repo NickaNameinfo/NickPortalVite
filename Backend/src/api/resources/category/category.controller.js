@@ -1,32 +1,50 @@
 const { Op } = require("sequelize");
 const db = require("../../../models");
- 
+
 module.exports = {
   /* Add user api start here................................*/
 
   async addCategory(req, res, next) {
     try {
-      const { name, slug } = req.body;
-      db.category
-        .findOne({ where: { name: name } })
+      const { name, slug, id } = req.body;
+      return db.category.create({ name: name, slug: slug }).then((category) => {
+        res
+          .status(200)
+          .json({ success: true, msg: "Successfully inserted category" });
+      })
+        .catch(function (err) {
+          console.log(err, "errrrrrrrrrrrrrrrrrrr")
+          next(err);
+        });
+    } catch (err) {
+      console.log(err, "erreo2034028")
+      throw new RequestError("Error");
+    }
+  },
+  async updateCategory(req, res, next) {
+    try {
+      const { name, slug, id } = req.body;
+      db.category.findOne({ where: { id: id } })
         .then((data) => {
           if (data) {
             return db.category.update(
               { slug: slug },
+              { name: name },
               { where: { id: data.id } }
             );
           }
-          return db.category.create({ name: name, slug: slug });
         })
         .then((category) => {
           res
             .status(200)
-            .json({ success: true, msg: "Successfully inserted category" });
+            .json({ success: true, msg: "Successfully updated category" });
         })
         .catch(function (err) {
+          console.log(err, "errrrrrrrrrrrrrrrrrrr")
           next(err);
         });
     } catch (err) {
+      console.log(err, "erreo2034028")
       throw new RequestError("Error");
     }
   },

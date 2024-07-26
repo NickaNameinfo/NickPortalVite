@@ -64,36 +64,27 @@ module.exports = {
         netPrice,
         paymentMode
       } = req.body;
-      db.product
-        .findOne({
-          where: { name: slug ? slug : null },
-        })
-        .then((product) => {
-          if (!product) {
-            return db.product.create({
-              categoryId: Number(categoryId),
-              subCategoryId: Number(subCategoryId),
-              childCategoryId: Number(childCategoryId),
-              name: name,
-              slug: slug,
-              status: parseInt(status) ? "active" : "inactive",
-              brand: brand,
-              unitSize: unitSize,
-              sortDesc: sortDesc,
-              desc: desc,
-              buyerPrice: buyerPrice,
-              price: price,
-              qty: qty,
-              discount: discount,
-              discountPer: discountPer,
-              total: total,
-              netPrice: netPrice,
-              paymentMode: paymentMode,
-              photo: req?.file ? req?.file?.path : "",
-            });
-          }
-          throw new RequestError("Already exist product", 409);
-        })
+      return db.product.create({
+        categoryId: Number(categoryId),
+        subCategoryId: Number(subCategoryId),
+        childCategoryId: Number(childCategoryId),
+        name: name,
+        slug: slug,
+        status: parseInt(status) ? "active" : "inactive",
+        brand: brand,
+        unitSize: unitSize,
+        sortDesc: sortDesc,
+        desc: desc,
+        buyerPrice: buyerPrice,
+        price: price,
+        qty: qty,
+        discount: discount,
+        discountPer: discountPer,
+        total: total,
+        netPrice: netPrice,
+        paymentMode: paymentMode,
+        photo: req?.file ? req?.file?.path : "",
+      })
         .then((product) => {
           res
             .status(200)
@@ -135,16 +126,22 @@ module.exports = {
       db.product
         .findAll({
           order: [["createdAt", "DESC"]],
+          attributes: ["id", "name", "price","createdAt"], // Add the correct product attributes here
           include: [
             {
               model: db.subcategories,
               attributes: ["id", "sub_name"],
-              include: [{ model: db.category, attributes: ["id", "name"] }],
-            },
-          ],
+              include: [
+                {
+                  model: db.category,
+                  attributes: ["id", "name"]
+                }
+              ]
+            }
+          ]
         })
-        .then((product) => {
-          res.status(200).json({ success: true, data: product });
+        .then((products) => {
+          res.status(200).json({ success: true, data: products });
         })
         .catch(function (err) {
           next(err);
@@ -152,7 +149,7 @@ module.exports = {
     } catch (err) {
       throw new RequestError("Error");
     }
-  },
+  }, 
 
   async update(req, res, next) {
     try {
