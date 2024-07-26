@@ -10,6 +10,8 @@ const orderRouter = require("./resources/order").orderRouter;
 const paymentRouter = require("./resources/payment").paymentRouter;
 const vendorStockRouter = require("./resources/vendorStock").vendorStockRouter;
 const cartRouter = require("./resources/cart").cartRouter;
+const requestStoreRouter =
+  require("./resources/requestStores/index").requestStoreRouter;
 
 const restRouter = express.Router();
 restRouter.use("/auth", authRouter);
@@ -23,5 +25,6 @@ restRouter.use("/order", orderRouter);
 restRouter.use("/payment", paymentRouter);
 restRouter.use("/vendorStock", vendorStockRouter);
 restRouter.use("/cart", cartRouter);
+restRouter.use("/requestStore", requestStoreRouter);
 
 module.exports = { restRouter };
