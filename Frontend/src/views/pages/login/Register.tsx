@@ -9,77 +9,169 @@ export const Register = () => {
   return (
     <>
       <div>
-        <p className="font-normal text-md text-slate-600">Register As</p>
+        <p
+          className="font-normal text-sm"
+          style={{
+            color: "#555555",
+          }}
+        >
+          Register As
+        </p>
         <RadioGroup
-          classNames={{ wrapper: ["justify-between"] }}
-          className="py-2"
+          size="sm"
+          classNames={{ wrapper: ["justify-evenly"] }}
+          className="py-3"
           orientation="horizontal"
           color="primary"
           value={selected}
           onValueChange={setSelected}
         >
-          <Radio value="Customer" color="default">
+          <Radio
+            value="Customer"
+            color="success"
+            className="font-medium text-xs"
+          >
             Customer
           </Radio>
-          <Radio value="Store" color="default">
+          <Radio value="Store" color="success" className="font-medium text-xs">
             Store
           </Radio>
-          <Radio value="Vendor" color="default">
+          <Radio value="Vendor" color="success" className="font-medium text-xs">
             Vendor
           </Radio>
         </RadioGroup>
-        <div className="grid grid-cols-2 gap-4 mb-2">
+        <div className="grid grid-cols-2 gap-4 pt-2 pb-2">
           <Input
+            className="max-w-xs"
             classNames={{
+              label: "text-black/50 dark:text-white/50",
               input: [
-                "placeholder:text-white/20 dark:placeholder:text-white/20",
+                "bg-transparent",
+                "text-black/90 dark:text-white/100",
+                "placeholder:text-default-100/50 dark:placeholder:text-white/10",
+              ],
+              innerWrapper: "bg-transparent",
+              inputWrapper: [
+                // "shadow-xl",
+                "bg-default-100/50",
+                "dark:bg-default/60",
+                "backdrop-blur-xl",
+                "backdrop-saturate-50",
+                "hover:bg-default-100/40",
+                "focus-within:!bg-default-50/10",
+                "dark:hover:bg-default/10",
+                "dark:focus-within:!bg-default/90",
+                "!cursor-text",
               ],
             }}
-            isRequired
+            // isRequired
+
             autoFocus
             label="Enter Your Name"
             labelPlacement="inside"
             color="default"
             variant="faded"
+            size="sm"
           />
+
           <Input
+            className="max-w-xs"
             classNames={{
+              label: "text-black/50 dark:text-white/50",
               input: [
-                "placeholder:text-white/20 dark:placeholder:text-white/20",
+                "bg-transparent",
+                "text-black/90 dark:text-white/100",
+                "placeholder:text-default-100/50 dark:placeholder:text-white/10",
+              ],
+              innerWrapper: "bg-transparent",
+              inputWrapper: [
+                // "shadow-xl",
+                "bg-default-100/50",
+                "dark:bg-default/60",
+                "backdrop-blur-xl",
+                "backdrop-saturate-50",
+                "hover:bg-default-100/40",
+                "focus-within:!bg-default-50/10",
+                "dark:hover:bg-default/10",
+                "dark:focus-within:!bg-default/90",
+                "!cursor-text",
               ],
             }}
-            isRequired
+            // isRequired
+
             autoFocus
             label="Email Address"
             labelPlacement="inside"
             color="default"
             variant="faded"
+            size="sm"
           />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
+        </div> 
+        <div className="grid grid-cols-2 gap-4 mt-2">
           <Input
+            className="max-w-xs"
             classNames={{
+              label: "text-black/50 dark:text-white/50",
               input: [
-                "placeholder:text-white/20 dark:placeholder:text-white/20",
+                "bg-transparent",
+                "text-black/90 dark:text-white/100",
+                "placeholder:text-default-100/50 dark:placeholder:text-white/10",
+              ],
+              innerWrapper: "bg-transparent",
+              inputWrapper: [
+                // "shadow-xl",
+                "bg-default-100/50",
+                "dark:bg-default/60",
+                "backdrop-blur-xl",
+                "backdrop-saturate-50",
+                "hover:bg-default-100/40",
+                "focus-within:!bg-default-50/10",
+                "dark:hover:bg-default/10",
+                "dark:focus-within:!bg-default/90",
+                "!cursor-text",
               ],
             }}
-            isRequired
+            // isRequired
+
             autoFocus
             label="Mobile Number"
             labelPlacement="inside"
             color="default"
             variant="faded"
+            size="sm"
           />
 
           <Input
+            className="max-w-xs"
             classNames={{
+              label: "text-black/50 dark:text-white/50",
               input: [
-                "placeholder:text-white/20 dark:placeholder:text-white/20",
+                "bg-transparent",
+                "text-black/90 dark:text-white/100",
+                "placeholder:text-default-100/50 dark:placeholder:text-white/10",
+              ],
+              innerWrapper: "bg-transparent",
+              inputWrapper: [
+                // "shadow-xl",
+                "bg-default-100/50",
+                "dark:bg-default/60",
+                "backdrop-blur-xl",
+                "backdrop-saturate-50",
+                "hover:bg-default-100/40",
+                "focus-within:!bg-default-50/10",
+                "dark:hover:bg-default/10",
+                "dark:focus-within:!bg-default/90",
+                "!cursor-text",
               ],
             }}
+            // isRequired
+
+            autoFocus
             label="Password"
+            labelPlacement="inside"
             color="default"
             variant="faded"
+            size="sm"
             endContent={
               <button
                 className="focus:outline-none"
@@ -100,7 +192,6 @@ export const Register = () => {
               </button>
             }
             type={isVisible ? "text" : "password"}
-            className="max-w-xs"
           />
         </div>
         <Checkbox
@@ -115,7 +206,7 @@ export const Register = () => {
               className="cursor-pointer"
               size="sm"
               style={{
-                color: "#7358D7",
+                color: "#4C86F9",
               }}
             >
               Terms & Conditions

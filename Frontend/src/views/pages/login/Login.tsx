@@ -89,15 +89,15 @@ const Login = () => {
               <ModalHeader className="flex self-center flex-col gap-1 p-0 m-0">
                 <div className="flex justify-center">
                   {isRegister ? (
-                    <IconRegisterSVG width="150px" height="150px" />
+                    <IconRegisterSVG width="140px" height="130px" />
                   ) : isNewPassword ? (
                     <IconNewPasswordSVG width="150px" height="150px" />
                   ) : isOTP ? (
                     <IconOTPSVG width="150px" height="150px" />
                   ) : isForgetPassword ? (
-                    <IconForgotSVG width="150px" height="150px" />
+                    <IconForgotSVG width="150px" height="235px" />
                   ) : (
-                    <IconLoginSVG width="150px" height="150px" />
+                    <IconLoginSVG width="150px" height="155px" />
                   )}
                 </div>
                 <div
@@ -163,7 +163,7 @@ const Login = () => {
                           size="sm"
                         />
                       </div>
-                      <div className="flex justify-center mt-3">
+                      <div className="flex justify-center  mt-3">
                         <Input
                           className="max-w-xs"
                           classNames={{
@@ -256,7 +256,7 @@ const Login = () => {
                   <Button
                     // color=""
                     onPress={() => onClickLogin()}
-                    size="md"
+                    size="sm"
                     className="w-full  font-normal "
                     style={{
                       padding: 0,
