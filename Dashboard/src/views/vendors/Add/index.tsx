@@ -17,6 +17,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import * as React from "react";
 import InputNextUI from "../../../Components/Common/Input/input";
+import TeaxtareaNextUI from "../../../Components/Common/Ddropdown/Textarea";
 
 const Add = () => {
   const {
@@ -87,13 +88,33 @@ const Add = () => {
     { key: "crocodile", label: "Crocodile" },
   ];
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex flex-col flex-wrap gap-4 border-b pb-2 mb-3">
-        <Chip color="secondary" variant="dot" className="bg-warning-50">
-          Vendor Register
-        </Chip>
-      </div>
-      <div>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-full flex justify-center"
+    >
+      <div className="w-5/6">
+        <div className="flex flex-col flex-wrap gap-4 border-b pb-3 mt-4  mb-4">
+          <Chip
+            startContent={
+              <svg
+                width={18}
+                height={18}
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 2C6.49 2 2 6.49 2 12C2 17.51 6.49 22 12 22C17.51 22 22 17.51 22 12C22 6.49 17.51 2 12 2ZM16.78 9.7L11.11 15.37C10.97 15.51 10.78 15.59 10.58 15.59C10.38 15.59 10.19 15.51 10.05 15.37L7.22 12.54C6.93 12.25 6.93 11.77 7.22 11.48C7.51 11.19 7.99 11.19 8.28 11.48L10.58 13.78L15.72 8.64C16.01 8.35 16.49 8.35 16.78 8.64C17.07 8.93 17.07 9.4 16.78 9.7Z"
+                  fill="green"
+                />
+              </svg>
+            }
+            variant="faded"
+            color="default"
+          >
+            <p className="font-medium  text-black/70"> Vendor Register</p>
+          </Chip>
+        </div>
         <div className="grid grid-cols-2 gap-4 mb-2">
           <Controller
             name="storename" // Changed to reflect a text input
@@ -102,12 +123,8 @@ const Add = () => {
             render={({ field }) => (
               // <Input type="text" label="Store Name" size="lg" {...field} />
               <InputNextUI
-                labelPlacement="inside"
-                color="default"
-                variant="faded"
                 type="text"
                 label="Store Name"
-                size="md"
                 onChange={(value) => {
                   console.log(value, "storename");
                 }}
@@ -120,6 +137,60 @@ const Add = () => {
             control={control}
             render={({ field }) => (
               <Select
+                variant="faded"
+                classNames={{
+                  label: "text-black/60 dark:text-white/60",
+                  innerWrapper: "bg-transparent",
+                  mainWrapper: [
+                    //   // "shadow-xl",
+                    "bg-default-100/50",
+                    "dark:bg-default/60",
+                    "backdrop-blur-xl",
+                    "backdrop-saturate-50",
+                    "hover:bg-default-100/40",
+                    "focus-within:!bg-default-50/10",
+                    "dark:hover:bg-default/10",
+                    "dark:focus-within:!bg-default/90",
+                    "!cursor-text",
+                  ],
+                  listboxWrapper: [
+                    //   // "shadow-xl",
+                    "bg-default-100/50",
+                    "dark:bg-default/60",
+                    "backdrop-blur-xl",
+                    "backdrop-saturate-50",
+                    "hover:bg-default-100/40",
+                    "focus-within:!bg-default-50/10",
+                    "dark:hover:bg-default/10",
+                    "dark:focus-within:!bg-default/90",
+                    "!cursor-text",
+                  ],
+                  helperWrapper: [
+                    //   // "shadow-xl",
+                    "bg-default-100/50",
+                    "dark:bg-default/60",
+                    "backdrop-blur-xl",
+                    "backdrop-saturate-50",
+                    "hover:bg-default-100/40",
+                    "focus-within:!bg-default-50/10",
+                    "dark:hover:bg-default/10",
+                    "dark:focus-within:!bg-default/90",
+                    "!cursor-text",
+                  ],
+                  // inputWrapper: [
+                  //   // "shadow-xl",
+                  //   "bg-default-100/50",
+                  //   "dark:bg-default/70",
+                  //   "backdrop-blur-xl",
+                  //   "backdrop-saturate-70",
+                  //   "hover:bg-default-100/60",
+                  //   "focus-within:!bg-default-70/10",
+                  //   "dark:hover:bg-default/0",
+                  //   "dark:focus-within:!bg-default/90",
+                  //   "!cursor-text",
+                  // ],
+                }}
+                size="sm"
                 label="Select an Status"
                 {...field}
                 selectedKeys={formData?.status}
@@ -133,19 +204,36 @@ const Add = () => {
             name="shopaddress" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Textarea label="Shop Address" size="lg" {...field} />
+              <TeaxtareaNextUI label="Shop Address" {...field} />
             )}
           />
           <Controller
             name="shopdesc" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Textarea label="Discription" size="lg" {...field} />
+              <TeaxtareaNextUI label="Discription" {...field} />
             )}
           />
-          <div className="flex flex-col flex-wrap gap-4 border-b pb-2 mb-3">
-            <Chip color="secondary" variant="dot" className="bg-warning-50">
-              Owner Details
+          <div className="flex flex-col flex-wrap gap-4 border-b pb-3 mb-4">
+            <Chip
+              startContent={
+                <svg
+                  width={18}
+                  height={18}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 2C6.49 2 2 6.49 2 12C2 17.51 6.49 22 12 22C17.51 22 22 17.51 22 12C22 6.49 17.51 2 12 2ZM16.78 9.7L11.11 15.37C10.97 15.51 10.78 15.59 10.58 15.59C10.38 15.59 10.19 15.51 10.05 15.37L7.22 12.54C6.93 12.25 6.93 11.77 7.22 11.48C7.51 11.19 7.99 11.19 8.28 11.48L10.58 13.78L15.72 8.64C16.01 8.35 16.49 8.35 16.78 8.64C17.07 8.93 17.07 9.4 16.78 9.7Z"
+                    fill="green"
+                  />
+                </svg>
+              }
+              variant="faded"
+              color="default"
+            >
+              <p className="font-medium text-black/70"> Owner Details</p>
             </Chip>
           </div>
         </div>
@@ -157,13 +245,8 @@ const Add = () => {
             render={({ field }) => (
               // <Input type="text" label="Owner Name" size="lg" {...field} />
               <InputNextUI
-                isRequired
-                labelPlacement="inside"
-                color="default"
-                variant="flat"
                 type="text"
                 label="Owner Name"
-                size="md"
                 onChange={(value) => {
                   console.log(value, "ownername");
                 }}
@@ -177,13 +260,8 @@ const Add = () => {
             render={({ field }) => (
               // <Input type="email" label="Email" size="lg" {...field} />
               <InputNextUI
-                isRequired
-                labelPlacement="inside"
-                color="default"
-                variant="flat"
                 type="email"
                 label="Email"
-                size="md"
                 onChange={(value) => {
                   console.log(value, "ownername");
                 }}
@@ -197,13 +275,8 @@ const Add = () => {
             render={({ field }) => (
               // <Input type="password" label="Password" size="lg" {...field} />
               <InputNextUI
-                isRequired
-                labelPlacement="inside"
-                color="default"
-                variant="flat"
                 type="password"
                 label="Password"
-                size="md"
                 onChange={(value) => {
                   console.log(value, "ownername");
                 }}
@@ -217,13 +290,8 @@ const Add = () => {
             render={({ field }) => (
               // <Input type="number" label="Phone Number" size="lg" {...field} />
               <InputNextUI
-                isRequired
-                labelPlacement="inside"
-                color="default"
-                variant="flat"
                 type="number"
                 label="Phone Number"
-                size="md"
                 onChange={(value) => {
                   console.log(value, "ownername");
                 }}
@@ -236,13 +304,30 @@ const Add = () => {
             name="owneraddress" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              <Textarea label="Owner Address" size="lg" {...field} />
+              <TeaxtareaNextUI label="Owner Address" {...field} />
             )}
           />
         </div>
-        <div className="flex flex-col flex-wrap gap-4 border-b pb-2 mb-3">
-          <Chip color="danger" variant="dot" className="bg-warning-50">
-            Bank Details(Optional)
+        <div className="flex flex-col flex-wrap gap-4 border-b pb-3 mt-4 mb-4">
+          <Chip
+            startContent={
+              <svg
+                width={18}
+                height={18}
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 2C6.49 2 2 6.49 2 12C2 17.51 6.49 22 12 22C17.51 22 22 17.51 22 12C22 6.49 17.51 2 12 2ZM16.78 9.7L11.11 15.37C10.97 15.51 10.78 15.59 10.58 15.59C10.38 15.59 10.19 15.51 10.05 15.37L7.22 12.54C6.93 12.25 6.93 11.77 7.22 11.48C7.51 11.19 7.99 11.19 8.28 11.48L10.58 13.78L15.72 8.64C16.01 8.35 16.49 8.35 16.78 8.64C17.07 8.93 17.07 9.4 16.78 9.7Z"
+                  fill="green"
+                />
+              </svg>
+            }
+            variant="faded"
+            color="default"
+          >
+            <p className="font-medium text-black/70"> Bank Details(Optional)</p>
           </Chip>
         </div>
         <div className="grid grid-cols-2 gap-4 mb-2">
@@ -257,13 +342,8 @@ const Add = () => {
               //   {...field}
               // />
               <InputNextUI
-                isRequired
-                labelPlacement="inside"
-                color="default"
-                variant="flat"
                 type="number"
                 label="Accoutn Number"
-                size="md"
                 onChange={(value) => {
                   console.log(value, "ownername");
                 }}
@@ -282,13 +362,8 @@ const Add = () => {
               //   {...field}
               // />
               <InputNextUI
-                isRequired
-                labelPlacement="inside"
-                color="default"
-                variant="flat"
                 type="text"
                 label="Accoutn Holder Name"
-                size="md"
                 onChange={(value) => {
                   console.log(value, "ownername");
                 }}
@@ -302,13 +377,8 @@ const Add = () => {
             render={({ field }) => (
               // <Input type="text" label="IFSC" size="lg" {...field} />
               <InputNextUI
-                isRequired
-                labelPlacement="inside"
-                color="default"
-                variant="flat"
                 type="text"
                 label="IFSC"
-                size="md"
                 onChange={(value) => {
                   console.log(value, "ownername");
                 }}
@@ -322,13 +392,8 @@ const Add = () => {
             render={({ field }) => (
               // <Input type="text" label="Bank Name" size="lg" {...field} />
               <InputNextUI
-                isRequired
-                labelPlacement="inside"
-                color="default"
-                variant="flat"
                 type="text"
                 label="Bank Name"
-                size="md"
                 onChange={(value) => {
                   console.log(value, "ownername");
                 }}
@@ -342,13 +407,8 @@ const Add = () => {
             render={({ field }) => (
               // <Input type="text" label="Branch" size="lg" {...field} />
               <InputNextUI
-                isRequired
-                labelPlacement="inside"
-                color="default"
-                variant="flat"
                 type="text"
                 label="Branch"
-                size="md"
                 onChange={(value) => {
                   console.log(value, "Branch");
                 }}
@@ -362,13 +422,8 @@ const Add = () => {
             render={({ field }) => (
               // <Input type="text" label="Aadhar Number" size="lg" {...field} />
               <InputNextUI
-                isRequired
-                labelPlacement="inside"
-                color="default"
-                variant="flat"
                 type="text"
                 label="Aadhar Number"
-                size="md"
                 onChange={(value) => {
                   console.log(value, "Aadhar_Number");
                 }}
@@ -382,13 +437,8 @@ const Add = () => {
             render={({ field }) => (
               // <Input type="text" label="PAN Number" size="lg" {...field} />
               <InputNextUI
-                isRequired
-                labelPlacement="inside"
-                color="default"
-                variant="flat"
                 type="text"
                 label="PAN Number"
-                size="md"
                 onChange={(value) => {
                   console.log(value, "PAN_Number");
                 }}
@@ -402,13 +452,8 @@ const Add = () => {
             render={({ field }) => (
               // <Input type="text" label="GST No" size="lg" {...field} />
               <InputNextUI
-                isRequired
-                labelPlacement="inside"
-                color="default"
-                variant="flat"
                 type="text"
                 label="GST"
-                size="md"
                 onChange={(value) => {
                   console.log(value, "GST");
                 }}

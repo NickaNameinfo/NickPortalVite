@@ -37,6 +37,7 @@ interface InputFieldProps {
   placeholder?: string;
   endContent?: any;
   description?: any;
+  // className?: any;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
@@ -46,31 +47,46 @@ const InputNextUI = (props: InputFieldProps) => {
       <div className="w-100">
         <Input
           classNames={{
+            label: "text-black/60 dark:text-white/60",
             input: [
               "bg-transparent",
-              "text-black/90 dark:text-white/90",
-              "placeholder:text-default-700/50 dark:placeholder:text-white/60",
+              "text-black/90 dark:text-white/100",
+              "placeholder:text-default-100/50 dark:placeholder:text-white/10",
+            ],
+            innerWrapper: "bg-transparent",
+            inputWrapper: [
+              // "shadow-xl",
+              "bg-default-100/50",
+              "dark:bg-default/60",
+              "backdrop-blur-xl",
+              "backdrop-saturate-50",
+              "hover:bg-default-100/40",
+              "focus-within:!bg-default-50/10",
+              "dark:hover:bg-default/10",
+              "dark:focus-within:!bg-default/90",
+              "!cursor-text",
             ],
           }}
-          variant={props.variant}
-          color={props.color}
+          // className={props.className ?? "max-w-sm"}
+          variant={props?.variant ?? "faded"}
+          color={props?.color ?? "default"}
           validationBehavior={props.validationBehavior}
-          size={props.size}
-          radius={props.radius}
-          label={props.label}
-          description={props.description}
-          startContent={props.startContent}
-          endContent={props.endContent}
-          isInvalid={props.isInvalid}
-          isClearable={props.isClearable ?? false}
-          isDisabled={props.isDisabled}
-          isReadOnly={props.isReadOnly}
-          isRequired={props.isRequired}
-          labelPlacement={props.labelPlacement}
-          placeholder={props.placeholder}
-          disableAnimation={props.disableAnimation}
-          errorMessage={props.errorMessage}
-          type={props.type}
+          size={props?.size ?? "sm"}
+          radius={props?.radius}
+          label={props?.label}
+          description={props?.description}
+          startContent={props?.startContent}
+          endContent={props?.endContent}
+          isInvalid={props?.isInvalid}
+          isClearable={props?.isClearable ?? false}
+          isDisabled={props?.isDisabled}
+          isReadOnly={props?.isReadOnly}
+          isRequired={props?.isRequired}
+          labelPlacement={props?.labelPlacement ?? "inside"}
+          placeholder={props?.placeholder}
+          disableAnimation={props?.disableAnimation}
+          errorMessage={props?.errorMessage}
+          type={props?.type}
           // onClear={() => console.log("input cleared")}
           // onValueChange={(value) => {
           //   props.onValueChange(value);
