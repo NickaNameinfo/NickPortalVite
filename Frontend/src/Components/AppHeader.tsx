@@ -1,7 +1,14 @@
-import { Button, Input, Tooltip, useDisclosure } from "@nextui-org/react";
+import {
+  Button,
+  Input,
+  Tab,
+  Tabs,
+  Tooltip,
+  useDisclosure,
+} from "@nextui-org/react";
 import * as React from "react";
 import "./style.scss";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   IconCall,
   IconHome,
@@ -18,6 +25,10 @@ import Login from "../views/pages/login/Login";
 import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
 
 export const AppHeader = () => {
+  const location = useLocation();
+  const currLocation = location?.pathname?.split("/");
+  console.log(location, "123ccsdf", currLocation);
+  const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [startIndex, setStartIndex] = React.useState(0);
   const [sliderLabel, setSliderLabel] = React.useState([]);
@@ -101,6 +112,161 @@ export const AppHeader = () => {
             />
           </div>
         </div>
+        <div className="flex justify-between w-full">
+          <div className="ms-3">
+            <Tooltip
+              showArrow={true}
+              color="foreground"
+              offset={3}
+              content="Store View"
+            >
+              <Button
+                onClick={() => navigate(`/`)}
+                radius="lg"
+                // variant="shadow"
+                color="primary"
+                aria-label="Like"
+                className={`${
+                  currLocation?.[1] === "" ? "" : "text-slate-400 bg-white"
+                }  Iconwhatsup ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6`}
+                size="md"
+              >
+                <div className="">
+                  <div>Store View</div>
+                  {currLocation?.[1] === "" && (
+                    <div className="flex justify-center">
+                      <svg
+                        width="6"
+                        height="6"
+                        viewBox="0 0 6 6"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle cx="3" cy="3" r="3" fill="white" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+              </Button>
+            </Tooltip>
+          </div>
+          <div>
+            <Tooltip
+              showArrow={true}
+              color="foreground"
+              offset={3}
+              content="Product View"
+            >
+              <Button
+                onClick={() => navigate(`/ProductView`)}
+                radius="lg"
+                color="primary"
+                // variant="shadow"
+                aria-label="Like"
+                className={` ${
+                  currLocation?.[1] === "ProductView"
+                    ? ""
+                    : "text-slate-400 bg-white"
+                } IconCall ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6`}
+                size="md"
+              >
+                <div className="">
+                  <div>Product View</div>
+                  {currLocation?.[1] === "ProductView" && (
+                    <div className="flex justify-center">
+                      <svg
+                        width="6"
+                        height="6"
+                        viewBox="0 0 6 6"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle cx="3" cy="3" r="3" fill="white" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+              </Button>
+            </Tooltip>
+          </div>
+          <div>
+            <Tooltip
+              showArrow={true}
+              color="foreground"
+              offset={3}
+              content="Vendor View"
+            >
+              <Button
+                onClick={() => navigate(`/VendoreView`)}
+                radius="lg"
+                color="primary"
+                // variant="shadow"
+                aria-label="Like"
+                className={` ${
+                  currLocation?.[1] === "VendoreView"
+                    ? ""
+                    : "text-slate-400 bg-white"
+                } IconCall ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6`}
+                size="md"
+              >
+                <div className="">
+                  <div>Vendor View</div>
+                  {currLocation?.[1] === "VendoreView" && (
+                    <div className="flex justify-center">
+                      <svg
+                        width="6"
+                        height="6"
+                        viewBox="0 0 6 6"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle cx="3" cy="3" r="3" fill="white" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+              </Button>
+            </Tooltip>
+          </div>
+          <div>
+            <Tooltip
+              showArrow={true}
+              color="foreground"
+              offset={3}
+              content="Map View"
+            >
+              <Button
+                onClick={() => navigate(`/MapView`)}
+                radius="lg"
+                color="primary"
+                aria-label="Like"
+                className={` ${
+                  currLocation?.[1] === "MapView"
+                    ? ""
+                    : "text-slate-400 bg-white"
+                } IconCall ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6`}
+                size="md"
+              >
+                <div className="">
+                  <div>Map View</div>
+                  {currLocation?.[1] === "MapView" && (
+                    <div className="flex justify-center">
+                      <svg
+                        width="6"
+                        height="6"
+                        viewBox="0 0 6 6"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle cx="3" cy="3" r="3" fill="white" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+              </Button>
+            </Tooltip>
+          </div>
+        </div>
         <div className="flex justify-between">
           <div className="md:hidden">
             <Button
@@ -129,116 +295,8 @@ export const AppHeader = () => {
           </div>
         </div>
       </div>
-      <div className="flex justify-between mt-2">
-        <div className="w-3/12  justify-between flex overflow-auto ms-2 me-5">
-          <div className="flex items-center justify-around">
-            <Link to={"/"}>
-              <Tooltip
-                showArrow={false}
-                color="primary"
-                offset={3}
-                content=" Store View"
-              >
-                <Button
-                  radius="lg"
-                  // variant="shadow"
-                  isIconOnly
-                  aria-label="Like"
-                  className=" Iconwhatsup ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6"
-                  size="md"
-                >
-                  <Iconwhatsup
-                    fill="#FFFFFF"
-                    width="20"
-                    height="22"
-                    className="cursor-pointer ml:h-[16px] ml:w-[18px] xm:h-[12px] xm:w-[16px]"
-                  />
-                </Button>
-              </Tooltip>
-            </Link>
-          </div>
-          <div className="flex items-center justify-around">
-            <Link to={"/ProductView"}>
-              <Tooltip
-                showArrow={false}
-                color="primary"
-                offset={3}
-                content="Product View"
-              >
-                <Button
-                  radius="lg"
-                  // variant="shadow"
-                  isIconOnly
-                  aria-label="Like"
-                  className="IconCall ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6"
-                  size="md"
-                >
-                  <IconCall
-                    fill="#FFFFFF"
-                    width="20"
-                    height="22"
-                    className="cursor-pointer ml:h-[16px] ml:w-[18px] xm:h-[12px] xm:w-[16px]"
-                  />
-                </Button>
-              </Tooltip>
-            </Link>
-          </div>
-          <div className="flex items-center justify-around">
-            <Link to={"/VendoreView"}>
-              <Tooltip
-                showArrow={false}
-                color="primary"
-                offset={3}
-                content="Vendor View"
-              >
-                <Button
-                  radius="lg"
-                  // variant="shadow"
-                  isIconOnly
-                  aria-label="Like"
-                  className="Iconwhatsup  ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6"
-                  size="md"
-                >
-                  <Iconwhatsup
-                    fill="#FFFFFF"
-                    width="20"
-                    height="22"
-                    className="cursor-pointer ml:h-[16px] ml:w-[18px] xm:h-[12px] xm:w-[16px]"
-                  />
-                </Button>
-              </Tooltip>
-            </Link>
-          </div>
-          <div className="flex items-center justify-around">
-            <Link to={""}>
-              <Tooltip
-                showArrow={false}
-                color="primary"
-                offset={3}
-                content="Map View"
-              >
-                <Button
-                  radius="lg"
-                  // color="primary"
-                  // variant="shadow"
-                  isIconOnly
-                  aria-label="Like"
-                  className=" ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6"
-                  size="md"
-                >
-                  <IconMap
-                    fill="#FFFFFF"
-                    width="20"
-                    height="22"
-                    className="cursor-pointer ml:h-[16px] ml:w-[18px] xm:h-[12px] xm:w-[16px]"
-                  />
-                </Button>
-              </Tooltip>
-            </Link>
-          </div>
-        </div>
-
-        <div className="w-9/12 ms-4 me-4">
+      <div className="flex justify-between pt-3 pb-2">
+        <div className="w-full">
           <div className="flex w-full justify-between">
             <Button
               radius="sm"
@@ -272,7 +330,8 @@ export const AppHeader = () => {
                     <div className="slider-item" key={index}>
                       <Button
                         size="sm"
-                        className="font-medium text-sm w-11/12 h-10"
+                        className="font-medium text-sm w-11/12 h-10 bg-stripe-gradient"
+                        radius="full"
                       >
                         {item}
                       </Button>
