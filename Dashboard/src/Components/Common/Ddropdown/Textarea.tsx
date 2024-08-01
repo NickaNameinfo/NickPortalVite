@@ -50,6 +50,7 @@ const TeaxtareaNextUI = (props: textareaFieldProps) => {
         // color="default"
         // size="md"
         variant={props?.variant ?? "faded"}
+        maxRows={3}
         color={props?.color ?? "default"}
         size={props?.size ?? "md"}
         classNames={{
