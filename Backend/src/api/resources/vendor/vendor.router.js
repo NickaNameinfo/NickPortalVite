@@ -25,7 +25,7 @@ const upload = multer({ storage: storage });
 const vendorRouter = express.Router();
 vendorRouter
   .route("/create")
-  .post(sanitize(), upload.single("vendorImage"), vendorController.index);
+  .post(upload.single("vendorImage"), vendorController.index);
 vendorRouter.route("/list").get(sanitize(), vendorController.getAllvendor);
 vendorRouter
   .route("/list/:id")

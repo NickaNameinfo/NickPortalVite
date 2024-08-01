@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
   );
   RequestStore.associate = function (models) {
     // associations can be defined here
-    models.vendor.hasMany(models.vendor, { foreignKey: "vendorName" });
+    models.vendor.hasMany(models.vendor, { foreignKey: "storename" });
   };
   return RequestStore;
 };
