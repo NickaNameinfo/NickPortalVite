@@ -253,6 +253,27 @@ export const NavSearchIcon = (props: any) => (
     />
   </svg>
 );
+export const NavHeaderSearchIcon = (props: any) => (
+  <svg
+    width="19"
+    height="22"
+    viewBox="0 0 27 29"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <circle cx="12.1034" cy="12.1034" r="12.1034" fill="#8465F7" />
+    <circle
+      cx="3.25862"
+      cy="3.25862"
+      r="3.25862"
+      transform="matrix(1 0 0 -1 20.4844 28.8613)"
+      fill="#9179F2"
+      // fill={props.fill}
+      
+    />
+  </svg>
+);
 
 export const IconShare = (props: any) => {
   return (

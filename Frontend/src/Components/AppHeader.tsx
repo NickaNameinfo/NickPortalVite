@@ -19,7 +19,7 @@ import {
   IconProfile,
   Iconwhatsup,
 } from "./Icons";
-import { NavSearchIcon } from "../Icons";
+import { NavHeaderSearchIcon, NavSearchIcon } from "../Icons";
 import { InfoCard } from "./Card/InfoCard";
 import Login from "../views/pages/login/Login";
 import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
@@ -61,8 +61,8 @@ export const AppHeader = () => {
   return (
     <>
       <div className="flex justify-between navBarStyle gap-4 items-center p-3">
-        <div className="items-center flex justify-between w-webkit-fill-available">
-          <div className="text-center">
+        <div className="flex w-1/3">
+          <div className="text-center mx-2">
             <Link to={"/"}>
               <Button
                 isIconOnly
@@ -74,52 +74,58 @@ export const AppHeader = () => {
               </Button>
             </Link>
           </div>
-          <div className="xm:hidden md:block w-webkit-fill-available">
+          {/* <div className="xm:hidden md:block w-webkit-fill-available"> */}
+          <div className=" flex justify-start">
             <Input
               isClearable
-              radius="full"
-              size="sm"
-              variant="underlined"
-              className="ms-2"
-              classNames={
-                {
-                  // label: "text-white",
-                  // input: [
-                  //   "bg-transparent",
-                  //   "text-white dark:text-white",
-                  //   "text-white",
-                  //   "placeholder:text-text-white dark:placeholder:text-",
-                  // ],
-                  // innerWrapper: "bg-transparent",
-                  // inputWrapper: [
-                  //   "shadow-xl",
-                  //   "bg-blue-600",
-                  //   "bg-blue-600",
-                  //   "backdrop-blur-xl",
-                  //   "backdrop-saturate-900",
-                  //   "hover:bg-blue-600",
-                  //   "hover:bg-blue-600",
-                  //   "group-data-[focused=true]:bg-blue-600",
-                  //   ":group-data-[focused=true]:bg-blue-600",
-                  //   "!cursor-text",
-                  // ],
-                }
-              }
-              placeholder="Type to search..."
+              className="w-[280px]"
+              radius="lg"
+              size="md"
+              type="Search"
+              // autoFocus
+              // color="default"
+              variant="flat"
+              placeholder="Search Here..."
+              // style={{ backgroundColor:"whitesmoke"}}
+              classNames={{
+                label: "text-black/50 dark:text-white/50",
+                input: [
+                  "bg-transparent",
+                  "text-black/90 dark:text-white/100",
+                  "placeholder:text-default-100/50 dark:placeholder:text-white/10",
+                ],
+                innerWrapper: "bg-transparent",
+                inputWrapper: [
+                  // "shadow-xl",
+                  "bg-default-100/50",
+                  "dark:bg-default/60",
+                  "backdrop-blur-xl",
+                  "backdrop-saturate-50",
+                  "hover:bg-default-100/40",
+                  "focus-within:!bg-default-50/10",
+                  "dark:hover:bg-default/10",
+                  "dark:focus-within:!bg-default/90",
+                  "!cursor-text",
+                ],
+              }}
               startContent={
-                <NavSearchIcon className="text-black/50 mb-0.5 dark:text-white/90 text-slate-400 pointer-events-none flex-shrink-0" />
+                <p className="me-1.5">
+                  <NavHeaderSearchIcon />
+                </p>
               }
             />
           </div>
         </div>
-        <div className="flex justify-between w-full">
-          <div className="ms-3">
-            <Tooltip
-              showArrow={true}
-              color="foreground"
-              offset={3}
-              content="Store View"
-            >
+
+        <div className="w-2/3 flex justify-end ">
+          <div className=" mx-3 flex  justify-around">
+            <div className="mx-1">
+              {/* <Tooltip
+                showArrow={true}
+                color="foreground"
+                offset={3}
+                content="Store View"
+              > */}
               <Button
                 onClick={() => navigate(`/`)}
                 radius="lg"
@@ -148,15 +154,9 @@ export const AppHeader = () => {
                   )}
                 </div>
               </Button>
-            </Tooltip>
-          </div>
-          <div>
-            <Tooltip
-              showArrow={true}
-              color="foreground"
-              offset={3}
-              content="Product View"
-            >
+              {/* </Tooltip> */}
+            </div>
+            <div className="mx-1">
               <Button
                 onClick={() => navigate(`/ProductView`)}
                 radius="lg"
@@ -187,15 +187,8 @@ export const AppHeader = () => {
                   )}
                 </div>
               </Button>
-            </Tooltip>
-          </div>
-          <div>
-            <Tooltip
-              showArrow={true}
-              color="foreground"
-              offset={3}
-              content="Vendor View"
-            >
+            </div>
+            <div className="mx-1">
               <Button
                 onClick={() => navigate(`/VendoreView`)}
                 radius="lg"
@@ -226,15 +219,8 @@ export const AppHeader = () => {
                   )}
                 </div>
               </Button>
-            </Tooltip>
-          </div>
-          <div>
-            <Tooltip
-              showArrow={true}
-              color="foreground"
-              offset={3}
-              content="Map View"
-            >
+            </div>
+            <div className="ms-1">
               <Button
                 onClick={() => navigate(`/MapView`)}
                 radius="lg"
@@ -264,37 +250,29 @@ export const AppHeader = () => {
                   )}
                 </div>
               </Button>
-            </Tooltip>
+            </div>
           </div>
-        </div>
-        <div className="flex justify-between">
-          <div className="md:hidden">
-            <Button
-              onPress={onOpen}
-              isIconOnly
-              color="warning"
-              aria-label="Search"
-              className="bg-warning-900"
-            >
-              <NavSearchIcon />
-            </Button>
-          </div>
-          <div>
-            <Button
-              onPress={() => onOpen()}
-              isIconOnly
-              color="warning"
-              aria-label="Like"
-              className="bg-warning-900"
-            >
-              <IconInfo />
-            </Button>
-          </div>
-          <div className="ms-3">
-            <Login />
+
+          <div className="flex">
+            <div>
+              <Button
+                onPress={() => onOpen()}
+                isIconOnly
+                color="warning"
+                aria-label="Like"
+                className="bg-warning-900"
+              >
+                <IconInfo />
+              </Button>
+            </div>
+            <div className="ms-3">
+              <Login />
+            </div>
           </div>
         </div>
       </div>
+
+      {/* //--------------------------- */}
       <div className="flex justify-between pt-3 pb-2">
         <div className="w-full">
           <div className="flex w-full justify-between">
