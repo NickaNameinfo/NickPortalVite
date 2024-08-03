@@ -26,6 +26,7 @@ import {
 } from "../../../Icons";
 import { Otp } from "./Otp";
 import { ForgotPassword } from "./ForgotPassword";
+import InputNextUI from "../../../Components/Input/input";
 const Login = () => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const [isForgetPassword, setIsForgetPassword] = React.useState(false);
@@ -130,92 +131,21 @@ const Login = () => {
                   <>
                     <div className="my-2">
                       <div className="flex justify-center mb-4">
-                        <Input
-                          className="max-w-xs"
-                          classNames={{
-                            label: "text-black/50 dark:text-white/50",
-                            input: [
-                              "bg-transparent",
-                              "text-black/90 dark:text-white/100",
-                              "placeholder:text-default-100/50 dark:placeholder:text-white/10",
-                            ],
-                            innerWrapper: "bg-transparent",
-                            inputWrapper: [
-                              // "shadow-xl",
-                              "bg-default-100/50",
-                              "dark:bg-default/60",
-                              "backdrop-blur-xl",
-                              "backdrop-saturate-50",
-                              "hover:bg-default-100/40",
-                              "focus-within:!bg-default-50/10",
-                              "dark:hover:bg-default/10",
-                              "dark:focus-within:!bg-default/90",
-                              "!cursor-text",
-                            ],
-                          }}
-                          // isRequired
-
-                          autoFocus
+                        <InputNextUI
+                          type="text"
                           label="Enter Your Email Address"
-                          labelPlacement="inside"
-                          color="default"
-                          variant="faded"
-                          size="sm"
+                          onChange={(value) => {
+                            console.log(value, "storename");
+                          }}
                         />
                       </div>
                       <div className="flex justify-center  mt-3">
-                        <Input
-                          className="max-w-xs"
-                          classNames={{
-                            label: "text-black/50 dark:text-white/50",
-                            input: [
-                              "bg-transparent",
-                              "text-black/90 dark:text-white/100",
-                              "placeholder:text-default-100/50 dark:placeholder:text-white/10",
-                            ],
-                            innerWrapper: "bg-transparent",
-                            inputWrapper: [
-                              // "shadow-xl",
-                              "bg-default-100/50",
-                              "dark:bg-default/60",
-                              "backdrop-blur-xl",
-                              "backdrop-saturate-50",
-                              "hover:bg-default-100/40",
-                              "focus-within:!bg-default-50/10",
-                              "dark:hover:bg-default/10",
-                              "dark:focus-within:!bg-default/90",
-                              "!cursor-text",
-                            ],
-                          }}
-                          // isRequired
-
-                          autoFocus
+                        <InputNextUI
+                          type="password"
                           label="Enter Your Password"
-                          labelPlacement="inside"
-                          color="default"
-                          variant="faded"
-                          size="sm"
-                          endContent={
-                            <button
-                              className="focus:outline-none"
-                              type="button"
-                              onClick={toggleVisibility}
-                            >
-                              {isVisible ? (
-                                <EyeSlashFilledIcon
-                                  className="text-2xl text-default-400 pointer-events-none"
-                                  fill="#8E99A4"
-                                />
-                              ) : (
-                                <EyeFilledIcon
-                                  className="text-2xl text-default-400 pointer-events-none"
-                                  fill="#8E99A4"
-                                />
-                              )}
-                            </button>
-                          }
-                          type={isVisible ? "text" : "password"}
-                          // className="w-full"
+                          onChange={(value) => {
+                            console.log(value, "storename");
+                          }}
                         />
                       </div>
                     </div>
