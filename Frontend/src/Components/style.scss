@@ -173,3 +173,8 @@ aside {
 .slider-container {
   transition: transform 0.3s ease-in-out; /* Adjust the duration and timing function as needed */
 }
+
+.group[data-focus-visible="true"]
+  .group-data-\[focus-visible\=true\]\:ring-focus {
+  --tw-ring-color: hsl(0deg 0% 37.16% / 0%) !important;
+}
