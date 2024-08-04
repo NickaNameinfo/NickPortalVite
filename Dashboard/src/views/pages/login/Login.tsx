@@ -9,6 +9,7 @@ const Login = () => {
     if (typeof window !== "undefined") {
       setCookie("token", user.token, 60);
       setCookie("role", user.role, 60);
+      setCookie("id", user.id, 60);
       next();
     }
   };
@@ -18,10 +19,9 @@ const Login = () => {
   const [login] = useLoginMutation();
 
   const onSubmit = async (data: any) => {
-    console.log(data, "data3452345234");
     const result = await login(data);
-    console.log(result, "result3452345");
     if (result) {
+      console.log(result, "sdf45234")
       authenticate(result?.data, () => {
         navigate("/Dashboard");
         window.location.reload();

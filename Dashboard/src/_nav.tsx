@@ -1,36 +1,59 @@
 import { IconHome } from "./Components/Icons";
 
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+}
+// Assuming getCookie is imported correctly
+const tempRole = getCookie("role");
+console.log(tempRole, "tempRole323");
 export const _nav = [
-  {
-    menuType: "multiple",
-    name: "Vendor",
-    key: "Vendor",
-    link: "/",
-    icons: <IconHome />,
-    menuItems: [
-      {
-        menuType: "single",
-        name: "Add",
-        key: "Add",
-        link: "/Vendors/Add",
-        icons: <IconHome />,
-      },
-      {
-        menuType: "single",
-        name: "List",
-        key: "List",
-        link: "/Vendors/List",
-        icons: <IconHome />,
-      },
-      {
-        menuType: "single",
-        name: "Stock",
-        key: "Stock",
-        link: "/AddStock",
-        icons: <IconHome />,
-      },
-    ],
-  },
+  ...(tempRole === "3"
+    ? [
+        {
+          menuType: "single",
+          name: "Vendors",
+          key: "Vendors",
+          link: "/Vendors/Products",
+          icons: <IconHome />,
+        },
+      ]
+    : []),
+  ...(tempRole === "2" || tempRole === "1"
+    ? [
+        {
+          menuType: tempRole === "2" ? "single" : "multiple",
+          name: tempRole === "2" ? "Profile" : "Vendor",
+          key: "Vendor",
+          link: tempRole === "2" ? "/Vendors/Add" : "/",
+          icons: <IconHome />,
+          menuItems: [
+            {
+              menuType: "single",
+              name: "Add",
+              key: "Add",
+              link: "/Vendors/Add",
+              icons: <IconHome />,
+            },
+            {
+              menuType: "single",
+              name: "List",
+              key: "List",
+              link: "/Vendors/List",
+              icons: <IconHome />,
+            },
+            {
+              menuType: "single",
+              name: "Stock",
+              key: "Stock",
+              link: "/AddStock",
+              icons: <IconHome />,
+            },
+          ],
+        },
+      ]
+    : []),
   {
     menuType: "multiple",
     name: "Categories",
@@ -70,29 +93,33 @@ export const _nav = [
       },
     ],
   },
-  {
-    menuType: "multiple",
-    name: "Stores",
-    key: "Stores",
-    link: "/",
-    icons: <IconHome />,
-    menuItems: [
-      {
-        menuType: "single",
-        name: "Add",
-        key: "Add",
-        link: "/Stores/Add",
-        icons: <IconHome />,
-      },
-      {
-        menuType: "single",
-        name: "List",
-        key: "List",
-        link: "/Stores/List",
-        icons: <IconHome />,
-      },
-    ],
-  },
+  ...(tempRole === "1"
+    ? [
+        {
+          menuType: "multiple",
+          name: "Stores",
+          key: "Stores",
+          link: "/",
+          icons: <IconHome />,
+          menuItems: [
+            {
+              menuType: "single",
+              name: "Add",
+              key: "Add",
+              link: "/Stores/Add",
+              icons: <IconHome />,
+            },
+            {
+              menuType: "single",
+              name: "List",
+              key: "List",
+              link: "/Stores/List",
+              icons: <IconHome />,
+            },
+          ],
+        },
+      ]
+    : []),
   {
     menuType: "single",
     name: "Customer",
@@ -107,20 +134,28 @@ export const _nav = [
     link: "/",
     icons: <IconHome />,
     menuItems: [
-      {
-        menuType: "single",
-        name: "Stores",
-        key: "Stores",
-        link: "/",
-        icons: <IconHome />,
-      },
-      {
-        menuType: "single",
-        name: "Vendors",
-        key: "Vendors",
-        link: "/",
-        icons: <IconHome />,
-      },
+      ...(tempRole !== "3"
+        ? [
+            {
+              menuType: "single",
+              name: "Stores",
+              key: "Stores",
+              link: "/",
+              icons: <IconHome />,
+            },
+          ]
+        : []),
+      ...(tempRole === "1"
+        ? [
+            {
+              menuType: "single",
+              name: "Vendors",
+              key: "Vendors",
+              link: "/",
+              icons: <IconHome />,
+            },
+          ]
+        : []),
       {
         menuType: "single",
         name: "Customers",
@@ -137,13 +172,17 @@ export const _nav = [
     link: "/",
     icons: <IconHome />,
     menuItems: [
-      {
-        menuType: "single",
-        name: "Stores",
-        key: "Stores",
-        link: "/",
-        icons: <IconHome />,
-      },
+      ...(tempRole !== "3"
+        ? [
+            {
+              menuType: "single",
+              name: "Stores",
+              key: "Stores",
+              link: "/",
+              icons: <IconHome />,
+            },
+          ]
+        : []),
       {
         menuType: "single",
         name: "Customers",
@@ -160,20 +199,28 @@ export const _nav = [
     link: "/",
     icons: <IconHome />,
     menuItems: [
-      {
-        menuType: "single",
-        name: "Stores",
-        key: "Stores",
-        link: "/",
-        icons: <IconHome />,
-      },
-      {
-        menuType: "single",
-        name: "Vendors",
-        key: "Vendors",
-        link: "/",
-        icons: <IconHome />,
-      },
+      ...(tempRole !== "3"
+        ? [
+            {
+              menuType: "single",
+              name: "Stores",
+              key: "Stores",
+              link: "/",
+              icons: <IconHome />,
+            },
+          ]
+        : []),
+      ...(tempRole === "1"
+        ? [
+            {
+              menuType: "single",
+              name: "Vendors",
+              key: "Vendors",
+              link: "/",
+              icons: <IconHome />,
+            },
+          ]
+        : []),
       {
         menuType: "single",
         name: "Customers",

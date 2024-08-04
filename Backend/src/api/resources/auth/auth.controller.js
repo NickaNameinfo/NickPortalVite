@@ -160,8 +160,7 @@ module.exports = {
       httpOnly: true,
       secure: config.app.secure,
     });
-
-    return res.status(200).json({ success: true, token, role: req.user.role });
+    return res.status(200).json({ success: true, token, role: req.user.role, id: req.user.id  });
   },
 
   async deleteUserList(req, res, next) {
