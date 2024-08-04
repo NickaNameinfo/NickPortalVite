@@ -46,6 +46,7 @@ const InputNextUI = (props: InputFieldProps) => {
     <>
       <div className="w-100">
         <Input
+          {...props}
           classNames={{
             label: "text-black/60 dark:text-white/60",
             input: [
@@ -53,6 +54,7 @@ const InputNextUI = (props: InputFieldProps) => {
               "text-black/90 dark:text-white/100",
               "placeholder:text-default-100/50 dark:placeholder:text-white/10",
             ],
+
             innerWrapper: "bg-transparent",
             inputWrapper: [
               // "shadow-xl",

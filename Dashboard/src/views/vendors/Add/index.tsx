@@ -53,19 +53,23 @@ const Add = () => {
   }, [type]);
 
   const onSubmit = async (data: any) => {
-    let tempAPI = {
+    let tempAPIData = {
       ...data,
       areaId: 1,
       adharCardNo: Number(data?.adharCardNo),
     };
-    console.log("datafrom data form", tempAPI);
+    const formData = new FormData();
+    for (const key in tempAPIData) {
+      formData.append(key, tempAPIData[key]);
+    }
+    console.log("datafrom data form", formData);
     if (id) {
-      const result = await updateVendors(tempAPI);
+      const result = await updateVendors(formData);
       if (result?.data?.success) {
         navigate("/Vendors/List");
       }
     } else {
-      const result = await addVendors(tempAPI);
+      const result = await addVendors(formData);
       if (result?.data?.success) {
         navigate("/Vendors/List");
       }
@@ -107,14 +111,7 @@ const Add = () => {
             rules={{ required: true }}
             render={({ field }) => (
               // <Input type="text" label="Store Name" size="lg" {...field} />
-              <InputNextUI
-                type="text"
-                label="Store Name"
-                onChange={(value) => {
-                  console.log(value, "storename");
-                }}
-                {...field}
-              />
+              <InputNextUI type="text" label="Store Name" {...field} />
             )}
           />
           <Controller
@@ -123,58 +120,58 @@ const Add = () => {
             render={({ field }) => (
               <Select
                 variant="faded"
-                classNames={{
-                  label: "text-black/60 dark:text-white/60",
-                  innerWrapper: "bg-transparent",
-                  mainWrapper: [
-                    //   // "shadow-xl",
-                    "bg-default-100/50",
-                    "dark:bg-default/60",
-                    "backdrop-blur-xl",
-                    "backdrop-saturate-50",
-                    "hover:bg-default-100/40",
-                    "focus-within:!bg-default-50/10",
-                    "dark:hover:bg-default/10",
-                    "dark:focus-within:!bg-default/90",
-                    "!cursor-text",
-                  ],
-                  listboxWrapper: [
-                    //   // "shadow-xl",
-                    "bg-default-100/50",
-                    "dark:bg-default/60",
-                    "backdrop-blur-xl",
-                    "backdrop-saturate-50",
-                    "hover:bg-default-100/40",
-                    "focus-within:!bg-default-50/10",
-                    "dark:hover:bg-default/10",
-                    "dark:focus-within:!bg-default/90",
-                    "!cursor-text",
-                  ],
-                  helperWrapper: [
-                    //   // "shadow-xl",
-                    "bg-default-100/50",
-                    "dark:bg-default/60",
-                    "backdrop-blur-xl",
-                    "backdrop-saturate-50",
-                    "hover:bg-default-100/40",
-                    "focus-within:!bg-default-50/10",
-                    "dark:hover:bg-default/10",
-                    "dark:focus-within:!bg-default/90",
-                    "!cursor-text",
-                  ],
-                  // inputWrapper: [
-                  //   // "shadow-xl",
-                  //   "bg-default-100/50",
-                  //   "dark:bg-default/70",
-                  //   "backdrop-blur-xl",
-                  //   "backdrop-saturate-70",
-                  //   "hover:bg-default-100/60",
-                  //   "focus-within:!bg-default-70/10",
-                  //   "dark:hover:bg-default/0",
-                  //   "dark:focus-within:!bg-default/90",
-                  //   "!cursor-text",
-                  // ],
-                }}
+                // classNames={{
+                //   label: "text-black/60 dark:text-white/60",
+                //   innerWrapper: "bg-transparent",
+                //   mainWrapper: [
+                //     //   // "shadow-xl",
+                //     "bg-default-100/50",
+                //     "dark:bg-default/60",
+                //     "backdrop-blur-xl",
+                //     "backdrop-saturate-50",
+                //     "hover:bg-default-100/40",
+                //     "focus-within:!bg-default-50/10",
+                //     "dark:hover:bg-default/10",
+                //     "dark:focus-within:!bg-default/90",
+                //     "!cursor-text",
+                //   ],
+                //   listboxWrapper: [
+                //     //   // "shadow-xl",
+                //     "bg-default-100/50",
+                //     "dark:bg-default/60",
+                //     "backdrop-blur-xl",
+                //     "backdrop-saturate-50",
+                //     "hover:bg-default-100/40",
+                //     "focus-within:!bg-default-50/10",
+                //     "dark:hover:bg-default/10",
+                //     "dark:focus-within:!bg-default/90",
+                //     "!cursor-text",
+                //   ],
+                //   helperWrapper: [
+                //     //   // "shadow-xl",
+                //     "bg-default-100/50",
+                //     "dark:bg-default/60",
+                //     "backdrop-blur-xl",
+                //     "backdrop-saturate-50",
+                //     "hover:bg-default-100/40",
+                //     "focus-within:!bg-default-50/10",
+                //     "dark:hover:bg-default/10",
+                //     "dark:focus-within:!bg-default/90",
+                //     "!cursor-text",
+                //   ],
+                //   // inputWrapper: [
+                //   //   // "shadow-xl",
+                //   //   "bg-default-100/50",
+                //   //   "dark:bg-default/70",
+                //   //   "backdrop-blur-xl",
+                //   //   "backdrop-saturate-70",
+                //   //   "hover:bg-default-100/60",
+                //   //   "focus-within:!bg-default-70/10",
+                //   //   "dark:hover:bg-default/0",
+                //   //   "dark:focus-within:!bg-default/90",
+                //   //   "!cursor-text",
+                //   // ],
+                // }}
                 size="sm"
                 label="Select an Status"
                 {...field}
@@ -199,30 +196,84 @@ const Add = () => {
               <TeaxtareaNextUI label="Discription" {...field} />
             )}
           />
-          <div className="flex flex-col flex-wrap gap-4 border-b pb-3 mb-4">
-            <Chip
-              startContent={
-                <svg
-                  width={18}
-                  height={18}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 2C6.49 2 2 6.49 2 12C2 17.51 6.49 22 12 22C17.51 22 22 17.51 22 12C22 6.49 17.51 2 12 2ZM16.78 9.7L11.11 15.37C10.97 15.51 10.78 15.59 10.58 15.59C10.38 15.59 10.19 15.51 10.05 15.37L7.22 12.54C6.93 12.25 6.93 11.77 7.22 11.48C7.51 11.19 7.99 11.19 8.28 11.48L10.58 13.78L15.72 8.64C16.01 8.35 16.49 8.35 16.78 8.64C17.07 8.93 17.07 9.4 16.78 9.7Z"
-                    fill="green"
-                  />
-                </svg>
-              }
-              variant="faded"
-              color="default"
-            >
-              <p className="font-medium text-black/70"> Owner Details</p>
-            </Chip>
-          </div>
+          <Controller
+            name="website" // Changed to reflect a text input
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              // <Input type="text" label="Store Name" size="lg" {...field} />
+              <InputNextUI type="text" label="website" {...field} />
+            )}
+          />
+          <Controller
+            name="location" // Changed to reflect a text input
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              // <Input type="text" label="Store Name" size="lg" {...field} />
+              <InputNextUI type="text" label="location" {...field} />
+            )}
+          />
+          <Controller
+            name="openTime" // Changed to reflect a text input
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              // <Input type="text" label="Store Name" size="lg" {...field} />
+              <InputNextUI type="text" label="Open Time" {...field} />
+            )}
+          />
+          <Controller
+            name="closeTime" // Changed to reflect a text input
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              // <Input type="text" label="Store Name" size="lg" {...field} />
+              <InputNextUI
+                type="text"
+                label="Close Time"
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="vendorImage" // Changed to reflect a text input
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <Input
+                type="file"
+                label="Image"
+                size="lg"
+                onChange={(e) => {
+                  field.onChange(e.target.files[0]); // Don't forget to call field.onChange to update the form state
+                }}
+              />
+            )}
+          />
         </div>
-
+        <div className="flex flex-col flex-wrap gap-4 border-b pb-3 mb-4">
+          <Chip
+            startContent={
+              <svg
+                width={18}
+                height={18}
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 2C6.49 2 2 6.49 2 12C2 17.51 6.49 22 12 22C17.51 22 22 17.51 22 12C22 6.49 17.51 2 12 2ZM16.78 9.7L11.11 15.37C10.97 15.51 10.78 15.59 10.58 15.59C10.38 15.59 10.19 15.51 10.05 15.37L7.22 12.54C6.93 12.25 6.93 11.77 7.22 11.48C7.51 11.19 7.99 11.19 8.28 11.48L10.58 13.78L15.72 8.64C16.01 8.35 16.49 8.35 16.78 8.64C17.07 8.93 17.07 9.4 16.78 9.7Z"
+                  fill="green"
+                />
+              </svg>
+            }
+            variant="faded"
+            color="default"
+          >
+            <p className="font-medium text-black/70"> Owner Details</p>
+          </Chip>
+        </div>
         <div className="grid grid-cols-2 gap-4 mb-2">
           <Controller
             name="ownername" // Changed to reflect a text input

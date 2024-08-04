@@ -48,6 +48,7 @@ const InputNextUI = (props: InputFieldProps) => {
   return (
     <>
       <Input
+        {...props}
         classNames={{
           label: "text-black/60 dark:text-white/60",
           input: [

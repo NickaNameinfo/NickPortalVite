@@ -15,9 +15,11 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
+  Image,
 } from "@nextui-org/react";
 import { TableList } from "../../../Components/Table/TableList";
 import { useNavigate } from "react-router-dom";
+import { infoData } from "../../../configData";
 
 const List = () => {
   const { data, error, refetch } = useGetVendorsQuery();
@@ -35,6 +37,7 @@ const List = () => {
   const defaultCloumns = [
     "storename",
     "shopaddress",
+    "vendorImage",
     "ownername",
     "phone",
     "email",
@@ -50,7 +53,8 @@ const List = () => {
   const columns = [
     { name: "S.No", id: "id", sortable: true },
     { name: "storename", id: "storename", sortable: true },
-    { name: "shopaddress", id: "shopaddress", sortable: true },
+    { name: "shopaddress", id: "shopaddress", sortable: false },
+    { name: "vendorImage", id: "vendorImage", sortable: false },
     { name: "email", id: "email", sortable: true },
     { name: "phone", id: "phone" },
     { name: "Actions", id: "actions" },
@@ -82,6 +86,10 @@ const List = () => {
           >
             {user.email}
           </User>
+        );
+      case "vendorImage":
+        return (
+          <Image src={`${infoData.baseApi}/${user.vendorImage}`} width={100} height={100}/>
         );
       case "status":
         return (

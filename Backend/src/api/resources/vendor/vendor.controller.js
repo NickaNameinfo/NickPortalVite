@@ -26,6 +26,7 @@ module.exports = {
         website,
         openTime,
         closeTime,
+        location
       } = req.body;
       console.log(id, "id452342");
       console.log(areaId, "areaId3452345");
@@ -59,10 +60,11 @@ module.exports = {
                 panCardNo: panCardNo ? panCardNo : supplier.panCardNo,
                 GSTNo: GSTNo ? GSTNo : supplier.GSTNo,
                 website: website ? website : supplier.website,
+                location: location ? location : supplier.location,
                 openTime: openTime ? openTime : supplier.openTime,
                 closeTime: closeTime ? closeTime : supplier.closeTime,
                 vendorImage: req.file
-                  ? req.file.location
+                  ? req.file.path
                   : supplier.vendorImage,
               },
               { where: { id: id } }
@@ -88,6 +90,7 @@ module.exports = {
             GSTNo: GSTNo,
             areaId: areaId,
             website: website,
+            location: location,
             openTime: openTime,
             closeTime: closeTime,
             vendorImage: req?.file ? req?.file?.path : "",
@@ -286,10 +289,15 @@ module.exports = {
         email,
         password,
         phone,
+        location,
+        website,
+        openTime,
+        closeTime
       } = req.body;
       db.vendor
         .findOne({ where: { id: id } })
         .then((list) => {
+          console.log(req.file, "req.file.location3453245")
           if (list) {
             return db.vendor.update(
               {
@@ -302,6 +310,12 @@ module.exports = {
                 email: email ? email : list.email,
                 password: password ? password : list.password,
                 phone: phone ? phone : list.phone,
+                website: website ? website : list.website,
+                location: location ? location : list.location,
+                openTime: openTime ? openTime : list.openTime,
+                closeTime: closeTime ? closeTime : list.closeTime,
+                vendorImage: req.file
+                  ? req.file.path : list.vendorImage,
               },
               { where: { id: id } }
             );

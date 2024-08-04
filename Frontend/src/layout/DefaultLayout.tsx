@@ -9,8 +9,8 @@ const DefaultLayout = () => {
         <div className="flex">
           <AppSidebar />
           <div className="mm:w-full ml:w-full sm:w-fullv md:w-full lg:w-full xl:w-full 2xl:w-full 3xl:w-full 4xl:w-full ps-3 pe-1 custom-scrollbar">
+            <AppHeader />
             <div className="appContentViewHeight overflow-auto navBarStyle p-4">
-              <AppHeader />
               <AppContent />
             </div>
           </div>

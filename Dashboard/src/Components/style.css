@@ -2,7 +2,7 @@
   border-radius: var(--borderRadius-28);
   background: var(--background-blur);
   -webkit-backdrop-filter: var(--backdrop-filter);
-  backdrop-filter: var(--backdrop-filter);
+          backdrop-filter: var(--backdrop-filter);
 }
 
 .custom-scrollbar {
@@ -44,12 +44,7 @@ aside {
 
 .Storecard {
   border-radius: 20px;
-  background: linear-gradient(
-    111deg,
-    rgb(245, 245, 245) 0.44%,
-    rgba(245, 245, 245, 0.765) 95.45%
-  );
-
+  background: linear-gradient(111deg, rgba(255, 250, 250, 0.29) 0.44%, rgba(255, 255, 255, 0.2) 95.45%);
   box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.1);
 }
 .Storecard .StortimingColor {
@@ -77,11 +72,7 @@ aside {
 
 .StorecardHeader {
   border-radius: 20px;
-  background: linear-gradient(
-    111deg,
-    rgba(255, 250, 250, 0.29) 0.44%,
-    rgba(255, 255, 255, 0.2) 95.45%
-  );
+  background: linear-gradient(111deg, rgba(255, 250, 250, 0.29) 0.44%, rgba(255, 255, 255, 0.2) 95.45%);
   box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.1);
 }
 .StorecardHeader .Iconwhatsup {
@@ -104,16 +95,12 @@ aside {
 }
 
 .Boxshadow {
-  background: linear-gradient(
-    111deg,
-    rgba(255, 250, 250, 0.29) 0.44%,
-    rgba(255, 255, 255, 0.2) 95.45%
-  );
+  background: linear-gradient(111deg, rgba(255, 250, 250, 0.29) 0.44%, rgba(255, 255, 255, 0.2) 95.45%);
   box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.1);
 }
 
 .bgnone {
-  /* background-color: rgba(228, 222, 222, 0.874) !important; */
+  background-color: white !important;
 }
 
 .maincolor {
@@ -145,4 +132,4 @@ aside {
 
 .paymetoption {
   color: var(--textColor-light);
-} /*# sourceMappingURL=style.css.map */
+}/*# sourceMappingURL=style.css.map */

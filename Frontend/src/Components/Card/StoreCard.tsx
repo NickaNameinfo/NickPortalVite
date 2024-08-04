@@ -86,7 +86,7 @@ export const StoreCard = () => {
 
                 <div className="mt-0 basis-3/12 justify-end flex pe-0">
                   <div className="iconbox flex items-center justify-center cursor-pointer">
-                    <Link to="/Pages/Store">
+                    <Link to="/Store/StoreDetails">
                       <Button
                         radius="full"
                         isIconOnly
@@ -179,7 +179,7 @@ export const StoreCard = () => {
 
                 <div className="mt-0 basis-3/12 justify-end flex pe-0">
                   <div className="iconbox flex items-center justify-center cursor-pointer">
-                    <Link to="/Pages/Store">
+                    <Link to="Store/StoreDetails">
                       <Button
                         radius="full"
                         isIconOnly
@@ -272,7 +272,7 @@ export const StoreCard = () => {
 
                 <div className="mt-0 basis-3/12 justify-end flex pe-0">
                   <div className="iconbox flex items-center justify-center cursor-pointer">
-                    <Link to="/Pages/Store">
+                    <Link to="Store/StoreDetails">
                       <Button
                         radius="full"
                         isIconOnly
@@ -365,7 +365,7 @@ export const StoreCard = () => {
 
                 <div className="mt-0 basis-3/12 justify-end flex pe-0">
                   <div className="iconbox flex items-center justify-center cursor-pointer">
-                    <Link to="/Pages/Store">
+                    <Link to="/Store/StoreDetails">
                       <Button
                         radius="full"
                         isIconOnly
@@ -458,7 +458,7 @@ export const StoreCard = () => {
 
                 <div className="mt-0 basis-3/12 justify-end flex pe-0">
                   <div className="iconbox flex items-center justify-center cursor-pointer">
-                    <Link to="/Pages/Store">
+                    <Link to="/Store/StoreDetails">
                       <Button
                         radius="full"
                         isIconOnly
@@ -551,7 +551,7 @@ export const StoreCard = () => {
 
                 <div className="mt-0 basis-3/12 justify-end flex pe-0">
                   <div className="iconbox flex items-center justify-center cursor-pointer">
-                    <Link to="/Pages/Store">
+                    <Link to="/Store/StoreDetails">
                       <Button
                         radius="full"
                         isIconOnly

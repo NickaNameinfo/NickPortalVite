@@ -46,13 +46,11 @@ const TeaxtareaNextUI = (props: textareaFieldProps) => {
     <>
       <Textarea
         label={props?.label ?? "label"}
-        // variant="faded"
-        // color="default"
-        // size="md"
         variant={props?.variant ?? "faded"}
         maxRows={3}
         color={props?.color ?? "default"}
         size={props?.size ?? "md"}
+        {...props}
         classNames={{
           label: "text-black/60 dark:text-white/60",
           innerWrapper: "bg-transparent",

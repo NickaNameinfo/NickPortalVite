@@ -5,21 +5,20 @@ import { Card, CardBody, Image, useDisclosure } from "@nextui-org/react";
 import { StoreList } from "./StoreList";
 import { useBoolean } from "../Common/CustomHooks";
 import { VendorDetails } from "../DetailsModales/VendorDetails";
+import { infoData } from "../../configData";
 
-export const CompanyCard = ({ item = null }) => {
+export const VendorCard = ({ item = null }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
-      <Card className=" Storecard" isPressable onClick={() => onOpen()}>
-        <CardBody className="overflow-visible p-0 relative">
+      <Card className="Storecard" isPressable onClick={() => onOpen()}>
+        <CardBody className="overflow-visible p-0 relative align-middle justify-evenly p-4">
           <Image
             isZoomed
             alt="Here no Image"
-            shadow="md"
             width="100%"
-            radius="lg"
-            className="w-full object-cover max-h-[190px]"
-            src="https://nextui-docs-v2.vercel.app/images/fruit-1.jpeg"
+            className="w-full object-cover"
+            src={`${infoData.baseApi}/${item.vendorImage}`}
           />
         </CardBody>
       </Card>
@@ -27,4 +26,4 @@ export const CompanyCard = ({ item = null }) => {
     </>
   );
 };
-export default CompanyCard;
+export default VendorCard;

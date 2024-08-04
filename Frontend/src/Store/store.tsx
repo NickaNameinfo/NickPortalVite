@@ -4,6 +4,7 @@ import { VendorApi } from "../views/pages/Vendor/Service.mjs";
 import { ProductApi } from "../views/pages/Product/Service.mjs";
 import { StoreApi } from "../views/pages/Store/Service.mjs";
 import { CategoryApi } from "../views/pages/Category/Service.mjs";
+import { AuthApi } from "../views/pages/login/Service.mjs";
 
 export const store = configureStore({
   reducer: {
@@ -11,13 +12,15 @@ export const store = configureStore({
     [ProductApi.reducerPath]: ProductApi.reducer,
     [StoreApi.reducerPath]: StoreApi.reducer,
     [CategoryApi.reducerPath]: CategoryApi.reducer,
+    [AuthApi.reducerPath]: AuthApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       VendorApi.middleware,
       ProductApi.middleware,
       StoreApi.middleware,
-      CategoryApi.middleware
+      CategoryApi.middleware,
+      AuthApi.middleware
     ),
 });
 setupListeners(store.dispatch);

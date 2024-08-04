@@ -8,7 +8,7 @@ const path = require("path");
 const cors = require("cors");
 const db = require("./models");
 global.appRoot = path.resolve(__dirname);
-
+const express = require('express');
 const PORT = 5000;
 const app = appManager.setup(config);
 /*cors handling*/
@@ -19,6 +19,7 @@ app.use(
   })
 );
 app.options("*", cors());
+app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 /* Route handling */
 app.use("/api", restRouter);

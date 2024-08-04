@@ -34,6 +34,7 @@ const Login = () => {
   const [isNewPassword, setIsNewPassword] = React.useState(false);
   const [isRegister, setIsRegister] = React.useState(false);
   const [isVisible, setIsVisible] = React.useState(false);
+  const [registration, setRegistration] = React.useState(false)
   const toggleVisibility = () => setIsVisible(!isVisible);
 
   const onCloseModal = () => {
@@ -44,6 +45,10 @@ const Login = () => {
     setIsRegister(false);
   };
   const onClickLogin = () => {
+    console.log(registration, "registration3425", isRegister)
+    if(isRegister){
+      setRegistration(true)
+    }
     if (isForgetPassword) {
       setIsOTP(true);
       if (isOTP) {
@@ -120,7 +125,7 @@ const Login = () => {
               </ModalHeader>
               <ModalBody className="px-3 m-0">
                 {isRegister ? (
-                  <Register />
+                  <Register registration={registration}/>
                 ) : isNewPassword ? (
                   <NewPassword />
                 ) : isOTP ? (

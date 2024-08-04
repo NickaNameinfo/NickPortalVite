@@ -63,7 +63,7 @@ const AddStock = () => {
     console.log(formData, "formData3452345234");
     let tempApiParams = {
       ...formData,
-      vendorId: 4,
+      vendorId: 7,
     };
     const result = await addStock(tempApiParams);
     console.log(result?.data?.success, "result3452345");

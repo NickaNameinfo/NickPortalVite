@@ -7,8 +7,8 @@ const Login = () => {
   const authenticate = (user, next) => {
     console.log(user, "user4352345");
     if (typeof window !== "undefined") {
-      setCookie("token", user.token, 30);
-      setCookie("role", user.role, 30);
+      setCookie("token", user.token, 60);
+      setCookie("role", user.role, 60);
       next();
     }
   };
@@ -20,7 +20,7 @@ const Login = () => {
   const onSubmit = async (data: any) => {
     console.log(data, "data3452345234");
     const result = await login(data);
-    console.log(result?.data, "result3452345");
+    console.log(result, "result3452345");
     if (result) {
       authenticate(result?.data, () => {
         navigate("/Dashboard");

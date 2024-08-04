@@ -183,4 +183,11 @@ export const _nav = [
       },
     ],
   },
+  {
+    menuType: "single",
+    name: "LogOut",
+    key: "LogOut",
+    link: "/",
+    icons: <IconHome />,
+  },
 ];
