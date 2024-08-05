@@ -1,6 +1,7 @@
 import { AnyAction, ThunkMiddleware, configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { VendorApi } from "../views/vendors/Service.mjs";
+import { VendorProductApi } from "../views/VendorProducts/Service.mjs";
 import { AuthApi } from "../views/pages/Service.mjs";
 import { CategoriesApi } from "../views/Categories/Service.mjs";
 import { ProductsApi } from "../views/Products/Service.mjs";
@@ -10,6 +11,7 @@ import { StoreApi } from "../views/Store/Service.mjs";
 export const store = configureStore({
   reducer: {
     [VendorApi.reducerPath]: VendorApi.reducer,
+    [VendorProductApi.reducerPath]: VendorProductApi.reducer,
     [AuthApi.reducerPath]: AuthApi.reducer,
     [CategoriesApi.reducerPath]: CategoriesApi.reducer,
     [ProductsApi.reducerPath]: ProductsApi.reducer,
@@ -18,6 +20,7 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
+      VendorProductApi.middleware,
       VendorApi.middleware,
       AuthApi.middleware,
       CategoriesApi.middleware,

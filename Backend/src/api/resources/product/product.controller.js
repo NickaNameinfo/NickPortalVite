@@ -42,7 +42,6 @@ module.exports = {
   /* Add user api start here................................*/
 
   async addProduct(req, res, next) {
-    console.log(req.file, "fasdfas0d8f7a90s8d");
     try {
       const {
         categoryId,
@@ -88,7 +87,7 @@ module.exports = {
         .then((product) => {
           res
             .status(200)
-            .json({ success: true, msg: "Successfully inserted product" });
+            .json({ success: true, msg: "Successfully inserted product", data:product });
         })
         .catch(function (err) {
           next(err);

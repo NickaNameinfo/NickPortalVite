@@ -8,10 +8,13 @@ module.exports = (sequelize, DataTypes) => {
     phone: DataTypes.STRING,
     role: DataTypes.STRING,
     verify: DataTypes.BOOLEAN,
-    password: DataTypes.STRING
-  }, {}); 
-  user.associate = function(models) {
+    password: DataTypes.STRING,
+    vendorId: DataTypes.STRING,
+    storeId: DataTypes.STRING,
+    plan: DataTypes.STRING
+  }, {});
+  user.associate = function (models) {
     // associations can be defined here
   };
   return user;
-};
+}; 

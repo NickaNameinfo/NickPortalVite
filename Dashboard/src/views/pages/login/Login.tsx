@@ -10,6 +10,9 @@ const Login = () => {
       setCookie("token", user.token, 60);
       setCookie("role", user.role, 60);
       setCookie("id", user.id, 60);
+      setCookie("vendorId", user?.data?.vendorId, 60);
+      setCookie("storeId", user?.data?.storeId, 60);
+      setCookie("plan", user?.data?.plan, 60);
       next();
     }
   };
@@ -21,7 +24,7 @@ const Login = () => {
   const onSubmit = async (data: any) => {
     const result = await login(data);
     if (result) {
-      console.log(result, "sdf45234")
+      console.log(result, "sdf45234");
       authenticate(result?.data, () => {
         navigate("/Dashboard");
         window.location.reload();

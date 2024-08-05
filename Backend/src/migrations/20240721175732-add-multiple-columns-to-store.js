@@ -2,32 +2,26 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await Promise.all([
-      queryInterface.addColumn('stores', 'website', {
-        type: Sequelize.STRING,
-        allowNull: true
-      }),
-      queryInterface.addColumn('stores', 'storeImage', {
-        type: Sequelize.STRING,
-        allowNull: true
-      }),
-      queryInterface.addColumn('stores', 'openTime', {
-        type: Sequelize.STRING,
-        allowNull: true
-      }),
-      queryInterface.addColumn('stores', 'closeTime', {
-        type: Sequelize.STRING,
-        allowNull: true
-      }),
-    ]);
+    await queryInterface.addColumn('users', 'vendorId', {
+      type: Sequelize.STRING,
+      allowNull: true, // or false depending on your requirement
+      defaultValue: '', // optional, provide a default value if needed
+    });
+    await queryInterface.addColumn('users', 'storeId', {
+      type: Sequelize.STRING,
+      allowNull: true, // or false depending on your requirement
+      defaultValue: '', // optional, provide a default value if needed
+    });
+    await queryInterface.addColumn('users', 'plan', {
+      type: Sequelize.STRING,
+      allowNull: true, // or false depending on your requirement
+      defaultValue: '', // optional, provide a default value if needed
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await Promise.all([
-      queryInterface.removeColumn('stores', 'website'),
-      queryInterface.removeColumn('stores', 'storeImage'),
-      queryInterface.removeColumn('stores', 'openTime'),
-      queryInterface.removeColumn('stores', 'closeTime'),
-    ]);
+    await queryInterface.removeColumn('users', 'vendorId');
+    await queryInterface.removeColumn('users', 'storeId');
+    await queryInterface.removeColumn('users', 'plan');
   }
 };

@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       vendorImage: DataTypes.STRING,
       openTime: DataTypes.STRING,
       closeTime: DataTypes.STRING,
+      plan: DataTypes.STRING,
     },
     {}
   );

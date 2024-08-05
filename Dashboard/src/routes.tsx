@@ -33,7 +33,7 @@ const routes = [
   { path: "/Stores/Edit/:id", name: "EditStores", element: EditStores },
   { path: "/Stores/List", name: "StoresList", element: StoresList },
   { path: "/Vendors/Products", name: "VendorProductList", element: VendorProducts },
-  { path: "/Vendors/Products/Details", name: "VendorProductDetails", element: VendorDetails },
+  { path: "/Vendors/Products/Details/:id", name: "VendorProductDetails", element: VendorDetails },
 ];
 
 export default routes;

@@ -41,11 +41,13 @@ aside {
 }
 .Storecard {
   border-radius: 20px;
-  background: linear-gradient(
-    111deg,
-    rgba(255, 250, 250, 0.29) 0.44%,
-    rgba(255, 255, 255, 0.2) 95.45%
-  );
+  background-color: white !important;
+  // background: linear-gradient(
+  //   111deg,
+  //   rgb(202, 197, 197) 0.44%,
+  //   rgba(245, 245, 245, 0.831) 95.45%
+  // );
+
   box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.1);
 
   .StortimingColor {
@@ -82,6 +84,7 @@ aside {
     rgba(255, 250, 250, 0.29) 0.44%,
     rgba(255, 255, 255, 0.2) 95.45%
   );
+
   box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.1);
 
   .Iconwhatsup {
@@ -114,7 +117,6 @@ aside {
 }
 
 .bgnone {
-  // background-color: rgba(255, 0, 0, 0);
   background-color: white !important;
 }
 .maincolor {
@@ -141,4 +143,42 @@ aside {
 }
 .paymetoption {
   color: var(--textColor-light);
+}
+.IconCloseBtn {
+  background-color: black;
+  z-index: 999;
+}
+.bg-input {
+  background-color: var(--bg-input);
+}
+.appContentViewHeight {
+  height: calc(100vh - 35px);
+}
+.slider-container {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  overflow: hidden;
+  width: 100%; // Ensure the container takes full width
+}
+
+.slider-item {
+  width: 100%; // Adjust based on the number of items per view (25% for 4 items)
+  box-sizing: border-box;
+  padding: 0 10px; // Optional padding for spacing between items
+  transition: background-color 0.3s ease;
+}
+.tab-spacing {
+  margin-right: 10px;
+}
+.slider-container {
+  transition: transform 0.3s ease-in-out; /* Adjust the duration and timing function as needed */
+}
+
+.group[data-focus-visible="true"]
+  .group-data-\[focus-visible\=true\]\:ring-focus {
+  --tw-ring-color: hsl(0deg 0% 37.16% / 0%) !important;
+}
+.modalIconClose {
+  top: -20px !important;
+  right: -20px !important;
 }

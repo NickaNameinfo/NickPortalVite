@@ -12,8 +12,9 @@ import {
   Iconwhatsup,
 } from "../Icons";
 import { Button, Image } from "@nextui-org/react";
+import { infoData } from "../../configData";
 
-export const VendorHeaderCard = () => {
+export const VendorHeaderCard = ({ item = null }) => {
   return (
     <div className=" mt-2 grid xm:grid-cols-1 mm:grid-cols-1  sm:grid-cols-1 ml:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-3 4xl:grid-cols-3  StorecardHeader  mb-2">
       {/* <div className="grid xm:grid-cols-3"> */}
@@ -23,12 +24,12 @@ export const VendorHeaderCard = () => {
             isZoomed
             alt="Here no Image"
             className="w-full object-cover max-h-[85px] p-1"
-            src="https://nextui-docs-v2.vercel.app/images/album-cover.png"
+            src={`${infoData.baseApi}/${item?.vendorImage}`}
           />
         </div>
         <div className="px-3">
           <div className="xm:mt-1 mm:mt-2 maincolor text-sm font-semibold items-center">
-            Lorem dolor Samz..
+            {item?.storename}
           </div>
           <div className="flex items-center">
             <IconStar fill="#FF9900" />
@@ -41,7 +42,7 @@ export const VendorHeaderCard = () => {
               Open :
             </div>
             <div className="ms-1 xm:text-xs xm:font-normal">
-              09:30am-10:00pm
+            {item?.openTime} - {item?.closeTime}
             </div>
           </div>
           <div className="textColortimingColor lg:mt-0.5 text-sm font-normal  flex items-center">

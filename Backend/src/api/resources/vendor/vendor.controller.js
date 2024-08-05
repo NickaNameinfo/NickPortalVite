@@ -257,11 +257,11 @@ module.exports = {
       db.vendor_product
         .findAll({
           attributes: ["id", "supplierId", "productId", "unitSize", "price"],
-          where: { supplierId: req.body.id },
+          where: { supplierId: req.params.id },
           include: [
             {
               model: db.product,
-              attributes: ["id", "name", "brand", "photo", "status"],
+              attributes: ["id", "name", "brand", "photo", "status", "sortDesc"],
             },
           ],
         })

@@ -125,7 +125,6 @@ module.exports = {
   async storeAddProduct(req, res, next) {
     try {
       const { supplierId, productId, unitSize, buyerPrice } = req.body;
-      let id = productId;
       db.store_product
         .findAll({
           where: {

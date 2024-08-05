@@ -34,8 +34,8 @@ vendorRouter
   .route("/product-list")
   .get(sanitize(), vendorController.getAllVendorProduct);
 vendorRouter
-  .route("/product/getAllProductById")
-  .post(sanitize(), vendorController.getProductByVendor);
+  .route("/product/getAllProductById/:id")
+  .get(sanitize(), vendorController.getProductByVendor);
 vendorRouter
   .route("/update")
   .post(upload.single("vendorImage"), vendorController.vendorUpdate);

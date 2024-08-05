@@ -13,14 +13,22 @@ import {
   User,
 } from "@nextui-org/react";
 import React from "react";
-import { useAddProductMutation } from "./Service.mjs";
+import {
+  useAddProductMutation,
+  useAddStoreProductMutation,
+  useAddVendorProductMutation,
+} from "./Service.mjs";
 import { useGetCategoriesQuery } from "../Categories/Service.mjs";
+import { getCookie } from "../.././JsFiles//CommonFunction.mjs";
 
 const AddProducts = () => {
   const { handleSubmit, control, reset } = useForm();
-
+  const currentStoreUserId = getCookie("storeId");
+  const currentVendorUserId = getCookie("vendorId");
   const navigate = useNavigate();
   const [addProducts] = useAddProductMutation();
+  const [addStoreProducts] = useAddStoreProductMutation();
+  const [addVendorProducts] = useAddVendorProductMutation();
 
   const {
     data: categoryData,
@@ -33,7 +41,7 @@ const AddProducts = () => {
       ...data,
       subCategoryId: 2,
       childCategoryId: 2,
-      slug: 3,
+      slug: 1,
     };
     console.log("datafrom data form", tempData);
     const formData = new FormData();
@@ -41,11 +49,34 @@ const AddProducts = () => {
       formData.append(key, tempData[key]);
       console.log(formData);
     }
-    const result = await addProducts(formData);
+    const result = await addProducts(formData).unwrap();
     if (result?.success) {
-      navigate("/ProductsList");
+      console.log(result, "result3452345");
+
+      const tempStoreValueAPI = {
+        supplierId: currentStoreUserId
+          ? currentStoreUserId
+          : currentVendorUserId,
+        productId: result.data?.id,
+        unitSize: result.data?.qty,
+        buyerPrice: result.data?.total,
+      };
+      if (currentStoreUserId) {
+        const storeResult = await addStoreProducts(tempStoreValueAPI).unwrap();
+        console.log(currentStoreUserId, storeResult, "currentUserId");
+        if (storeResult) {
+          navigate("/ProductsList");
+        }
+      } else {
+        const vendorResult = await addVendorProducts(
+          tempStoreValueAPI
+        ).unwrap();
+        console.log(currentStoreUserId, vendorResult, "currentUserId");
+        if (vendorResult) {
+          navigate("/ProductsList");
+        }
+      }
     }
-    console.log(result, "result3452345");
   };
 
   return (
@@ -63,7 +94,7 @@ const AddProducts = () => {
               control={control}
               rules={{ required: true }}
               render={({ field }) => (
-                <Select label="Select an Status" {...field}>
+                <Select label="Select an Category" {...field}>
                   {categoryData?.data?.map((item) => (
                     <SelectItem key={item.id}>{item.name}</SelectItem>
                   ))}

@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('vendor', 'location', {
+    await queryInterface.addColumn('vendors', 'plan', {
       type: Sequelize.STRING,
       allowNull: true,
     });
@@ -10,6 +10,6 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     // Remove the new column
-    await queryInterface.removeColumn('vendor', 'location');
+    await queryInterface.removeColumn('vendors', 'plan');
   }
 };

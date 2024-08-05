@@ -7,8 +7,8 @@ const axiosBaseQuery = fetchBaseQuery({
   },
 });
 
-export const VendorApi = createApi({
-  reducerPath: "VendorApi",
+export const VendorProductApi = createApi({
+  reducerPath: "VendorProductApi",
   baseQuery: axiosBaseQuery,
   endpoints: (builder) => ({
     getVendors: builder.query({
@@ -23,8 +23,14 @@ export const VendorApi = createApi({
         method: "GET",
       }),
     }),
+    getVendorsProductById: builder.query({
+      query: (id) => ({
+        url: `/vendor/product/getAllProductById/${id}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useGetVendorsQuery, useGetVendorsByIdQuery } = VendorApi;
-export const { endpoints } = VendorApi;
+export const { useGetVendorsQuery, useGetVendorsByIdQuery, useGetVendorsProductByIdQuery } = VendorProductApi;
+export const { endpoints } = VendorProductApi;

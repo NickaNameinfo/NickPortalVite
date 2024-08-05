@@ -25,6 +25,20 @@ export const ProductsApi = createApi({
         body,
       }),
     }),
+    addStoreProduct: builder.mutation({
+      query: (body) => ({
+        url: `/store/product-add`,
+        method: "POST",
+        body,
+      }),
+    }),
+    addVendorProduct: builder.mutation({
+      query: (body) => ({
+        url: `/vendor/product-add`,
+        method: "POST",
+        body,
+      }),
+    }),
     getProducts: builder.query({
       query: () => ({
         url: `/product/getAllproductList`,
@@ -34,5 +48,5 @@ export const ProductsApi = createApi({
   }),
 });
 
-export const { useAddProductMutation, useGetProductsQuery } = ProductsApi;
+export const { useAddProductMutation, useGetProductsQuery, useAddStoreProductMutation, useAddVendorProductMutation } = ProductsApi;
 export const { endpoints } = ProductsApi;

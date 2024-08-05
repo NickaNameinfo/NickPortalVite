@@ -8,6 +8,7 @@ import {
   Image,
   CardFooter,
   Button,
+  useDisclosure,
 } from "@nextui-org/react";
 import {
   IconCall,
@@ -18,9 +19,9 @@ import {
   Iconwhatsup,
 } from "../Icons";
 import { Link } from "react-router-dom";
-export const VendorCard = () => {
+export const VendorCard = ({ item = null }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   return (
-    <div className="grid xm:grid-cols-1 mm:grid-cols-1 ml:grid-cols-1 sm:grid-cols-2  md:grid-cols-2  lg:grid-cols-2  xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-4 gap-2">
       <Card className="ps-1 Storecard p-0">
         <CardHeader className="pb-0 pt-3 ps-2 flex-col items-start ">
           <p className="p-0 font-semibold text-base TextMaincolor">
@@ -86,7 +87,7 @@ export const VendorCard = () => {
 
                 <div className="mt-0 basis-3/12 justify-end flex pe-0">
                   <div className="iconbox flex items-center justify-center cursor-pointer">
-                    <Link to="/Vendors/Products/Details">
+                    <Link to={`/Vendors/Products/Details/${item?.id}`}>
                       <Button
                         radius="full"
                         isIconOnly
@@ -114,7 +115,6 @@ export const VendorCard = () => {
           </div>
         </CardFooter>
       </Card>
-    </div>
   );
 };
 export default VendorCard;
