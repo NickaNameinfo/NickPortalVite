@@ -669,3 +669,89 @@ export const ModalCloseIcon = (props: any) => (
     />
   </svg>
 );
+export const Arrowleft = (props: any) => (
+  <svg
+    fill="#000000"
+    width="32px"
+    height="37px"
+    viewBox="0 0 28 28"
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M14.657 18.657a1 1 0 0 1-.707-.293l-5.657-5.657a1 1 0 0 1 0-1.414l5.657-5.657a1 1 0 0 1 1.414 1.414L10.414 12l4.95 4.95a1 1 0 0 1-.707 1.707z" />
+  </svg>
+);
+export const FormeIcon = (props: any) => (
+  <svg
+    width="20px"
+    height="25px"
+    viewBox="0 0 32 32"
+    {...props}
+    enable-background="new 0 0 32 32"
+    id="Stock_cut"
+    version="1.1"
+    // xml:space="preserve"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <desc />
+
+    <g>
+      <circle
+        cx="16"
+        cy="16"
+        fill="none"
+        r="15"
+        stroke="#000000"
+        stroke-linejoin="round"
+        stroke-miterlimit="10"
+        stroke-width="2"
+      />
+
+      <path
+        d="M26,27L26,27   c0-5.523-4.477-10-10-10h0c-5.523,0-10,4.477-10,10v0"
+        fill="none"
+        stroke="#000000"
+        stroke-linejoin="round"
+        stroke-miterlimit="10"
+        stroke-width="2"
+      />
+
+      <circle
+        cx="16"
+        cy="11"
+        fill="none"
+        r="6"
+        stroke="#000000"
+        stroke-linejoin="round"
+        stroke-miterlimit="10"
+        stroke-width="2"
+      />
+    </g>
+  </svg>
+);
+
+export const Arrowright = (props: any) => (
+  <svg
+    fill="#000000"
+    height="15px"
+    width="18px"
+    version="1.1"
+    id="Layer_1"
+    xmlns="http://www.w3.org/2000/svg"
+    // xmlns:xlink="http://www.w3.org/1999/xlink"
+    viewBox="0 0 492.004 492.004"
+    {...props}
+    // xml:space="preserve"
+  >
+    <g>
+      <g>
+        <path
+          d="M382.678,226.804L163.73,7.86C158.666,2.792,151.906,0,144.698,0s-13.968,2.792-19.032,7.86l-16.124,16.12
+                 c-10.492,10.504-10.492,27.576,0,38.064L293.398,245.9l-184.06,184.06c-5.064,5.068-7.86,11.824-7.86,19.028
+                 c0,7.212,2.796,13.968,7.86,19.04l16.124,16.116c5.068,5.068,11.824,7.86,19.032,7.86s13.968-2.792,19.032-7.86L382.678,265
+                 c5.076-5.084,7.864-11.872,7.848-19.088C390.542,238.668,387.754,231.884,382.678,226.804z"
+        />
+      </g>
+    </g>
+  </svg>
+);

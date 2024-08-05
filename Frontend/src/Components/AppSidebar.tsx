@@ -11,7 +11,14 @@ import {
   cn,
 } from "@nextui-org/react";
 import * as React from "react";
-import { IconHome } from "./Icons";
+import {
+  Arrowleft,
+  Arrowright,
+  FormeIcon,
+  IconHome,
+  IconMap,
+  IconMapRound,
+} from "./Icons";
 import { _nav } from "../_nav";
 import { Link } from "react-router-dom";
 
@@ -46,66 +53,514 @@ export const AppSidebar = () => {
           to="#"
           className="flex items-center justify-between px-4 border-b-2 border-b-white text-gray-900 dark:text-white group logoCls"
         >
-          {/* <span className="">Logo</span>{" "} */}
-          <div>
-            <Card className="p-0 m-0">
-              <Image
-                alt="Woman listing to music"
-                className="object-cover  max-h-[40px] min-w-[140px]"
-                height={30}
-                width={140}
-                src="https://nextui-docs-v2.vercel.app/images/album-cover.png"
-              />
-              {/* <CardHeader className="p-0 m-0"></CardHeader> */}
-              <CardBody className="p-0 m-0">
-                {/* <Image
-                isZoomed
-                alt="Here no Image"
-                className="w-full object-cover max-h-[40px] min-w-[140px]"
-                src="https://nextui-docs-v2.vercel.app/images/album-cover.png"
-                // height={30}
-                // width={140}
-              /> */}
-              </CardBody>
-            </Card>
+          <div className="rounded-sm">
+            <Image
+              alt="Woman listing to music"
+              className={` rounded-xl object-cover ${
+                menuToggle
+                  ? "max-h-[42px] min-w-[100px]"
+                  : "max-h-[42px] min-w-[190px]"
+              }`}
+              src="https://nextui-docs-v2.vercel.app/images/album-cover.png"
+            />
           </div>
           {mobileExpand ? (
             <span onClick={() => setMobileExpand((prev) => !prev)}>
-              <IconHome />
+              {menuToggle ? (
+                <svg
+                  width="9"
+                  height="14"
+                  viewBox="0 0 9 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1 1L8 7L1 13"
+                    stroke="black"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              ) : (
+                <p>No</p>
+              )}
             </span>
           ) : (
-            <span onClick={() => setMenuToggle((prev) => !prev)}>
-              <IconHome />
+            <span
+              className="ms-2"
+              onClick={() => setMenuToggle((prev) => !prev)}
+            >
+              {menuToggle ? <Arrowright /> : <Arrowleft />}
             </span>
           )}
         </Link>
         <aside id="default-sidebar" className="h-[84vh]" aria-label="Sidebar">
           <div className="h-full px-3 pb-4 pt-0 overflow-y-auto custom-scrollbar">
             <div className="scroll-content h-fit left-0 top-0 transition-transform z-40">
-              <ul role="list" className="space-y-2 font-medium list-disc">
+              <div>
+                {" "}
+                <Link
+                  to="#"
+                  className="mt-5 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white bg-white/60"
+                >
+                  <div className="flex justify-between w-full items-center">
+                    {menuToggle ? (
+                      <span>
+                        <FormeIcon />
+                      </span>
+                    ) : (
+                      <p className="text-black font-normal">For Me</p>
+                    )}
+                    <Switch
+                      color="secondary"
+                      size="md"
+                      defaultSelected
+                      classNames={{
+                        wrapper: "p-0 h-3 w-9   overflow-visible",
+                        thumb: cn(
+                          "w-5 h-5  shadow-lg",
+                          "group-data-[hover=true]:border-secondary",
+                          //selected
+                          "group-data-[selected=true]:ml-4  bg-secondary",
+
+                          // pressed
+                          "group-data-[pressed=true]:w-7",
+                          "group-data-[selected]:group-data-[pressed]:ml-4"
+                        ),
+                      }}
+                      aria-label="Automatic updates"
+                    />
+                  </div>
+                </Link>
+              </div>
+              <div>
+                <Link
+                  to="#"
+                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white bg-white/60"
+                >
+                  <div className="flex justify-between w-full items-center">
+                    {menuToggle ? (
+                      <span>
+                        <FormeIcon />
+                      </span>
+                    ) : (
+                      <p className="text-black font-normal">Within 5Km</p>
+                    )}
+                    <Switch
+                      color="secondary"
+                      size="md"
+                      defaultSelected
+                      classNames={{
+                        wrapper: "p-0 h-3 w-9   overflow-visible",
+                        thumb: cn(
+                          "w-5 h-5  shadow-lg",
+                          "group-data-[hover=true]:border-secondary",
+                          //selected
+                          "group-data-[selected=true]:ml-4  bg-secondary",
+
+                          // pressed
+                          "group-data-[pressed=true]:w-7",
+                          "group-data-[selected]:group-data-[pressed]:ml-4"
+                        ),
+                      }}
+                      aria-label="Automatic updates"
+                    />
+                  </div>
+                </Link>
+              </div>
+              <div>
+                <Accordion variant="light">
+                  <AccordionItem
+                    key="1"
+                    aria-label="Categories"
+                    title="Categories"
+                    className="p-0 m-0 text-black"
+                  >
+                    <ul className="">
+                      <li className="p-0 m-0">
+                        <div className="flex items-center justify-between">
+                          <div className="flex  items-center">
+                            <p
+                              className="me-2 text-black mt-0.5"
+                              style={{
+                                height: "4px",
+                                width: "4px",
+                                borderRadius: "8px",
+                                backgroundColor: "black",
+                              }}
+                            ></p>
+                            <p className="ms-2 text-black font-normal text-sm">
+                              Grocery
+                            </p>
+                          </div>
+                          <div>
+                            <Checkbox
+                              className="m-0 p-0"
+                              defaultSelected
+                              size="sm"
+                              color="success"
+                              radius="none"
+                            />
+                          </div>
+                        </div>
+                      </li>
+                      <li>
+                        <div className="flex items-center justify-between">
+                          <div className="flex  items-center">
+                            <p
+                              className="me-2 text-black mt-0.5"
+                              style={{
+                                height: "4px",
+                                width: "4px",
+                                borderRadius: "8px",
+                                backgroundColor: "black",
+                              }}
+                            ></p>
+                            <p className="ms-2 text-black font-normal text-sm">
+                              Mobiles
+                            </p>
+                          </div>
+                          <div>
+                            <Checkbox
+                              className="m-0 p-0"
+                              defaultSelected
+                              size="sm"
+                              color="success"
+                              radius="none"
+                            />
+                          </div>
+                        </div>
+                      </li>
+                      <li>
+                        <div className="flex items-center justify-between">
+                          <div className="flex  items-center">
+                            <p
+                              className="me-2 text-black mt-0.5"
+                              style={{
+                                height: "4px",
+                                width: "4px",
+                                borderRadius: "8px",
+                                backgroundColor: "black",
+                              }}
+                            ></p>
+                            <p className="ms-2 text-black font-normal text-sm">
+                              Beauty, Toys & More
+                            </p>
+                          </div>
+                          <div>
+                            <Checkbox
+                              className="m-0 p-0"
+                              defaultSelected
+                              size="sm"
+                              color="success"
+                              radius="none"
+                            />
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+              <div>
+                <Accordion variant="light">
+                  <AccordionItem
+                    key="1"
+                    aria-label="Other For You"
+                    title="Other For You"
+                    className="p-0 m-0 text-black"
+                  >
+                    <ul className="">
+                      <li className="p-0 m-0">
+                        <div className="flex items-center justify-between">
+                          <div className="flex  items-center">
+                            <p
+                              className="me-2 text-black mt-0.5"
+                              style={{
+                                height: "4px",
+                                width: "4px",
+                                borderRadius: "8px",
+                                backgroundColor: "black",
+                              }}
+                            ></p>
+                            <p className="ms-2 text-black font-normal text-sm">
+                              Grocery
+                            </p>
+                          </div>
+                          <div>
+                            <Checkbox
+                              className="m-0 p-0"
+                              defaultSelected
+                              size="sm"
+                              color="success"
+                              radius="none"
+                            />
+                          </div>
+                        </div>
+                      </li>
+                      <li>
+                        <div className="flex items-center justify-between">
+                          <div className="flex  items-center">
+                            <p
+                              className="me-2 text-black mt-0.5"
+                              style={{
+                                height: "4px",
+                                width: "4px",
+                                borderRadius: "8px",
+                                backgroundColor: "black",
+                              }}
+                            ></p>
+                            <p className="ms-2 text-black font-normal text-sm">
+                            Home
+                            </p>
+                          </div>
+                          <div>
+                            <Checkbox
+                              className="m-0 p-0"
+                              defaultSelected
+                              size="sm"
+                              color="success"
+                              radius="none"
+                            />
+                          </div>
+                        </div>
+                      </li>
+                      <li>
+                        <div className="flex items-center justify-between">
+                          <div className="flex  items-center">
+                            <p
+                              className="me-2 text-black mt-0.5"
+                              style={{
+                                height: "4px",
+                                width: "4px",
+                                borderRadius: "8px",
+                                backgroundColor: "black",
+                              }}
+                            ></p>
+                            <p className="ms-2 text-black font-normal text-sm">
+                            Electronics
+                            </p>
+                          </div>
+                          <div>
+                            <Checkbox
+                              className="m-0 p-0"
+                              defaultSelected
+                              size="sm"
+                              color="success"
+                              radius="none"
+                            />
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+              <div>
+                {" "}
+                <Link
+                  to="#"
+                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white bg-white/60"
+                >
+                  <div className="flex justify-between w-full items-center">
+                    {menuToggle ? (
+                      <span>
+                        <FormeIcon />
+                      </span>
+                    ) : (
+                      <p className="text-black font-normal">Cash on Delivery</p>
+                    )}
+                    <Switch
+                      color="secondary"
+                      size="md"
+                      defaultSelected
+                      classNames={{
+                        wrapper: "p-0 h-3 w-9   overflow-visible",
+                        thumb: cn(
+                          "w-5 h-5  shadow-lg",
+                          "group-data-[hover=true]:border-secondary",
+                          //selected
+                          "group-data-[selected=true]:ml-4  bg-secondary",
+
+                          // pressed
+                          "group-data-[pressed=true]:w-7",
+                          "group-data-[selected]:group-data-[pressed]:ml-4"
+                        ),
+                      }}
+                      aria-label="Automatic updates"
+                    />
+                  </div>
+                </Link>
+              </div>
+              <div>
+                {" "}
+                <Link
+                  to="#"
+                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white bg-white/60"
+                >
+                  <div className="flex justify-between w-full items-center">
+                    {menuToggle ? (
+                      <span>
+                        <FormeIcon />
+                      </span>
+                    ) : (
+                      <p className="text-black font-normal">Pre Booking</p>
+                    )}
+                    <Switch
+                      color="secondary"
+                      size="md"
+                      defaultSelected
+                      classNames={{
+                        wrapper: "p-0 h-3 w-9   overflow-visible",
+                        thumb: cn(
+                          "w-5 h-5  shadow-lg",
+                          "group-data-[hover=true]:border-secondary",
+                          //selected
+                          "group-data-[selected=true]:ml-4  bg-secondary",
+
+                          // pressed
+                          "group-data-[pressed=true]:w-7",
+                          "group-data-[selected]:group-data-[pressed]:ml-4"
+                        ),
+                      }}
+                      aria-label="Automatic updates"
+                    />
+                  </div>
+                </Link>
+              </div>
+              <div>
+                {" "}
+                <Link
+                  to="#"
+                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white bg-white/60"
+                >
+                  <div className="flex justify-between w-full items-center">
+                    {menuToggle ? (
+                      <span>
+                        <FormeIcon />
+                      </span>
+                    ) : (
+                      <p className="text-black font-normal">Open Shop</p>
+                    )}
+                    <Switch
+                      color="secondary"
+                      size="md"
+                      defaultSelected
+                      classNames={{
+                        wrapper: "p-0 h-3 w-9   overflow-visible",
+                        thumb: cn(
+                          "w-5 h-5  shadow-lg",
+                          "group-data-[hover=true]:border-secondary",
+                          //selected
+                          "group-data-[selected=true]:ml-4  bg-secondary",
+
+                          // pressed
+                          "group-data-[pressed=true]:w-7",
+                          "group-data-[selected]:group-data-[pressed]:ml-4"
+                        ),
+                      }}
+                      aria-label="Automatic updates"
+                    />
+                  </div>
+                </Link>
+              </div>
+              <div>
+                <Link
+                  to="#"
+                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white bg-white/60"
+                >
+                  <div className="flex justify-between w-full items-center">
+                    {menuToggle ? (
+                      <span>
+                        <FormeIcon />
+                      </span>
+                    ) : (
+                      <p className="text-black font-normal">Hospitals</p>
+                    )}
+                    <Switch
+                      color="secondary"
+                      size="md"
+                      defaultSelected
+                      classNames={{
+                        wrapper: "p-0 h-3 w-9   overflow-visible",
+                        thumb: cn(
+                          "w-5 h-5  shadow-lg",
+                          "group-data-[hover=true]:border-secondary",
+                          //selected
+                          "group-data-[selected=true]:ml-4  bg-secondary",
+
+                          // pressed
+                          "group-data-[pressed=true]:w-7",
+                          "group-data-[selected]:group-data-[pressed]:ml-4"
+                        ),
+                      }}
+                      aria-label="Automatic updates"
+                    />
+                  </div>
+                </Link>
+              </div>
+              <div>
+                {" "}
+                <Link
+                  to="#"
+                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white bg-white/60"
+                >
+                  <div className="flex justify-between w-full items-center">
+                    {menuToggle ? (
+                      <span>
+                        <FormeIcon />
+                      </span>
+                    ) : (
+                      <p className="text-black font-normal">Hotels</p>
+                    )}
+                    <Switch
+                      color="secondary"
+                      size="md"
+                      defaultSelected
+                      classNames={{
+                        wrapper: "p-0 h-3 w-9   overflow-visible",
+                        thumb: cn(
+                          "w-5 h-5  shadow-lg",
+                          "group-data-[hover=true]:border-secondary",
+                          //selected
+                          "group-data-[selected=true]:ml-4  bg-secondary",
+
+                          // pressed
+                          "group-data-[pressed=true]:w-7",
+                          "group-data-[selected]:group-data-[pressed]:ml-4"
+                        ),
+                      }}
+                      aria-label="Automatic updates"
+                    />
+                  </div>
+                </Link>
+              </div>
+
+              {/* <ul role="list" className="space-y-2 font-medium list-disc">
                 {_nav?.map((result) =>
                   result?.menuType === "single" ? (
                     <li className="bg-white rounded-xl">
                       <Link
                         to="#"
-                        className="mt-7 p-3 text-sm flex items-center text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                        className="mt-7 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                       >
                         <div className="flex justify-between w-full items-center">
                           {menuToggle ? (
                             <span>
-                              <IconHome />
+                              <FormeIcon />
                             </span>
                           ) : (
                             <p>For Me</p>
                           )}
                           <Switch
                             color="secondary"
-                            // size="lg"
+                            size="sm"
                             defaultSelected
                             classNames={{
-                              wrapper: "p-0 h-5 w-9 overflow-visible",
+                              wrapper: "p-0 h-3 w-9  border-1 overflow-visible",
                               thumb: cn(
-                                "w-4 h-4 border-2 shadow-lg",
+                                "w-5 h-5 border-1 shadow-lg",
                                 "group-data-[hover=true]:border-secondary",
                                 //selected
                                 "group-data-[selected=true]:ml-4  bg-secondary",
@@ -166,7 +621,7 @@ export const AppSidebar = () => {
                     </li>
                   )
                 )}
-              </ul>
+              </ul> */}
             </div>
           </div>
         </aside>
