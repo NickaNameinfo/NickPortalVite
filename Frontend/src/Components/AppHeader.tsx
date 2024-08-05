@@ -77,6 +77,7 @@ export const AppHeader = () => {
           {/* <div className="xm:hidden md:block w-webkit-fill-available"> */}
           <div className=" flex justify-start">
             <Input
+              autoFocus={false}
               isClearable
               className="w-[280px]"
               radius="lg"
@@ -88,24 +89,34 @@ export const AppHeader = () => {
               placeholder="Search Here..."
               // style={{ backgroundColor:"whitesmoke"}}
               classNames={{
-                label: "text-black/50 dark:text-white/50",
+                label: "text-black/60 dark:text-white/60",
                 input: [
                   "bg-transparent",
                   "text-black/90 dark:text-white/100",
-                  "placeholder:text-default-100/50 dark:placeholder:text-white/10",
+                  "placeholder:text-default-100/30 dark:placeholder:text-white/10",
+                  "font-normal",
                 ],
                 innerWrapper: "bg-transparent",
                 inputWrapper: [
                   // "shadow-xl",
-                  "bg-default-100/50",
-                  "dark:bg-default/60",
+                  // "bg-default-200/190",
+                  // "dark:bg-default/90",
+                  // "backdrop-blur-xl",
+                  "bg-transparent",
+                  "dark:bg-transparent",
                   "backdrop-blur-xl",
                   "backdrop-saturate-50",
-                  "hover:bg-default-100/40",
-                  "focus-within:!bg-default-50/10",
-                  "dark:hover:bg-default/10",
-                  "dark:focus-within:!bg-default/90",
+                  "hover:bg-transparent",
+                  "hover:border-gray-600/10",
+                  "focus-within:!bg-transparent",
+                  "dark:hover:bg-transparent",
+                  "dark:focus-within:!bg-transparent",
                   "!cursor-text",
+                  "shadow-none",
+                  "border-0",
+                  "data-[hover=true]:bg-transparent",
+                  "data-[hover=true]:bg-transparent",
+                  "dark:data-[hover=true]:bg-transparent",
                 ],
               }}
               startContent={
