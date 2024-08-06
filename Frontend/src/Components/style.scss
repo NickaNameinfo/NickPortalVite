@@ -152,7 +152,7 @@ aside {
   background-color: var(--bg-input);
 }
 .appContentViewHeight {
-  height: calc(100vh - 35px);
+  height: calc(100vh - 156px);
 }
 .slider-container {
   display: flex;
@@ -177,8 +177,4 @@ aside {
 .group[data-focus-visible="true"]
   .group-data-\[focus-visible\=true\]\:ring-focus {
   --tw-ring-color: hsl(0deg 0% 37.16% / 0%) !important;
-}
-.modalIconClose {
-  top: -20px !important;
-  right: -20px !important;
 }
