@@ -28,7 +28,7 @@ export const AppSidebar = () => {
 
   const itemClasses = {
     base: "py-0 w-full",
-    title: "font-normal text-medium text-black",
+    title: "text-black text-sm font-normal",
     trigger:
       "px-2 py-0 data-[hover=true]:bg-default-10 rounded-lg h-14 flex items-center",
     indicator: "text-medium",
@@ -117,7 +117,7 @@ export const AppSidebar = () => {
                         <FormeIcon />
                       </span>
                     ) : (
-                      <p className="text-black font-normal">For Me</p>
+                      <p className="text-black text-sm font-normal">For Me</p>
                     )}
                     <Switch
                       color="secondary"
@@ -155,7 +155,9 @@ export const AppSidebar = () => {
                         <FormeIcon />
                       </span>
                     ) : (
-                      <p className="text-black font-normal">Within 5Km</p>
+                      <p className="text-black text-sm font-normal">
+                        Within 5Km
+                      </p>
                     )}
                     <Switch
                       color="secondary"
@@ -400,7 +402,9 @@ export const AppSidebar = () => {
                         <FormeIcon />
                       </span>
                     ) : (
-                      <p className="text-black font-normal">Cash on Delivery</p>
+                      <p className="text-black text-sm font-normal">
+                        Cash on Delivery
+                      </p>
                     )}
                     <Switch
                       color="secondary"
@@ -439,7 +443,9 @@ export const AppSidebar = () => {
                         <FormeIcon />
                       </span>
                     ) : (
-                      <p className="text-black font-normal">Pre Booking</p>
+                      <p className="text-black text-sm font-normal">
+                        Pre Booking
+                      </p>
                     )}
                     <Switch
                       color="secondary"
@@ -478,7 +484,9 @@ export const AppSidebar = () => {
                         <FormeIcon />
                       </span>
                     ) : (
-                      <p className="text-black font-normal">Open Shop</p>
+                      <p className="text-black text-sm font-normal">
+                        Open Shop
+                      </p>
                     )}
                     <Switch
                       color="secondary"
@@ -516,7 +524,9 @@ export const AppSidebar = () => {
                         <FormeIcon />
                       </span>
                     ) : (
-                      <p className="text-black font-normal">Hospitals</p>
+                      <p className="text-black text-sm font-normal">
+                        Hospitals
+                      </p>
                     )}
                     <Switch
                       color="secondary"
@@ -555,7 +565,7 @@ export const AppSidebar = () => {
                         <FormeIcon />
                       </span>
                     ) : (
-                      <p className="text-black font-normal">Hotels</p>
+                      <p className="text-black text-sm font-normal">Hotels</p>
                     )}
                     <Switch
                       color="secondary"
