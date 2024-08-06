@@ -57,7 +57,7 @@ export const TableList = (props: TableProps) => {
     );
   }, [visibleColumns]);
 
-  console.log(headerColumns, "headerColumns452345");
+  console.log(props.tableItems, "headerColumns452345");
 
   const filteredItems = React.useMemo(() => {
     let filteredUsers = [...props.tableItems];

@@ -61,7 +61,10 @@ module.exports = {
         discountPer,
         total,
         netPrice,
-        paymentMode
+        paymentMode,
+        preOrder,
+        onlinePayment,
+        cashPayment,
       } = req.body;
       return db.product.create({
         categoryId: Number(categoryId),
@@ -83,11 +86,14 @@ module.exports = {
         netPrice: netPrice,
         paymentMode: paymentMode,
         photo: req?.file ? req?.file?.path : "",
+        preOrder: preOrder,
+        onlinePayment: onlinePayment,
+        cashPayment: cashPayment,
       })
         .then((product) => {
           res
             .status(200)
-            .json({ success: true, msg: "Successfully inserted product", data:product });
+            .json({ success: true, msg: "Successfully inserted product", data: product });
         })
         .catch(function (err) {
           next(err);
@@ -125,7 +131,7 @@ module.exports = {
       db.product
         .findAll({
           order: [["createdAt", "DESC"]],
-          attributes: ["id", "name", "price","createdAt"], // Add the correct product attributes here
+          attributes: ["id", "name", "price", "createdAt"], // Add the correct product attributes here
           include: [
             {
               model: db.subcategories,
@@ -148,7 +154,7 @@ module.exports = {
     } catch (err) {
       throw new RequestError("Error");
     }
-  }, 
+  },
 
   async update(req, res, next) {
     try {
@@ -170,7 +176,10 @@ module.exports = {
         discountPer,
         total,
         netPrice,
-        paymentMode
+        paymentMode,
+        preOrder,
+        onlinePayment,
+        cashPayment,
       } = req.body;
       db.product
         .findOne({ where: { id: productId } })
@@ -200,6 +209,9 @@ module.exports = {
                 netPrice: netPrice,
                 paymentMode: paymentMode,
                 photo: req.file ? req.file.location : product.photo,
+                preOrder: preOrder,
+                onlinePayment: onlinePayment,
+                cashPayment: cashPayment,
               },
               { where: { id: product.id } }
             );

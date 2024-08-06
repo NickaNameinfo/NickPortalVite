@@ -12,15 +12,15 @@ import { getCookie } from "../../.././JsFiles//CommonFunction.mjs";
 const VendorDetails = () => {
   const { id } = useParams();
   const currentPlan = getCookie("plan");
-
-  const { data, error, refetch } = useGetVendorsProductByIdQuery(7);
+  const vendorId = getCookie("vendorId");
+  const { data, error, refetch } = useGetVendorsProductByIdQuery(Number(id));
   const {
     data: vendorDetails,
     error: vendorError,
     refetch: vendorRefetch,
-  } = useGetVendorsByIdQuery(7);
+  } = useGetVendorsByIdQuery(id);
 
-  console.log(data, "data3462354", error, vendorDetails);
+  console.log(data, "data3462354", error, vendorDetails, id);
   // Refetch the data when the id changes
   React.useEffect(() => {
     if (id) {
@@ -30,13 +30,13 @@ const VendorDetails = () => {
 
   return (
     <div>
-      <VendorHeaderCard item={vendorDetails?.data?.[0]}/>
+      <VendorHeaderCard item={vendorDetails?.data?.[0]} />
       <div className="grid xm:grid-cols-1 mm:grid-cols-1 ml:grid-cols-1 sm:grid-cols-2  md:grid-cols-3  lg:grid-cols-3  xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-5 gap-2">
         {data?.data?.map((result) =>
           currentPlan === "1" ? (
             <RelatedVendors item={result} />
           ) : (
-            <PremiumCard item={result}/>
+            <PremiumCard item={result} />
           )
         )}
       </div>

@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import {
   Button,
+  Checkbox,
+  CheckboxGroup,
   Chip,
   Dropdown,
   DropdownItem,
@@ -22,14 +24,15 @@ import { useGetCategoriesQuery } from "../Categories/Service.mjs";
 import { getCookie } from "../.././JsFiles//CommonFunction.mjs";
 
 const AddProducts = () => {
-  const { handleSubmit, control, reset } = useForm();
+  const { handleSubmit, control, reset,watch } = useForm();
   const currentStoreUserId = getCookie("storeId");
   const currentVendorUserId = getCookie("vendorId");
   const navigate = useNavigate();
   const [addProducts] = useAddProductMutation();
   const [addStoreProducts] = useAddStoreProductMutation();
   const [addVendorProducts] = useAddVendorProductMutation();
-
+  let tempFormData = watch()
+  console.log(tempFormData, "watch2451234")
   const {
     data: categoryData,
     error: categoryerror,
@@ -42,8 +45,9 @@ const AddProducts = () => {
       subCategoryId: 2,
       childCategoryId: 2,
       slug: 1,
+      paymentMode : String(tempFormData?.paymentMode || '')
     };
-    console.log("datafrom data form", tempData);
+    console.log("datafrom", tempData);
     const formData = new FormData();
     for (const key in tempData) {
       formData.append(key, tempData[key]);
@@ -261,12 +265,32 @@ const AddProducts = () => {
                 <Input type="text" label="Total" size="lg" {...field} />
               )}
             />
+          </div>
+          <div className="grid grid-cols-2 gap-4 mb-2">
             <Controller
               name="grand_total" // Changed to reflect a text input
               control={control}
               rules={{ required: true }}
               render={({ field }) => (
                 <Input type="text" label="Grand total" size="lg" {...field} />
+              )}
+            />
+            <Controller
+              name="paymentMode" // Changed to reflect a text input
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <CheckboxGroup
+                  label="Select Payment Type"
+                  orientation="horizontal"
+                  color="secondary"
+                  {...field}
+                  defaultValue={["1", "2", "3"]}
+                >
+                  <Checkbox value="1">Per Order</Checkbox>
+                  <Checkbox value="2">Online Payment</Checkbox>
+                  <Checkbox value="3">Cash on Delivery</Checkbox>
+                </CheckboxGroup>
               )}
             />
           </div>

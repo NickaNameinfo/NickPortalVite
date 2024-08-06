@@ -48,6 +48,12 @@ export const StoreApi = createApi({
         method: "GET",
       }),
     }),
+    getStoresProductByID: builder.query({
+      query: (id) => ({
+        url: `/store/product/getAllProductById/${id}`,
+        method: "GET",
+      }),
+    }),
     updateStore: builder.mutation({
       query: (body) => ({
         url: `/store/update`,
@@ -65,5 +71,6 @@ export const {
   useAddStoreMutation,
   useGetStoresByIDQuery,
   useUpdateStoreMutation,
+  useGetStoresProductByIDQuery
 } = StoreApi;
 export const { endpoints } = StoreApi;
