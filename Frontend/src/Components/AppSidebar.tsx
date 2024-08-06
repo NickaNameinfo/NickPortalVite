@@ -25,8 +25,12 @@ import { Link } from "react-router-dom";
 export const AppSidebar = () => {
   const [menuToggle, setMenuToggle] = React.useState(false);
   const [mobileExpand, setMobileExpand] = React.useState(false);
+
   const itemClasses = {
-    title: "font-normal text-sm text-black ms-1",
+    base: "py-0 w-full",
+    title: "font-normal text-medium text-black",
+    trigger:
+      "px-2 py-0 data-[hover=true]:bg-default-10 rounded-lg h-14 flex items-center",
     indicator: "text-medium",
     content: "text-small px-2",
   };
@@ -98,11 +102,14 @@ export const AppSidebar = () => {
         <aside id="default-sidebar" className="h-[84vh]" aria-label="Sidebar">
           <div className="h-full px-3 pb-4 pt-0 overflow-y-auto custom-scrollbar">
             <div className="scroll-content h-fit left-0 top-0 transition-transform z-40">
-              <div>
+              <div
+                style={{ backgroundColor: "#ffffff80" }}
+                className="rounded-lg"
+              >
                 {" "}
                 <Link
                   to="#"
-                  className="mt-5 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white bg-white/60"
+                  className="mt-5 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white "
                 >
                   <div className="flex justify-between w-full items-center">
                     {menuToggle ? (
@@ -134,10 +141,13 @@ export const AppSidebar = () => {
                   </div>
                 </Link>
               </div>
-              <div>
+              <div
+                style={{ backgroundColor: "#ffffff80" }}
+                className="rounded-lg"
+              >
                 <Link
                   to="#"
-                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white bg-white/60"
+                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white "
                 >
                   <div className="flex justify-between w-full items-center">
                     {menuToggle ? (
@@ -169,17 +179,25 @@ export const AppSidebar = () => {
                   </div>
                 </Link>
               </div>
-              <div>
-                <Accordion variant="light">
+              <div className="rounded-lg">
+                <Accordion
+                  itemClasses={itemClasses}
+                  className="text-foreground rounded-lg"
+                  style={{
+                    backgroundColor: "rgba(236, 247, 255, 0.5)",
+                    // color: "black !important",
+                    // opacity: 4,
+                  }}
+                >
                   <AccordionItem
                     key="1"
                     aria-label="Categories"
                     title="Categories"
-                    className="p-0 m-0 text-black"
+                    className="p-0 m-0 text-foreground"
                   >
                     <ul className="">
                       <li className="p-0 m-0">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between mb-0.5">
                           <div className="flex  items-center">
                             <p
                               className="me-2 text-black mt-0.5"
@@ -206,7 +224,7 @@ export const AppSidebar = () => {
                         </div>
                       </li>
                       <li>
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between mb-0.5">
                           <div className="flex  items-center">
                             <p
                               className="me-2 text-black mt-0.5"
@@ -263,13 +281,23 @@ export const AppSidebar = () => {
                   </AccordionItem>
                 </Accordion>
               </div>
-              <div>
-                <Accordion variant="light">
+              <div className="mt-3">
+                <Accordion
+                  variant="light"
+                  className="text-foreground rounded-lg"
+                  itemClasses={itemClasses}
+                  style={{
+                    backgroundColor: "rgba(236, 247, 255, 0.5)",
+                    // opacity: 1,
+                    // color: "black !important",
+                    // opacity: 4,
+                  }}
+                >
                   <AccordionItem
                     key="1"
                     aria-label="Other For You"
                     title="Other For You"
-                    className="p-0 m-0 text-black"
+                    className="p-0 m-0"
                   >
                     <ul className="">
                       <li className="p-0 m-0">
@@ -312,7 +340,7 @@ export const AppSidebar = () => {
                               }}
                             ></p>
                             <p className="ms-2 text-black font-normal text-sm">
-                            Home
+                              Home
                             </p>
                           </div>
                           <div>
@@ -339,7 +367,7 @@ export const AppSidebar = () => {
                               }}
                             ></p>
                             <p className="ms-2 text-black font-normal text-sm">
-                            Electronics
+                              Electronics
                             </p>
                           </div>
                           <div>
@@ -357,11 +385,14 @@ export const AppSidebar = () => {
                   </AccordionItem>
                 </Accordion>
               </div>
-              <div>
+              <div
+                style={{ backgroundColor: "#ffffff80" }}
+                className="rounded-lg"
+              >
                 {" "}
                 <Link
                   to="#"
-                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white bg-white/60"
+                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white"
                 >
                   <div className="flex justify-between w-full items-center">
                     {menuToggle ? (
@@ -393,11 +424,14 @@ export const AppSidebar = () => {
                   </div>
                 </Link>
               </div>
-              <div>
+              <div
+                style={{ backgroundColor: "#ffffff80" }}
+                className="rounded-lg"
+              >
                 {" "}
                 <Link
                   to="#"
-                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white bg-white/60"
+                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white"
                 >
                   <div className="flex justify-between w-full items-center">
                     {menuToggle ? (
@@ -429,11 +463,14 @@ export const AppSidebar = () => {
                   </div>
                 </Link>
               </div>
-              <div>
+              <div
+                style={{ backgroundColor: "#ffffff80" }}
+                className="rounded-lg"
+              >
                 {" "}
                 <Link
                   to="#"
-                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white bg-white/60"
+                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white "
                 >
                   <div className="flex justify-between w-full items-center">
                     {menuToggle ? (
@@ -465,10 +502,13 @@ export const AppSidebar = () => {
                   </div>
                 </Link>
               </div>
-              <div>
+              <div
+                style={{ backgroundColor: "#ffffff80" }}
+                className="rounded-lg"
+              >
                 <Link
                   to="#"
-                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white bg-white/60"
+                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white "
                 >
                   <div className="flex justify-between w-full items-center">
                     {menuToggle ? (
@@ -500,11 +540,14 @@ export const AppSidebar = () => {
                   </div>
                 </Link>
               </div>
-              <div>
+              <div
+                style={{ backgroundColor: "#ffffff80" }}
+                className="rounded-lg"
+              >
                 {" "}
                 <Link
                   to="#"
-                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white bg-white/60"
+                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white "
                 >
                   <div className="flex justify-between w-full items-center">
                     {menuToggle ? (
