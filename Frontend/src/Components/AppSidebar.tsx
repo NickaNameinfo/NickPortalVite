@@ -34,6 +34,10 @@ export const AppSidebar = () => {
     indicator: "text-medium",
     content: "text-small px-2",
   };
+  const slots = {
+    base: "border-default hover:bg-default-200",
+    content: "text-default-500",
+  };
 
   return (
     <>
@@ -124,16 +128,22 @@ export const AppSidebar = () => {
                       size="md"
                       defaultSelected
                       classNames={{
-                        wrapper: "p-0 h-3 w-9   overflow-visible",
+                        wrapper: [
+                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
+                        ],
                         thumb: cn(
                           "w-5 h-5  shadow-lg",
-                          "group-data-[hover=true]:border-secondary",
-                          //selected
-                          "group-data-[selected=true]:ml-4  bg-secondary",
 
-                          // pressed
-                          "group-data-[pressed=true]:w-7",
-                          "group-data-[selected]:group-data-[pressed]:ml-4"
+                          "group-data-[hover=true]:border-secondary",
+
+                          //selected bg-teal-400 , bg-yellow-600
+                          "group-data-[selected=true]:bg-green-500",
+                          "group-data-[selected=true]:ml-4 ",
+
+                          // pressed bg-green-600
+                          "group-data-[pressed=true]:w-7 ",
+                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
+                          "group-data-[selected=true]: bg-cyan-500"
                         ),
                       }}
                       aria-label="Automatic updates"
@@ -164,16 +174,22 @@ export const AppSidebar = () => {
                       size="md"
                       defaultSelected
                       classNames={{
-                        wrapper: "p-0 h-3 w-9   overflow-visible",
+                        wrapper: [
+                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
+                        ],
                         thumb: cn(
                           "w-5 h-5  shadow-lg",
-                          "group-data-[hover=true]:border-secondary",
-                          //selected
-                          "group-data-[selected=true]:ml-4  bg-secondary",
 
-                          // pressed
-                          "group-data-[pressed=true]:w-7",
-                          "group-data-[selected]:group-data-[pressed]:ml-4"
+                          "group-data-[hover=true]:border-secondary",
+
+                          //selected bg-teal-400 , bg-yellow-600
+                          "group-data-[selected=true]:bg-green-500",
+                          "group-data-[selected=true]:ml-4 ",
+
+                          // pressed bg-green-600
+                          "group-data-[pressed=true]:w-7 ",
+                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
+                          "group-data-[selected=true]: bg-cyan-500"
                         ),
                       }}
                       aria-label="Automatic updates"
@@ -216,8 +232,22 @@ export const AppSidebar = () => {
                           </div>
                           <div>
                             <Checkbox
+                              classNames={{
+                                label: [
+                                  "text-small",
+                                  "text-yellow-300",
+                                  "font-light",
+                                  "hover:bg-cyan-500",
+                                  "data-[hover=true]:bg-cyan-500",
+                                ],
+                                wrapper: [
+                                  "before:border-0",
+                                  "before:bg-cyan-500",
+                                  "data-[hover=true]:bg-cyan-500",
+                                ],
+                              }}
                               className="m-0 p-0"
-                              defaultSelected
+                              // defaultSelected
                               size="sm"
                               color="success"
                               radius="none"
@@ -243,8 +273,22 @@ export const AppSidebar = () => {
                           </div>
                           <div>
                             <Checkbox
+                              classNames={{
+                                label: [
+                                  "text-small",
+                                  "text-yellow-300",
+                                  "font-light",
+                                  "hover:bg-cyan-500",
+                                  "data-[hover=true]:bg-cyan-500",
+                                ],
+                                wrapper: [
+                                  "before:border-0",
+                                  "before:bg-cyan-500",
+                                  "data-[hover=true]:bg-cyan-500",
+                                ],
+                              }}
                               className="m-0 p-0"
-                              defaultSelected
+                              // defaultSelected
                               size="sm"
                               color="success"
                               radius="none"
@@ -270,8 +314,22 @@ export const AppSidebar = () => {
                           </div>
                           <div>
                             <Checkbox
+                              classNames={{
+                                label: [
+                                  "text-small",
+                                  "text-yellow-300",
+                                  "font-light",
+                                  "hover:bg-cyan-500",
+                                  "data-[hover=true]:bg-cyan-500",
+                                ],
+                                wrapper: [
+                                  "before:border-0",
+                                  "before:bg-cyan-500",
+                                  "data-[hover=true]:bg-cyan-500",
+                                ],
+                              }}
                               className="m-0 p-0"
-                              defaultSelected
+                              // defaultSelected
                               size="sm"
                               color="success"
                               radius="none"
@@ -320,8 +378,22 @@ export const AppSidebar = () => {
                           </div>
                           <div>
                             <Checkbox
+                              classNames={{
+                                label: [
+                                  "text-small",
+                                  "text-yellow-300",
+                                  "font-light",
+                                  "hover:bg-cyan-500",
+                                  "data-[hover=true]:bg-cyan-500",
+                                ],
+                                wrapper: [
+                                  "before:border-0",
+                                  "before:bg-cyan-500",
+                                  "data-[hover=true]:bg-cyan-500",
+                                ],
+                              }}
                               className="m-0 p-0"
-                              defaultSelected
+                              // defaultSelected
                               size="sm"
                               color="success"
                               radius="none"
@@ -347,8 +419,22 @@ export const AppSidebar = () => {
                           </div>
                           <div>
                             <Checkbox
+                              classNames={{
+                                label: [
+                                  "text-small",
+                                  "text-yellow-300",
+                                  "font-light",
+                                  "hover:bg-cyan-500",
+                                  "data-[hover=true]:bg-cyan-500",
+                                ],
+                                wrapper: [
+                                  "before:border-0",
+                                  "before:bg-cyan-500",
+                                  "data-[hover=true]:bg-cyan-500",
+                                ],
+                              }}
                               className="m-0 p-0"
-                              defaultSelected
+                              // defaultSelected
                               size="sm"
                               color="success"
                               radius="none"
@@ -374,8 +460,22 @@ export const AppSidebar = () => {
                           </div>
                           <div>
                             <Checkbox
+                              classNames={{
+                                label: [
+                                  "text-small",
+                                  "text-yellow-300",
+                                  "font-light",
+                                  "hover:bg-cyan-500",
+                                  "data-[hover=true]:bg-cyan-500",
+                                ],
+                                wrapper: [
+                                  "before:border-0",
+                                  "before:bg-cyan-500",
+                                  "data-[hover=true]:bg-cyan-500",
+                                ],
+                              }}
                               className="m-0 p-0"
-                              defaultSelected
+                              // defaultSelected
                               size="sm"
                               color="success"
                               radius="none"
@@ -411,16 +511,22 @@ export const AppSidebar = () => {
                       size="md"
                       defaultSelected
                       classNames={{
-                        wrapper: "p-0 h-3 w-9   overflow-visible",
+                        wrapper: [
+                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
+                        ],
                         thumb: cn(
                           "w-5 h-5  shadow-lg",
-                          "group-data-[hover=true]:border-secondary",
-                          //selected
-                          "group-data-[selected=true]:ml-4  bg-secondary",
 
-                          // pressed
-                          "group-data-[pressed=true]:w-7",
-                          "group-data-[selected]:group-data-[pressed]:ml-4"
+                          "group-data-[hover=true]:border-secondary",
+
+                          //selected bg-teal-400 , bg-yellow-600
+                          "group-data-[selected=true]:bg-green-500",
+                          "group-data-[selected=true]:ml-4 ",
+
+                          // pressed bg-green-600
+                          "group-data-[pressed=true]:w-7 ",
+                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
+                          "group-data-[selected=true]: bg-cyan-500"
                         ),
                       }}
                       aria-label="Automatic updates"
@@ -452,16 +558,22 @@ export const AppSidebar = () => {
                       size="md"
                       defaultSelected
                       classNames={{
-                        wrapper: "p-0 h-3 w-9   overflow-visible",
+                        wrapper: [
+                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
+                        ],
                         thumb: cn(
                           "w-5 h-5  shadow-lg",
-                          "group-data-[hover=true]:border-secondary",
-                          //selected
-                          "group-data-[selected=true]:ml-4  bg-secondary",
 
-                          // pressed
-                          "group-data-[pressed=true]:w-7",
-                          "group-data-[selected]:group-data-[pressed]:ml-4"
+                          "group-data-[hover=true]:border-secondary",
+
+                          //selected bg-teal-400 , bg-yellow-600
+                          "group-data-[selected=true]:bg-green-500",
+                          "group-data-[selected=true]:ml-4 ",
+
+                          // pressed bg-green-600
+                          "group-data-[pressed=true]:w-7 ",
+                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
+                          "group-data-[selected=true]: bg-cyan-500"
                         ),
                       }}
                       aria-label="Automatic updates"
@@ -493,16 +605,22 @@ export const AppSidebar = () => {
                       size="md"
                       defaultSelected
                       classNames={{
-                        wrapper: "p-0 h-3 w-9   overflow-visible",
+                        wrapper: [
+                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
+                        ],
                         thumb: cn(
                           "w-5 h-5  shadow-lg",
-                          "group-data-[hover=true]:border-secondary",
-                          //selected
-                          "group-data-[selected=true]:ml-4  bg-secondary",
 
-                          // pressed
-                          "group-data-[pressed=true]:w-7",
-                          "group-data-[selected]:group-data-[pressed]:ml-4"
+                          "group-data-[hover=true]:border-secondary",
+
+                          //selected bg-teal-400 , bg-yellow-600
+                          "group-data-[selected=true]:bg-green-500",
+                          "group-data-[selected=true]:ml-4 ",
+
+                          // pressed bg-green-600
+                          "group-data-[pressed=true]:w-7 ",
+                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
+                          "group-data-[selected=true]: bg-cyan-500"
                         ),
                       }}
                       aria-label="Automatic updates"
@@ -533,16 +651,22 @@ export const AppSidebar = () => {
                       size="md"
                       defaultSelected
                       classNames={{
-                        wrapper: "p-0 h-3 w-9   overflow-visible",
+                        wrapper: [
+                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
+                        ],
                         thumb: cn(
                           "w-5 h-5  shadow-lg",
-                          "group-data-[hover=true]:border-secondary",
-                          //selected
-                          "group-data-[selected=true]:ml-4  bg-secondary",
 
-                          // pressed
-                          "group-data-[pressed=true]:w-7",
-                          "group-data-[selected]:group-data-[pressed]:ml-4"
+                          "group-data-[hover=true]:border-secondary",
+
+                          //selected bg-teal-400 , bg-yellow-600
+                          "group-data-[selected=true]:bg-green-500",
+                          "group-data-[selected=true]:ml-4 ",
+
+                          // pressed bg-green-600
+                          "group-data-[pressed=true]:w-7 ",
+                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
+                          "group-data-[selected=true]: bg-cyan-500"
                         ),
                       }}
                       aria-label="Automatic updates"
@@ -572,16 +696,22 @@ export const AppSidebar = () => {
                       size="md"
                       defaultSelected
                       classNames={{
-                        wrapper: "p-0 h-3 w-9   overflow-visible",
+                        wrapper: [
+                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
+                        ],
                         thumb: cn(
                           "w-5 h-5  shadow-lg",
-                          "group-data-[hover=true]:border-secondary",
-                          //selected
-                          "group-data-[selected=true]:ml-4  bg-secondary",
 
-                          // pressed
-                          "group-data-[pressed=true]:w-7",
-                          "group-data-[selected]:group-data-[pressed]:ml-4"
+                          "group-data-[hover=true]:border-secondary",
+
+                          //selected bg-teal-400 , bg-yellow-600
+                          "group-data-[selected=true]:bg-green-500",
+                          "group-data-[selected=true]:ml-4 ",
+
+                          // pressed bg-green-600
+                          "group-data-[pressed=true]:w-7 ",
+                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
+                          "group-data-[selected=true]: bg-cyan-500"
                         ),
                       }}
                       aria-label="Automatic updates"
@@ -606,25 +736,31 @@ export const AppSidebar = () => {
                           ) : (
                             <p>For Me</p>
                           )}
-                          <Switch
-                            color="secondary"
-                            size="sm"
-                            defaultSelected
-                            classNames={{
-                              wrapper: "p-0 h-3 w-9  border-1 overflow-visible",
-                              thumb: cn(
-                                "w-5 h-5 border-1 shadow-lg",
-                                "group-data-[hover=true]:border-secondary",
-                                //selected
-                                "group-data-[selected=true]:ml-4  bg-secondary",
+                         <Switch
+                      color="secondary"
+                      size="md"
+                      defaultSelected
+                      classNames={{
+                        wrapper: [
+                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
+                        ],
+                        thumb: cn(
+                          "w-5 h-5  shadow-lg",
 
-                                // pressed
-                                "group-data-[pressed=true]:w-7",
-                                "group-data-[selected]:group-data-[pressed]:ml-4"
-                              ),
-                            }}
-                            aria-label="Automatic updates"
-                          />
+                          "group-data-[hover=true]:border-secondary",
+
+                          //selected bg-teal-400 , bg-yellow-600
+                          "group-data-[selected=true]:bg-green-500",
+                          "group-data-[selected=true]:ml-4 ",
+
+                          // pressed bg-green-600
+                          "group-data-[pressed=true]:w-7 ",
+                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
+                          "group-data-[selected=true]: bg-cyan-500"
+                        ),
+                      }}
+                      aria-label="Automatic updates"
+                    />
                         </div>
                       </Link>
                     </li>
