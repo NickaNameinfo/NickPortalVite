@@ -5,6 +5,8 @@ import InputNextUI from "../../../Components/Input/input";
 import ModalUI from "../../../Components/Modal";
 import { useDispatch } from "react-redux";
 import { onOpenResigter } from "../../../Components/Common/globalSlice";
+import { useAppSelector } from "../../../Components/Common/hooks";
+import { Register } from "./Register";
 const Login = () => {
   const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -19,6 +21,10 @@ const Login = () => {
     password: "",
   });
 
+  const isOpenRegister = useAppSelector(
+    (state) => state.globalConfig.isOpenRegister
+  );
+  console.log(isOpenRegister, "panelReloadlknsdf");
   const onCloseModal = () => {
     onClose();
     setErrorMessage({
@@ -198,6 +204,7 @@ const Login = () => {
           </div>
         }
       />
+      {isOpenRegister && <Register />}
 
       {/* <Modal
         isDismissable={false}

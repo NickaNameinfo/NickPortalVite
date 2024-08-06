@@ -19,9 +19,11 @@ import { useRegisterMutation } from "../login/Service.mjs";
 import InputNextUI from "../../../Components/Input/input";
 import { useAppSelector } from "../../../Components/Common/hooks";
 import ModalUI from "../../../Components/Modal";
+import { onOpenResigter } from "../../../Components/Common/globalSlice";
+import { useDispatch } from "react-redux";
 
-export const Register = ({ registration = false }) => {
-  console.log(registration, "registration345");
+export const Register = () => {
+  const dispatch = useDispatch();
   const {
     handleSubmit,
     control,
@@ -38,7 +40,7 @@ export const Register = ({ registration = false }) => {
     (state) => state.globalConfig.isOpenRegister
   );
   console.log(isOpenRegister, "panelReloadlknsdf");
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
   const onSubmit = async () => {
     try {
@@ -58,15 +60,10 @@ export const Register = ({ registration = false }) => {
     }
   };
 
-  // React.useEffect(() => {
-  //   if (registration) {
-  //     onSubmit();
-  //   }
-  // }, [registration]);
-
   const onCloseModal = () => {
     reset();
     onClose();
+    dispatch(onOpenResigter(false));
   };
 
   const onClickLogin = () => {};
@@ -74,9 +71,9 @@ export const Register = ({ registration = false }) => {
   return (
     <>
       <ModalUI
-        isOpen={isOpen}
+        isOpen={isOpenRegister}
         onOpenChange={onCloseModal}
-        heading={"Login"}
+        heading={"Register"}
         headerIcon={<IconRegisterSVG width="200px" height="155px" />}
         content={
           <div className="px-3 m-0">
@@ -174,7 +171,8 @@ export const Register = ({ registration = false }) => {
                   <Checkbox
                     className="pt-4"
                     classNames={{
-                      label: "text-small",
+                      label: ["text-small", "text-gray-400", "font-light"],
+                      wrapper: ["before:border-1", "before:border-gray-300"],
                     }}
                   >
                     Accept the all{" "}
@@ -194,34 +192,6 @@ export const Register = ({ registration = false }) => {
               </form>
             </div>
 
-            <div className="w-full flex pt-5">
-              <div className="flex w-1/2">
-                <Checkbox
-                  className="justify-center flex"
-                  color="primary"
-                  radius="sm"
-                  classNames={{
-                    label: ["text-small", "text-gray-400", "font-light"],
-                    wrapper: ["before:border-1", "before:border-gray-300"],
-                  }}
-                >
-                  Remember Me
-                </Checkbox>
-              </div>
-              <div className="w-1/2 justify-end flex ">
-                <Link
-                  className="cursor-pointer p-0 m-0 #7358D7 max-w-md "
-                  style={{
-                    color: "#4C86F9",
-                  }}
-                  // color="foreground"
-                  onPress={() => {}}
-                  size="sm"
-                >
-                  Forgot Password?
-                </Link>
-              </div>
-            </div>
             <div className="w-full justify-center pt-5">
               <Button
                 onPress={() => onSubmit()}
