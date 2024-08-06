@@ -65,20 +65,23 @@ const InputNextUI = (props: InputFieldProps) => {
             "backdrop-blur-xl",
             "backdrop-saturate-50",
             "hover:bg-transparent",
-            "hover:border-gray-600/20",
+            `${props?.errorMessage && "hover:border-gray-600/20"}`,
             "focus-within:!bg-transparent",
             "dark:hover:bg-transparent",
             "dark:focus-within:!bg-transparent",
             "!cursor-text",
             "shadow-none",
             "border-1",
-            "data-[hover=true]:border-gray-600/20",
-            "dark:data-[hover=true]:border-gray-600/20",
+            `${!props?.errorMessage && "data-[hover=true]:border-gray-600/20"}`,
+            `${
+              !props?.errorMessage &&
+              "dark:data-[hover=true]:border-gray-600/20"
+            }`,
           ],
         }}
         className={`${props.className && props.className} max-w-xs`}
         variant={props?.variant ?? "faded"}
-        color={props?.color ?? "default"}
+        color={props?.errorMessage ? "danger" : props?.color ?? "default"}
         validationBehavior={props.validationBehavior}
         size={props?.size ?? "sm"}
         radius={props?.radius}
@@ -108,7 +111,7 @@ const InputNextUI = (props: InputFieldProps) => {
             props?.endContent
           )
         }
-        isInvalid={props?.isInvalid}
+        isInvalid={props?.errorMessage}
         isClearable={props?.isClearable ?? false}
         isDisabled={props?.isDisabled}
         isReadOnly={props?.isReadOnly}
