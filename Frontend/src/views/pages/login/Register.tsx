@@ -19,8 +19,12 @@ import { useRegisterMutation } from "../login/Service.mjs";
 import InputNextUI from "../../../Components/Input/input";
 import { useAppSelector } from "../../../Components/Common/hooks";
 import ModalUI from "../../../Components/Modal";
-import { onOpenResigter } from "../../../Components/Common/globalSlice";
+import {
+  onOpenLogin,
+  onOpenResigter,
+} from "../../../Components/Common/globalSlice";
 import { useDispatch } from "react-redux";
+import Login from "./Login";
 
 export const Register = () => {
   const dispatch = useDispatch();
@@ -39,6 +43,7 @@ export const Register = () => {
   const isOpenRegister = useAppSelector(
     (state) => state.globalConfig.isOpenRegister
   );
+  const isOpenLogin = useAppSelector((state) => state.globalConfig.isOpenLogin);
   console.log(isOpenRegister, "panelReloadlknsdf");
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
@@ -66,7 +71,10 @@ export const Register = () => {
     dispatch(onOpenResigter(false));
   };
 
-  const onClickLogin = () => {};
+  const onClickLogin = () => {
+    dispatch(onOpenResigter(false));
+    dispatch(onOpenLogin(true));
+  };
 
   return (
     <>
@@ -235,6 +243,7 @@ export const Register = () => {
           </div>
         }
       />
+      {isOpenLogin && <Login />}
     </>
   );
 };
