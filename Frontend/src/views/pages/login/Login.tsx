@@ -4,7 +4,10 @@ import { IconLogin, IconLoginSVG, IconProfile } from "../../../Icons";
 import InputNextUI from "../../../Components/Input/input";
 import ModalUI from "../../../Components/Modal";
 import { useDispatch } from "react-redux";
-import { onOpenResigter } from "../../../Components/Common/globalSlice";
+import {
+  onOpenLogin,
+  onOpenResigter,
+} from "../../../Components/Common/globalSlice";
 import { useAppSelector } from "../../../Components/Common/hooks";
 import { Register } from "./Register";
 const Login = () => {
@@ -24,6 +27,8 @@ const Login = () => {
   const isOpenRegister = useAppSelector(
     (state) => state.globalConfig.isOpenRegister
   );
+  const isOpenLogin = useAppSelector((state) => state.globalConfig.isOpenLogin);
+
   console.log(isOpenRegister, "panelReloadlknsdf");
   const onCloseModal = () => {
     onClose();
@@ -31,6 +36,7 @@ const Login = () => {
       email: "",
       password: "",
     });
+    dispatch(onOpenLogin(false));
   };
   const onClickLogin = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -82,6 +88,7 @@ const Login = () => {
 
   const onClickRegister = () => {
     dispatch(onOpenResigter(true));
+    dispatch(onOpenLogin(false));
     onClose();
   };
 
@@ -92,13 +99,13 @@ const Login = () => {
         color="primary"
         className="bg-primary-900"
         aria-label="Take a photo"
-        onPress={onOpen}
+        onPress={() => dispatch(onOpenLogin(true))}
       >
         <IconProfile />
       </Button>
 
       <ModalUI
-        isOpen={isOpen}
+        isOpen={isOpenLogin}
         onOpenChange={onCloseModal}
         heading={"Login"}
         headerIcon={<IconLoginSVG width="200px" height="155px" />}
