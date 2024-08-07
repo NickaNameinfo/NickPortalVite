@@ -1,63 +1,88 @@
 import React from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  useDisclosure,
-  Checkbox,
-  Input,
-  Link,
-} from "@nextui-org/react";
-import { NewPassword } from "./NewPassword";
-import { Register } from "./Register";
-import {
-  EyeFilledIcon,
-  EyeSlashFilledIcon,
-  IconForgotSVG,
-  IconLogin,
-  IconLoginSVG,
-  IconNewPasswordSVG,
-  IconOTPSVG,
-  IconProfile,
-  IconRegisterSVG,
-} from "../../../Icons";
-import { Otp } from "./Otp";
-import { ForgotPassword } from "./ForgotPassword";
+import { Button, useDisclosure, Checkbox, Link } from "@nextui-org/react";
+import { IconLogin, IconLoginSVG, IconProfile } from "../../../Icons";
 import InputNextUI from "../../../Components/Input/input";
+import ModalUI from "../../../Components/Modal";
+import { useDispatch } from "react-redux";
+import { onOpenResigter } from "../../../Components/Common/globalSlice";
+import { useAppSelector } from "../../../Components/Common/hooks";
+import { Register } from "./Register";
 const Login = () => {
-  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
-  const [isForgetPassword, setIsForgetPassword] = React.useState(false);
-  const [isOTP, setIsOTP] = React.useState(false);
-  const [isNewPassword, setIsNewPassword] = React.useState(false);
-  const [isRegister, setIsRegister] = React.useState(false);
-  const [isVisible, setIsVisible] = React.useState(false);
-  const [registration, setRegistration] = React.useState(false)
-  const toggleVisibility = () => setIsVisible(!isVisible);
+  const dispatch = useDispatch();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
+  // set Login Values
+  const [loginData, setLoginData] = React.useState({
+    email: "",
+    password: "",
+  });
+  const [errorMessage, setErrorMessage] = React.useState({
+    email: "",
+    password: "",
+  });
+
+  const isOpenRegister = useAppSelector(
+    (state) => state.globalConfig.isOpenRegister
+  );
+  console.log(isOpenRegister, "panelReloadlknsdf");
   const onCloseModal = () => {
     onClose();
-    setIsForgetPassword(false);
-    setIsOTP(false);
-    setIsNewPassword(false);
-    setIsRegister(false);
+    setErrorMessage({
+      email: "",
+      password: "",
+    });
   };
   const onClickLogin = () => {
-    console.log(registration, "registration3425", isRegister)
-    if(isRegister){
-      setRegistration(true)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let flag1 = false;
+    let flag2 = false;
+    let flag3 = false;
+
+    if (!loginData.email) {
+      setErrorMessage((prev) => ({
+        ...prev,
+        email: "Please enter Email Address",
+      }));
+      flag1 = true;
+    } else if (!emailRegex.test(loginData.email)) {
+      setErrorMessage((prev) => ({
+        ...prev,
+        email: "Please enter a valid Email Address",
+      }));
+      flag2 = true;
+    } else {
+      setErrorMessage((prev) => ({
+        ...prev,
+        email: "",
+      }));
     }
-    if (isForgetPassword) {
-      setIsOTP(true);
-      if (isOTP) {
-        setIsNewPassword(true);
-      }
+
+    if (!loginData.password) {
+      setErrorMessage((prev) => ({
+        ...prev,
+        password: "Please enter Password",
+      }));
+      flag3 = true;
+    } else {
+      setErrorMessage((prev) => ({
+        ...prev,
+        password: "",
+      }));
+    }
+
+    if (flag1 || flag2 || flag3) {
+      return;
+    } else {
+      setErrorMessage({
+        email: "",
+        password: "",
+      });
     }
   };
+
   const onClickRegister = () => {
-    setIsRegister(true);
+    dispatch(onOpenResigter(true));
+    onClose();
   };
 
   return (
@@ -71,7 +96,117 @@ const Login = () => {
       >
         <IconProfile />
       </Button>
-      <Modal
+
+      <ModalUI
+        isOpen={isOpen}
+        onOpenChange={onCloseModal}
+        heading={"Login"}
+        headerIcon={<IconLoginSVG width="200px" height="155px" />}
+        content={
+          <div className="px-3 m-0">
+            <div className="mt-2">
+              <div className="flex justify-center mb-4">
+                <InputNextUI
+                  type="text"
+                  label="Enter Your Email Address"
+                  onChange={(value) => {
+                    setLoginData((prev) => ({
+                      ...prev,
+                      email: value,
+                    }));
+                  }}
+                  errorMessage={errorMessage?.email}
+                />
+              </div>
+              <div className="flex justify-center  mt-3">
+                <InputNextUI
+                  type="password"
+                  label="Enter Your Password"
+                  onChange={(value) => {
+                    setLoginData((prev) => ({
+                      ...prev,
+                      password: value,
+                    }));
+                  }}
+                  errorMessage={errorMessage?.password}
+                />
+              </div>
+            </div>
+
+            <div className="w-full flex pt-5">
+              <div className="flex w-1/2">
+                <Checkbox
+                  className="justify-center flex"
+                  color="primary"
+                  radius="sm"
+                  classNames={{
+                    label: ["text-small", "text-gray-400", "font-light"],
+                    wrapper: ["before:border-1", "before:border-gray-300"],
+                  }}
+                >
+                  Remember Me
+                </Checkbox>
+              </div>
+              <div className="w-1/2 justify-end flex ">
+                <Link
+                  className="cursor-pointer p-0 m-0 #7358D7 max-w-md "
+                  style={{
+                    color: "#4C86F9",
+                  }}
+                  // color="foreground"
+                  onPress={() => {}}
+                  size="sm"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
+            </div>
+            <div className="w-full justify-center pt-5">
+              <Button
+                onPress={() => onClickLogin()}
+                size="sm"
+                className="w-full  font-normal "
+                style={{
+                  padding: 0,
+                  margin: 0,
+                  background: "#4C86F9",
+                  color: "#FFFFFF",
+                }}
+              >
+                {"LOGIN"}
+                <IconLogin fill="white" />
+              </Button>
+            </div>
+          </div>
+        }
+        footerContent={
+          <div className="w-full flex justify-center">
+            <div className="flex items-center my-3">
+              <p
+                className="text-sm pe-2 Iconweb"
+                style={{
+                  color: "#A5A5A5",
+                }}
+              >
+                {"Not A Member ? "}
+              </p>
+              <Link
+                className="cursor-pointer font-medium p-0 m-0"
+                style={{
+                  color: "#4C86F9",
+                }}
+                onPress={() => onClickRegister()}
+                size="sm"
+              >
+                {"Register Now"}
+              </Link>
+            </div>
+          </div>
+        }
+      />
+      {isOpenRegister && <Register />}
+
+      {/* <Modal
         isDismissable={false}
         isOpen={isOpen}
         onOpenChange={onCloseModal}
@@ -234,7 +369,7 @@ const Login = () => {
             </>
           )}
         </ModalContent>
-      </Modal>
+      </Modal> */}
     </div>
   );
 };
