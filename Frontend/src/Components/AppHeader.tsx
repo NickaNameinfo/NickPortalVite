@@ -89,12 +89,13 @@ export const AppHeader = () => {
               placeholder="Search Here..."
               // style={{ backgroundColor:"whitesmoke"}}
               classNames={{
-                label: " bg-white text-black/90 dark:text-black/90",
+                label: " bg-[#ffffff3b] text-black/90 dark:text-black/90",
                 input: [
-                  "bg-white",
+                  "bg-[#ffffff3b]",
                   "text-black/90 dark:text-black/100",
                   "placeholder:text-black-100/30 dark:placeholder:text-black/10",
                   "font-normal",
+                  "group-data-[has-value=true]:text-black/90",
                 ],
                 innerWrapper: " text-black/90 dark:text-black/70",
                 inputWrapper: [
@@ -102,21 +103,21 @@ export const AppHeader = () => {
                   // "bg-default-200/190",
                   // "dark:bg-default/90",
                   // "backdrop-blur-xl",
-                  "bg-white",
-                  "dark:bg-white",
+                  "bg-[#ffffff3b]",
+                  "dark:bg-[#ffffff3b]",
                   "backdrop-blur-xl",
                   "backdrop-saturate-50",
-                  "hover:bg-white",
+                  "hover:bg-[#ffffff3b]",
                   "hover:border-gray-600/10",
-                  "focus-within:!bg-white",
-                  "dark:hover:bg-whitet",
-                  "dark:focus-within:!bg-white",
+                  "focus-within:!bg-[#ffffff3b]",
+                  "dark:hover:bg-[#ffffff3b]",
+                  "dark:focus-within:!bg-[#ffffff3b]",
                   "!cursor-text",
                   "shadow-none",
                   "border-0",
-                  "data-[hover=true]:bg-white",
-                  "data-[hover=true]:bg-white",
-                  "dark:data-[hover=true]:bg-white",
+                  "data-[hover=true]:bg-[#ffffff3b]",
+                  "data-[hover=true]:bg-[#ffffff3b]",
+                  "dark:data-[hover=true]:bg-[#ffffff3b]",
                 ],
               }}
               startContent={
