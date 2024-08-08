@@ -270,7 +270,6 @@ export const NavHeaderSearchIcon = (props: any) => (
       transform="matrix(1 0 0 -1 20.4844 28.8613)"
       fill="#9179F2"
       // fill={props.fill}
-      
     />
   </svg>
 );
@@ -455,7 +454,7 @@ export const IconstoreCardNext = (props: any) => {
         d="M10.5 4.13397C11.1667 4.51887 11.1667 5.48113 10.5 5.86603L6 8.4641C5.33333 8.849 4.5 8.36788 4.5 7.59808L4.5 2.40192C4.5 1.63212 5.33333 1.151 6 1.5359L10.5 4.13397Z"
         fill={props.fill}
       />
-      <rect y="4" width="3" height="2" rx="1" fill="#6942CB" />
+      <rect y="4" width="3" height="2" rx="1" fill={props.fill} />
     </svg>
   );
 };
