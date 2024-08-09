@@ -11,14 +11,20 @@ export const StoreApi = createApi({
   reducerPath: "StoreApi",
   baseQuery: axiosBaseQuery,
   endpoints: (builder) => ({
+    getStoresProductByID: builder.query({
+      query: (id) => ({
+        url: `/store/product/getAllProductById/${id}`,
+        method: "GET",
+      }),
+    }),
     getStores: builder.query({
-      query: (body) => ({
-        url: ``,
+      query: (id) => ({
+        url: `/store/list`,
         method: "GET",
       }),
     }),
   }),
 });
 
-export const { useGetStoresQuery } = StoreApi;
+export const { useGetStoresProductByIDQuery, useGetStoresQuery } = StoreApi;
 export const { endpoints } = StoreApi;

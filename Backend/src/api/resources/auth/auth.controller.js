@@ -1,7 +1,7 @@
 const JWT = require("jsonwebtoken");
 const mailer = require("../../../mailer");
 const config = require("../../../config");
-const bcrypt = require("bcrypt-nodejs"); 
+const bcrypt = require("bcrypt-nodejs");
 const speakeasy = require("speakeasy");
 const { validateEmail } = require("./../../../functions");
 const db = require("../../../models");
@@ -77,7 +77,7 @@ module.exports = {
         //     return res.status(200).json({ success: true, key: otp, msg: "New Registration added and password has been sent to " + email + " ." });
         // }
         // else
-        res.status(500).json({ success: true, user });
+        res.status(200).json({ success: true, user });
       })
       .catch((err) => {
         console.log(err);
@@ -160,7 +160,13 @@ module.exports = {
       httpOnly: true,
       secure: config.app.secure,
     });
-    return res.status(200).json({ success: true, token, role: req.user.role, id: req.user.id, data: req.user  });
+    return res.status(200).json({
+      success: true,
+      token,
+      role: req.user.role,
+      id: req.user.id,
+      data: req.user,
+    });
   },
 
   async deleteUserList(req, res, next) {

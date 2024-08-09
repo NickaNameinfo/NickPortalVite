@@ -43,6 +43,7 @@ interface InputFieldProps {
 }
 
 const InputNextUI = (props: InputFieldProps) => {
+  console.log(props.errorMessage, "props6897")
   const [isVisible, setIsVisible] = React.useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
   return (

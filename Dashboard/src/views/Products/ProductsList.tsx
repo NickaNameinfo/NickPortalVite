@@ -34,7 +34,14 @@ const ProductsList = () => {
   const currentPlan = getCookie("role");
   console.log(data, "data769867", storeProducts, vendorProducts);
 
-  const defaultCloumns = ["id", "name", "actions", "price", "sortDesc", "photo"];
+  const defaultCloumns = [
+    "id",
+    "name",
+    "actions",
+    "price",
+    "sortDesc",
+    "photo",
+  ];
   const byuserProduct = ["price", "unitSize", "product", "photo"];
   const byuserCloumn = [
     { name: "Price", id: "price", sortable: true },
@@ -52,19 +59,20 @@ const ProductsList = () => {
   ];
 
   React.useEffect(() => {
-    refetch();
-    vendorRefetch();
-    stroeRefetch();
+    console.log(storeId, vendorId, "asdljfalksd")
+    if (storeId || vendorId) {
+      refetch();
+      vendorRefetch();
+      stroeRefetch();
+    }
   }, [vendorId, storeId]);
 
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
-    console.log(cellValue, "cellValue23", cellValue?.photo, user)
+    console.log(cellValue, "cellValue23", cellValue?.photo, user);
     switch (columnKey) {
       case "product":
-        return (
-          <p>{user?.product?.name}</p>
-        );
+        return <p>{user?.product?.name}</p>;
       case "storename":
         return (
           <User
@@ -95,7 +103,13 @@ const ProductsList = () => {
       case "photo":
         return (
           <div className="relative flex justify-center items-center gap-2">
-            {<Image src={`${infoData?.baseApi}/${user?.product?.photo}`} width ={50} height={50}/>}
+            {
+              <Image
+                src={`${infoData?.baseApi}/${user?.product?.photo}`}
+                width={50}
+                height={50}
+              />
+            }
           </div>
         );
       default:
@@ -110,7 +124,13 @@ const ProductsList = () => {
           defaultCloumns={currentPlan !== "1" ? byuserProduct : defaultCloumns}
           renderCell={renderCell}
           columns={currentPlan !== "1" ? byuserCloumn : columns}
-          tableItems={currentPlan === "1" ? data?.["data"] : currentPlan === "2" ? storeProducts?.data : vendorProducts?.data}
+          tableItems={
+            currentPlan === "1"
+              ? data?.["data"]
+              : currentPlan === "2"
+              ? storeProducts?.data
+              : vendorProducts?.data
+          }
           isStatusFilter={false}
         />
       )}

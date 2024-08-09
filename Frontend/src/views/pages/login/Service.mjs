@@ -11,6 +11,13 @@ export const AuthApi = createApi({
   reducerPath: "AuthApi",
   baseQuery: axiosBaseQuery,
   endpoints: (builder) => ({
+    Login: builder.mutation({
+      query: (body) => ({
+        url: `/auth/rootLogin`,
+        method: "POST",
+        body,
+      }),
+    }),
     register: builder.mutation({
       query: (body) => ({
         url: `/auth/register`,
@@ -21,5 +28,5 @@ export const AuthApi = createApi({
   }),
 });
 
-export const { useRegisterMutation } = AuthApi;
+export const { useRegisterMutation, useLoginMutation } = AuthApi;
 export const { endpoints } = AuthApi;

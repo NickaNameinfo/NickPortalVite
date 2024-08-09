@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Button,
   Input,
   Tab,
@@ -23,19 +24,20 @@ import { NavHeaderSearchIcon, NavSearchIcon } from "../Icons";
 import { InfoCard } from "./Card/InfoCard";
 import Login from "../views/pages/login/Login";
 import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
+import { useAppSelector } from "./Common/hooks";
 
 export const AppHeader = () => {
   const location = useLocation();
+  const currentloginDetails = useAppSelector(
+    (state) => state.globalConfig.currentloginDetails
+  );
   const currLocation = location?.pathname?.split("/");
-  console.log(location, "123ccsdf", currLocation);
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [startIndex, setStartIndex] = React.useState(0);
   const [sliderLabel, setSliderLabel] = React.useState([]);
   const { data: category } = useGetCategoryQuery();
   const itemsPerPage = 4;
-  console.log(sliderLabel, "sliderLabel");
-
   React.useEffect(() => {
     if (category?.data) {
       const labels = category.data.map((item) => item?.name);
@@ -57,6 +59,8 @@ export const AppHeader = () => {
       Math.min(prevIndex + 1, sliderLabel?.length - itemsPerPage)
     );
   };
+
+  console.log(currentloginDetails, "currentloginDetails453")
 
   return (
     <>
@@ -278,7 +282,7 @@ export const AppHeader = () => {
               </Button>
             </div>
             <div className="ms-3">
-              <Login />
+              {!currentloginDetails ? <Login /> : <Avatar name={currentloginDetails?.data?.firstName}/>}
             </div>
           </div>
         </div>

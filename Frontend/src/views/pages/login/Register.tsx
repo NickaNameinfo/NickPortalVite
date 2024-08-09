@@ -25,6 +25,8 @@ import {
 } from "../../../Components/Common/globalSlice";
 import { useDispatch } from "react-redux";
 import Login from "./Login";
+import { authenticate } from "../../../Components/Common/CustomHooks";
+import { useNavigate } from "react-router-dom";
 
 export const Register = () => {
   const dispatch = useDispatch();
@@ -37,14 +39,12 @@ export const Register = () => {
     formState: { errors },
   } = useForm();
   const formData = watch();
+  const navigate = useNavigate();
   const [register] = useRegisterMutation();
-  const [selected, setSelected] = React.useState("0");
-
   const isOpenRegister = useAppSelector(
     (state) => state.globalConfig.isOpenRegister
   );
   const isOpenLogin = useAppSelector((state) => state.globalConfig.isOpenLogin);
-  console.log(isOpenRegister, "panelReloadlknsdf");
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
   const onSubmit = async () => {
@@ -52,13 +52,11 @@ export const Register = () => {
       let tempApiValue = {
         ...formData,
         verify: 1,
-        role: selected,
       };
       const result = await register(tempApiValue);
-      console.log(result, "asdfyuasoidfu");
-
       if (result?.data?.success) {
-        return;
+        dispatch(onOpenResigter(false));
+        dispatch(onOpenLogin(true));
       }
     } catch (error) {
       console.log(error, "Error");
@@ -84,139 +82,164 @@ export const Register = () => {
         heading={"Register"}
         headerIcon={<IconRegisterSVG width="200px" height="155px" />}
         content={
-          <div className="px-3 m-0">
-            <div className="mt-2">
-              <form>
-                <div>
-                  <p
-                    className="font-normal text-sm"
-                    style={{
-                      color: "#555555",
-                    }}
-                  >
-                    Register As
-                  </p>
-                  <RadioGroup
-                    size="sm"
-                    classNames={{ wrapper: ["justify-evenly"] }}
-                    className="py-3"
-                    orientation="horizontal"
-                    color="primary"
-                    value={selected}
-                    onValueChange={setSelected}
-                  >
-                    <Radio
-                      value="0"
-                      color="success"
-                      className="font-medium text-xs"
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="px-3 m-0">
+              <div className="mt-2">
+                <form>
+                  <div>
+                    <p
+                      className="font-normal text-sm"
+                      style={{
+                        color: "#555555",
+                      }}
                     >
-                      Customer
-                    </Radio>
-                    <Radio
-                      value="3"
-                      color="success"
-                      className="font-medium text-xs"
-                    >
-                      Store
-                    </Radio>
-                    <Radio
-                      value="2"
-                      color="success"
-                      className="font-medium text-xs"
-                    >
-                      Vendor
-                    </Radio>
-                  </RadioGroup>
-                  <div className="grid grid-cols-2 gap-4 pt-2 pb-2">
+                      Register As
+                    </p>
                     <Controller
-                      name="firstName" // Changed to reflect a text input
+                      name="role"
                       control={control}
-                      rules={{ required: true }}
+                      rules={{ required: "Please select a role" }} // Validation rule with custom message
                       render={({ field }) => (
-                        // <Input type="text" label="Store Name" size="lg" {...field} />
-                        <InputNextUI type="text" label="Name" {...field} />
-                      )}
-                    />
-                    <Controller
-                      name="email" // Changed to reflect a text input
-                      control={control}
-                      rules={{ required: true }}
-                      render={({ field }) => (
-                        // <Input type="text" label="Store Name" size="lg" {...field} />
-                        <InputNextUI type="email" label="Email" {...field} />
-                      )}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 mt-2">
-                    <Controller
-                      name="phoneNo" // Changed to reflect a text input
-                      control={control}
-                      rules={{ required: true }}
-                      render={({ field }) => (
-                        // <Input type="text" label="Store Name" size="lg" {...field} />
-                        <InputNextUI
-                          type="number"
-                          label="Mobile Number"
-                          {...field}
-                        />
-                      )}
-                    />
+                        <div className="py-3">
+                          <RadioGroup
+                            size="sm"
+                            classNames={{ wrapper: ["justify-evenly"] }}
+                            orientation="horizontal"
+                            color="primary"
+                            {...field}
+                          >
+                            <Radio
+                              value="0"
+                              color="success"
+                              className="font-medium text-xs"
+                            >
+                              Customer
+                            </Radio>
+                            <Radio
+                              value="3"
+                              color="success"
+                              className="font-medium text-xs"
+                            >
+                              Store
+                            </Radio>
+                            <Radio
+                              value="2"
+                              color="success"
+                              className="font-medium text-xs"
+                            >
+                              Vendor
+                            </Radio>
+                          </RadioGroup>
 
-                    <Controller
-                      name="password" // Changed to reflect a text input
-                      control={control}
-                      rules={{ required: true }}
-                      render={({ field }) => (
-                        // <Input type="text" label="Store Name" size="lg" {...field} />
-                        <InputNextUI
-                          type="password"
-                          label="Password"
-                          {...field}
-                        />
+                          {/* Render the error message conditionally */}
+                          {errors.role && (
+                            <p className="text-red-500 text-xs mt-2">
+                              {String(errors.role.message)}
+                            </p>
+                          )}
+                        </div>
                       )}
                     />
-                  </div>
-                  <Checkbox
-                    className="pt-4"
-                    classNames={{
-                      label: ["text-small", "text-gray-400", "font-light"],
-                      wrapper: ["before:border-1", "before:border-gray-300"],
-                    }}
-                  >
-                    Accept the all{" "}
-                    <span>
-                      <Link
-                        className="cursor-pointer"
-                        size="sm"
-                        style={{
-                          color: "#4C86F9",
-                        }}
-                      >
-                        Terms & Conditions
-                      </Link>
-                    </span>
-                  </Checkbox>
-                </div>
-              </form>
-            </div>
+                    <div className="grid grid-cols-2 gap-4 pt-2 pb-2">
+                      <Controller
+                        name="firstName" // Changed to reflect a text input
+                        control={control}
+                        rules={{ required: "Name is required" }}
+                        render={({ field }) => (
+                          <InputNextUI
+                            type="text"
+                            label="Name"
+                            {...field}
+                            errorMessage={errors?.firstName?.["message"]}
+                          />
+                        )}
+                      />
 
-            <div className="w-full justify-center pt-5">
-              <Button
-                onPress={() => onSubmit()}
-                size="sm"
-                className="w-full  font-normal "
-                style={{
-                  padding: 0,
-                  margin: 0,
-                  background: "#4C86F9",
-                  color: "#FFFFFF",
-                }}
-              >
-                {"Register"}
-                <IconLogin fill="white" />
-              </Button>
+                      <Controller
+                        name="email" // Changed to reflect a text input
+                        control={control}
+                        rules={{ required: "Email is required" }}
+                        render={({ field }) => (
+                          <InputNextUI
+                            type="email"
+                            label="Email"
+                            {...field}
+                            errorMessage={errors?.email?.["message"]}
+                          />
+                        )}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mt-2">
+                      <Controller
+                        name="phoneNo" // Changed to reflect a text input
+                        control={control}
+                        rules={{ required: "Phone Number is required" }}
+                        render={({ field }) => (
+                          <InputNextUI
+                            type="number"
+                            label="Mobile Number"
+                            {...field}
+                            errorMessage={errors?.phoneNo?.["message"]}
+                          />
+                        )}
+                      />
+
+                      <Controller
+                        name="password" // Changed to reflect a text input
+                        control={control}
+                        rules={{ required: "Password is required" }}
+                        render={({ field }) => (
+                          <InputNextUI
+                            type="password"
+                            label="Password"
+                            {...field}
+                            errorMessage={errors?.password?.["message"]}
+                          />
+                        )}
+                      />
+                    </div>
+                    <Checkbox
+                      className="pt-4"
+                      classNames={{
+                        label: ["text-small", "text-gray-400", "font-light"],
+                        wrapper: ["before:border-1", "before:border-gray-300"],
+                      }}
+                    >
+                      Accept the all{" "}
+                      <span>
+                        <Link
+                          className="cursor-pointer"
+                          size="sm"
+                          style={{
+                            color: "#4C86F9",
+                          }}
+                        >
+                          Terms & Conditions
+                        </Link>
+                      </span>
+                    </Checkbox>
+                  </div>
+                </form>
+              </div>
+
+              <div className="w-full justify-center pt-5">
+                <Button
+                  size="sm"
+                  type="submit"
+                  className="w-full  font-normal "
+                  style={{
+                    padding: 0,
+                    margin: 0,
+                    background: "#4C86F9",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  {"Register"}
+                  <IconLogin fill="white" />
+                </Button>
+              </div>
             </div>
-          </div>
+          </form>
         }
         footerContent={
           <div className="w-full flex justify-center">

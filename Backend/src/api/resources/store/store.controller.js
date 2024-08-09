@@ -254,7 +254,7 @@ module.exports = {
       db.store_product
         .findAll({
           attributes: ["id", "supplierId", "productId", "unitSize", "price"],
-          where: { supplierId: req.body.id },
+          where: { supplierId: req.params.id },
           include: [
             {
               model: db.product,

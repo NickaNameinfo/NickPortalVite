@@ -9,7 +9,7 @@ const VendoreView = React.lazy(() => import("../src/views/pages/Vendor/index"));
 const routes = [
   { path: "/", name: "Dashboard", element: StoreView },
   { path: "/ProductView", name: "ProductView", element: ProductView },
-  { path: "/Store/StoreDetails", name: "StoreDetails", element: StoreDetails },
+  { path: "/Store/StoreDetails/:id", name: "StoreDetails", element: StoreDetails },
   { path: "/VendoreView", name: "VendoreView", element: VendoreView },
 ];
 
