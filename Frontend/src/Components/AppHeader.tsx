@@ -103,11 +103,7 @@ export const AppHeader = () => {
                   "group-data-[has-value=true]:text-black/90",
                 ],
                 innerWrapper: " text-black/90 dark:text-black/70",
-                inputWrapper: [
-                  // "shadow-xl",
-                  // "bg-default-200/190",
-                  // "dark:bg-default/90",
-                  // "backdrop-blur-xl",
+                inputWrapper: [                
                   "bg-[#ffffff3b]",
                   "dark:bg-[#ffffff3b]",
                   "backdrop-blur-xl",

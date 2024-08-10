@@ -48,25 +48,36 @@ const InputNextUI = (props: InputFieldProps) => {
         <Input
           {...props}
           classNames={{
-            label: "text-black/60 dark:text-white/60",
+            label:
+              "text-black/60 dark:text-white/60",
+            // group-data-[filled=true]:-translate-y-3
             input: [
               "bg-transparent",
               "text-black/90 dark:text-white/100",
-              "placeholder:text-default-100/50 dark:placeholder:text-white/10",
+              "placeholder:text-default-100/30 dark:placeholder:text-white/10",
+              "font-normal",
             ],
-
             innerWrapper: "bg-transparent",
             inputWrapper: [
               // "shadow-xl",
-              "bg-default-100/50",
-              "dark:bg-default/60",
+              "bg-transparent",
+              "dark:bg-transparent",
               "backdrop-blur-xl",
               "backdrop-saturate-50",
-              "hover:bg-default-100/40",
-              "focus-within:!bg-default-50/10",
-              "dark:hover:bg-default/10",
-              "dark:focus-within:!bg-default/90",
+              "hover:bg-transparent",
+              "focus-within:!bg-transparent",
+              "dark:hover:bg-transparent",
+              "dark:focus-within:!bg-transparent",
               "!cursor-text",
+              "shadow-none",
+              "border-1",
+              // `${
+              //   !props?.errorMessage && "data-[hover=true]:border-gray-600/20"
+              // }`,
+              // `${
+              //   !props?.errorMessage &&
+              //   "dark:data-[hover=true]:border-gray-600/20"
+              // }`,
             ],
           }}
           // className={props.className ?? "max-w-sm"}

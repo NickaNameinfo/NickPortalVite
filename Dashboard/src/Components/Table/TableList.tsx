@@ -23,6 +23,7 @@ import {
   VerticalDotsIcon,
 } from "../Icons";
 import { capitalize } from "./data2";
+import { NavHeaderSearchIcon } from "../Common/Icons/icon";
 
 interface TableProps {
   tableItems: any;
@@ -166,8 +167,57 @@ export const TableList = (props: TableProps) => {
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
-        <div className="flex justify-between gap-3 items-center">
+        <div className="flex justify-between gap-3 items-center mt-2">
           <Input
+            autoFocus={false}
+            isClearable
+            // className="w-[280px]"
+            className="w-[280px] sm:max-w-[44%]"
+            radius="lg"
+            size="md"
+            type="Search"
+            // autoFocus
+            // color="default"
+            variant="flat"
+            placeholder="Search by name..."
+            classNames={{
+              label: " bg-[#ffffff3b] text-black/90 dark:text-black/90",
+              input: [
+                "bg-[#ffffff3b]",
+                "text-black/90 dark:text-black/100",
+                "placeholder:text-black-100/30 dark:placeholder:text-black/10",
+                "font-normal",
+                "group-data-[has-value=true]:text-black/90",
+              ],
+              // innerWrapper: " text-black/90 dark:text-black/70",
+              inputWrapper: [
+                "bg-[#ffffff3b]",
+                "dark:bg-[#ffffff3b]",
+                "backdrop-blur-xl",
+                "backdrop-saturate-50",
+                "hover:bg-[#ffffff3b]",
+                "hover:border-gray-600/10",
+                "focus-within:!bg-[#ffffff3b]",
+                "dark:hover:bg-[#ffffff3b]",
+                "dark:focus-within:!bg-[#ffffff3b]",
+                "!cursor-text",
+                "shadow-none",
+                "border-1",
+                "data-[hover=true]:bg-[#ffffff3b]",
+                "data-[hover=true]:bg-[#ffffff3b]",
+                "dark:data-[hover=true]:bg-[#ffffff3b]",
+              ],
+            }}
+            startContent={
+              <p className="me-1.5">
+                <NavHeaderSearchIcon />
+              </p>
+            }
+            value={filterValue}
+            onClear={() => onClear()}
+            onValueChange={onSearchChange}
+          />
+          {/* <Input
             isClearable
             className="w-full sm:max-w-[44%]"
             placeholder="Search by name..."
@@ -176,7 +226,7 @@ export const TableList = (props: TableProps) => {
             onClear={() => onClear()}
             onValueChange={onSearchChange}
             size="sm"
-          />
+          /> */}
           {props.isStatusFilter && (
             <div className="flex gap-3">
               <Dropdown>

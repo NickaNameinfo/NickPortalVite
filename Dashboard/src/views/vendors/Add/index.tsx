@@ -82,8 +82,13 @@ const Add = () => {
       className="w-full flex justify-center"
     >
       <div className="w-5/6">
-        <div className="flex flex-col flex-wrap gap-4 border-b pb-3 mt-4  mb-4">
+        <div className="flex  items-center justify-between border-b pb-3 mt-4  mb-4">
           <Chip
+            classNames={{
+              // "border-1",
+              base: "bg-gradient-to-br  border-small border-white/60 ",
+              content: "drop-shadow shadow-black text-white",
+            }}
             startContent={
               <svg
                 width={18}
@@ -103,6 +108,11 @@ const Add = () => {
           >
             <p className="font-medium  text-black/70"> Vendor Register</p>
           </Chip>
+          <div className="text-center">
+            <Button color="primary" type="submit" size="sm" className="w-[90px]">
+              {id ? "Update" : "Create"}
+            </Button>
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-4 mb-2">
           <Controller
@@ -119,59 +129,48 @@ const Add = () => {
             control={control}
             render={({ field }) => (
               <Select
+                classNames={{
+                  label: "group-data-[filled=true]:-translate-y-3",
+                  trigger: [
+                    "bg-transparent",
+                    "border-1",
+                    "text-default-500",
+                    "transition-opacity",
+                    "data-[hover=true]:bg-transparent",
+                    "data-[hover=true]:bg-transparent",
+                    "dark:data-[hover=true]:bg-transparent",
+                    "data-[selectable=true]:focus:bg-transparent",
+                  ],
+                  // listboxWrapper: [
+                  //   "border-1",
+                  //   "text-default-500",
+                  //   "transition-opacity",
+                  //   "data-[hover=true]:text-foreground",
+                  //   "data-[hover=true]:bg-default-100",
+                  //   "dark:data-[hover=true]:bg-default-50",
+                  //   "data-[selectable=true]:focus:bg-default-50",
+                  //   "data-[pressed=true]:opacity-90",
+                  //   "data-[focus-visible=true]:ring-default-500",
+                  // ],
+                }}
+                listboxProps={{
+                  itemClasses: {
+                    base: [
+                      "rounded-md",
+                      "text-default-500",
+                      "transition-opacity",
+                      "data-[hover=true]:text-foreground",
+                      "data-[hover=true]:bg-default-100",
+                      "dark:data-[hover=true]:bg-default-50",
+                      "data-[selectable=true]:focus:bg-default-50",
+                      "data-[pressed=true]:opacity-90",
+                      "data-[focus-visible=true]:ring-default-500",
+                      "shadow-none",
+                      // "border-1",
+                    ],
+                  },
+                }}
                 variant="faded"
-                // classNames={{
-                //   label: "text-black/60 dark:text-white/60",
-                //   innerWrapper: "bg-transparent",
-                //   mainWrapper: [
-                //     //   // "shadow-xl",
-                //     "bg-default-100/50",
-                //     "dark:bg-default/60",
-                //     "backdrop-blur-xl",
-                //     "backdrop-saturate-50",
-                //     "hover:bg-default-100/40",
-                //     "focus-within:!bg-default-50/10",
-                //     "dark:hover:bg-default/10",
-                //     "dark:focus-within:!bg-default/90",
-                //     "!cursor-text",
-                //   ],
-                //   listboxWrapper: [
-                //     //   // "shadow-xl",
-                //     "bg-default-100/50",
-                //     "dark:bg-default/60",
-                //     "backdrop-blur-xl",
-                //     "backdrop-saturate-50",
-                //     "hover:bg-default-100/40",
-                //     "focus-within:!bg-default-50/10",
-                //     "dark:hover:bg-default/10",
-                //     "dark:focus-within:!bg-default/90",
-                //     "!cursor-text",
-                //   ],
-                //   helperWrapper: [
-                //     //   // "shadow-xl",
-                //     "bg-default-100/50",
-                //     "dark:bg-default/60",
-                //     "backdrop-blur-xl",
-                //     "backdrop-saturate-50",
-                //     "hover:bg-default-100/40",
-                //     "focus-within:!bg-default-50/10",
-                //     "dark:hover:bg-default/10",
-                //     "dark:focus-within:!bg-default/90",
-                //     "!cursor-text",
-                //   ],
-                //   // inputWrapper: [
-                //   //   // "shadow-xl",
-                //   //   "bg-default-100/50",
-                //   //   "dark:bg-default/70",
-                //   //   "backdrop-blur-xl",
-                //   //   "backdrop-saturate-70",
-                //   //   "hover:bg-default-100/60",
-                //   //   "focus-within:!bg-default-70/10",
-                //   //   "dark:hover:bg-default/0",
-                //   //   "dark:focus-within:!bg-default/90",
-                //   //   "!cursor-text",
-                //   // ],
-                // }}
                 size="sm"
                 label="Select an Status"
                 {...field}
@@ -229,11 +228,7 @@ const Add = () => {
             rules={{ required: true }}
             render={({ field }) => (
               // <Input type="text" label="Store Name" size="lg" {...field} />
-              <InputNextUI
-                type="text"
-                label="Close Time"
-                {...field}
-              />
+              <InputNextUI type="text" label="Close Time" {...field} />
             )}
           />
           <Controller
@@ -243,6 +238,7 @@ const Add = () => {
             render={({ field }) => (
               <Input
                 type="file"
+                // labelPlacement=""
                 label="Image"
                 size="lg"
                 onChange={(e) => {
@@ -254,6 +250,11 @@ const Add = () => {
         </div>
         <div className="flex flex-col flex-wrap gap-4 border-b pb-3 mb-4">
           <Chip
+            classNames={{
+              // "border-1",
+              base: "bg-gradient-to-br  border-small border-white/60 ",
+              content: "drop-shadow shadow-black text-white",
+            }}
             startContent={
               <svg
                 width={18}
@@ -346,6 +347,11 @@ const Add = () => {
         </div>
         <div className="flex flex-col flex-wrap gap-4 border-b pb-3 mt-4 mb-4">
           <Chip
+            classNames={{
+              // "border-1",
+              base: "bg-gradient-to-br  border-small border-white/60 ",
+              content: "drop-shadow shadow-black text-white",
+            }}
             startContent={
               <svg
                 width={18}

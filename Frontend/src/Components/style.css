@@ -191,3 +191,9 @@ aside {
   --tw-text-opacity: 1;
   color: rgb(0, 0, 0) !important;
 }
+.custom-input-red {
+  color: rgb(209, 32, 32) !important;
+}
+.custom-input-wrapper input {
+  color: red !important;
+}

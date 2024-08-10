@@ -53,18 +53,25 @@ const TeaxtareaNextUI = (props: textareaFieldProps) => {
         {...props}
         classNames={{
           label: "text-black/60 dark:text-white/60",
+          input: [
+            "bg-transparent",
+            "text-black/90 dark:text-white/100",
+            "placeholder:text-default-100/30 dark:placeholder:text-white/10",
+            "font-normal",
+          ],
           innerWrapper: "bg-transparent",
           inputWrapper: [
-            // "shadow-xl",
-            "bg-default-100/50",
-            "dark:bg-default/70",
+            "bg-transparent",
+            "dark:bg-transparent",
             "backdrop-blur-xl",
-            "backdrop-saturate-70",
-            "hover:bg-default-100/60",
-            "focus-within:!bg-default-70/10",
-            "dark:hover:bg-default/0",
-            "dark:focus-within:!bg-default/90",
+            "backdrop-saturate-50",
+            "hover:bg-transparent",
+            "focus-within:!bg-transparent",
+            "dark:hover:bg-transparent",
+            "dark:focus-within:!bg-transparent",
             "!cursor-text",
+            "shadow-none",
+            "border-1",
           ],
         }}
       />
