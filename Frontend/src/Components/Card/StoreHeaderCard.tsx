@@ -12,8 +12,11 @@ import {
   Iconwhatsup,
 } from "../Icons";
 import { Button, Image } from "@nextui-org/react";
+import { useNavigate, useParams } from "react-router-dom";
 
 export const StoreHeaderCard = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
   return (
     <div className=" mt-2 grid xm:grid-cols-1 mm:grid-cols-1  sm:grid-cols-1 ml:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-3 4xl:grid-cols-3  StorecardHeader  mb-2">
       {/* <div className="grid xm:grid-cols-3"> */}
@@ -142,14 +145,11 @@ export const StoreHeaderCard = () => {
         </div>
         <div className="w-4/12 items-center justify-between flex  ">
           <div className=" px-1 w-full items-center justify-between Boxshadow rounded-xl xm:min-h-[30px] mm:min-h-[35px] ml:min-h-[35px] lg:min-h-[45px] xl:min-h-[45px] 2xl:min-h-[45px] 3x l:min-h-[45px] flex ">
-            {/* <div className="size-1/4 flex items-center justify-end"></div> */}
-            {/* <div className="h-4/6 w-0.5 Divider cursor-pointer ">|</div> */}
-            {/* <div className="size-3/4 flex items-center justify-between"> */}
             <Button
               radius="full"
               isIconOnly
               aria-label="Like"
-              // size="md"
+              onClick={() => navigate(`/`)}
               className="bgnone ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6"
             >
               <IconMinus
@@ -160,6 +160,7 @@ export const StoreHeaderCard = () => {
               />
             </Button>
             <Button
+              onClick={() => navigate(`/Store/StoreDetails/${Number(id) - 1}`)}
               radius="full"
               isIconOnly
               aria-label="Like"
@@ -175,6 +176,7 @@ export const StoreHeaderCard = () => {
             </Button>
 
             <Button
+              onClick={() => navigate(`/Store/StoreDetails/${Number(id) + 1}`)}
               radius="full"
               isIconOnly
               aria-label="Like"
@@ -188,7 +190,6 @@ export const StoreHeaderCard = () => {
                 className="cursor-pointer ml:h-[16px] ml:w-[16px] xm:h-[12px] xm:w-[16px]"
               />
             </Button>
-            {/* </div> */}
           </div>
         </div>
       </div>

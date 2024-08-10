@@ -1,10 +1,5 @@
 import { IconHome } from "./Components/Icons";
-
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-}
+import { getCookie } from "../src/JsFiles/CommonFunction.mjs";
 // Assuming getCookie is imported correctly
 const tempRole = getCookie("role");
 console.log(tempRole, "tempRole323");

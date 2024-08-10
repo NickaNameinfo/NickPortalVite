@@ -88,8 +88,7 @@ module.exports = {
   async findUser(req, res, next) {
     db.user
       .findOne({
-        attributes: ["firstName", "lastName"],
-        where: { email: req.query.email },
+        where: { id: req.params.id },
         paranoid: false,
       })
       .then((user) => {

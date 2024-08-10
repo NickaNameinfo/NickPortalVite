@@ -6,6 +6,7 @@ import {
   Tabs,
   Tooltip,
   useDisclosure,
+  User,
 } from "@nextui-org/react";
 import * as React from "react";
 import "./style.scss";
@@ -60,7 +61,7 @@ export const AppHeader = () => {
     );
   };
 
-  console.log(currentloginDetails, "currentloginDetails453")
+  console.log(currentloginDetails, "currentloginDetails453");
 
   return (
     <>
@@ -282,7 +283,16 @@ export const AppHeader = () => {
               </Button>
             </div>
             <div className="ms-3">
-              {!currentloginDetails ? <Login /> : <Avatar name={currentloginDetails?.data?.firstName}/>}
+              {!currentloginDetails ? (
+                <Login />
+              ) : (
+                <User
+                  name={''}
+                  avatarProps={{
+                    src: "https://avatars.githubusercontent.com/u/30373425?v=4",
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>

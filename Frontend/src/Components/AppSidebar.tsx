@@ -1,14 +1,22 @@
 import {
   Accordion,
   AccordionItem,
+  Avatar,
   Button,
   Card,
   CardBody,
+  CardFooter,
   CardHeader,
   Checkbox,
   Image,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Switch,
+  User,
   cn,
+  Listbox,
+  ListboxItem,
 } from "@nextui-org/react";
 import * as React from "react";
 import {
@@ -21,11 +29,15 @@ import {
 } from "./Icons";
 import { _nav } from "../_nav";
 import { Link } from "react-router-dom";
+import { useAppSelector } from "./Common/hooks";
+import Login from "../views/pages/login/Login";
 
 export const AppSidebar = () => {
   const [menuToggle, setMenuToggle] = React.useState(false);
   const [mobileExpand, setMobileExpand] = React.useState(false);
-
+  const currentloginDetails = useAppSelector(
+    (state) => state.globalConfig.currentloginDetails
+  );
   const itemClasses = {
     base: "py-0 w-full",
     title: "text-black text-sm font-normal",
@@ -106,711 +118,272 @@ export const AppSidebar = () => {
         <aside id="default-sidebar" className="h-[84vh]" aria-label="Sidebar">
           <div className="h-full px-3 pb-4 pt-0 overflow-y-auto custom-scrollbar">
             <div className="scroll-content h-fit left-0 top-0 transition-transform z-40">
-              <div
-                style={{ backgroundColor: "#ffffff80" }}
-                className="rounded-lg"
-              >
-                {" "}
-                <Link
-                  to="#"
-                  className="mt-5 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white "
-                >
-                  <div className="flex justify-between w-full items-center">
-                    {menuToggle ? (
-                      <span>
-                        <FormeIcon />
-                      </span>
-                    ) : (
-                      <p className="text-black text-sm font-normal">For Me</p>
-                    )}
-                    <Switch
-                      color="secondary"
-                      size="md"
-                      defaultSelected
-                      classNames={{
-                        wrapper: [
-                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
-                        ],
-                        thumb: cn(
-                          "w-5 h-5  shadow-lg",
-
-                          "group-data-[hover=true]:border-secondary",
-
-                          //selected bg-teal-400 , bg-yellow-600
-                          "group-data-[selected=true]:bg-green-500",
-                          "group-data-[selected=true]:ml-4 ",
-
-                          // pressed bg-green-600
-                          "group-data-[pressed=true]:w-7 ",
-                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
-                          "group-data-[selected=true]: bg-cyan-500"
-                        ),
-                      }}
-                      aria-label="Automatic updates"
-                    />
-                  </div>
-                </Link>
-              </div>
-              <div
-                style={{ backgroundColor: "#ffffff80" }}
-                className="rounded-lg"
-              >
-                <Link
-                  to="#"
-                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white "
-                >
-                  <div className="flex justify-between w-full items-center">
-                    {menuToggle ? (
-                      <span>
-                        <FormeIcon />
-                      </span>
-                    ) : (
-                      <p className="text-black text-sm font-normal">
-                        Within 5Km
-                      </p>
-                    )}
-                    <Switch
-                      color="secondary"
-                      size="md"
-                      defaultSelected
-                      classNames={{
-                        wrapper: [
-                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
-                        ],
-                        thumb: cn(
-                          "w-5 h-5  shadow-lg",
-
-                          "group-data-[hover=true]:border-secondary",
-
-                          //selected bg-teal-400 , bg-yellow-600
-                          "group-data-[selected=true]:bg-green-500",
-                          "group-data-[selected=true]:ml-4 ",
-
-                          // pressed bg-green-600
-                          "group-data-[pressed=true]:w-7 ",
-                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
-                          "group-data-[selected=true]: bg-cyan-500"
-                        ),
-                      }}
-                      aria-label="Automatic updates"
-                    />
-                  </div>
-                </Link>
-              </div>
-              <div className="rounded-lg">
-                <Accordion
-                  itemClasses={itemClasses}
-                  className="text-foreground rounded-lg"
-                  style={{
-                    backgroundColor: "rgba(236, 247, 255, 0.5)",
-                    // color: "black !important",
-                    // opacity: 4,
-                  }}
-                >
-                  <AccordionItem
-                    key="1"
-                    aria-label="Categories"
-                    title="Categories"
-                    className="p-0 m-0 text-foreground"
+              {_nav?.map((result) =>
+                result?.menuType === "single" ? (
+                  <div
+                    style={{ backgroundColor: "#ffffff80" }}
+                    className="rounded-lg"
                   >
-                    <ul className="">
-                      <li className="p-0 m-0">
-                        <div className="flex items-center justify-between mb-0.5">
-                          <div className="flex  items-center">
-                            <p
-                              className="me-2 text-black mt-0.5"
-                              style={{
-                                height: "4px",
-                                width: "4px",
-                                borderRadius: "8px",
-                                backgroundColor: "black",
-                              }}
-                            ></p>
-                            <p className="ms-2 text-black font-normal text-sm">
-                              Grocery
-                            </p>
-                          </div>
-                          <div>
-                            <Checkbox
-                              classNames={{
-                                label: [
-                                  "text-small",
-                                  "text-yellow-300",
-                                  "font-light",
-                                  "hover:bg-cyan-500",
-                                  "data-[hover=true]:bg-cyan-500",
-                                ],
-                                wrapper: [
-                                  "before:border-0",
-                                  "before:bg-cyan-500",
-                                  "data-[hover=true]:bg-cyan-500",
-                                ],
-                              }}
-                              className="m-0 p-0"
-                              // defaultSelected
-                              size="sm"
-                              color="success"
-                              radius="none"
-                            />
-                          </div>
-                        </div>
-                      </li>
-                      <li>
-                        <div className="flex items-center justify-between mb-0.5">
-                          <div className="flex  items-center">
-                            <p
-                              className="me-2 text-black mt-0.5"
-                              style={{
-                                height: "4px",
-                                width: "4px",
-                                borderRadius: "8px",
-                                backgroundColor: "black",
-                              }}
-                            ></p>
-                            <p className="ms-2 text-black font-normal text-sm">
-                              Mobiles
-                            </p>
-                          </div>
-                          <div>
-                            <Checkbox
-                              classNames={{
-                                label: [
-                                  "text-small",
-                                  "text-yellow-300",
-                                  "font-light",
-                                  "hover:bg-cyan-500",
-                                  "data-[hover=true]:bg-cyan-500",
-                                ],
-                                wrapper: [
-                                  "before:border-0",
-                                  "before:bg-cyan-500",
-                                  "data-[hover=true]:bg-cyan-500",
-                                ],
-                              }}
-                              className="m-0 p-0"
-                              // defaultSelected
-                              size="sm"
-                              color="success"
-                              radius="none"
-                            />
-                          </div>
-                        </div>
-                      </li>
-                      <li>
-                        <div className="flex items-center justify-between">
-                          <div className="flex  items-center">
-                            <p
-                              className="me-2 text-black mt-0.5"
-                              style={{
-                                height: "4px",
-                                width: "4px",
-                                borderRadius: "8px",
-                                backgroundColor: "black",
-                              }}
-                            ></p>
-                            <p className="ms-2 text-black font-normal text-sm">
-                              Beauty, Toys & More
-                            </p>
-                          </div>
-                          <div>
-                            <Checkbox
-                              classNames={{
-                                label: [
-                                  "text-small",
-                                  "text-yellow-300",
-                                  "font-light",
-                                  "hover:bg-cyan-500",
-                                  "data-[hover=true]:bg-cyan-500",
-                                ],
-                                wrapper: [
-                                  "before:border-0",
-                                  "before:bg-cyan-500",
-                                  "data-[hover=true]:bg-cyan-500",
-                                ],
-                              }}
-                              className="m-0 p-0"
-                              // defaultSelected
-                              size="sm"
-                              color="success"
-                              radius="none"
-                            />
-                          </div>
-                        </div>
-                      </li>
-                    </ul>
-                  </AccordionItem>
-                </Accordion>
-              </div>
-              <div className="mt-3">
-                <Accordion
-                  variant="light"
-                  className="text-foreground rounded-lg"
-                  itemClasses={itemClasses}
-                  style={{
-                    backgroundColor: "rgba(236, 247, 255, 0.5)",
-                    // opacity: 1,
-                    // color: "black !important",
-                    // opacity: 4,
-                  }}
-                >
-                  <AccordionItem
-                    key="1"
-                    aria-label="Other For You"
-                    title="Other For You"
-                    className="p-0 m-0"
-                  >
-                    <ul className="">
-                      <li className="p-0 m-0">
-                        <div className="flex items-center justify-between">
-                          <div className="flex  items-center">
-                            <p
-                              className="me-2 text-black mt-0.5"
-                              style={{
-                                height: "4px",
-                                width: "4px",
-                                borderRadius: "8px",
-                                backgroundColor: "black",
-                              }}
-                            ></p>
-                            <p className="ms-2 text-black font-normal text-sm">
-                              Grocery
-                            </p>
-                          </div>
-                          <div>
-                            <Checkbox
-                              classNames={{
-                                label: [
-                                  "text-small",
-                                  "text-yellow-300",
-                                  "font-light",
-                                  "hover:bg-cyan-500",
-                                  "data-[hover=true]:bg-cyan-500",
-                                ],
-                                wrapper: [
-                                  "before:border-0",
-                                  "before:bg-cyan-500",
-                                  "data-[hover=true]:bg-cyan-500",
-                                ],
-                              }}
-                              className="m-0 p-0"
-                              // defaultSelected
-                              size="sm"
-                              color="success"
-                              radius="none"
-                            />
-                          </div>
-                        </div>
-                      </li>
-                      <li>
-                        <div className="flex items-center justify-between">
-                          <div className="flex  items-center">
-                            <p
-                              className="me-2 text-black mt-0.5"
-                              style={{
-                                height: "4px",
-                                width: "4px",
-                                borderRadius: "8px",
-                                backgroundColor: "black",
-                              }}
-                            ></p>
-                            <p className="ms-2 text-black font-normal text-sm">
-                              Home
-                            </p>
-                          </div>
-                          <div>
-                            <Checkbox
-                              classNames={{
-                                label: [
-                                  "text-small",
-                                  "text-yellow-300",
-                                  "font-light",
-                                  "hover:bg-cyan-500",
-                                  "data-[hover=true]:bg-cyan-500",
-                                ],
-                                wrapper: [
-                                  "before:border-0",
-                                  "before:bg-cyan-500",
-                                  "data-[hover=true]:bg-cyan-500",
-                                ],
-                              }}
-                              className="m-0 p-0"
-                              // defaultSelected
-                              size="sm"
-                              color="success"
-                              radius="none"
-                            />
-                          </div>
-                        </div>
-                      </li>
-                      <li>
-                        <div className="flex items-center justify-between">
-                          <div className="flex  items-center">
-                            <p
-                              className="me-2 text-black mt-0.5"
-                              style={{
-                                height: "4px",
-                                width: "4px",
-                                borderRadius: "8px",
-                                backgroundColor: "black",
-                              }}
-                            ></p>
-                            <p className="ms-2 text-black font-normal text-sm">
-                              Electronics
-                            </p>
-                          </div>
-                          <div>
-                            <Checkbox
-                              classNames={{
-                                label: [
-                                  "text-small",
-                                  "text-yellow-300",
-                                  "font-light",
-                                  "hover:bg-cyan-500",
-                                  "data-[hover=true]:bg-cyan-500",
-                                ],
-                                wrapper: [
-                                  "before:border-0",
-                                  "before:bg-cyan-500",
-                                  "data-[hover=true]:bg-cyan-500",
-                                ],
-                              }}
-                              className="m-0 p-0"
-                              // defaultSelected
-                              size="sm"
-                              color="success"
-                              radius="none"
-                            />
-                          </div>
-                        </div>
-                      </li>
-                    </ul>
-                  </AccordionItem>
-                </Accordion>
-              </div>
-              <div
-                style={{ backgroundColor: "#ffffff80" }}
-                className="rounded-lg"
-              >
-                {" "}
-                <Link
-                  to="#"
-                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white"
-                >
-                  <div className="flex justify-between w-full items-center">
-                    {menuToggle ? (
-                      <span>
-                        <FormeIcon />
-                      </span>
-                    ) : (
-                      <p className="text-black text-sm font-normal">
-                        Cash on Delivery
-                      </p>
-                    )}
-                    <Switch
-                      color="secondary"
-                      size="md"
-                      defaultSelected
-                      classNames={{
-                        wrapper: [
-                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
-                        ],
-                        thumb: cn(
-                          "w-5 h-5  shadow-lg",
-
-                          "group-data-[hover=true]:border-secondary",
-
-                          //selected bg-teal-400 , bg-yellow-600
-                          "group-data-[selected=true]:bg-green-500",
-                          "group-data-[selected=true]:ml-4 ",
-
-                          // pressed bg-green-600
-                          "group-data-[pressed=true]:w-7 ",
-                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
-                          "group-data-[selected=true]: bg-cyan-500"
-                        ),
-                      }}
-                      aria-label="Automatic updates"
-                    />
-                  </div>
-                </Link>
-              </div>
-              <div
-                style={{ backgroundColor: "#ffffff80" }}
-                className="rounded-lg"
-              >
-                {" "}
-                <Link
-                  to="#"
-                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white"
-                >
-                  <div className="flex justify-between w-full items-center">
-                    {menuToggle ? (
-                      <span>
-                        <FormeIcon />
-                      </span>
-                    ) : (
-                      <p className="text-black text-sm font-normal">
-                        Pre Booking
-                      </p>
-                    )}
-                    <Switch
-                      color="secondary"
-                      size="md"
-                      defaultSelected
-                      classNames={{
-                        wrapper: [
-                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
-                        ],
-                        thumb: cn(
-                          "w-5 h-5  shadow-lg",
-
-                          "group-data-[hover=true]:border-secondary",
-
-                          //selected bg-teal-400 , bg-yellow-600
-                          "group-data-[selected=true]:bg-green-500",
-                          "group-data-[selected=true]:ml-4 ",
-
-                          // pressed bg-green-600
-                          "group-data-[pressed=true]:w-7 ",
-                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
-                          "group-data-[selected=true]: bg-cyan-500"
-                        ),
-                      }}
-                      aria-label="Automatic updates"
-                    />
-                  </div>
-                </Link>
-              </div>
-              <div
-                style={{ backgroundColor: "#ffffff80" }}
-                className="rounded-lg"
-              >
-                {" "}
-                <Link
-                  to="#"
-                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white "
-                >
-                  <div className="flex justify-between w-full items-center">
-                    {menuToggle ? (
-                      <span>
-                        <FormeIcon />
-                      </span>
-                    ) : (
-                      <p className="text-black text-sm font-normal">
-                        Open Shop
-                      </p>
-                    )}
-                    <Switch
-                      color="secondary"
-                      size="md"
-                      defaultSelected
-                      classNames={{
-                        wrapper: [
-                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
-                        ],
-                        thumb: cn(
-                          "w-5 h-5  shadow-lg",
-
-                          "group-data-[hover=true]:border-secondary",
-
-                          //selected bg-teal-400 , bg-yellow-600
-                          "group-data-[selected=true]:bg-green-500",
-                          "group-data-[selected=true]:ml-4 ",
-
-                          // pressed bg-green-600
-                          "group-data-[pressed=true]:w-7 ",
-                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
-                          "group-data-[selected=true]: bg-cyan-500"
-                        ),
-                      }}
-                      aria-label="Automatic updates"
-                    />
-                  </div>
-                </Link>
-              </div>
-              <div
-                style={{ backgroundColor: "#ffffff80" }}
-                className="rounded-lg"
-              >
-                <Link
-                  to="#"
-                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white "
-                >
-                  <div className="flex justify-between w-full items-center">
-                    {menuToggle ? (
-                      <span>
-                        <FormeIcon />
-                      </span>
-                    ) : (
-                      <p className="text-black text-sm font-normal">
-                        Hospitals
-                      </p>
-                    )}
-                    <Switch
-                      color="secondary"
-                      size="md"
-                      defaultSelected
-                      classNames={{
-                        wrapper: [
-                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
-                        ],
-                        thumb: cn(
-                          "w-5 h-5  shadow-lg",
-
-                          "group-data-[hover=true]:border-secondary",
-
-                          //selected bg-teal-400 , bg-yellow-600
-                          "group-data-[selected=true]:bg-green-500",
-                          "group-data-[selected=true]:ml-4 ",
-
-                          // pressed bg-green-600
-                          "group-data-[pressed=true]:w-7 ",
-                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
-                          "group-data-[selected=true]: bg-cyan-500"
-                        ),
-                      }}
-                      aria-label="Automatic updates"
-                    />
-                  </div>
-                </Link>
-              </div>
-              <div
-                style={{ backgroundColor: "#ffffff80" }}
-                className="rounded-lg"
-              >
-                {" "}
-                <Link
-                  to="#"
-                  className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white "
-                >
-                  <div className="flex justify-between w-full items-center">
-                    {menuToggle ? (
-                      <span>
-                        <FormeIcon />
-                      </span>
-                    ) : (
-                      <p className="text-black text-sm font-normal">Hotels</p>
-                    )}
-                    <Switch
-                      color="secondary"
-                      size="md"
-                      defaultSelected
-                      classNames={{
-                        wrapper: [
-                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
-                        ],
-                        thumb: cn(
-                          "w-5 h-5  shadow-lg",
-
-                          "group-data-[hover=true]:border-secondary",
-
-                          //selected bg-teal-400 , bg-yellow-600
-                          "group-data-[selected=true]:bg-green-500",
-                          "group-data-[selected=true]:ml-4 ",
-
-                          // pressed bg-green-600
-                          "group-data-[pressed=true]:w-7 ",
-                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
-                          "group-data-[selected=true]: bg-cyan-500"
-                        ),
-                      }}
-                      aria-label="Automatic updates"
-                    />
-                  </div>
-                </Link>
-              </div>
-
-              {/* <ul role="list" className="space-y-2 font-medium list-disc">
-                {_nav?.map((result) =>
-                  result?.menuType === "single" ? (
-                    <li className="bg-white rounded-xl">
-                      <Link
-                        to="#"
-                        className="mt-7 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                      >
-                        <div className="flex justify-between w-full items-center">
-                          {menuToggle ? (
-                            <span>
-                              <FormeIcon />
-                            </span>
-                          ) : (
-                            <p>For Me</p>
-                          )}
-                         <Switch
-                      color="secondary"
-                      size="md"
-                      defaultSelected
-                      classNames={{
-                        wrapper: [
-                          "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
-                        ],
-                        thumb: cn(
-                          "w-5 h-5  shadow-lg",
-
-                          "group-data-[hover=true]:border-secondary",
-
-                          //selected bg-teal-400 , bg-yellow-600
-                          "group-data-[selected=true]:bg-green-500",
-                          "group-data-[selected=true]:ml-4 ",
-
-                          // pressed bg-green-600
-                          "group-data-[pressed=true]:w-7 ",
-                          "group-data-[selected]:group-data-[pressed]:ml-4 ",
-                          "group-data-[selected=true]: bg-cyan-500"
-                        ),
-                      }}
-                      aria-label="Automatic updates"
-                    />
-                        </div>
-                      </Link>
-                    </li>
-                  ) : (
-                    <li
-                      className="rounded-xl hover:bg-gray-100"
-                      style={{ backgroundColor: "var(--secondary-500)" }}
+                    {" "}
+                    <Link
+                      to="#"
+                      className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white"
                     >
-                      <Accordion
-                        itemClasses={itemClasses}
-                        className="customAccordion"
+                      <div className="flex justify-between w-full items-center">
+                        {menuToggle ? (
+                          <span>
+                            <FormeIcon />
+                          </span>
+                        ) : (
+                          <p className="text-black text-sm font-normal">
+                            {result?.name}
+                          </p>
+                        )}
+                        <Switch
+                          color="secondary"
+                          size="md"
+                          defaultSelected
+                          classNames={{
+                            wrapper: [
+                              "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
+                            ],
+                            thumb: cn(
+                              "w-5 h-5  shadow-lg",
+
+                              "group-data-[hover=true]:border-secondary",
+
+                              //selected bg-teal-400 , bg-yellow-600
+                              "group-data-[selected=true]:bg-green-500",
+                              "group-data-[selected=true]:ml-4 ",
+
+                              // pressed bg-green-600
+                              "group-data-[pressed=true]:w-7 ",
+                              "group-data-[selected]:group-data-[pressed]:ml-4 ",
+                              "group-data-[selected=true]: bg-cyan-500"
+                            ),
+                          }}
+                          aria-label="Automatic updates"
+                        />
+                      </div>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="rounded-lg mb-3">
+                    <Accordion
+                      itemClasses={itemClasses}
+                      className="text-foreground rounded-lg"
+                      style={{
+                        backgroundColor: "rgba(236, 247, 255, 0.5)",
+                        // color: "black !important",
+                        // opacity: 4,
+                      }}
+                    >
+                      <AccordionItem
+                        key="1"
+                        aria-label={result?.name}
+                        title={result?.name}
+                        className="p-0 m-0 text-foreground"
                       >
-                        <AccordionItem
-                          key="2"
-                          aria-label="Accordion 1"
-                          title={
-                            <div className="flex justify-between">
-                              {menuToggle ? (
-                                <span>
-                                  <IconHome />
-                                </span>
-                              ) : (
-                                <p>For Me</p>
-                              )}
-                              <p className="rounded-full bg-secondary text-secondary border-1 px-1 py-0 leading-4 text-xs">
-                                3
-                              </p>
-                            </div>
-                          }
-                          className="text-black"
-                        >
-                          <ul className="list-disc pl-10">
-                            {result?.["menuItems"]?.map((subMenu) => (
-                              <li className="flex justify-between pb-2.5">
-                                <div>Grocery</div>
+                        <ul className="">
+                          <li className="p-0 m-0">
+                            <div className="flex items-center justify-between mb-0.5">
+                              <div className="flex  items-center">
+                                <p
+                                  className="me-2 text-black mt-0.5"
+                                  style={{
+                                    height: "4px",
+                                    width: "4px",
+                                    borderRadius: "8px",
+                                    backgroundColor: "black",
+                                  }}
+                                ></p>
+                                <p className="ms-2 text-black font-normal text-sm">
+                                  Grocery
+                                </p>
+                              </div>
+                              <div>
                                 <Checkbox
+                                  classNames={{
+                                    label: [
+                                      "text-small",
+                                      "text-yellow-300",
+                                      "font-light",
+                                      "hover:bg-cyan-500",
+                                      "data-[hover=true]:bg-cyan-500",
+                                    ],
+                                    wrapper: [
+                                      "before:border-0",
+                                      "before:bg-cyan-500",
+                                      "data-[hover=true]:bg-cyan-500",
+                                    ],
+                                  }}
                                   className="m-0 p-0"
-                                  defaultSelected
-                                  size="md"
+                                  // defaultSelected
+                                  size="sm"
                                   color="success"
-                                ></Checkbox>
-                              </li>
-                            ))}
-                          </ul>
-                        </AccordionItem>
-                      </Accordion>
-                    </li>
-                  )
-                )}
-              </ul> */}
+                                  radius="none"
+                                />
+                              </div>
+                            </div>
+                          </li>
+                          <li>
+                            <div className="flex items-center justify-between mb-0.5">
+                              <div className="flex  items-center">
+                                <p
+                                  className="me-2 text-black mt-0.5"
+                                  style={{
+                                    height: "4px",
+                                    width: "4px",
+                                    borderRadius: "8px",
+                                    backgroundColor: "black",
+                                  }}
+                                ></p>
+                                <p className="ms-2 text-black font-normal text-sm">
+                                  Mobiles
+                                </p>
+                              </div>
+                              <div>
+                                <Checkbox
+                                  classNames={{
+                                    label: [
+                                      "text-small",
+                                      "text-yellow-300",
+                                      "font-light",
+                                      "hover:bg-cyan-500",
+                                      "data-[hover=true]:bg-cyan-500",
+                                    ],
+                                    wrapper: [
+                                      "before:border-0",
+                                      "before:bg-cyan-500",
+                                      "data-[hover=true]:bg-cyan-500",
+                                    ],
+                                  }}
+                                  className="m-0 p-0"
+                                  // defaultSelected
+                                  size="sm"
+                                  color="success"
+                                  radius="none"
+                                />
+                              </div>
+                            </div>
+                          </li>
+                          <li>
+                            <div className="flex items-center justify-between">
+                              <div className="flex  items-center">
+                                <p
+                                  className="me-2 text-black mt-0.5"
+                                  style={{
+                                    height: "4px",
+                                    width: "4px",
+                                    borderRadius: "8px",
+                                    backgroundColor: "black",
+                                  }}
+                                ></p>
+                                <p className="ms-2 text-black font-normal text-sm">
+                                  Beauty, Toys & More
+                                </p>
+                              </div>
+                              <div>
+                                <Checkbox
+                                  classNames={{
+                                    label: [
+                                      "text-small",
+                                      "text-yellow-300",
+                                      "font-light",
+                                      "hover:bg-cyan-500",
+                                      "data-[hover=true]:bg-cyan-500",
+                                    ],
+                                    wrapper: [
+                                      "before:border-0",
+                                      "before:bg-cyan-500",
+                                      "data-[hover=true]:bg-cyan-500",
+                                    ],
+                                  }}
+                                  className="m-0 p-0"
+                                  // defaultSelected
+                                  size="sm"
+                                  color="success"
+                                  radius="none"
+                                />
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
+                )
+              )}
+            </div>
+            <div
+              style={{ backgroundColor: "#ffffff80" }}
+              className="absolute bottom-[5%] rounded-lg w-11/12"
+            >
+              {!currentloginDetails ? (
+                <Login />
+              ) : (
+                <div className="flex justify-between w-full items-center">
+                  {menuToggle ? (
+                    <span>
+                      <FormeIcon />
+                    </span>
+                  ) : (
+                    <p className="text-black text-sm font-normal">
+                      <Popover showArrow placement="bottom">
+                        <PopoverTrigger>
+                          <User
+                            as="button"
+                            name={currentloginDetails?.data?.firstName}
+                            description="Your Details"
+                            className="transition-transform"
+                            avatarProps={{
+                              src: "https://i.pravatar.cc/150?u=a04258114e29026702d",
+                            }}
+                          />
+                        </PopoverTrigger>
+                        <PopoverContent className="p-0">
+                          <Card
+                            shadow="none"
+                            className="min-w-[230px] border-none bg-transparent p-0"
+                          >
+                            <CardBody className="p-0 w-full">
+                              <Listbox
+                                aria-label="User Menu"
+                                onAction={(key) => alert(key)}
+                                itemClasses={{
+                                  base: "first:rounded-t-medium last:rounded-b-medium rounded-none gap-3 h-12 data-[hover=true]:bg-default-100/80",
+                                }}
+                              >
+                                <ListboxItem
+                                  key="issues"
+                                  endContent={90}
+                                  startContent={<IconHome />}
+                                >
+                                  Orders
+                                </ListboxItem>
+                                <ListboxItem
+                                  key="pull_requests"
+                                  endContent={90}
+                                  startContent={<IconHome />}
+                                >
+                                  Cart
+                                </ListboxItem>
+                                <ListboxItem
+                                  key="discussions"
+                                  // endContent={90}
+                                  startContent={<IconHome />}
+                                >
+                                  Profile
+                                </ListboxItem>
+                              </Listbox>
+                            </CardBody>
+                          </Card>
+                        </PopoverContent>
+                      </Popover>
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </aside>
