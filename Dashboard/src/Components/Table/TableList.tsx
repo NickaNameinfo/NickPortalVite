@@ -132,7 +132,7 @@ export const TableList = (props: TableProps) => {
 
   const bottomContent = React.useMemo(() => {
     return (
-      <div className="py-2 px-2 flex justify-between items-center">
+      <div className="py-1 px-2 flex justify-between items-center">
         <Pagination
           isCompact
           showControls
@@ -145,7 +145,7 @@ export const TableList = (props: TableProps) => {
         <div className="hidden sm:flex w-[30%] justify-end gap-2 ml-4">
           <Button
             isDisabled={pages === 1}
-            size="sm"
+            size="md"
             variant="flat"
             onPress={onPreviousPage}
           >
@@ -153,7 +153,7 @@ export const TableList = (props: TableProps) => {
           </Button>
           <Button
             isDisabled={pages === 1}
-            size="sm"
+            size="md"
             variant="flat"
             onPress={onNextPage}
           >
@@ -166,72 +166,14 @@ export const TableList = (props: TableProps) => {
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-0">
         <div className="flex justify-between gap-3 items-center mt-2">
-          <Input
-            autoFocus={false}
-            isClearable
-            // className="w-[280px]"
-            className="w-[280px] sm:max-w-[44%]"
-            radius="lg"
-            size="md"
-            type="Search"
-            // autoFocus
-            // color="default"
-            variant="flat"
-            placeholder="Search by name..."
-            classNames={{
-              label: " bg-[#ffffff3b] text-black/90 dark:text-black/90",
-              input: [
-                "bg-[#ffffff3b]",
-                "text-black/90 dark:text-black/100",
-                "placeholder:text-black-100/30 dark:placeholder:text-black/10",
-                "font-normal",
-                "group-data-[has-value=true]:text-black/90",
-              ],
-              // innerWrapper: " text-black/90 dark:text-black/70",
-              inputWrapper: [
-                "bg-[#ffffff3b]",
-                "dark:bg-[#ffffff3b]",
-                "backdrop-blur-xl",
-                "backdrop-saturate-50",
-                "hover:bg-[#ffffff3b]",
-                "hover:border-gray-600/10",
-                "focus-within:!bg-[#ffffff3b]",
-                "dark:hover:bg-[#ffffff3b]",
-                "dark:focus-within:!bg-[#ffffff3b]",
-                "!cursor-text",
-                "shadow-none",
-                "border-1",
-                "data-[hover=true]:bg-[#ffffff3b]",
-                "data-[hover=true]:bg-[#ffffff3b]",
-                "dark:data-[hover=true]:bg-[#ffffff3b]",
-              ],
-            }}
-            startContent={
-              <p className="me-1.5">
-                <NavHeaderSearchIcon />
-              </p>
-            }
-            value={filterValue}
-            onClear={() => onClear()}
-            onValueChange={onSearchChange}
-          />
-          {/* <Input
-            isClearable
-            className="w-full sm:max-w-[44%]"
-            placeholder="Search by name..."
-            startContent={<SearchIcon />}
-            value={filterValue}
-            onClear={() => onClear()}
-            onValueChange={onSearchChange}
-            size="sm"
-          /> */}
           {props.isStatusFilter && (
             <div className="flex gap-3">
               <Dropdown>
                 <DropdownTrigger className="hidden sm:flex">
                   <Button
+                    size="md"
                     endContent={<ChevronDownIcon className="text-small" />}
                     variant="flat"
                   >
@@ -258,6 +200,7 @@ export const TableList = (props: TableProps) => {
                   <Button
                     endContent={<ChevronDownIcon className="text-small" />}
                     variant="flat"
+                    size="md"
                   >
                     Columns
                   </Button>
@@ -281,9 +224,65 @@ export const TableList = (props: TableProps) => {
           )}
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">
-            Total {props.tableItems.length}
-          </span>
+          <div className="flex justify-between items-center">
+            <span className="flex me-5">
+              <p className="font-semibold text-default-700 "> Total</p>
+              <p className=" text-default-700 font-semibold ms-1">
+                {props.tableItems.length}
+              </p>
+            </span>
+            <div className="">
+              <Input
+                autoFocus={false}
+                isClearable
+                // className="w-[280px]"
+                className="w-[280px]"
+                radius="lg"
+                size="md"
+                type="Search"
+                // autoFocus
+                // color="default"
+                variant="flat"
+                placeholder="Search by name..."
+                classNames={{
+                  label: " bg-[#ffffff3b] text-black/90 dark:text-black/90",
+                  input: [
+                    "bg-[#ffffff3b]",
+                    "text-black/90 dark:text-black/100",
+                    "placeholder:text-black-100/30 dark:placeholder:text-black/10",
+                    "font-normal",
+                    "group-data-[has-value=true]:text-black/90",
+                  ],
+                  // innerWrapper: " text-black/90 dark:text-black/70",
+                  inputWrapper: [
+                    "bg-[#ffffff3b]",
+                    "dark:bg-[#ffffff3b]",
+                    "backdrop-blur-xl",
+                    "backdrop-saturate-50",
+                    "hover:bg-[#ffffff3b]",
+                    "hover:border-gray-600/10",
+                    "focus-within:!bg-[#ffffff3b]",
+                    "dark:hover:bg-[#ffffff3b]",
+                    "dark:focus-within:!bg-[#ffffff3b]",
+                    "!cursor-text",
+                    "shadow-none",
+                    "border-1",
+                    "data-[hover=true]:bg-[#ffffff3b]",
+                    "data-[hover=true]:bg-[#ffffff3b]",
+                    "dark:data-[hover=true]:bg-[#ffffff3b]",
+                  ],
+                }}
+                startContent={
+                  <p className="me-1.5">
+                    <NavHeaderSearchIcon />
+                  </p>
+                }
+                value={filterValue}
+                onClear={() => onClear()}
+                onValueChange={onSearchChange}
+              />
+            </div>
+          </div>
           <label className="flex items-center text-default-400 text-small">
             {bottomContent}
           </label>
@@ -304,6 +303,7 @@ export const TableList = (props: TableProps) => {
     <Table
       aria-label="Example table with custom cells, pagination and sorting"
       isHeaderSticky
+      // isStriped
       // bottomContent={bottomContent}
       // bottomContentPlacement="inside"
       classNames={{
@@ -317,7 +317,7 @@ export const TableList = (props: TableProps) => {
       onSelectionChange={setSelectedKeys}
       onSortChange={setSortDescriptor}
     >
-      <TableHeader columns={headerColumns}>
+      <TableHeader columns={headerColumns} className="m-0 p-0">
         {(column: any) => (
           <TableColumn
             key={column?.["id"]}
@@ -328,7 +328,11 @@ export const TableList = (props: TableProps) => {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody emptyContent={"No users found"} items={sortedItems}>
+      <TableBody
+        emptyContent={"No users found"}
+        items={sortedItems}
+        className="m-0 p-0"
+      >
         {(item: any) => (
           <TableRow key={item.id}>
             {(columnKey) => (

@@ -82,8 +82,9 @@ const Add = () => {
       className="w-full flex justify-center"
     >
       <div className="w-5/6">
-        <div className="flex  items-center justify-between border-b pb-3 mt-4  mb-4">
+        <div className="flex items-center justify-between border-b pb-3 mt-2  mb-4">
           <Chip
+          size="lg"
             classNames={{
               // "border-1",
               base: "bg-gradient-to-br  border-small border-white/60 ",
@@ -109,7 +110,12 @@ const Add = () => {
             <p className="font-medium  text-black/70"> Vendor Register</p>
           </Chip>
           <div className="text-center">
-            <Button color="primary" type="submit" size="sm" className="w-[90px]">
+            <Button
+              color="primary"
+              type="submit"
+              size="md"
+              className="w-[90px]"
+            >
               {id ? "Update" : "Create"}
             </Button>
           </div>
@@ -250,6 +256,7 @@ const Add = () => {
         </div>
         <div className="flex flex-col flex-wrap gap-4 border-b pb-3 mb-4">
           <Chip
+          size="lg"
             classNames={{
               // "border-1",
               base: "bg-gradient-to-br  border-small border-white/60 ",
@@ -347,6 +354,7 @@ const Add = () => {
         </div>
         <div className="flex flex-col flex-wrap gap-4 border-b pb-3 mt-4 mb-4">
           <Chip
+          size="lg"
             classNames={{
               // "border-1",
               base: "bg-gradient-to-br  border-small border-white/60 ",
@@ -504,11 +512,11 @@ const Add = () => {
             )}
           />
         </div>
-        <div className="text-center">
+        {/* <div className="text-center">
           <Button color="primary" type="submit">
             {id ? "Update" : "Create"}
           </Button>
-        </div>
+        </div> */}
       </div>
     </form>
   );

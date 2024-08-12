@@ -75,7 +75,7 @@ const StoreList = () => {
           <Chip
             className="capitalize"
             color={statusColorMap[user.status]}
-            size="sm"
+          size="lg"
             variant="flat"
           >
             {cellValue}
@@ -116,7 +116,7 @@ const StoreList = () => {
   }, []);
 
   return (
-    <div>
+    <div className="mx-2">
       {data && (
         <TableList
           defaultCloumns={defaultCloumns}

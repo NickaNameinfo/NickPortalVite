@@ -96,7 +96,7 @@ const List = () => {
           <Chip
             className="capitalize"
             color={statusColorMap[user.status]}
-            size="sm"
+           size="lg"
             variant="flat"
           >
             {cellValue}
@@ -139,7 +139,7 @@ const List = () => {
   }, []);
 
   return (
-    <div>
+    <div className="mx-2">
       {data && (
         <TableList
           defaultCloumns={defaultCloumns}

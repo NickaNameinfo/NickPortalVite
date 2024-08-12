@@ -147,12 +147,13 @@ const AddStock = () => {
   }, []);
 
   return (
-    <div>
+    <div className="mx-1">
       <form onSubmit={handleSubmit(onSubmit)} className="px-2">
         <div className="flex items-center justify-between border-b pb-3 mt-1.5  mb-3">
           <div>
             <Chip
-            className="py-4 px-2"
+              size="lg"
+              className="py-4 px-2"
               classNames={{
                 // "border-1",
                 base: "bg-gradient-to-br  border-small border-white/60 ",
@@ -179,7 +180,7 @@ const AddStock = () => {
             </Chip>
           </div>
           <div className="text-center w-[100px]">
-            <Button color="primary" size="sm" type="submit" className="w-full">
+            <Button color="primary" size="md" type="submit" className="w-full">
               Submit
             </Button>
           </div>

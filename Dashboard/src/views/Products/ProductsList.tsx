@@ -118,7 +118,7 @@ const ProductsList = () => {
   }, []);
 
   return (
-    <div>
+    <div className="mx-2">
       {data && (
         <TableList
           defaultCloumns={currentPlan !== "1" ? byuserProduct : defaultCloumns}

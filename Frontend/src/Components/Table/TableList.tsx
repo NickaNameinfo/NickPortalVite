@@ -261,6 +261,7 @@ export const TableList = (props: TableProps) => {
       }}
       selectedKeys={selectedKeys}
       selectionMode="multiple"
+     
       sortDescriptor={sortDescriptor}
       topContent={topContent}
       topContentPlacement="outside"

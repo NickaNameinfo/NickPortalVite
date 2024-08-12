@@ -90,6 +90,7 @@ const CategoriesAdd = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex items-center justify-between border-b pb-3 mt-1.5  mb-3">
           <Chip
+          size="lg"
             classNames={{
               base: "bg-gradient-to-br  border-small border-white/60 ",
               content: "drop-shadow shadow-black text-white",
@@ -118,7 +119,7 @@ const CategoriesAdd = () => {
             <Button
               color="primary"
               type="submit"
-              size="sm"
+              size="md"
               className="w-[90px]"
             >
               Submit
