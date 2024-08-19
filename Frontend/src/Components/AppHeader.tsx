@@ -38,7 +38,8 @@ export const AppHeader = () => {
   const [startIndex, setStartIndex] = React.useState(0);
   const [sliderLabel, setSliderLabel] = React.useState([]);
   const { data: category } = useGetCategoryQuery();
-  const itemsPerPage = 4;
+
+  const itemsPerPage = 12;
   React.useEffect(() => {
     if (category?.data) {
       const labels = category.data.map((item) => item?.name);
@@ -60,8 +61,6 @@ export const AppHeader = () => {
       Math.min(prevIndex + 1, sliderLabel?.length - itemsPerPage)
     );
   };
-
-  console.log(currentloginDetails, "currentloginDetails453");
 
   return (
     <>
@@ -330,7 +329,7 @@ export const AppHeader = () => {
                     <div className="slider-item" key={index}>
                       <Button
                         size="sm"
-                        className="font-medium text-sm w-11/12 h-10 bg-stripe-gradient"
+                        className="font-medium text-sm w-auto h-10 bg-stripe-gradient"
                         radius="full"
                       >
                         {item}

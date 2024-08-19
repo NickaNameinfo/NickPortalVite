@@ -4,7 +4,6 @@ module.exports = (sequelize, DataTypes) => {
     productId: DataTypes.INTEGER,
     name: DataTypes.STRING,
     orderId: DataTypes.INTEGER,
-    addressId: DataTypes.INTEGER,
     price: DataTypes.INTEGER,
     total: DataTypes.INTEGER,
     qty: DataTypes.INTEGER,
@@ -12,8 +11,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   Cart.associate = function(models) {
     // associations can be defined here
-    models.carts.belongsTo(models.addresses, { foreignKey: 'addressId' });  
-    models.carts.belongsTo(models.orders, { foreignKey: 'orderId' });
+    models.carts.belongsTo(models.user, { foreignKey: 'orderId' });
   };
   return Cart;
 }; 

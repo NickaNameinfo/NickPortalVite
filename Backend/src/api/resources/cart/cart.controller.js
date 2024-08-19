@@ -4,16 +4,15 @@ module.exports = {
   // Create a new cart item
   async create(req, res, next) {
     try {
-      const { productId, name, orderId, addressId, price, total, qty } = req.body;
+      const { productId, name, orderId, price, total, qty, photo } = req.body;
       const newCart = await db.carts.create({
         productId,
         name,
         orderId,
-        addressId,
         price,
         total,
         qty,
-        photo : req?.file ? req?.file?.path : "",
+        photo,
       });
       res.status(201).json({ success: true, data: newCart });
     } catch (err) {
@@ -24,11 +23,12 @@ module.exports = {
   // Get all cart items
   async index(req, res, next) {
     try {
+      const { orderId } = req.params;
       const carts = await db.carts.findAll({
-        include: [
-          { model: db.addresses},
-          { model: db.orders}
-        ]
+        where: {
+          orderId,
+        },
+        include: [{ model: db.user }],
       });
       res.status(200).json({ success: true, data: carts });
     } catch (err) {
@@ -39,16 +39,18 @@ module.exports = {
   // Get cart item by ID
   async show(req, res, next) {
     try {
-      const { id } = req.params;
+      const { orderId, productId } = req.params;
       const cart = await db.carts.findOne({
-        where: { id },
-        include: [
-          { model: db.addresses, attributes: ["id", "address"] },
-          { model: db.orders, attributes: ["id", "orderNumber"] }
-        ]
+        where: {
+          productId,
+          orderId,
+        },
+        include: [{ model: db.user }],
       });
       if (!cart) {
-        return res.status(404).json({ success: false, message: "Cart item not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Cart item not found" });
       }
       res.status(200).json({ success: true, data: cart });
     } catch (err) {
@@ -59,23 +61,23 @@ module.exports = {
   // Update a cart item
   async update(req, res, next) {
     try {
-      const { id } = req.params;
-      const { productId, name, orderId, addressId, price, total, qty } = req.body;
-      console.log(name , "name234234")
+      const { orderId, productId } = req.params;
+      const { name, price, total, qty, photo } = req.body;
 
-      const cart = await db.carts.findOne({ where: { id } });
+      const cart = await db.carts.findOne({ where: { orderId, productId } });
       if (!cart) {
-        return res.status(404).json({ success: false, message: "Cart item not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Cart item not found" });
       }
       await cart.update({
         productId: productId ?? cart.productId,
         name: name ?? cart.name,
         orderId: orderId ?? cart.orderId,
-        addressId: addressId ?? cart.addressId,
         price: price ?? cart.price,
         total: total ?? cart.total,
         qty: qty ?? cart.qty,
-        photo: req.file ? req.file.location : cart.photo
+        photo: photo ? photo : cart.photo,
       });
       res.status(200).json({ success: true, data: cart });
     } catch (err) {
@@ -89,12 +91,14 @@ module.exports = {
       const { id } = req.params;
       const cart = await db.carts.findOne({ where: { id } });
       if (!cart) {
-        return res.status(404).json({ success: false, message: "Cart item not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Cart item not found" });
       }
       await cart.destroy();
       res.status(200).json({ success: true, message: "Cart item deleted" });
     } catch (err) {
       next(err);
     }
-  }
+  },
 };

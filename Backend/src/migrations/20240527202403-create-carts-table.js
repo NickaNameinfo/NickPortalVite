@@ -20,17 +20,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Orders', // Name of the Orders table (usually pluralized)
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
-      },
-      addressId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'Addresses', // Name of the Addresses table (usually pluralized)
+          model: 'users', // Name of the Orders table (usually pluralized)
           key: 'id'
         },
         onUpdate: 'CASCADE',
