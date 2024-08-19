@@ -29,8 +29,35 @@ export const VendorProductApi = createApi({
         method: "GET",
       }),
     }),
+    getCartByProductId: builder.query({
+      query: (body) => ({
+        url: `/cart/list/${body?.id}/${body?.productId}`,
+        method: "GET",
+      }),
+    }),
+    addCart: builder.mutation({
+      query: (body) => ({
+        url: `/cart/create`,
+        method: "POST",
+        body,
+      }),
+    }),
+    updateCart: builder.mutation({
+      query: (body) => ({
+        url: `/cart/update/${body?.orderId}/${body?.productId}`,
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useGetVendorsQuery, useGetVendorsByIdQuery, useGetVendorsProductByIdQuery } = VendorProductApi;
+export const {
+  useGetVendorsQuery,
+  useGetVendorsByIdQuery,
+  useGetVendorsProductByIdQuery,
+  useAddCartMutation,
+  useGetCartByProductIdQuery,
+  useUpdateCartMutation
+} = VendorProductApi;
 export const { endpoints } = VendorProductApi;

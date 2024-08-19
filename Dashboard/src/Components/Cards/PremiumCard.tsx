@@ -27,10 +27,63 @@ import { useBoolean } from "../../Common/CustomHooks";
 import { BuyCard } from "./BuyCard";
 import { VendorDetails } from "./VendorDetails";
 import { infoData } from "../../configData";
+import {
+  useAddCartMutation,
+  useGetCartByProductIdQuery,
+  useUpdateCartMutation,
+} from "../../views/VendorProducts/Service.mjs";
+import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 
 export const PremiumCard = ({ item = null }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [cartPopup, setTrue, setFalse, toggle] = useBoolean(false);
+  const id = getCookie("id");
+  const [addCart] = useAddCartMutation();
+  const [updateCart] = useUpdateCartMutation();
+
+  let productId = {
+    id: id,
+    productId: item?.product?.id,
+  };
+
+  const { data, error, refetch } = useGetCartByProductIdQuery(productId);
+
+  console.log("item323452345", data);
+
+  const handleAddCart = async (type) => {
+    let tempCartValue = {
+      productId: item?.product?.id,
+      name: item?.product?.name,
+      orderId: id,
+      price: item?.product?.price,
+      total: item?.product?.total,
+      qty: data?.data?.qty
+        ? type === "add"
+          ? Number(data?.data?.qty) + 1
+          : Number(data?.data?.qty) - 1
+        : 1,
+      photo: item?.product?.photo,
+    };
+    if (data?.data) {
+      try {
+        const result = await updateCart(tempCartValue);
+        if (result) {
+          refetch();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        const result = await addCart(tempCartValue);
+        if (result) {
+          refetch();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
   return (
     <>
@@ -141,15 +194,19 @@ export const PremiumCard = ({ item = null }) => {
                           radius="full"
                           isIconOnly
                           size="md"
+                          onClick={() => handleAddCart("remove")}
                         >
                           -
                         </Button>
-                        <p className="bgnonetext-sm font-semibold px-2 ">845</p>
+                        <p className="bgnonetext-sm font-semibold px-2 ">
+                          {data?.data?.qty ? data?.data?.qty : 0}
+                        </p>
                         <Button
                           className="bgnone p-0 m-0 text-base font-semibold "
                           radius="full"
                           isIconOnly
                           size="md"
+                          onClick={() => handleAddCart("add")}
                         >
                           +
                         </Button>
