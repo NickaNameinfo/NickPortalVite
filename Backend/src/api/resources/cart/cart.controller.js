@@ -88,8 +88,8 @@ module.exports = {
   // Delete a cart item
   async delete(req, res, next) {
     try {
-      const { id } = req.params;
-      const cart = await db.carts.findOne({ where: { id } });
+      const { orderId, productId } = req.params;
+      const cart = await db.carts.findOne({ where: { orderId, productId } });
       if (!cart) {
         return res
           .status(404)

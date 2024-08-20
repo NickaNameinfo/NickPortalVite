@@ -25,21 +25,84 @@ import {
 import { useGetVendorsByIdQuery } from "../../views/VendorProducts/Service.mjs";
 import { infoData } from "../../configData";
 import RelatedVendors from "./RelatedVendors";
+import { getCookie } from "../../JsFiles/CommonFunction.mjs";
+import { useGetVendorsQuery } from "../../views/vendors/Service.mjs";
+import VendorCard from "./VendorCard";
+import {
+  useAddCartMutation,
+  useGetCartByProductIdQuery,
+  useUpdateCartMutation,
+} from "../../views/VendorProducts/Service.mjs";
+import { BuyCard } from "./BuyCard";
 
 interface VendorDetailsProps {
   isOpen: any;
   onClose: any;
-  id: any;
+  item: any;
 }
 
-export const VendorDetails = (props: VendorDetailsProps) => {
+export const ProductDetails = (props: VendorDetailsProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data, error, refetch } = useGetVendorsByIdQuery(props.id);
-  console.log(data?.data, "propsdata");
+  const id = getCookie("id");
+  const {
+    data: vendors,
+    error: vendorsError,
+    refetch: vendorRefetch,
+  } = useGetVendorsQuery();
+  const { data, error, refetch } = useGetVendorsByIdQuery(
+    Number(props?.item?.supplierId)
+  );
+
+  let productId = {
+    id: id,
+    productId: props?.item?.product?.id,
+  };
+  const { data:cart, error:cartError, refetch:cartRefetch } = useGetCartByProductIdQuery(productId);
+  
+  const [addCart] = useAddCartMutation();
+  const [updateCart] = useUpdateCartMutation();
+
+  console.log(data?.data, "propsdata", props?.item);
 
   React.useEffect(() => {
     refetch();
+    vendorRefetch();
   }, []);
+
+  const handleAddCart = async (type) => {
+    let tempCartValue = {
+      productId: props?.item?.product?.id,
+      name: props?.item?.product?.name,
+      orderId: id,
+      price: Number(props?.item?.price),
+      total: Number(cart?.data?.qty) * Number(props?.item?.price),
+      qty: cart?.data?.qty
+        ? type === "add"
+          ? Number(cart?.data?.qty) + 1
+          : Number(cart?.data?.qty) - 1
+        : 1,
+      photo: props?.item?.product?.photo,
+    };
+    if (cart?.data) {
+      try {
+        const result = await updateCart(tempCartValue);
+        if (result) {
+          cartRefetch();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        const result = await addCart(tempCartValue);
+        if (result) {
+          cartRefetch();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
   return (
     <>
@@ -65,7 +128,7 @@ export const VendorDetails = (props: VendorDetailsProps) => {
                       <CardBody className="overflow-visible p-0 relative">
                         <Image
                           alt="Card background"
-                          src={`${infoData.baseApi}/${data?.data?.[0]?.vendorImage}`}
+                          src={`${infoData.baseApi}/${props?.item?.product?.photo}`}
                           width="100%"
                           radius="lg"
                           className="w-full object-cover md:h-[222px] xm:h-[150px] mm:h-[150px]  ml:h-[150px]"
@@ -76,36 +139,74 @@ export const VendorDetails = (props: VendorDetailsProps) => {
                   <div className="sm:px-2 xl:col-span-1 lg:col-span-1 md:order-3 xm:order-3 mm:order-3 ml:order-3 md:col-span-2 xm:col-span-2 mm:col-span-2 ml:col-span-2 ">
                     <div className="">
                       <h2 className="text-xl truncate font-bold">
-                        {data?.data?.[0]?.storename}
+                        {props?.item?.product?.name}
                       </h2>
-                      <p className="text-slate-300 text-lg font-normal">
-                        {data?.data?.[0]?.shopdesc}
+                      <p className="text-slate-300 text-lg line-through font-normal">
+                        Rs : {props?.item?.price}
                       </p>
-                      <p className="text-black text-lg font-normal flex">
-                        <IconLocation
-                          fill="#4C86F9"
-                          width={50}
-                          className={"pt-2"}
-                        />{" "}
-                        {data?.data?.[0]?.shopaddress}
-                      </p>
+                      <div className="flex justify-between items-center">
+                        <p className="text-black text-lg font-normal">
+                          Price:Rs {props?.item?.price} ({props?.item?.unitSize}
+                          )
+                        </p>
+                        <div className="text-sm">120 Stocks</div>
+                      </div>
+                      <div className="flex items-center justify-between mt-2">
+                        <div className="">
+                          <div className="flex justify-between items-center rounded-xl bg-gray-100 lg:h-unit-xl">
+                            <Button
+                              className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
+                              radius="full"
+                              isIconOnly
+                              size="md"
+                              onClick={() => handleAddCart("remove")}
+                            >
+                              -
+                            </Button>
+                            <p className="bg-gray-100 text-sm font-semibold p-0 m-0">
+                              {cart?.data?.qty ? cart?.data?.qty : 0}
+                            </p>
+                            <Button
+                              className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
+                              radius="full"
+                              isIconOnly
+                              size={"md"}
+                              onClick={() => handleAddCart("add")}
+                            >
+                              +
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="">
+                          <Button
+                            className="xm:h-unit-8 xm:px-4 lg:px-3 lg:h-unit-xl"
+                            color="primary"
+                            variant="ghost"
+                            radius="lg"
+                            size={"md"}
+                            onClick={() => onOpen()}
+                          >
+                            View Cart
+                          </Button>
+                        </div>
+                      </div>
                       <div className="grid grid-cols-12 justify-between items-center mt-4">
                         <div className="col-span-8">
                           <div className="flex items-center justify-between pb-2.5">
-                            <p className="text-sm font-normal">Category</p>
-                            <b>89</b>
+                            <p className="text-sm font-normal">Per Order</p>
+                            <IconTick fill="#49A84C" />
                           </div>
                           <div className="flex items-center justify-between pb-2.5">
                             <p className="text-sm font-normal">
-                              Customer Review :
+                              Online Payment
                             </p>
-                            <b>4.6</b>
+                            <IconTick fill="#49A84C" />
                           </div>
                           <div className="flex items-center justify-between">
                             <p className="text-sm font-normal">
-                              Store Review :
+                              Cash On Delivery
                             </p>
-                            <b>4.6</b>
+                            <IconTick fill="#E6E6E6" />
                           </div>
                         </div>
                         <div className="col-span-4 ms-4 flex flex-col justify-between h-full">
@@ -147,7 +248,7 @@ export const VendorDetails = (props: VendorDetailsProps) => {
                                 variant="bordered"
                                 isIconOnly
                               >
-                                <IconInfo fill="#FF0000" />
+                                <IconHeart fill="#FF0000" />
                               </Button>
                             </div>
                           </div>
@@ -171,7 +272,7 @@ export const VendorDetails = (props: VendorDetailsProps) => {
                   </div>
                 </div>
 
-                <div className=" sm:px-2 mt-3 flex justify-between items-center ">
+                <div className="sm:px-2 mt-3 flex justify-between items-center ">
                   <div className="font-semibold md:text-xl xm:text-md">
                     Related Vendors
                   </div>
@@ -196,13 +297,18 @@ export const VendorDetails = (props: VendorDetailsProps) => {
                     </Button>
                   </div>
                 </div>
-                <RelatedVendors />
+                <div className="grid xm:grid-cols-1 mm:grid-cols-1 ml:grid-cols-1 sm:grid-cols-2  md:grid-cols-2  lg:grid-cols-2  xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-4 gap-2">
+                  {vendors?.data?.map((item, index) => {
+                    return <VendorCard item={item} key={index} />;
+                  })}
+                </div>
               </ModalBody>
               <ModalFooter className="pt-0 p-3 flex justify-between"></ModalFooter>
             </>
           )}
         </ModalContent>
       </Modal>
+      <BuyCard isOpen={isOpen} onClose={onClose} />
     </>
   );
 };

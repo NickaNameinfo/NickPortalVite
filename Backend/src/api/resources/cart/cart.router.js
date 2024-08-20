@@ -29,6 +29,6 @@ cartRouter.route('/create').post(cartController.create);
 cartRouter.route('/list/:orderId').get(sanitize(), cartController.index);
 cartRouter.route('/list/:orderId/:productId').get(sanitize(), cartController.show);
 cartRouter.route('/update/:orderId/:productId').post(sanitize(), cartController.update);
-cartRouter.route('/delete/:id').delete(sanitize(), cartController.delete);
+cartRouter.route('/delete/:orderId/:productId').delete(sanitize(), cartController.delete);
 
 module.exports = { cartRouter };

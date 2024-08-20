@@ -35,6 +35,12 @@ export const VendorProductApi = createApi({
         method: "GET",
       }),
     }),
+    getCartByOrderId: builder.query({
+      query: (id) => ({
+        url: `/cart/list/${id}`,
+        method: "GET",
+      }),
+    }),
     addCart: builder.mutation({
       query: (body) => ({
         url: `/cart/create`,
@@ -49,6 +55,13 @@ export const VendorProductApi = createApi({
         body,
       }),
     }),
+    deleteCartItem: builder.mutation({
+      query: (body) => ({
+        url: `/cart/delete/${body?.orderId}/${body?.productId}`,
+        method: "DELETE",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -58,6 +71,8 @@ export const {
   useGetVendorsProductByIdQuery,
   useAddCartMutation,
   useGetCartByProductIdQuery,
-  useUpdateCartMutation
+  useUpdateCartMutation,
+  useGetCartByOrderIdQuery,
+  useDeleteCartItemMutation
 } = VendorProductApi;
 export const { endpoints } = VendorProductApi;

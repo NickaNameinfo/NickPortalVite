@@ -25,7 +25,7 @@ import {
 } from "../Icons";
 import { useBoolean } from "../../Common/CustomHooks";
 import { BuyCard } from "./BuyCard";
-import { VendorDetails } from "./VendorDetails";
+import { ProductDetails } from "./ProductDetails";
 import { infoData } from "../../configData";
 import {
   useAddCartMutation,
@@ -48,15 +48,15 @@ export const PremiumCard = ({ item = null }) => {
 
   const { data, error, refetch } = useGetCartByProductIdQuery(productId);
 
-  console.log("item323452345", data);
+  console.log("item323452345", item);
 
   const handleAddCart = async (type) => {
     let tempCartValue = {
       productId: item?.product?.id,
       name: item?.product?.name,
       orderId: id,
-      price: item?.product?.price,
-      total: item?.product?.total,
+      price: Number(item?.price),
+      total: Number(data?.data?.qty) * Number(item?.price),
       qty: data?.data?.qty
         ? type === "add"
           ? Number(data?.data?.qty) + 1
@@ -219,7 +219,7 @@ export const PremiumCard = ({ item = null }) => {
           </div>
         </CardFooter>
       </Card>
-      <VendorDetails isOpen={isOpen} onClose={onClose} id={2} />
+      <ProductDetails isOpen={isOpen} onClose={onClose} item={item} />
       <BuyCard isOpen={cartPopup} onClose={setFalse} />
     </>
   );

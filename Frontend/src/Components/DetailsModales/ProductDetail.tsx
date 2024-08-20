@@ -202,7 +202,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                   </div>
                 </div>
 
-                <div className=" sm:px-2 mt-3 flex justify-between items-center ">
+                <div className="sm:px-2 mt-3 flex justify-between items-center ">
                   <div className="font-semibold md:text-xl xm:text-md">
                     Related Products
                   </div>
