@@ -32,6 +32,8 @@ import {
 } from "../../views/VendorProducts/Service.mjs";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import { infoData } from "../../configData";
+import { useAppDispatch, useAppSelector } from "../../Common/hooks";
+import { onRefreshCart } from "../../Common/globalSlice";
 
 const columns = [
   { name: "Sl.No", uid: "id" },
@@ -42,6 +44,7 @@ const columns = [
 
 export const BuyCard = (props: any) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+  const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart)
   const id = getCookie("id");
   const {
     data: cart,
@@ -51,10 +54,12 @@ export const BuyCard = (props: any) => {
   const [updateCart] = useUpdateCartMutation();
   const [deleteCartItem] = useDeleteCartItemMutation();
   const [deletId, setDeleteId] = React.useState(null);
+  const dispatch = useAppDispatch()
 
   React.useEffect(() => {
+    onRefresh && dispatch(onRefreshCart(false))
     cartRefetch();
-  }, [id]);
+  }, [id, onRefresh]);
 
   const handleAddCart = async (type, product) => {
     let tempCartValue = {
@@ -87,9 +92,9 @@ export const BuyCard = (props: any) => {
     };
     const result = await deleteCartItem(apiInfo);
     if (result) {
-      cartRefetch();
       onClose();
       setDeleteId(null);
+      dispatch(onRefreshCart(true))
     }
   };
 

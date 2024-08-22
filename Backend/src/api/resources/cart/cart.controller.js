@@ -49,7 +49,7 @@ module.exports = {
       });
       if (!cart) {
         return res
-          .status(404)
+          .status(200)
           .json({ success: false, message: "Cart item not found" });
       }
       res.status(200).json({ success: true, data: cart });
@@ -67,7 +67,7 @@ module.exports = {
       const cart = await db.carts.findOne({ where: { orderId, productId } });
       if (!cart) {
         return res
-          .status(404)
+          .status(200)
           .json({ success: false, message: "Cart item not found" });
       }
       await cart.update({

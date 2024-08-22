@@ -1,6 +1,7 @@
 import * as React from "react";
 import "../style.scss";
 import {
+  Badge,
   Button,
   Card,
   CardBody,
@@ -33,22 +34,32 @@ import {
   useUpdateCartMutation,
 } from "../../views/VendorProducts/Service.mjs";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
+import { useAppDispatch, useAppSelector } from "../../Common/hooks";
+import { onRefreshCart } from "../../Common/globalSlice";
 
 export const PremiumCard = ({ item = null }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: cartIsOpen,
+    onOpen: cartOpen,
+    onClose: cartClose,
+  } = useDisclosure();
   const [cartPopup, setTrue, setFalse, toggle] = useBoolean(false);
+  const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
   const id = getCookie("id");
   const [addCart] = useAddCartMutation();
   const [updateCart] = useUpdateCartMutation();
-
+  const dispatch = useAppDispatch();
   let productId = {
     id: id,
     productId: item?.product?.id,
   };
-
   const { data, error, refetch } = useGetCartByProductIdQuery(productId);
 
-  console.log("item323452345", item);
+  React.useEffect(() => {
+    onRefresh && dispatch(onRefreshCart(false));
+    refetch();
+  }, [onRefresh]);
 
   const handleAddCart = async (type) => {
     let tempCartValue = {
@@ -69,6 +80,7 @@ export const PremiumCard = ({ item = null }) => {
         const result = await updateCart(tempCartValue);
         if (result) {
           refetch();
+          dispatch(onRefreshCart(true));
         }
       } catch (error) {
         console.log(error);
@@ -78,6 +90,7 @@ export const PremiumCard = ({ item = null }) => {
         const result = await addCart(tempCartValue);
         if (result) {
           refetch();
+          dispatch(onRefreshCart(true));
         }
       } catch (error) {
         console.log(error);
@@ -155,19 +168,25 @@ export const PremiumCard = ({ item = null }) => {
                   >
                     <IconsEye fill="#CFA007" className="m-3 cursor-pointer" />
                   </Button>
-                  <Button
-                    className="bgnone p-0 m-0"
-                    radius="full"
-                    isIconOnly
-                    size="lg"
-                    onClick={() => setTrue}
+                  <Badge
+                    content={data?.data?.qty ? data?.data?.qty : 0}
+                    shape="circle"
+                    color="danger"
                   >
+                    {/* <Button
+                      className="bgnone p-0 m-0"
+                      radius="full"
+                      isIconOnly
+                      size="lg"
+                      onClick={() => cartOpen()}
+                    > */}
                     <IconShopBag
+                      onClick={() => cartOpen()}
                       fill="#4C86F9"
-                      className="m-3 cursor-pointer"
+                      className="cursor-pointer"
                     />
-                  </Button>
-
+                    {/* </Button> */}
+                  </Badge>
                   <Popover
                     placement="top"
                     showArrow={true}
@@ -220,7 +239,7 @@ export const PremiumCard = ({ item = null }) => {
         </CardFooter>
       </Card>
       <ProductDetails isOpen={isOpen} onClose={onClose} item={item} />
-      <BuyCard isOpen={cartPopup} onClose={setFalse} />
+      <BuyCard isOpen={cartIsOpen} onClose={cartClose} />
     </>
   );
 };

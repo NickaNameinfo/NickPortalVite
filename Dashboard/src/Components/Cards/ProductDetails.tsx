@@ -34,6 +34,8 @@ import {
   useUpdateCartMutation,
 } from "../../views/VendorProducts/Service.mjs";
 import { BuyCard } from "./BuyCard";
+import { useAppDispatch, useAppSelector } from "../../Common/hooks";
+import { onRefreshCart } from "../../Common/globalSlice";
 
 interface VendorDetailsProps {
   isOpen: any;
@@ -43,6 +45,7 @@ interface VendorDetailsProps {
 
 export const ProductDetails = (props: VendorDetailsProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
   const id = getCookie("id");
   const {
     data: vendors,
@@ -52,22 +55,24 @@ export const ProductDetails = (props: VendorDetailsProps) => {
   const { data, error, refetch } = useGetVendorsByIdQuery(
     Number(props?.item?.supplierId)
   );
-
   let productId = {
     id: id,
     productId: props?.item?.product?.id,
   };
-  const { data:cart, error:cartError, refetch:cartRefetch } = useGetCartByProductIdQuery(productId);
-  
+  const {
+    data: cart,
+    error: cartError,
+    refetch: cartRefetch,
+  } = useGetCartByProductIdQuery(productId);
   const [addCart] = useAddCartMutation();
   const [updateCart] = useUpdateCartMutation();
-
-  console.log(data?.data, "propsdata", props?.item);
+  const dispatch = useAppDispatch();
 
   React.useEffect(() => {
+    onRefresh && dispatch(onRefreshCart(false));
     refetch();
     vendorRefetch();
-  }, []);
+  }, [onRefresh]);
 
   const handleAddCart = async (type) => {
     let tempCartValue = {

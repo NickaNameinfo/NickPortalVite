@@ -7,7 +7,7 @@ import { CategoriesApi } from "../views/Categories/Service.mjs";
 import { ProductsApi } from "../views/Products/Service.mjs";
 import { VendorStockApi } from "../views/vendors/Stock/Service.mjs";
 import { StoreApi } from "../views/Store/Service.mjs";
-
+import globalConfigSlice from "../Common/globalSlice"
 export const store = configureStore({
   reducer: {
     [VendorApi.reducerPath]: VendorApi.reducer,
@@ -17,6 +17,7 @@ export const store = configureStore({
     [ProductsApi.reducerPath]: ProductsApi.reducer,
     [VendorStockApi.reducerPath]: VendorStockApi.reducer,
     [StoreApi.reducerPath]: StoreApi.reducer,
+    globalConfig: globalConfigSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
