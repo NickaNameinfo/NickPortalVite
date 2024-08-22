@@ -45,6 +45,8 @@ export const ProductViewCard = (props: ProductViewCardProps) => {
     <div className="grid  mm:grid-cols-2 ml:grid-cols-2 sm:grid-cols-4  md:grid-cols-4  lg:grid-cols-5  xl:grid-cols-5 2xl:grid-cols-5 3xl:grid-cols-5 gap-2 mt-1">
       {props.loadData?.length > 0 &&
         props.loadData?.map((product, index) => {
+          console.log("product", product);
+
           return (
             <>
               <Popover showArrow placement="right" key={index}>
@@ -65,10 +67,11 @@ export const ProductViewCard = (props: ProductViewCardProps) => {
                       <Image
                         alt="Here no Image"
                         shadow="md"
-                        width="100%"
+                        width={250}
                         radius="lg"
                         className="object-cover"
-                        src="https://nextui-docs-v2.vercel.app/images/album-cover.png"
+                        src={product?.productphotos?.[0]?.imgUrl}
+                        height={250}
                       />
                     </CardBody>
                   </Card>
