@@ -16,10 +16,12 @@ import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import { useGetVendorsProductByIdQuery } from "../VendorProducts/Service.mjs";
 import { useGetStoresProductByIDQuery } from "../Store/Service.mjs";
 import { infoData } from "../../configData";
+import { useNavigate } from "react-router-dom";
 const ProductsList = () => {
   const { data, error, refetch } = useGetProductsQuery();
   const vendorId = getCookie("vendorId");
   const storeId = getCookie("storeId");
+  const nativegate = useNavigate();
   const {
     data: vendorProducts,
     error: vendorError,
@@ -32,8 +34,6 @@ const ProductsList = () => {
   } = useGetStoresProductByIDQuery(Number(storeId));
 
   const currentPlan = getCookie("role");
-  console.log(data, "data769867", storeProducts, vendorProducts);
-
   const defaultCloumns = [
     "id",
     "name",
@@ -41,13 +41,24 @@ const ProductsList = () => {
     "price",
     "sortDesc",
     "photo",
+    "status",
+    "createdType",
   ];
-  const byuserProduct = ["price", "unitSize", "product", "photo"];
+  const byuserProduct = [
+    "price",
+    "unitSize",
+    "product",
+    "photo",
+    "actions",
+    "status",
+  ];
   const byuserCloumn = [
     { name: "Price", id: "price", sortable: true },
     { name: "Unit Size", id: "unitSize", sortable: true },
     { name: "Products", id: "product", sortable: true },
     { name: "Image", id: "photo", sortable: true },
+    { name: "Status", id: "status", sortable: false },
+    { name: "Action", id: "actions", sortable: false },
   ];
   const columns = [
     { name: "S.No", id: "id", sortable: true },
@@ -55,11 +66,12 @@ const ProductsList = () => {
     { name: "price", id: "price", sortable: true },
     { name: "sortDesc", id: "sortDesc", sortable: true },
     { name: "image", id: "photo", sortable: true },
+    { name: "Status", id: "status" },
+    { name: "Created", id: "createdType" },
     { name: "Actions", id: "actions" },
   ];
 
   React.useEffect(() => {
-    console.log(storeId, vendorId, "asdljfalksd")
     if (storeId || vendorId) {
       refetch();
       vendorRefetch();
@@ -67,20 +79,19 @@ const ProductsList = () => {
     }
   }, [vendorId, storeId]);
 
-  const renderCell = React.useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
-    console.log(cellValue, "cellValue23", cellValue?.photo, user);
+  const renderCell = React.useCallback((data, columnKey) => {
+    console.log(data, data);
     switch (columnKey) {
       case "product":
-        return <p>{user?.product?.name}</p>;
+        return <p>{data?.product?.name}</p>;
       case "storename":
         return (
           <User
-            avatarProps={{ radius: "lg", src: user.avatar }}
-            description={user.email}
-            name={cellValue}
+            avatarProps={{ radius: "lg", src: data.avatar }}
+            description={data.email}
+            name={data?.[columnKey]}
           >
-            {user.email}
+            {data.email}
           </User>
         );
       case "actions":
@@ -93,9 +104,17 @@ const ProductsList = () => {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem>View</DropdownItem>
-                <DropdownItem>Edit</DropdownItem>
-                <DropdownItem>Delete</DropdownItem>
+                <DropdownItem
+                  onClick={() => nativegate(`/AddProducts/${data.product?.id}`)}
+                >
+                  View
+                </DropdownItem>
+                <DropdownItem
+                  onClick={() => nativegate(`/AddProducts/${data.product?.id}`)}
+                >
+                  Edit
+                </DropdownItem>
+                {/* <DropdownItem>Delete</DropdownItem> */}
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -105,15 +124,32 @@ const ProductsList = () => {
           <div className="relative flex justify-center items-center gap-2">
             {
               <Image
-                src={`${infoData?.baseApi}/${user?.product?.photo}`}
+                src={`${infoData?.baseApi}/${data?.product?.photo ? data?.product?.photo : data?.photo}`}
                 width={50}
                 height={50}
               />
             }
           </div>
         );
+      case "status":
+        return (
+          <Chip
+            className="capitalize"
+            color={
+              data?.product?.status === "1" || data?.status === "1"
+                ? "success"
+                : "danger"
+            }
+            size="lg"
+            variant="flat"
+          >
+            {data?.product?.status === "1" || data?.status === "1" ? "Active" : "In Active"}
+          </Chip>
+        );
       default:
-        return cellValue;
+        return data?.product?.[columnKey]
+          ? data?.product?.[columnKey]
+          : data?.[columnKey];
     }
   }, []);
 
@@ -128,8 +164,8 @@ const ProductsList = () => {
             currentPlan === "1"
               ? data?.["data"]
               : currentPlan === "2"
-              ? storeProducts?.data
-              : vendorProducts?.data
+              ? vendorProducts?.data
+              : storeProducts?.data
           }
           isStatusFilter={false}
         />

@@ -17,13 +17,11 @@ import {
 } from "./Service.mjs";
 import InputNextUI from "../../Components/Common/Input/input";
 import TeaxtareaNextUI from "../../Components/Common/Ddropdown/Textarea";
-
+import { getCookie, setCookie } from "../../JsFiles/CommonFunction.mjs";
+import { useAppSelector } from "../../Common/hooks";
+import { useUpdatUserMutation } from "../../Service.mjs";
 const AddStore = () => {
   const navigate = useNavigate();
-  const { id, type } = useParams();
-  const currentLocation = useLocation();
-  const parts = currentLocation.pathname.split("/");
-  console.log(parts?.[2], "ajsdfhiuiuwert");
 
   const {
     handleSubmit,
@@ -34,48 +32,58 @@ const AddStore = () => {
     formState: { errors },
   } = useForm();
   const formData = watch();
-  console.log(formData, "formDatatest");
-  const { data: Area, error, refetch } = useGetStoreAreaQuery();
+  const currentloginDetails = useAppSelector(
+    (state) => state.globalConfig.currentloginDetails
+  );
   const [addStores] = useAddStoreMutation();
+  const id = getCookie("id");
+  const storeId = getCookie("storeId");
+  const currentUserRole = getCookie("role");
+  const { itemId } = useParams();
   const {
     data: getStoreByID,
     error: errorStoreID,
     refetch: refetchStoreID,
-  } = useGetStoresByIDQuery(id ? id : null);
-  console.log(getStoreByID, "getStoreByIDkmsdfosfjl");
+  } = useGetStoresByIDQuery(storeId ? storeId : null);
+  console.log(getStoreByID, "getStoreByIDkmsdfosfjl", currentloginDetails);
 
   const [updateStores] = useUpdateStoreMutation();
+  const [updateUser] = useUpdatUserMutation();
 
   React.useEffect(() => {
+    setValue("storename", currentloginDetails?.data?.firstName);
+    setValue("email", currentloginDetails?.data?.email);
+    setValue("phone", currentloginDetails?.data?.phone);
+    setValue("status", "0");
+    setValue("areaId", 3);
     if (getStoreByID?.data.length > 0) {
-      const areaIds = getStoreByID?.data?.[0]?.areaId;
-      const statusIds = getStoreByID?.data?.[0]?.status;
       reset(getStoreByID?.data?.[0]);
-      setValue("status", statusIds.toString());
-      setValue("adharCardNo", Number(getStoreByID?.data?.[0]?.adharCardNo));
-      setValue("areaId", areaIds.toString());
-    } else {
     }
-  }, [getStoreByID]);
-
-  React.useEffect(() => {
-    if (parts?.[2] === "Add") {
-      reset();
-    }
-  }, []);
+  }, [getStoreByID, currentloginDetails]);
 
   const onSubmit = async (data: any) => {
-    if (id) {
+    let tempAPIUserData = {
+      id: currentloginDetails?.data?.id,
+      firstName: data?.["storename"],
+      email: data?.["email"],
+      address: data?.["address"],
+      password: data?.["password"] ? data?.["password"] : null,
+      storeId: storeId,
+    };
+    if (storeId) {
       const result = await updateStores(data);
       if (result?.data?.success) {
-        navigate("/Vendors/List");
+        navigate("/Vendors/Products");
       }
     } else {
       const result = await addStores(data);
-      console.log(result, "addStores");
-
       if (result?.data?.success) {
-        navigate("/Stores/List");
+        setCookie("storeId", result?.data?.data?.[0]?.storeId, 60);
+        let userResult = updateUser(tempAPIUserData);
+        if (userResult) {
+          refetchStoreID();
+          navigate("/Dashboard");
+        }
       }
     }
   };
@@ -111,7 +119,7 @@ const AddStore = () => {
             variant="faded"
             color="default"
           >
-            <p className="font-medium  text-black/70"> Vendor Register</p>
+            <p className="font-medium  text-black/70"> Store Update</p>
           </Chip>
           <div className="text-center">
             <Button
@@ -134,63 +142,66 @@ const AddStore = () => {
               <InputNextUI type="text" label="Store Name" {...field} />
             )}
           />
-          <Controller
-            name="status" // Changed to reflect a text input
-            control={control}
-            render={({ field }) => (
-              <Select
-                classNames={{
-                  label: "group-data-[filled=true]:-translate-y-3",
-                  trigger: [
-                    "bg-transparent",
-                    "border-1",
-                    "text-default-500",
-                    "transition-opacity",
-                    "data-[hover=true]:bg-transparent",
-                    "data-[hover=true]:bg-transparent",
-                    "dark:data-[hover=true]:bg-transparent",
-                    "data-[selectable=true]:focus:bg-transparent",
-                  ],
-                  // listboxWrapper: [
-                  //   "border-1",
-                  //   "text-default-500",
-                  //   "transition-opacity",
-                  //   "data-[hover=true]:text-foreground",
-                  //   "data-[hover=true]:bg-default-100",
-                  //   "dark:data-[hover=true]:bg-default-50",
-                  //   "data-[selectable=true]:focus:bg-default-50",
-                  //   "data-[pressed=true]:opacity-90",
-                  //   "data-[focus-visible=true]:ring-default-500",
-                  // ],
-                }}
-                listboxProps={{
-                  itemClasses: {
-                    base: [
-                      "rounded-md",
+          {currentUserRole === "1" && (
+            <Controller
+              name="status" // Changed to reflect a text input
+              control={control}
+              render={({ field }) => (
+                <Select
+                  classNames={{
+                    label: "group-data-[filled=true]:-translate-y-3",
+                    trigger: [
+                      "bg-transparent",
+                      "border-1",
                       "text-default-500",
                       "transition-opacity",
-                      "data-[hover=true]:text-foreground",
-                      "data-[hover=true]:bg-default-100",
-                      "dark:data-[hover=true]:bg-default-50",
-                      "data-[selectable=true]:focus:bg-default-50",
-                      "data-[pressed=true]:opacity-90",
-                      "data-[focus-visible=true]:ring-default-500",
-                      "shadow-none",
-                      // "border-1",
+                      "data-[hover=true]:bg-transparent",
+                      "data-[hover=true]:bg-transparent",
+                      "dark:data-[hover=true]:bg-transparent",
+                      "data-[selectable=true]:focus:bg-transparent",
                     ],
-                  },
-                }}
-                variant="faded"
-                size="sm"
-                label="Select an Status"
-                {...field}
-                selectedKeys={formData?.status}
-              >
-                <SelectItem key={1}>{"Active"}</SelectItem>
-                <SelectItem key={0}>{"InActive"}</SelectItem>
-              </Select>
-            )}
-          />
+                    // listboxWrapper: [
+                    //   "border-1",
+                    //   "text-default-500",
+                    //   "transition-opacity",
+                    //   "data-[hover=true]:text-foreground",
+                    //   "data-[hover=true]:bg-default-100",
+                    //   "dark:data-[hover=true]:bg-default-50",
+                    //   "data-[selectable=true]:focus:bg-default-50",
+                    //   "data-[pressed=true]:opacity-90",
+                    //   "data-[focus-visible=true]:ring-default-500",
+                    // ],
+                  }}
+                  listboxProps={{
+                    itemClasses: {
+                      base: [
+                        "rounded-md",
+                        "text-default-500",
+                        "transition-opacity",
+                        "data-[hover=true]:text-foreground",
+                        "data-[hover=true]:bg-default-100",
+                        "dark:data-[hover=true]:bg-default-50",
+                        "data-[selectable=true]:focus:bg-default-50",
+                        "data-[pressed=true]:opacity-90",
+                        "data-[focus-visible=true]:ring-default-500",
+                        "shadow-none",
+                        // "border-1",
+                      ],
+                    },
+                  }}
+                  variant="faded"
+                  size="sm"
+                  label="Select an Status"
+                  {...field}
+                  selectedKeys={formData?.status}
+                >
+                  <SelectItem key={1}>{"Active"}</SelectItem>
+                  <SelectItem key={0}>{"InActive"}</SelectItem>
+                </Select>
+              )}
+            />
+          )}
+
           <Controller
             name="shopaddress" // Changed to reflect a text input
             control={control}

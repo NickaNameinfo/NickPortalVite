@@ -26,11 +26,9 @@ module.exports = {
         website,
         openTime,
         closeTime,
-        location
+        location,
       } = req.body;
-      console.log(id, "id452342");
-      console.log(areaId, "areaId3452345");
-
+      console.log(status, "id452342");
       db.vendor
         .findOne({ where: { id: id ? id : null } })
         .then((supplier) => {
@@ -63,9 +61,7 @@ module.exports = {
                 location: location ? location : supplier.location,
                 openTime: openTime ? openTime : supplier.openTime,
                 closeTime: closeTime ? closeTime : supplier.closeTime,
-                vendorImage: req.file
-                  ? req.file.path
-                  : supplier.vendorImage,
+                vendorImage: req.file ? req.file.path : supplier.vendorImage,
               },
               { where: { id: id } }
             );
@@ -110,9 +106,11 @@ module.exports = {
           return true;
         })
         .then((success) => {
-          res
-            .status(200)
-            .json({ success: true, msg: "Successfully inserted supplier" });
+          res.status(200).json({
+            success: true,
+            msg: "Successfully inserted supplier",
+            data: success,
+          });
         })
         .catch(function (err) {
           console.log(err);
@@ -261,7 +259,16 @@ module.exports = {
           include: [
             {
               model: db.product,
-              attributes: ["id", "name", "brand", "photo", "status", "sortDesc"],
+              attributes: [
+                "id",
+                "name",
+                "brand",
+                "photo",
+                "status",
+                "sortDesc",
+                "unitSize",
+                "price",
+              ],
             },
           ],
         })
@@ -292,17 +299,16 @@ module.exports = {
         location,
         website,
         openTime,
-        closeTime
+        closeTime,
       } = req.body;
       db.vendor
         .findOne({ where: { id: id } })
         .then((list) => {
-          console.log(req.file, "req.file.location3453245")
           if (list) {
             return db.vendor.update(
               {
                 storename: storename,
-                status: parseInt(status) ? "active" : "inactive",
+                status: status ? parseInt(status) : list.status,
                 shopaddress: shopaddress ? shopaddress : list.shopaddress,
                 shopdesc: shopdesc ? shopdesc : list.shopdesc,
                 ownername: ownername ? ownername : list.ownername,
@@ -314,8 +320,7 @@ module.exports = {
                 location: location ? location : list.location,
                 openTime: openTime ? openTime : list.openTime,
                 closeTime: closeTime ? closeTime : list.closeTime,
-                vendorImage: req.file
-                  ? req.file.path : list.vendorImage,
+                vendorImage: req.file ? req.file.path : list.vendorImage,
               },
               { where: { id: id } }
             );

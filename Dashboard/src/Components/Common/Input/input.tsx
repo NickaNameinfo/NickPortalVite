@@ -37,7 +37,7 @@ interface InputFieldProps {
   placeholder?: string;
   endContent?: any;
   description?: any;
-  // className?: any;
+  value?: any;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
@@ -100,10 +100,6 @@ const InputNextUI = (props: InputFieldProps) => {
           disableAnimation={props?.disableAnimation}
           errorMessage={props?.errorMessage}
           type={props?.type}
-          // onClear={() => console.log("input cleared")}
-          // onValueChange={(value) => {
-          //   props.onValueChange(value);
-          // }}
           onChange={(e) => {
             props.onChange(e.target.value);
           }}

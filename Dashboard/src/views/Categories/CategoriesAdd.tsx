@@ -14,23 +14,26 @@ import { TableList } from "../../Components/Table/TableList";
 import React from "react";
 import { useGetCategoriesQuery, useAddCategoriesMutation } from "./Service.mjs";
 import InputNextUI from "../../Components/Common/Input/input";
-
+import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 const CategoriesAdd = () => {
   const { handleSubmit, control, reset } = useForm();
   const navigate = useNavigate();
+  const vendorId = getCookie("vendorId");
+  const storeId = getCookie("storeId");
   const { data, error, refetch } = useGetCategoriesQuery();
   const [addCategories] = useAddCategoriesMutation();
   const [refresh, setRefresh] = React.useState(false);
 
-  console.log(data, "data5234523452345", data?.data, refresh);
-
   const onSubmit = async (formData: any) => {
-    console.log(formData, "formData3452345234");
-    const result = await addCategories(formData);
-    console.log(result?.data, "result3452345");
+    let tempApiParams = {
+      ...formData,
+      createdId: vendorId ? vendorId : storeId,
+      createdType: vendorId ? "Vendor" : "Store",
+    };
+    const result = await addCategories(tempApiParams);
     if (result) {
       setRefresh(true);
-      reset();
+      refetch();
     }
   };
 
@@ -42,11 +45,14 @@ const CategoriesAdd = () => {
     setRefresh((prev) => !prev);
   }, [data]);
 
-  const defaultCloumns = ["id", "name", "actions"];
+  console.log(data, "data3245425343")
+
+  const defaultCloumns = ["id", "name", "createdType", "actions"];
 
   const columns = [
     { name: "S.No", id: "id", sortable: true },
     { name: "name", id: "name", sortable: true },
+    { name: "Created Type", id: "createdType", sortable: true },
     { name: "Actions", id: "actions" },
   ];
 
@@ -69,12 +75,10 @@ const CategoriesAdd = () => {
             <Dropdown>
               <DropdownTrigger>
                 <Button size="sm" variant="flat">
-                  action
+                  Action
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem>View</DropdownItem>
-                <DropdownItem>Edit</DropdownItem>
                 <DropdownItem>Delete</DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -90,7 +94,7 @@ const CategoriesAdd = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex items-center justify-between border-b pb-3 mt-1.5  mb-3">
           <Chip
-          size="lg"
+            size="lg"
             classNames={{
               base: "bg-gradient-to-br  border-small border-white/60 ",
               content: "drop-shadow shadow-black text-white",

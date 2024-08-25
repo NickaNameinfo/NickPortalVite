@@ -7,6 +7,7 @@ import {
   SelectItem,
   Button,
   Textarea,
+  Image,
 } from "@nextui-org/react";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import {
@@ -18,7 +19,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import * as React from "react";
 import InputNextUI from "../../../Components/Common/Input/input";
 import TeaxtareaNextUI from "../../../Components/Common/Ddropdown/Textarea";
-
+import { useAppDispatch, useAppSelector } from "../../../Common/hooks";
+import { useUpdatUserMutation } from "../../../Service.mjs";
+import { getCookie, setCookie } from "../../../JsFiles/CommonFunction.mjs";
+import { infoData } from "../../../configData";
 const Add = () => {
   const {
     handleSubmit,
@@ -29,51 +33,72 @@ const Add = () => {
     formState: { errors },
   } = useForm();
   const formData = watch();
-  console.log(formData, "Form data");
-
+  const currentloginDetails = useAppSelector(
+    (state) => state.globalConfig.currentloginDetails
+  );
+  console.log(currentloginDetails?.data, "currentloginDetails");
   const navigate = useNavigate();
   const [addVendors] = useAddVendorsMutation();
   const [updateVendors] = useUpdateVendorsMutation();
-  const { id, type } = useParams();
-  const { data, error, refetch } = useGetVendorsByIDQuery(id ? id : null);
+  const [updateUser] = useUpdatUserMutation();
+  const id = getCookie("id");
+  const vendorId = getCookie("vendorId");
+  const currentUserRole = getCookie("role");
+  const { itemId } = useParams();
+  const { data, error, refetch } = useGetVendorsByIDQuery(
+    itemId ? itemId : vendorId ? vendorId : null
+  );
 
   React.useEffect(() => {
-    if (data?.data.length > 0) {
+    refetch();
+    if (data?.data.length > 0 || currentloginDetails) {
       reset(data?.data?.[0]);
       setValue("status", data?.data?.[0]?.status.toString());
       setValue("adharCardNo", Number(data?.data?.[0]?.adharCardNo));
-    } else {
+      setValue("storename", currentloginDetails?.data?.firstName);
+      setValue("email", currentloginDetails?.data?.email);
+      setValue("phone", currentloginDetails?.data?.phone);
+      setValue("status", "0");
     }
-  }, [data]);
-
-  React.useEffect(() => {
-    if (type === "Add") {
-      reset();
-    }
-  }, [type]);
+  }, [data, currentloginDetails]);
 
   const onSubmit = async (data: any) => {
     let tempAPIData = {
       ...data,
-      areaId: 1,
+      areaId: 3,
       adharCardNo: Number(data?.adharCardNo),
+    };
+    let tempAPIUserData = {
+      id: currentloginDetails?.data?.id,
+      firstName: data?.["storename"],
+      email: data?.["email"],
+      address: data?.["address"],
+      password: data?.["password"] ? data?.["password"] : null,
+      vendorId: vendorId,
     };
     const formData = new FormData();
     for (const key in tempAPIData) {
       formData.append(key, tempAPIData[key]);
     }
-    console.log("datafrom data form", formData);
-    if (id) {
+    if (vendorId || itemId) {
       const result = await updateVendors(formData);
       if (result?.data?.success) {
-        navigate("/Vendors/List");
+        let result = updateUser(tempAPIUserData);
+        if (result) {
+          refetch();
+          navigate("/Dashboard");
+        }
       }
     } else {
       const result = await addVendors(formData);
       if (result?.data?.success) {
-        navigate("/Vendors/List");
+        setCookie("vendorId", result?.data?.data?.[0]?.vendorId, 60);
+        let userResult = updateUser(tempAPIUserData);
+        if (userResult) {
+          refetch();
+          navigate("/Dashboard");
+        }
       }
-      console.log(data, "datadatadatadatadata", result);
     }
   };
   return (
@@ -84,7 +109,7 @@ const Add = () => {
       <div className="w-5/6">
         <div className="flex items-center justify-between border-b pb-3 mt-2  mb-4">
           <Chip
-          size="lg"
+            size="lg"
             classNames={{
               // "border-1",
               base: "bg-gradient-to-br  border-small border-white/60 ",
@@ -107,7 +132,7 @@ const Add = () => {
             variant="faded"
             color="default"
           >
-            <p className="font-medium  text-black/70"> Vendor Register</p>
+            <p className="font-medium  text-black/70"> Update Profile</p>
           </Chip>
           <div className="text-center">
             <Button
@@ -130,63 +155,54 @@ const Add = () => {
               <InputNextUI type="text" label="Store Name" {...field} />
             )}
           />
-          <Controller
-            name="status" // Changed to reflect a text input
-            control={control}
-            render={({ field }) => (
-              <Select
-                classNames={{
-                  label: "group-data-[filled=true]:-translate-y-3",
-                  trigger: [
-                    "bg-transparent",
-                    "border-1",
-                    "text-default-500",
-                    "transition-opacity",
-                    "data-[hover=true]:bg-transparent",
-                    "data-[hover=true]:bg-transparent",
-                    "dark:data-[hover=true]:bg-transparent",
-                    "data-[selectable=true]:focus:bg-transparent",
-                  ],
-                  // listboxWrapper: [
-                  //   "border-1",
-                  //   "text-default-500",
-                  //   "transition-opacity",
-                  //   "data-[hover=true]:text-foreground",
-                  //   "data-[hover=true]:bg-default-100",
-                  //   "dark:data-[hover=true]:bg-default-50",
-                  //   "data-[selectable=true]:focus:bg-default-50",
-                  //   "data-[pressed=true]:opacity-90",
-                  //   "data-[focus-visible=true]:ring-default-500",
-                  // ],
-                }}
-                listboxProps={{
-                  itemClasses: {
-                    base: [
-                      "rounded-md",
+          {currentUserRole === "1" && (
+            <Controller
+              name="status" // Changed to reflect a text input
+              control={control}
+              render={({ field }) => (
+                <Select
+                  classNames={{
+                    label: "group-data-[filled=true]:-translate-y-3",
+                    trigger: [
+                      "bg-transparent",
+                      "border-1",
                       "text-default-500",
                       "transition-opacity",
-                      "data-[hover=true]:text-foreground",
-                      "data-[hover=true]:bg-default-100",
-                      "dark:data-[hover=true]:bg-default-50",
-                      "data-[selectable=true]:focus:bg-default-50",
-                      "data-[pressed=true]:opacity-90",
-                      "data-[focus-visible=true]:ring-default-500",
-                      "shadow-none",
-                      // "border-1",
+                      "data-[hover=true]:bg-transparent",
+                      "data-[hover=true]:bg-transparent",
+                      "dark:data-[hover=true]:bg-transparent",
+                      "data-[selectable=true]:focus:bg-transparent",
                     ],
-                  },
-                }}
-                variant="faded"
-                size="sm"
-                label="Select an Status"
-                {...field}
-                selectedKeys={formData?.status}
-              >
-                <SelectItem key={1}>{"Active"}</SelectItem>
-                <SelectItem key={0}>{"InActive"}</SelectItem>
-              </Select>
-            )}
-          />
+                  }}
+                  listboxProps={{
+                    itemClasses: {
+                      base: [
+                        "rounded-md",
+                        "text-default-500",
+                        "transition-opacity",
+                        "data-[hover=true]:text-foreground",
+                        "data-[hover=true]:bg-default-100",
+                        "dark:data-[hover=true]:bg-default-50",
+                        "data-[selectable=true]:focus:bg-default-50",
+                        "data-[pressed=true]:opacity-90",
+                        "data-[focus-visible=true]:ring-default-500",
+                        "shadow-none",
+                        // "border-1",
+                      ],
+                    },
+                  }}
+                  variant="faded"
+                  size="sm"
+                  label="Select an Status"
+                  {...field}
+                  selectedKeys={formData?.status}
+                >
+                  <SelectItem key={1}>{"Active"}</SelectItem>
+                  <SelectItem key={0}>{"InActive"}</SelectItem>
+                </Select>
+              )}
+            />
+          )}
           <Controller
             name="shopaddress" // Changed to reflect a text input
             control={control}
@@ -237,26 +253,34 @@ const Add = () => {
               <InputNextUI type="text" label="Close Time" {...field} />
             )}
           />
-          <Controller
-            name="vendorImage" // Changed to reflect a text input
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <Input
-                type="file"
-                // labelPlacement=""
-                label="Image"
-                size="lg"
-                onChange={(e) => {
-                  field.onChange(e.target.files[0]); // Don't forget to call field.onChange to update the form state
-                }}
-              />
-            )}
-          />
+          <div className="flex">
+            <Controller
+              name="vendorImage" // Changed to reflect a text input
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <Input
+                  type="file"
+                  // labelPlacement=""
+                  label="Image"
+                  size="lg"
+                  className="w-80"
+                  onChange={(e) => {
+                    field.onChange(e.target.files[0]); // Don't forget to call field.onChange to update the form state
+                  }}
+                />
+              )}
+            />
+            <Image
+              src={`${infoData.baseApi}/${data?.data?.[0]?.vendorImage}`}
+              className="h-fit"
+              width={100}
+            />
+          </div>
         </div>
         <div className="flex flex-col flex-wrap gap-4 border-b pb-3 mb-4">
           <Chip
-          size="lg"
+            size="lg"
             classNames={{
               // "border-1",
               base: "bg-gradient-to-br  border-small border-white/60 ",
@@ -317,7 +341,6 @@ const Add = () => {
             name="password" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              // <Input type="password" label="Password" size="lg" {...field} />
               <InputNextUI
                 type="password"
                 label="Password"
@@ -354,7 +377,7 @@ const Add = () => {
         </div>
         <div className="flex flex-col flex-wrap gap-4 border-b pb-3 mt-4 mb-4">
           <Chip
-          size="lg"
+            size="lg"
             classNames={{
               // "border-1",
               base: "bg-gradient-to-br  border-small border-white/60 ",

@@ -7,6 +7,7 @@ import { CategoriesApi } from "../views/Categories/Service.mjs";
 import { ProductsApi } from "../views/Products/Service.mjs";
 import { VendorStockApi } from "../views/vendors/Stock/Service.mjs";
 import { StoreApi } from "../views/Store/Service.mjs";
+import {GlobalApi} from "../Service.mjs"
 import globalConfigSlice from "../Common/globalSlice"
 export const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ export const store = configureStore({
     [ProductsApi.reducerPath]: ProductsApi.reducer,
     [VendorStockApi.reducerPath]: VendorStockApi.reducer,
     [StoreApi.reducerPath]: StoreApi.reducer,
+    [GlobalApi.reducerPath]: GlobalApi.reducer,
     globalConfig: globalConfigSlice,
   },
   middleware: (getDefaultMiddleware) =>
@@ -27,7 +29,8 @@ export const store = configureStore({
       CategoriesApi.middleware,
       ProductsApi.middleware,
       VendorStockApi.middleware,
-      StoreApi.middleware
+      StoreApi.middleware,
+      GlobalApi.middleware
     ),
 });
 setupListeners(store.dispatch);

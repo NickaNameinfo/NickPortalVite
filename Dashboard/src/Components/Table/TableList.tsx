@@ -58,10 +58,8 @@ export const TableList = (props: TableProps) => {
     );
   }, [visibleColumns]);
 
-  console.log(props.tableItems, "headerColumns452345");
-
   const filteredItems = React.useMemo(() => {
-    let filteredUsers = [...props.tableItems];
+    let filteredUsers = props?.tableItems ? [...props?.tableItems] : [];
 
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user: any) =>
@@ -78,7 +76,7 @@ export const TableList = (props: TableProps) => {
     }
 
     return filteredUsers;
-  }, [props.tableItems, filterValue, statusFilter]);
+  }, [props?.tableItems, filterValue, statusFilter]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -228,7 +226,7 @@ export const TableList = (props: TableProps) => {
             <span className="flex me-5">
               <p className="font-semibold text-default-700 "> Total</p>
               <p className=" text-default-700 font-semibold ms-1">
-                {props.tableItems.length}
+                {props?.tableItems?.length}
               </p>
             </span>
             <div className="">
@@ -294,7 +292,7 @@ export const TableList = (props: TableProps) => {
     statusFilter,
     visibleColumns,
     onRowsPerPageChange,
-    props.tableItems.length,
+    props?.tableItems?.length,
     onSearchChange,
     hasSearchFilter,
   ]);

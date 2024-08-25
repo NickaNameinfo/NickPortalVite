@@ -73,6 +73,10 @@ module.exports = {
               model: db.category,
               attributes: ["id", "name"],
             },
+            {
+              model: db.vendor,
+              attributes: ["id", "storename", "ownername", "email"],
+            },
           ],
         })
         .then((list) => {

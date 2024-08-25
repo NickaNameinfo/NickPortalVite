@@ -13,15 +13,28 @@ import {
 import * as React from "react";
 import { IconHome } from "./Icons";
 import { _nav } from "../_nav";
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import { eraseCookie } from "../JsFiles/CommonFunction.mjs";
 export const AppSidebar = () => {
   const [menuToggle, setMenuToggle] = React.useState(false);
   const [mobileExpand, setMobileExpand] = React.useState(false);
+
+  const navigate = useNavigate()
+
   const itemClasses = {
     title: "font-normal text-sm text-black ms-1",
     indicator: "text-medium",
     content: "text-small px-2",
+  };
+
+  const handleLogOut = () => {
+    eraseCookie("token");
+    eraseCookie("role");
+    eraseCookie("id");
+    eraseCookie("vendorId");
+    eraseCookie("storeId");
+    eraseCookie("plan");
+    navigate("/")
   };
 
   return (
@@ -85,43 +98,83 @@ export const AppSidebar = () => {
               <ul role="list" className="space-y-2 font-medium list-disc">
                 {_nav?.map((result: any) =>
                   result?.menuType === "single" ? (
-                    <li className="bg-white rounded-xl">
-                      <Link
-                        to={result?.link}
-                        className="mt-4 p-3 text-sm flex items-center text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                      >
-                        <div className="flex justify-between w-full items-center">
-                          {menuToggle ? (
-                            <span>
-                              <IconHome />
-                            </span>
-                          ) : (
-                            <p>{result?.["name"]}</p>
-                          )}
-                          {result?.["isToggle"] && (
-                            <Switch
-                              color="secondary"
-                              // size="lg"
-                              defaultSelected
-                              classNames={{
-                                wrapper: "p-0 h-5 w-9 overflow-visible",
-                                thumb: cn(
-                                  "w-4 h-4 border-2 shadow-lg",
-                                  "group-data-[hover=true]:border-secondary",
-                                  //selected
-                                  "group-data-[selected=true]:ml-4  bg-secondary",
+                    result?.["key"] === "LogOut" ? (
+                      <li className="bg-white rounded-xl">
+                        <div
+                          onClick={() => handleLogOut()}
+                          className="mt-4 p-3 text-sm flex items-center text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                        >
+                          <div className="flex justify-between w-full items-center">
+                            {menuToggle ? (
+                              <span>
+                                <IconHome />
+                              </span>
+                            ) : (
+                              <p>{result?.["name"]}</p>
+                            )}
+                            {result?.["isToggle"] && (
+                              <Switch
+                                color="secondary"
+                                // size="lg"
+                                defaultSelected
+                                classNames={{
+                                  wrapper: "p-0 h-5 w-9 overflow-visible",
+                                  thumb: cn(
+                                    "w-4 h-4 border-2 shadow-lg",
+                                    "group-data-[hover=true]:border-secondary",
+                                    //selected
+                                    "group-data-[selected=true]:ml-4  bg-secondary",
 
-                                  // pressed
-                                  "group-data-[pressed=true]:w-7",
-                                  "group-data-[selected]:group-data-[pressed]:ml-4"
-                                ),
-                              }}
-                              aria-label="Automatic updates"
-                            />
-                          )}
+                                    // pressed
+                                    "group-data-[pressed=true]:w-7",
+                                    "group-data-[selected]:group-data-[pressed]:ml-4"
+                                  ),
+                                }}
+                                aria-label="Automatic updates"
+                              />
+                            )}
+                          </div>
                         </div>
-                      </Link>
-                    </li>
+                      </li>
+                    ) : (
+                      <li className="bg-white rounded-xl">
+                        <Link
+                          to={result?.link}
+                          className="mt-4 p-3 text-sm flex items-center text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                        >
+                          <div className="flex justify-between w-full items-center">
+                            {menuToggle ? (
+                              <span>
+                                <IconHome />
+                              </span>
+                            ) : (
+                              <p>{result?.["name"]}</p>
+                            )}
+                            {result?.["isToggle"] && (
+                              <Switch
+                                color="secondary"
+                                // size="lg"
+                                defaultSelected
+                                classNames={{
+                                  wrapper: "p-0 h-5 w-9 overflow-visible",
+                                  thumb: cn(
+                                    "w-4 h-4 border-2 shadow-lg",
+                                    "group-data-[hover=true]:border-secondary",
+                                    //selected
+                                    "group-data-[selected=true]:ml-4  bg-secondary",
+
+                                    // pressed
+                                    "group-data-[pressed=true]:w-7",
+                                    "group-data-[selected]:group-data-[pressed]:ml-4"
+                                  ),
+                                }}
+                                aria-label="Automatic updates"
+                              />
+                            )}
+                          </div>
+                        </Link>
+                      </li>
+                    )
                   ) : (
                     <li
                       className="rounded-xl hover:bg-gray-100 mt-3"

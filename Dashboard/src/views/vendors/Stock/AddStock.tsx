@@ -21,7 +21,7 @@ import {
 import { TableList } from "../../../Components/Table/TableList";
 import { useGetCategoriesQuery } from "../../Categories/Service.mjs";
 import InputNextUI from "../../../Components/Common/Input/input";
-
+import { getCookie } from "../../../JsFiles/CommonFunction.mjs";
 const AddStock = () => {
   const {
     handleSubmit,
@@ -31,22 +31,20 @@ const AddStock = () => {
     watch,
     formState: { errors },
   } = useForm();
-  const formData = watch();
-  console.log(formData, "formDatakmsfskdlfksfdsdf");
+  const vendorId = getCookie("vendorId");
   const [DeleteData] = useDeleteStockMutation();
   const navigate = useNavigate();
-  const { data, error, refetch } = useGetStockQuery(3);
+  const { data, error, refetch } = useGetStockQuery(vendorId);
   const {
     data: categoryData,
     error: categoryerror,
     refetch: categoryrefetch,
   } = useGetCategoriesQuery();
-  console.log(categoryData?.data, "categoryDatakdsflj");
+  console.log("categoryDatakdsflj", vendorId);
 
   const [addStock] = useAddStockMutation();
   const [refresh, setRefresh] = React.useState(false);
 
-  console.log(data, "data5234523452345", data?.data, refresh);
   React.useEffect(() => {
     if (refresh) {
       refetch();
@@ -54,20 +52,18 @@ const AddStock = () => {
       setValue("stock", "");
       setRefresh(false);
     }
-  }, [refresh]);
+  }, [refresh, vendorId]);
 
   React.useEffect(() => {
     setRefresh((prev) => !prev);
   }, [data]);
 
   const onSubmit = async (formData: any) => {
-    console.log(formData, "formData3452345234");
     let tempApiParams = {
       ...formData,
-      vendorId: 7,
+      vendorId: vendorId,
     };
     const result = await addStock(tempApiParams);
-    console.log(result?.data?.success, "result3452345");
     if (result?.data?.success) {
       setRefresh(true);
     }
@@ -86,8 +82,6 @@ const AddStock = () => {
   const onDelete = async (deleteID) => {
     if (deleteID) {
       const result = await DeleteData(deleteID);
-      console.log(result, "DeleteData");
-
       if (result?.data?.success) {
         refetch();
       }
@@ -111,11 +105,11 @@ const AddStock = () => {
       case "vendor":
         return (
           <User
-            avatarProps={{ radius: "lg", src: items?.vendor.storename }}
-            description={items?.vendor.storename}
+            avatarProps={{ radius: "lg", src: items?.vendor?.storename }}
+            description={items?.vendor?.storename}
             name={items?.vendor.storename}
           >
-            {vendor?.vendor.storename}
+            {vendor?.vendor?.storename}
           </User>
         );
       case "actions":

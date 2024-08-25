@@ -42,6 +42,7 @@ const List = () => {
     "phone",
     "email",
     "actions",
+    "status",
   ];
 
   const statusColorMap = {
@@ -58,6 +59,7 @@ const List = () => {
     { name: "email", id: "email", sortable: true },
     { name: "phone", id: "phone" },
     { name: "Actions", id: "actions" },
+    { name: "Status", id: "status" },
   ];
 
   const onDelete = async () => {
@@ -108,7 +110,7 @@ const List = () => {
             <Dropdown>
               <DropdownTrigger>
                 <Button size="sm" variant="flat">
-                  action
+                  Action
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>

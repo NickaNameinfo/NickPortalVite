@@ -5,6 +5,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       name: DataTypes.STRING,
       slug: DataTypes.STRING,
+      createdId: DataTypes.TEXT,
+      createdType: DataTypes.TEXT,
     },
     {}
   );

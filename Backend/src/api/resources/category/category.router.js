@@ -15,7 +15,7 @@ categoryRouter
 categoryRouter
   .route("/getAllSubChildCategory")
   .get(sanitize(), jwtStrategy, categoryController.getSubChildCategoryList);
-categoryRouter.route("/create").post(sanitize(),validateBody(schemas.category), categoryController.addCategory);
+categoryRouter.route("/create").post(sanitize(), categoryController.addCategory);
 categoryRouter.route("/list").get(sanitize(), categoryController.getList);
 categoryRouter
   .route("/getCategoryById")

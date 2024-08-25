@@ -25,6 +25,13 @@ export const ProductsApi = createApi({
         body,
       }),
     }),
+    updateProduct: builder.mutation({
+      query: (body) => ({
+        url: `/product/update`,
+        method: "POST",
+        body,
+      }),
+    }),
     addStoreProduct: builder.mutation({
       query: (body) => ({
         url: `/store/product-add`,
@@ -45,8 +52,21 @@ export const ProductsApi = createApi({
         method: "GET",
       }),
     }),
+    getProductsById: builder.query({
+      query: (id) => ({
+        url: `/product/getProductById/${id}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useAddProductMutation, useGetProductsQuery, useAddStoreProductMutation, useAddVendorProductMutation } = ProductsApi;
+export const {
+  useAddProductMutation,
+  useGetProductsQuery,
+  useAddStoreProductMutation,
+  useAddVendorProductMutation,
+  useGetProductsByIdQuery,
+  useUpdateProductMutation
+} = ProductsApi;
 export const { endpoints } = ProductsApi;

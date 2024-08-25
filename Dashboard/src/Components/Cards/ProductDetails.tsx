@@ -45,7 +45,7 @@ interface VendorDetailsProps {
 
 export const ProductDetails = (props: VendorDetailsProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
+  const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart)
   const id = getCookie("id");
   const {
     data: vendors,
@@ -59,17 +59,13 @@ export const ProductDetails = (props: VendorDetailsProps) => {
     id: id,
     productId: props?.item?.product?.id,
   };
-  const {
-    data: cart,
-    error: cartError,
-    refetch: cartRefetch,
-  } = useGetCartByProductIdQuery(productId);
+  const { data:cart, error:cartError, refetch:cartRefetch } = useGetCartByProductIdQuery(productId);
   const [addCart] = useAddCartMutation();
   const [updateCart] = useUpdateCartMutation();
-  const dispatch = useAppDispatch();
-
-  React.useEffect(() => {
-    onRefresh && dispatch(onRefreshCart(false));
+  const dispatch = useAppDispatch()
+  
+React.useEffect(() => {
+  onRefresh && dispatch(onRefreshCart(false))
     refetch();
     vendorRefetch();
   }, [onRefresh]);

@@ -27,14 +27,14 @@ export const VendorStockApi = createApi({
     }),
     getStock: builder.query({
       query: (id) => ({
-        url: `/vendorStock`,
+        url: `/vendorStock/${id}`,
         method: "GET",
       }),
     }),
     deleteStock: builder.mutation({
       query: (id) => ({
         url: `/vendorStock/${id}`,
-        method: "POST",
+        method: "DELETE",
       }),
     }),
   }),

@@ -51,7 +51,7 @@ export const Register = () => {
     try {
       let tempApiValue = {
         ...formData,
-        verify: 1,
+        verify: 0,
       };
       const result = await register(tempApiValue);
       if (result?.data?.success) {

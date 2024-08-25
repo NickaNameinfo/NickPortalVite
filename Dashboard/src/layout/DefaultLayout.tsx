@@ -1,8 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { AppContent, AppSidebar } from "../Components";
-
+import { getCookie } from "../JsFiles/CommonFunction.mjs";
 const DefaultLayout = () => {
+  const navigate = useNavigate();
+  const token = getCookie("token")
+  React.useEffect(() => {
+    if (!token) {
+      navigate("/");
+    } 
+  }, [token]);
+
   return (
     <div>
       <main className="mytheme text-foreground overflow-hidden p-4">

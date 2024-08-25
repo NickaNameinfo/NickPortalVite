@@ -28,13 +28,14 @@ import {
   IconMapRound,
 } from "./Icons";
 import { _nav } from "../_nav";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppSelector } from "./Common/hooks";
 import Login from "../views/pages/login/Login";
-
+import {eraseCookie} from "../JsFiles/CommonFunction.mjs"
 export const AppSidebar = () => {
   const [menuToggle, setMenuToggle] = React.useState(false);
   const [mobileExpand, setMobileExpand] = React.useState(false);
+  const navigate = useNavigate();
   const currentloginDetails = useAppSelector(
     (state) => state.globalConfig.currentloginDetails
   );
@@ -50,6 +51,17 @@ export const AppSidebar = () => {
     base: "border-default hover:bg-default-200",
     content: "text-default-500",
   };
+
+  const handleLogOut = () => {
+    eraseCookie("token");
+    eraseCookie("role");
+    eraseCookie("id");
+    eraseCookie("vendorId");
+    eraseCookie("storeId");
+    eraseCookie("plan");
+    navigate("/")
+  };
+
 
   return (
     <>
@@ -124,7 +136,6 @@ export const AppSidebar = () => {
                     style={{ backgroundColor: "#ffffff80" }}
                     className="rounded-lg"
                   >
-                    {" "}
                     <Link
                       to="#"
                       className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white"
@@ -319,7 +330,7 @@ export const AppSidebar = () => {
               style={{ backgroundColor: "#ffffff80" }}
               className="absolute bottom-[5%] rounded-lg w-11/12"
             >
-              {!currentloginDetails ? (
+              {!currentloginDetails?.token ? (
                 <Login />
               ) : (
                 <div className="flex justify-between w-full items-center">
@@ -374,6 +385,14 @@ export const AppSidebar = () => {
                                   startContent={<IconHome />}
                                 >
                                   Profile
+                                </ListboxItem>
+                                <ListboxItem
+                                  key="discussions"
+                                  // endContent={90}
+                                  startContent={<IconHome />}
+                                  onClick={() => handleLogOut()}
+                                >
+                                  Log Out
                                 </ListboxItem>
                               </Listbox>
                             </CardBody>

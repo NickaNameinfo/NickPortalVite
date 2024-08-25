@@ -62,38 +62,39 @@ module.exports = {
         total,
         netPrice,
         paymentMode,
-        preOrder,
-        onlinePayment,
-        cashPayment,
+        createdId,
+        createdType,
       } = req.body;
-      return db.product.create({
-        categoryId: Number(categoryId),
-        subCategoryId: Number(subCategoryId),
-        childCategoryId: Number(childCategoryId),
-        name: name,
-        slug: slug,
-        status: parseInt(status) ? "active" : "inactive",
-        brand: brand,
-        unitSize: unitSize,
-        sortDesc: sortDesc,
-        desc: desc,
-        buyerPrice: buyerPrice,
-        price: price,
-        qty: qty,
-        discount: discount,
-        discountPer: discountPer,
-        total: total,
-        netPrice: netPrice,
-        paymentMode: paymentMode,
-        photo: req?.file ? req?.file?.path : "",
-        preOrder: preOrder,
-        onlinePayment: onlinePayment,
-        cashPayment: cashPayment,
-      })
+      return db.product
+        .create({
+          categoryId: Number(categoryId),
+          subCategoryId: Number(subCategoryId),
+          childCategoryId: Number(childCategoryId),
+          name: name,
+          slug: slug,
+          status: status,
+          brand: brand,
+          unitSize: unitSize,
+          sortDesc: sortDesc,
+          desc: desc,
+          buyerPrice: buyerPrice,
+          price: price,
+          qty: qty,
+          discount: discount,
+          discountPer: discountPer,
+          total: total,
+          netPrice: netPrice,
+          paymentMode: paymentMode,
+          photo: req?.file ? req?.file?.path : "",
+          createdId: createdId,
+          createdType: createdType,
+        })
         .then((product) => {
-          res
-            .status(200)
-            .json({ success: true, msg: "Successfully inserted product", data: product });
+          res.status(200).json({
+            success: true,
+            msg: "Successfully inserted product",
+            data: product,
+          });
         })
         .catch(function (err) {
           next(err);
@@ -131,7 +132,6 @@ module.exports = {
       db.product
         .findAll({
           order: [["createdAt", "DESC"]],
-          attributes: ["id", "name", "price", "createdAt"], // Add the correct product attributes here
           include: [
             {
               model: db.subcategories,
@@ -139,11 +139,11 @@ module.exports = {
               include: [
                 {
                   model: db.category,
-                  attributes: ["id", "name"]
-                }
-              ]
-            }
-          ]
+                  attributes: ["id", "name"],
+                },
+              ],
+            },
+          ],
         })
         .then((products) => {
           res.status(200).json({ success: true, data: products });
@@ -159,6 +159,7 @@ module.exports = {
   async update(req, res, next) {
     try {
       const {
+        id,
         productId,
         categoryId,
         subCategoryId,
@@ -177,12 +178,11 @@ module.exports = {
         total,
         netPrice,
         paymentMode,
-        preOrder,
-        onlinePayment,
-        cashPayment,
+        createdId,
+        createdType,
       } = req.body;
       db.product
-        .findOne({ where: { id: productId } })
+        .findOne({ where: { id: id } })
         .then((product) => {
           if (product) {
             return db.product.update(
@@ -194,11 +194,11 @@ module.exports = {
                 childCategoryId: childCategoryId
                   ? childCategoryId
                   : product.childCategoryId,
-                name: name,
-                slug: slug,
-                status: parseInt(status) ? "active" : "inactive",
-                brand: brand,
-                unitSize: unitSize,
+                name: name ? name : product.name,
+                slug: slug ? slug : product.slug,
+                status: status,
+                brand: brand ? brand : product?.brand,
+                unitSize: unitSize ? unitSize : product.unitSize,
                 desc: desc,
                 buyerPrice: buyerPrice,
                 price: price,
@@ -209,9 +209,8 @@ module.exports = {
                 netPrice: netPrice,
                 paymentMode: paymentMode,
                 photo: req.file ? req.file.location : product.photo,
-                preOrder: preOrder,
-                onlinePayment: onlinePayment,
-                cashPayment: cashPayment,
+                createdId: createdId,
+                createdType: createdType,
               },
               { where: { id: product.id } }
             );
@@ -251,20 +250,26 @@ module.exports = {
   },
   async getProductListById(req, res, next) {
     try {
-      db.product
-        .findAll({
-          where: { id: req.query.id },
-          include: [{ model: db.productphoto, attributes: ["id", "imgUrl"] }],
-          order: [["createdAt", "DESC"]],
-        })
-        .then((list) => {
-          res.status(200).json({ success: true, data: list });
-        })
-        .catch(function (err) {
-          next(err);
-        });
+      const product = await db.product.findOne({
+        where: { id: req.params.id },
+        include: [
+          {
+            model: db.productphoto,
+            attributes: ["id", "imgUrl"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+
+      if (!product) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Product not found" });
+      }
+
+      res.status(200).json({ success: true, data: product });
     } catch (err) {
-      throw new RequestError("Error");
+      next(err); // Pass the error to the next middleware or error handler
     }
   },
 
@@ -272,7 +277,7 @@ module.exports = {
     try {
       db.product
         .findOne({
-          where: { id: req.query.id },
+          where: { id: req.params.id },
           include: [{ model: db.productphoto, attributes: ["id", "imgUrl"] }],
           order: [["createdAt", "DESC"]],
         })

@@ -6,25 +6,28 @@ module.exports = {
 
   async addCategory(req, res, next) {
     try {
-      const { name, slug, id } = req.body;
-      return db.category.create({ name: name, slug: slug }).then((category) => {
-        res
-          .status(200)
-          .json({ success: true, msg: "Successfully inserted category" });
-      })
+      const { name, slug, createdId, createdType } = req.body;
+      return db.category
+        .create({ name: name, slug: slug, createdId : createdId,  createdType:createdType})
+        .then((category) => {
+          res
+            .status(200)
+            .json({ success: true, msg: "Successfully inserted category" });
+        })
         .catch(function (err) {
-          console.log(err, "errrrrrrrrrrrrrrrrrrr")
+          console.log(err, "errrrrrrrrrrrrrrrrrrr");
           next(err);
         });
     } catch (err) {
-      console.log(err, "erreo2034028")
+      console.log(err, "erreo2034028");
       throw new RequestError("Error");
     }
   },
   async updateCategory(req, res, next) {
     try {
       const { name, slug, id } = req.body;
-      db.category.findOne({ where: { id: id } })
+      db.category
+        .findOne({ where: { id: id } })
         .then((data) => {
           if (data) {
             return db.category.update(
@@ -40,11 +43,11 @@ module.exports = {
             .json({ success: true, msg: "Successfully updated category" });
         })
         .catch(function (err) {
-          console.log(err, "errrrrrrrrrrrrrrrrrrr")
+          console.log(err, "errrrrrrrrrrrrrrrrrrr");
           next(err);
         });
     } catch (err) {
-      console.log(err, "erreo2034028")
+      console.log(err, "erreo2034028");
       throw new RequestError("Error");
     }
   },
@@ -52,7 +55,8 @@ module.exports = {
   async addSubCategory(req, res, next) {
     try {
       const { categoryId, sub_name } = req.body;
-      db.subcategories.findOne({ where: { sub_name: sub_name } })
+      db.subcategories
+        .findOne({ where: { sub_name: sub_name } })
         .then((data) => {
           if (data) {
             throw new RequestError("Category already exist", 409);
@@ -78,7 +82,8 @@ module.exports = {
   async addSubChildCategory(req, res, next) {
     try {
       const { categoryId, subcategoryId, name } = req.body;
-      db.subchildcategories.findOne({ where: { name: name } })
+      db.subchildcategories
+        .findOne({ where: { name: name } })
         .then((data) => {
           if (data) {
             throw new RequestError("Category already exist", 409);
@@ -105,16 +110,19 @@ module.exports = {
   async updateCategory(req, res, next) {
     try {
       const { childcategoryId, subcategoryId, sub_name, name } = req.body;
-      db.subcategories.findOne({ where: { id: subcategoryId } }).then((data) => {
-        if (data) {
-          return db.subcategories.update(
-            { sub_name: sub_name },
-            { where: { id: subcategoryId } }
-          );
-        }
-        throw new RequestError("Category Not Found", 409);
-      });
-      db.subchildcategories.findOne({ where: { id: childcategoryId } })
+      db.subcategories
+        .findOne({ where: { id: subcategoryId } })
+        .then((data) => {
+          if (data) {
+            return db.subcategories.update(
+              { sub_name: sub_name },
+              { where: { id: subcategoryId } }
+            );
+          }
+          throw new RequestError("Category Not Found", 409);
+        });
+      db.subchildcategories
+        .findOne({ where: { id: childcategoryId } })
         .then((data) => {
           if (data) {
             return db.subchildcategories.update(
@@ -139,7 +147,7 @@ module.exports = {
     try {
       db.category
         .findAll({
-          attributes: ["id", "name"],
+          attributes: ["id", "name", "createdId", "createdType"],
           include: [{ model: db.subcategories }],
         })
         .then((list) => {
@@ -155,10 +163,11 @@ module.exports = {
 
   async getSubCategoryList(req, res, next) {
     try {
-      db.subcategories.findAll({
-        where: { categoryId: req.query.categoryId },
-        include: [{ model: db.category, attributes: ["id", "name"] }],
-      })
+      db.subcategories
+        .findAll({
+          where: { categoryId: req.query.categoryId },
+          include: [{ model: db.category, attributes: ["id", "name"] }],
+        })
         .then((list) => {
           res.status(200).json({ success: true, data: list });
         })
@@ -173,9 +182,10 @@ module.exports = {
   async getSubChildCategoryList(req, res, next) {
     try {
       const { subcategoryId } = req.query;
-      db.subchildcategories.findAll({
-        where: { subcategoryId: subcategoryId },
-      })
+      db.subchildcategories
+        .findAll({
+          where: { subcategoryId: subcategoryId },
+        })
         .then((list) => {
           res.status(200).json({ success: true, data: list });
         })
@@ -189,15 +199,16 @@ module.exports = {
 
   async getList(req, res, next) {
     try {
-      db.subchildcategories.findAll({
-        include: [
-          {
-            model: db.subcategories,
-            attributes: ["id", "sub_name"],
-            include: [{ model: db.category, attributes: ["id", "name"] }],
-          },
-        ],
-      })
+      db.subchildcategories
+        .findAll({
+          include: [
+            {
+              model: db.subcategories,
+              attributes: ["id", "sub_name"],
+              include: [{ model: db.category, attributes: ["id", "name"] }],
+            },
+          ],
+        })
         .then((list) => {
           res.status(200).json({ success: true, data: list });
         })
@@ -212,16 +223,17 @@ module.exports = {
   async getCategoryById(req, res, next) {
     try {
       let categoryId = req.query.categoryId;
-      db.subchildcategories.findAll({
-        where: { categoryId: categoryId },
-        include: [
-          {
-            model: db.subcategories,
-            attributes: ["id", "sub_name"],
-            include: [{ model: db.category, attributes: ["id", "name"] }],
-          },
-        ],
-      })
+      db.subchildcategories
+        .findAll({
+          where: { categoryId: categoryId },
+          include: [
+            {
+              model: db.subcategories,
+              attributes: ["id", "sub_name"],
+              include: [{ model: db.category, attributes: ["id", "name"] }],
+            },
+          ],
+        })
         .then((list) => {
           res.status(200).json({ success: true, data: list });
         })
@@ -278,9 +290,10 @@ module.exports = {
   // Sub category list
   async getSubCategory(req, res, next) {
     try {
-      db.subcategories.findAll({
-        include: [{ model: db.category, attributes: ["id", "name"] }],
-      })
+      db.subcategories
+        .findAll({
+          include: [{ model: db.category, attributes: ["id", "name"] }],
+        })
         .then((list) => {
           res.status(200).json({ success: true, data: list });
         })
@@ -294,7 +307,8 @@ module.exports = {
   async getSubCatListUpdate(req, res, next) {
     try {
       const { id, sub_name } = req.body;
-      db.subcategories.findOne({ where: { id: id } })
+      db.subcategories
+        .findOne({ where: { id: id } })
         .then((data) => {
           if (data) {
             return db.subcategories.update(
@@ -319,7 +333,8 @@ module.exports = {
 
   async getDeletedSubCatList(req, res, next) {
     try {
-      db.subcategories.findOne({ where: { id: parseInt(req.query.id) } })
+      db.subcategories
+        .findOne({ where: { id: parseInt(req.query.id) } })
         .then((list) => {
           if (list) {
             return db.subcategories.destroy({ where: { id: list.id } });
@@ -327,12 +342,10 @@ module.exports = {
           throw new RequestError("Id is not found");
         })
         .then((re) => {
-          return res
-            .status(200)
-            .json({
-              msg: "success",
-              status: "deleted Sub_Category Seccessfully",
-            });
+          return res.status(200).json({
+            msg: "success",
+            status: "deleted Sub_Category Seccessfully",
+          });
         })
         .catch((err) => {
           next(err);
@@ -344,12 +357,13 @@ module.exports = {
 
   //child category
   async deleteCategory(req, res, next) {
-    db.subchildcategories.findOne({ where: { id: parseInt(req.query.id) } })
+    db.subchildcategories
+      .findOne({ where: { id: parseInt(req.query.id) } })
       .then((data) => {
         if (data) {
-          return db.subchildcategories.destroy({ where: { id: data.id } }).then(
-            (r) => [r, data]
-          );
+          return db.subchildcategories
+            .destroy({ where: { id: data.id } })
+            .then((r) => [r, data]);
         }
         throw new RequestError("child_category is not found");
       })
@@ -406,11 +420,12 @@ module.exports = {
   async getFilterbyCategory(req, res, next) {
     try {
       let { id, name } = req.body;
-      db.subcategories.findOne({
-        attributes: ["id", "sub_name"],
-        where: { id: id, sub_name: name },
-        include: [{ model: db.subchildcategories }],
-      })
+      db.subcategories
+        .findOne({
+          attributes: ["id", "sub_name"],
+          where: { id: id, sub_name: name },
+          include: [{ model: db.subchildcategories }],
+        })
         .then((product) => {
           res.status(200).json({ success: true, data: product });
         })
@@ -429,19 +444,20 @@ module.exports = {
       if (name) {
         search = "%" + name + "%";
       }
-      db.subcategories.findAll({
-        attributes: ["id", "sub_name"],
-        include: [
-          {
-            model: db.product,
-            order: [["createdAt", "DESC"]],
-            required: true,
-            where: {
-              [Op.or]: [{ name: { [Op.like]: search }, subCategoryId: id }],
+      db.subcategories
+        .findAll({
+          attributes: ["id", "sub_name"],
+          include: [
+            {
+              model: db.product,
+              order: [["createdAt", "DESC"]],
+              required: true,
+              where: {
+                [Op.or]: [{ name: { [Op.like]: search }, subCategoryId: id }],
+              },
             },
-          },
-        ],
-      })
+          ],
+        })
         .then((product) => {
           res.status(200).json({ success: true, data: product });
         })

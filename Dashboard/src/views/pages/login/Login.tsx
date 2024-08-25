@@ -3,9 +3,11 @@ import { Controller, useForm } from "react-hook-form";
 import { Button, Input } from "@nextui-org/react";
 import { setCookie } from "../../../JsFiles/CommonFunction.mjs";
 import { useLoginMutation } from "../Service.mjs";
+import { useAppDispatch } from "../../../Common/hooks";
+import { updateLoginDetails } from "../../../Common/globalSlice";
 const Login = () => {
+
   const authenticate = (user, next) => {
-    console.log(user, "user4352345");
     if (typeof window !== "undefined") {
       setCookie("token", user.token, 60);
       setCookie("role", user.role, 60);
@@ -16,7 +18,7 @@ const Login = () => {
       next();
     }
   };
-
+  const dispatch = useAppDispatch();
   const { handleSubmit, control, reset } = useForm();
   const navigate = useNavigate();
   const [login] = useLoginMutation();
@@ -24,7 +26,7 @@ const Login = () => {
   const onSubmit = async (data: any) => {
     const result = await login(data);
     if (result) {
-      console.log(result, "sdf45234");
+      dispatch(updateLoginDetails(result?.data));
       authenticate(result?.data, () => {
         navigate("/Dashboard");
         window.location.reload();

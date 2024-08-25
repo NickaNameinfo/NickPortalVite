@@ -2,7 +2,6 @@ import { IconHome } from "./Components/Icons";
 import { getCookie } from "../src/JsFiles/CommonFunction.mjs";
 // Assuming getCookie is imported correctly
 const tempRole = getCookie("role");
-console.log(tempRole, "tempRole323");
 export const _nav = [
   ...(tempRole === "3"
     ? [
@@ -24,13 +23,17 @@ export const _nav = [
           link: tempRole === "2" ? "/Vendors/Add" : "/",
           icons: <IconHome />,
           menuItems: [
-            {
-              menuType: "single",
-              name: "Add",
-              key: "Add",
-              link: "/Vendors/Add",
-              icons: <IconHome />,
-            },
+            ...(tempRole === "2"
+              ? [
+                  {
+                    menuType: "single",
+                    name: "Add",
+                    key: "Add",
+                    link: "/Vendors/Add",
+                    icons: <IconHome />,
+                  },
+                ]
+              : []),
             {
               menuType: "single",
               name: "List",
@@ -38,11 +41,24 @@ export const _nav = [
               link: "/Vendors/List",
               icons: <IconHome />,
             },
+          ],
+        },
+      ]
+    : []),
+  ...(tempRole !== "1"
+    ? [
+        {
+          menuType: "multiple",
+          name: "Categories",
+          key: "Categories",
+          link: "/",
+          icons: <IconHome />,
+          menuItems: [
             {
               menuType: "single",
-              name: "Stock",
-              key: "Stock",
-              link: "/AddStock",
+              name: "Add",
+              key: "Add",
+              link: "/CategoriesAdd",
               icons: <IconHome />,
             },
           ],
@@ -51,34 +67,33 @@ export const _nav = [
     : []),
   {
     menuType: "multiple",
-    name: "Categories",
-    key: "Categories",
-    link: "/",
-    icons: <IconHome />,
-    menuItems: [
-      {
-        menuType: "single",
-        name: "Add",
-        key: "Add",
-        link: "/CategoriesAdd",
-        icons: <IconHome />,
-      },
-    ],
-  },
-  {
-    menuType: "multiple",
     name: "Products",
     key: "Products",
     link: "/",
     icons: <IconHome />,
     menuItems: [
-      {
-        menuType: "single",
-        name: "Add",
-        key: "Add",
-        link: "/AddProducts",
-        icons: <IconHome />,
-      },
+      ...(tempRole !== "1"
+        ? [
+            {
+              menuType: "single",
+              name: "Add",
+              key: "Add",
+              link: "/AddProducts",
+              icons: <IconHome />,
+            },
+          ]
+        : []),
+      ...(tempRole === "2"
+        ? [
+            {
+              menuType: "single",
+              name: "Stock",
+              key: "Stock",
+              link: "/AddStock",
+              icons: <IconHome />,
+            },
+          ]
+        : []),
       {
         menuType: "single",
         name: "List",
@@ -88,29 +103,37 @@ export const _nav = [
       },
     ],
   },
-  ...(tempRole === "1"
+  ...(tempRole === "3" || tempRole === "1"
     ? [
         {
-          menuType: "multiple",
-          name: "Stores",
+          menuType: tempRole === "3" ? "single" : "multiple",
+          name: tempRole === "3" ? "Profile" : "Stores",
           key: "Stores",
-          link: "/",
+          link: "/Stores/Add",
           icons: <IconHome />,
           menuItems: [
-            {
-              menuType: "single",
-              name: "Add",
-              key: "Add",
-              link: "/Stores/Add",
-              icons: <IconHome />,
-            },
-            {
-              menuType: "single",
-              name: "List",
-              key: "List",
-              link: "/Stores/List",
-              icons: <IconHome />,
-            },
+            ...(tempRole === "3"
+              ? [
+                  {
+                    menuType: "single",
+                    name: "Add",
+                    key: "Add",
+                    link: "/Stores/Add",
+                    icons: <IconHome />,
+                  },
+                ]
+              : []),
+            ...(tempRole === "1"
+              ? [
+                  {
+                    menuType: "single",
+                    name: "List",
+                    key: "List",
+                    link: "/Stores/List",
+                    icons: <IconHome />,
+                  },
+                ]
+              : []),
           ],
         },
       ]
@@ -229,7 +252,6 @@ export const _nav = [
     menuType: "single",
     name: "LogOut",
     key: "LogOut",
-    link: "/",
     icons: <IconHome />,
   },
 ];

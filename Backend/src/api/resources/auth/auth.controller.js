@@ -117,7 +117,7 @@ module.exports = {
   },
 
   async userUpdate(req, res, next) {
-    const { id, firstName, lastName, email, address, password, role, verify } =
+    const { id, firstName, lastName, email, address, password, role, verify, vendorId } =
       req.body;
     var passwordHash = bcrypt.hashSync(password);
     db.user
@@ -134,15 +134,17 @@ module.exports = {
             address: address ? address : user.address,
             role: role ? role : user.role,
             verify: verify ? verify : user.verify,
+            vendorId: vendorId ? vendorId : user.vendorId,
           },
           { where: { id: id } }
         );
       })
       .then((user) => {
         if (user) {
-          return res
-            .status(200)
-            .json({ success: true, msg: "User update successsfully" });
+          return res.status(200).json({
+            success: true,
+            msg: "User update successsfully",
+          });
         } else res.status(500).json({ success: false });
       })
       .catch((err) => {

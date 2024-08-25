@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import {
   Button,
@@ -9,6 +9,7 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
+  Image,
   Input,
   Select,
   SelectItem,
@@ -19,70 +20,98 @@ import {
   useAddProductMutation,
   useAddStoreProductMutation,
   useAddVendorProductMutation,
+  useGetProductsByIdQuery,
+  useUpdateProductMutation,
 } from "./Service.mjs";
 import { useGetCategoriesQuery } from "../Categories/Service.mjs";
 import { getCookie } from "../.././JsFiles//CommonFunction.mjs";
 import InputNextUI from "../../Components/Common/Input/input";
+import { infoData } from "../../configData";
 
 const AddProducts = () => {
-  const { handleSubmit, control, reset, watch } = useForm();
+  const { handleSubmit, control, reset, watch, setValue } = useForm();
   const currentStoreUserId = getCookie("storeId");
   const currentVendorUserId = getCookie("vendorId");
   const navigate = useNavigate();
   const [addProducts] = useAddProductMutation();
   const [addStoreProducts] = useAddStoreProductMutation();
   const [addVendorProducts] = useAddVendorProductMutation();
+  const [updateProducts] = useUpdateProductMutation();
+  const { productId } = useParams();
   let tempFormData = watch();
-  console.log(tempFormData, "watch2451234");
   const {
     data: categoryData,
     error: categoryerror,
     refetch: categoryrefetch,
   } = useGetCategoriesQuery();
+  const {
+    data: productData,
+    error: productError,
+    refetch: productRefetch,
+  } = useGetProductsByIdQuery(productId);
+
+  console.log(productData, "productData234");
 
   const onSubmit = async (data: any) => {
     let tempData = {
       ...data,
-      subCategoryId: 2,
-      childCategoryId: 2,
-      slug: 1,
+      subCategoryId: 3,
+      childCategoryId: 3,
+      slug: currentStoreUserId ? currentStoreUserId : currentVendorUserId,
+      createdId: currentStoreUserId ? currentStoreUserId : currentVendorUserId,
+      createdType: currentStoreUserId ? "Store" : "Vendor",
       paymentMode: String(tempFormData?.paymentMode || ""),
     };
-    console.log("datafrom", tempData);
     const formData = new FormData();
     for (const key in tempData) {
       formData.append(key, tempData[key]);
-      console.log(formData);
     }
-    const result = await addProducts(formData).unwrap();
-    if (result?.success) {
-      console.log(result, "result3452345");
-
-      const tempStoreValueAPI = {
-        supplierId: currentStoreUserId
-          ? currentStoreUserId
-          : currentVendorUserId,
-        productId: result.data?.id,
-        unitSize: result.data?.qty,
-        buyerPrice: result.data?.total,
-      };
-      if (currentStoreUserId) {
-        const storeResult = await addStoreProducts(tempStoreValueAPI).unwrap();
-        console.log(currentStoreUserId, storeResult, "currentUserId");
-        if (storeResult) {
-          navigate("/ProductsList");
+    if (!productData?.data) {
+      const result = await addProducts(formData).unwrap();
+      if (result?.success) {
+        console.log(result, "result3452345");
+        const tempStoreValueAPI = {
+          supplierId: currentStoreUserId
+            ? currentStoreUserId
+            : currentVendorUserId,
+          productId: result.data?.id,
+          unitSize: result.data?.qty,
+          buyerPrice: result.data?.total,
+        };
+        if (currentStoreUserId) {
+          const storeResult = await addStoreProducts(
+            tempStoreValueAPI
+          ).unwrap();
+          console.log(currentStoreUserId, storeResult, "currentUserId");
+          if (storeResult) {
+            navigate("/ProductsList");
+          }
+        } else {
+          const vendorResult = await addVendorProducts(
+            tempStoreValueAPI
+          ).unwrap();
+          console.log(currentStoreUserId, vendorResult, "currentUserId");
+          if (vendorResult) {
+            navigate("/ProductsList");
+          }
         }
-      } else {
-        const vendorResult = await addVendorProducts(
-          tempStoreValueAPI
-        ).unwrap();
-        console.log(currentStoreUserId, vendorResult, "currentUserId");
-        if (vendorResult) {
-          navigate("/ProductsList");
-        }
+      }
+    } else {
+      setValue("id", productData?.data?.id);
+      const result = await updateProducts(formData).unwrap();
+      if (result?.success) {
+        navigate("/ProductsList");
       }
     }
   };
+
+  React.useEffect(() => {
+    if (productData?.data) {
+      reset(productData?.data);
+      setValue("grand_total", productData?.data?.total);
+      setValue("paymentMode", productData?.data?.paymentMode?.split(","));
+    }
+  }, [productData]);
 
   return (
     <div className="mx-3">
@@ -112,7 +141,10 @@ const AddProducts = () => {
             variant="faded"
             color="default"
           >
-            <p className="font-medium  text-black/70"> Add Protuct</p>
+            <p className="font-medium  text-black/70">
+              {" "}
+              {productData?.data ? "Update Product" : "Add Protuct"}
+            </p>
           </Chip>
           <div className="text-center">
             <Button
@@ -121,7 +153,7 @@ const AddProducts = () => {
               size="md"
               // className="w-[90px]"
             >
-              {"Add New Protuct"}
+              {productData?.data ? "Update Product" : "Add New Product"}
             </Button>
           </div>
         </div>
@@ -133,6 +165,7 @@ const AddProducts = () => {
               rules={{ required: true }}
               render={({ field }) => (
                 <Select
+                  defaultSelectedKeys={String(productData?.data?.categoryId)}
                   classNames={{
                     label: "group-data-[filled=true]:-translate-y-3",
                     trigger: [
@@ -168,9 +201,10 @@ const AddProducts = () => {
                   size="sm"
                   {...field}
                 >
-                  <SelectItem key={0}>{"Select Category"}</SelectItem>
                   {categoryData?.data?.map((item) => (
-                    <SelectItem key={item.id}>{item.name}</SelectItem>
+                    <SelectItem key={item.id} value={String(item.id)}>
+                      {item.name}
+                    </SelectItem>
                   ))}
                 </Select>
 
@@ -204,6 +238,7 @@ const AddProducts = () => {
               rules={{ required: true }}
               render={({ field }) => (
                 <Select
+                  defaultSelectedKeys={String(productData?.data?.status)}
                   classNames={{
                     label: "group-data-[filled=true]:-translate-y-3",
                     trigger: [
@@ -234,24 +269,22 @@ const AddProducts = () => {
                       ],
                     },
                   }}
-                  label="Select Category"
+                  label="Status"
                   variant="faded"
                   size="sm"
                   {...field}
                 >
-                  <SelectItem key={0}>{"Select Category"}</SelectItem>
-                  {categoryData?.data?.map((item) => (
-                    <SelectItem key={item.id}>{item.name}</SelectItem>
-                  ))}
+                  <SelectItem key={1} value={"1"}>
+                    {"Active"}
+                  </SelectItem>
+                  <SelectItem key={0} value={"0"}>
+                    {"InActive"}
+                  </SelectItem>
                 </Select>
-                // <Select label="Select an Status" {...field}>
-                //   <SelectItem key={1}>{"Active"}</SelectItem>
-                //   <SelectItem key={0}>{"InActive"}</SelectItem>
-                // </Select>
               )}
             />
             <Controller
-              name="unit" // Changed to reflect a text input
+              name="unitSize" // Changed to reflect a text input
               control={control}
               rules={{ required: true }}
               render={({ field }) => (
@@ -265,7 +298,7 @@ const AddProducts = () => {
                 />
               )}
             />
-            <Controller
+            {/* <Controller
               name="content" // Changed to reflect a text input
               control={control}
               rules={{ required: true }}
@@ -279,7 +312,7 @@ const AddProducts = () => {
                   {...field}
                 />
               )}
-            />
+            /> */}
             <Controller
               name="sortDesc" // Changed to reflect a text input
               control={control}
@@ -371,23 +404,28 @@ const AddProducts = () => {
                 />
               )}
             />
-            <Controller
-              name="photo" // Changed to reflect a text input
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <Input
-                  type="file"
-                  label="Image"
-                  size="lg"
-                  onChange={(e) => {
-                    field.onChange(e.target.files[0]); // Don't forget to call field.onChange to update the form state
-                  }}
-                />
-              )}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4 mb-2">
+            <div className="flex">
+              <Controller
+                name="photo" // Changed to reflect a text input
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <Input
+                    type="file"
+                    label="Image"
+                    size="lg"
+                    onChange={(e) => {
+                      field.onChange(e.target.files[0]); // Don't forget to call field.onChange to update the form state
+                    }}
+                  />
+                )}
+              />
+              <Image
+                src={`${infoData.baseApi}/${productData?.data?.photo}`}
+                className="h-fit"
+                width={100}
+              />
+            </div>
             <Controller
               name="grand_total" // Changed to reflect a text input
               control={control}
@@ -403,6 +441,8 @@ const AddProducts = () => {
                 />
               )}
             />
+          </div>
+          <div className="grid grid-cols-2 gap-4 mb-2">
             <Controller
               name="paymentMode" // Changed to reflect a text input
               control={control}

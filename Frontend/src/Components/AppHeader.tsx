@@ -278,7 +278,7 @@ export const AppHeader = () => {
               </Button>
             </div>
             <div className="ms-3">
-              {!currentloginDetails ? (
+              {!currentloginDetails?.token ? (
                 <Login />
               ) : (
                 <User

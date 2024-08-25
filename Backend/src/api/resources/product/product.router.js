@@ -40,10 +40,10 @@ productRouter
   .route("/getProductByCategory")
   .get(sanitize(), productController.getProductListByCategory);
 productRouter
-  .route("/getProductById")
+  .route("/getProductById/:id")
   .get(sanitize(), productController.getProductListById);
 productRouter
-  .route("/getWebProductById")
+  .route("/getWebProductById/:id")
   .get(sanitize(), productController.getWebProductListById);
 productRouter
   .route("/product-offer")
