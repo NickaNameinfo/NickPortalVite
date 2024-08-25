@@ -17,6 +17,12 @@ export const ProductApi = createApi({
         method: "GET",
       }),
     }),
+    getProductImg: builder.query({
+      query: (body) => ({
+        url: `/product/getAllPhoto`,
+        method: "GET",
+      }),
+    }),
     getProductsById: builder.query({
       query: (id) => ({
         url: `/product/getProductById`,
@@ -27,5 +33,9 @@ export const ProductApi = createApi({
   }),
 });
 
-export const { useGetProductsQuery, useGetProductsByIdQuery } = ProductApi;
+export const {
+  useGetProductsQuery,
+  useGetProductsByIdQuery,
+  useGetProductImgQuery,
+} = ProductApi;
 export const { endpoints } = ProductApi;
