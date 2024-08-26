@@ -25,6 +25,16 @@ import {
 } from "@nextui-org/react";
 import { IconDelete } from "../Icons";
 import { useBoolean } from "../Common/CustomHooks";
+import { useAppDispatch, useAppSelector } from "../Common/hooks";
+import { useParams } from "react-router-dom";
+import { infoData } from "../../configData";
+import { onRefreshCart } from "../Common/globalSlice";
+import {
+  useGetCartByOrderIdQuery,
+  useUpdateCartMutation,
+  useDeleteCartItemMutation,
+} from "../../views/pages/Store/Service.mjs";
+
 const columns = [
   { name: "Sl.No", uid: "no" },
   { name: "Product", uid: "name" },
@@ -33,227 +43,120 @@ const columns = [
   { name: "Price", uid: "Price" },
 ];
 
-const users = [
-  {
-    id: 1,
-    name: "Tony Reichert",
-    no: "1",
-    team: "Management",
-    status: "active",
-    StoreName: "Samz Stroe",
-    age: "29",
-    avatar:
-      "https://app.requestly.io/delay/1000/https://nextui.org/images/hero-card-complete.jpeg",
-    Price: "45",
-    email: "4",
-  },
-  {
-    id: 2,
-    name: "Zoey Lang",
-    no: "2",
-    team: "Development",
-    status: "paused",
-    age: "25",
-    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-    Price: "657",
-    email: "4",
-    StoreName: "Fruits Stroe",
-  },
-  {
-    id: 3,
-    name: "Jane Fisher",
-    no: "3",
-    team: "Development",
-    status: "active",
-    age: "22",
-    avatar:
-      "https://app.requestly.io/delay/1000/https://nextui.org/images/hero-card-complete.jpeg",
-    Price: "657",
-    email: "4",
-    StoreName: "Grocery Stroe",
-  },
-  {
-    id: 4,
-    name: "William Howard",
-    no: "4",
-    team: "Marketing",
-    status: "vacation",
-    age: "28",
-    avatar: "https://i.pravatar.cc/150?u=a048581f4e29026701d",
-    Price: "657",
-    email: "4",
-    StoreName: "Bike Stroe",
-  },
-  {
-    id: 5,
-    name: "Kristen Copper",
-    no: "5",
-    team: "Sales",
-    status: "active",
-    age: "24",
-    avatar:
-      "https://app.requestly.io/delay/1000/https://nextui.org/images/hero-card-complete.jpeg",
-    Price: "657",
-    email: "4",
-    StoreName: "Arul's Stroe",
-  },
-  {
-    id: 6,
-    name: "Kristen Copper",
-    no: "6",
-    team: "Sales",
-    status: "active",
-    age: "24",
-    avatar:
-      "https://app.requestly.io/delay/1000/https://nextui.org/images/hero-card-complete.jpeg",
-    Price: "657",
-    email: "4",
-    StoreName: "Arul's Stroe",
-  },
-  {
-    id: 7,
-    name: "Kristen Copper",
-    no: "7",
-    team: "Sales",
-    status: "active",
-    age: "24",
-    avatar:
-      "https://app.requestly.io/delay/1000/https://nextui.org/images/hero-card-complete.jpeg",
-    Price: "657",
-    email: "4",
-    StoreName: "Arul's Stroe",
-  },
-  {
-    id: 8,
-    name: "Kristen Copper",
-    no: "8",
-    team: "Sales",
-    status: "active",
-    age: "24",
-    avatar:
-      "https://app.requestly.io/delay/1000/https://nextui.org/images/hero-card-complete.jpeg",
-    Price: "657",
-    email: "4",
-    StoreName: "Arul's Stroe",
-  },
-  {
-    id: 9,
-    name: "Kristen Copper",
-    no: "9",
-    team: "Sales",
-    status: "active",
-    age: "24",
-    avatar:
-      "https://app.requestly.io/delay/1000/https://nextui.org/images/hero-card-complete.jpeg",
-    Price: "657",
-    email: "4",
-    StoreName: "Arul's Stroe",
-  },
-  {
-    id: 10,
-    name: "Kristen Copper",
-    no: "10",
-    team: "Sales",
-    status: "active",
-    age: "24",
-    avatar:
-      "https://app.requestly.io/delay/1000/https://nextui.org/images/hero-card-complete.jpeg",
-    Price: "657",
-    email: "4",
-    StoreName: "Arul's Stroe",
-  },
-];
 export const BuyCard = (props: any) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
-  const renderCell = React.useCallback(
-    (
-      user: {
-        [x: string]: any;
-        avatar: any;
-        email: any;
-        team: any;
-      },
-      columnKey: string | number
-    ) => {
-      const cellValue = user[columnKey];
+  const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
+  const { id } = useParams();
+  const {
+    data: cart,
+    error: cartError,
+    refetch: cartRefetch,
+  } = useGetCartByOrderIdQuery(Number(id));
+  const [updateCart] = useUpdateCartMutation();
+  const [deleteCartItem] = useDeleteCartItemMutation();
+  const [deletId, setDeleteId] = React.useState(null);
+  const dispatch = useAppDispatch();
 
-      switch (columnKey) {
-        case "name":
-          return (
-            <User
-              className="p-0 m-0"
-              avatarProps={{ radius: "lg", src: user.avatar }}
-              //   description={user.email}
-              name={null}
-            >
-              {/* {user.email} */}
-            </User>
-          );
-        case "role":
-          return (
-            <div className="flex flex-col items-center">
-              <p className="text-bold xm:text-sm mm:text-sm ml:text-sm capitalize flex items-center">
-                {cellValue}
-              </p>
-            </div>
-          );
+  React.useEffect(() => {
+    onRefresh && dispatch(onRefreshCart(false));
+    cartRefetch();
+  }, [id, onRefresh]);
 
-        case "actions":
-          return (
-            <div className=" flex items-center">
-              <div className="rounded-lg bg-gray-200 flex justify-between items-center">
-                <Button
-                  className="bg-gray-200 3xl:w-unit-10 3xl:h-unit-8 3xl:min-h-unit-8 2xl:w-unit-10 2xl:h-unit-8 2xl:min-h-unit-8 xl:w-unit-10 xl:h-unit-8 xl:min-h-unit-8 lg:w-unit-10 lg:h-unit-8 lg:min-h-unit-8 xm:min-w-unit-6 ml:min-h-unit-6 xm:min-h-unit-6 mm:min-h-unit-6 xm:w-unit-4 xm:h-unit-4 mm:min-w-unit-6 mm:w-unit-4 mm:h-unit-4 ml:min-w-unit-6 ml:w-unit-4 ml:h-unit-4"
-                  radius="full"
-                  isIconOnly
-                  size="md"
-                >
-                  -
-                </Button>
-                <p className="bg-gray-200 p-0 m-0 text-sm font-semibold ">
-                  777
-                </p>
-
-                <Button
-                  className="bg-gray-200 3xl:w-unit-10 3xl:h-unit-8 3xl:min-h-unit-8 2xl:w-unit-10 2xl:h-unit-8 2xl:min-h-unit-8 xl:w-unit-10 xl:h-unit-8 xl:min-h-unit-8 lg:w-unit-10 lg:h-unit-8 lg:min-h-unit-8 ml:min-h-unit-6 xm:min-h-unit-6 mm:min-h-unit-6 xm:min-w-unit-6 xm:w-unit-4 xm:h-unit-4 mm:min-w-unit-6 mm:w-unit-4 mm:h-unit-4 ml:min-w-unit-6 ml:w-unit-4 ml:h-unit-4"
-                  radius="full"
-                  isIconOnly
-                  size="md"
-                >
-                  +
-                </Button>
-              </div>
-
-              {/* <div className="text-sm text-danger cursor-pointer active:opacity-50"> xm:h-unit-4 ml:h-unit-4 mm:h-unit-4 xm:w-unit-4 mm:w-unit-4 ml::w-unit-4*/}
-              <Button
-                className=" bg-gray-200 lg:w-unit-10 lg:h-unit-10 lg:min-h-unit-8 ml:min-h-unit-6 xm:min-h-unit-6 mm:min-h-unit-6 xm:min-w-unit-6 xm:w-unit-4 xm:h-unit-4 mm:min-w-unit-6 mm:w-unit-4 mm:h-unit-4 ml:min-w-unit-6 ml:w-unit-4 ml:h-unit-4"
-                isIconOnly
-                onPress={onOpen}
-                size="md"
-              >
-                <IconDelete fill="#ff0000" />
-                {/* <Tooltip
-                  color="danger"
-                  content="Delete"
-                  closeDelay={0}
-                  size="sm"
-                  radius="lg"
-                  showArrow={true}
-                >
-                  <p className="p-0 m-0">
-                    
-                  </p>
-                </Tooltip> */}
-              </Button>
-              {/* </div> */}
-            </div>
-          );
-        default:
-          return <p className="m-0 p-0">{cellValue}</p>;
+  const handleAddCart = async (type, product) => {
+    let tempCartValue = {
+      productId: product?.productId,
+      name: product?.name,
+      orderId: id,
+      price: Number(product?.price),
+      total: Number(product?.qty) * Number(product?.price),
+      qty: product?.qty
+        ? type === "add"
+          ? Number(product?.qty) + 1
+          : Number(product?.qty) - 1
+        : 1,
+      photo: props?.item?.product?.photo,
+    };
+    try {
+      const result = await updateCart(tempCartValue);
+      if (result) {
+        cartRefetch();
       }
-    },
-    []
-  );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onDeleteCartItems = async () => {
+    let apiInfo = {
+      orderId: id,
+      productId: deletId,
+    };
+    const result = await deleteCartItem(apiInfo);
+    if (result) {
+      onClose();
+      setDeleteId(null);
+      dispatch(onRefreshCart(true));
+    }
+  };
+
+  const renderCell = React.useCallback((data, columnKey) => {
+    console.log(data, "datacolumnKey", columnKey);
+
+    switch (columnKey) {
+      case "photo":
+        return (
+          <User
+            className="p-0 m-0"
+            avatarProps={{
+              radius: "lg",
+              src: `${infoData.baseApi}/${data.photo}`,
+            }}
+            name={null}
+          ></User>
+        );
+      case "actions":
+        return (
+          <div className=" flex items-center">
+            <div className="rounded-lg bg-gray-200 flex justify-between items-center mr-1">
+              <Button
+                className="bg-gray-200 3xl:w-unit-10 3xl:h-unit-8 3xl:min-h-unit-8 2xl:w-unit-10 2xl:h-unit-8 2xl:min-h-unit-8 xl:w-unit-10 xl:h-unit-8 xl:min-h-unit-8 lg:w-unit-10 lg:h-unit-8 lg:min-h-unit-8 xm:min-w-unit-6 ml:min-h-unit-6 xm:min-h-unit-6 mm:min-h-unit-6 xm:w-unit-4 xm:h-unit-4 mm:min-w-unit-6 mm:w-unit-4 mm:h-unit-4 ml:min-w-unit-6 ml:w-unit-4 ml:h-unit-4"
+                radius="full"
+                isIconOnly
+                size="md"
+                onClick={() => handleAddCart("remove", data)}
+              >
+                -
+              </Button>
+              <p className="bg-gray-200 p-0 m-0 text-sm font-semibold ">
+                {data?.qty ? data?.qty : 0}
+              </p>
+
+              <Button
+                className="bg-gray-200 3xl:w-unit-10 3xl:h-unit-8 3xl:min-h-unit-8 2xl:w-unit-10 2xl:h-unit-8 2xl:min-h-unit-8 xl:w-unit-10 xl:h-unit-8 xl:min-h-unit-8 lg:w-unit-10 lg:h-unit-8 lg:min-h-unit-8 ml:min-h-unit-6 xm:min-h-unit-6 mm:min-h-unit-6 xm:min-w-unit-6 xm:w-unit-4 xm:h-unit-4 mm:min-w-unit-6 mm:w-unit-4 mm:h-unit-4 ml:min-w-unit-6 ml:w-unit-4 ml:h-unit-4"
+                radius="full"
+                isIconOnly
+                size="md"
+                onClick={() => handleAddCart("add", data)}
+              >
+                +
+              </Button>
+            </div>
+            <Button
+              className=" bg-gray-200 lg:w-unit-10 lg:h-unit-10 lg:min-h-unit-8 ml:min-h-unit-6 xm:min-h-unit-6 mm:min-h-unit-6 xm:min-w-unit-6 xm:w-unit-4 xm:h-unit-4 mm:min-w-unit-6 mm:w-unit-4 mm:h-unit-4 ml:min-w-unit-6 ml:w-unit-4 ml:h-unit-4"
+              isIconOnly
+              onPress={onOpen}
+              onClick={() => setDeleteId(data.productId)}
+              size="md"
+            >
+              <IconDelete fill="#ff0000" />
+            </Button>
+          </div>
+        );
+      default:
+        return <p className="m-0 p-0">{data?.[columnKey]}</p>;
+    }
+  }, []);
+
   return (
     <>
       <Modal
@@ -261,7 +164,7 @@ export const BuyCard = (props: any) => {
         onClose={props.onClose}
         size={"5xl"}
         shadow="md"
-        placement="bottom"
+        placement="center"
         backdrop="blur"
         scrollBehavior="inside"
       >
@@ -291,9 +194,9 @@ export const BuyCard = (props: any) => {
                       )}
                     </TableHeader>
 
-                    <TableBody items={users} className="m-0 p-0">
-                      {(item) => (
-                        <TableRow key={item.id} className="p-0 m-0">
+                    <TableBody items={cart?.data} className="m-0 p-0">
+                      {(item: any) => (
+                        <TableRow key={item?.["id"]} className="p-0 m-0">
                           {(columnKey) => (
                             <TableCell className="p-1 m-0">
                               {renderCell(item, columnKey)}
@@ -336,8 +239,17 @@ export const BuyCard = (props: any) => {
                 <div>
                   <div className=" BuycarBg mx-3">
                     <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
-                      <div>Total Products (4 Items )</div>
-                      <div> Rs : 5050</div>
+                      <div>
+                        Total Products (<b>{cart?.data?.length}</b> Items )
+                      </div>
+                      <div>
+                        {" "}
+                        Rs :{" "}
+                        {cart?.data
+                          ?.reduce((sum, item) => sum + item.total, 0)
+                          .toString()
+                          .replace(/(\d+)(\d{3})$/, "$1,$2")}
+                      </div>
                     </div>
                     <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
                       <div>Discount</div>
@@ -350,7 +262,14 @@ export const BuyCard = (props: any) => {
                     <Divider orientation="horizontal" className="my-3.5" />
                     <div className="flex justify-between py-1 mx-3 text-base font-medium  m-1">
                       <div>Total Amount</div>
-                      <div> Rs. 3500</div>
+                      <div>
+                        {" "}
+                        Rs.{" "}
+                        {cart?.data
+                          ?.reduce((sum, item) => sum + item.total, 0)
+                          .toString()
+                          .replace(/(\d+)(\d{3})$/, "$1,$2")}
+                      </div>
                     </div>
                     <Divider orientation="horizontal" className="my-2" />
                     <div className="paymetoptionBg mx-3 mt-2 rounded-lg">
@@ -540,7 +459,12 @@ export const BuyCard = (props: any) => {
                   >
                     Cancel
                   </Button>
-                  <Button color="danger" size="sm" onPress={onClose}>
+                  <Button
+                    color="danger"
+                    size="sm"
+                    onPress={onClose}
+                    onClick={() => onDeleteCartItems()}
+                  >
                     Delete
                   </Button>
                 </ModalFooter>

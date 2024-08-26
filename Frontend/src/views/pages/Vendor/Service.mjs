@@ -23,8 +23,34 @@ export const VendorApi = createApi({
         method: "GET",
       }),
     }),
+    addVendors: builder.mutation({
+      query: (body) => ({
+        url: `/vendor/create`,
+        method: "POST",
+        body,
+      }),
+    }),
+    updateVendors: builder.mutation({
+      query: (body) => ({
+        url: `/vendor/update`,
+        method: "POST",
+        body,
+      }),
+    }),
+    deleteVendors: builder.mutation({
+      query: (id) => ({
+        url: `/vendor/delete/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
-export const { useGetVendorsQuery, useGetVendorsByIdQuery } = VendorApi;
+export const {
+  useGetVendorsQuery,
+  useGetVendorsByIdQuery,
+  useAddVendorsMutation,
+  useUpdateVendorsMutation,
+  useDeleteVendorsMutation,
+} = VendorApi;
 export const { endpoints } = VendorApi;
