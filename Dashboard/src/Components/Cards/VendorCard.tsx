@@ -20,7 +20,14 @@ import {
 } from "../Icons";
 import { Link } from "react-router-dom";
 import { infoData } from "../../configData";
+import { useGetVendorsProductByIdQuery } from "../../views/VendorProducts/Service.mjs";
 export const VendorCard = ({ item = null }) => {
+  const { data, error, refetch } = useGetVendorsProductByIdQuery(
+    Number(item?.id)
+  );
+
+  console.log(item, "data452938742");
+
   return (
     <Card className="ps-1 Storecard p-0">
       <CardHeader className="pb-0 pt-3 ps-2 flex-col items-start ">
@@ -44,7 +51,7 @@ export const VendorCard = ({ item = null }) => {
           <div className="col-span-7 ps-3">
             <h2 className="font-medium text-sm TextMaincolor">Open :</h2>
             <p className="font-normal text-xs StortimingColor tracking-tight mt-2">
-              {item?.openTime} AM-10 : {item?.closeTime} PM
+              {item?.openTime} AM : {item?.closeTime} PM
             </p>
             <div className="flex items-center mt-2">
               <p className="mt-1 ">
@@ -57,32 +64,43 @@ export const VendorCard = ({ item = null }) => {
             <div className="flex flex-row ">
               <div className="flex  justify-between basis-9/12  items-center">
                 <p className="cursor-pointer pe-1">
-                  <Iconwhatsup fill="#6942CB" />
+                  <Link
+                    to={`https://api.whatsapp.com/send?phone=+91${item?.phone}&&text=Hello`}
+                    target="_blank"
+                  >
+                    <Iconwhatsup fill="#6942CB" />
+                  </Link>
                 </p>
-                <Button
-                  className="bgnone p-0 m-0"
-                  radius="full"
-                  isIconOnly
-                  size="sm"
-                >
-                  <IconCall fill="#6942CB" />
-                </Button>
-                <Button
-                  className="bgnone p-0 m-0"
-                  radius="full"
-                  isIconOnly
-                  size="sm"
-                >
-                  <IconMap fill="#6942CB" />
-                </Button>
-                <Button
-                  className="bgnone p-0 m-0"
-                  radius="full"
-                  isIconOnly
-                  size="sm"
-                >
-                  <IconMapRound fill="#6942CB" />
-                </Button>
+                <a href={`tel:+91${item?.phone}`}>
+                  <Button
+                    className="bgnone p-0 m-0"
+                    radius="full"
+                    isIconOnly
+                    size="sm"
+                  >
+                    <IconCall fill="#6942CB" />
+                  </Button>
+                </a>
+                <a href={item?.location} target="_blank">
+                  <Button
+                    className="bgnone p-0 m-0"
+                    radius="full"
+                    isIconOnly
+                    size="sm"
+                  >
+                    <IconMap fill="#6942CB" />
+                  </Button>
+                </a>
+                <Link to={item?.website} target="_blank">
+                  <Button
+                    className="bgnone p-0 m-0"
+                    radius="full"
+                    isIconOnly
+                    size="sm"
+                  >
+                    <IconMapRound fill="#6942CB" />
+                  </Button>
+                </Link>
               </div>
 
               <div className="mt-0 basis-3/12 justify-end flex pe-0">
@@ -107,7 +125,7 @@ export const VendorCard = ({ item = null }) => {
       <CardFooter className="p-0 m-0">
         <div className="w-full px-2.5  pb-3 flex">
           <div className="font-normal text-sm  TextMaincolor w-6/12">
-            Products : 150
+            Products : {data?.data?.length ? data?.data?.length : 0}
           </div>
           <div className="font-normal text-sm  TextMaincolor w-6/12 justify-end flex">
             Near By : 15 Km
