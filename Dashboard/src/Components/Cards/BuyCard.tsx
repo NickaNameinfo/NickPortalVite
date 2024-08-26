@@ -99,6 +99,7 @@ export const BuyCard = (props: any) => {
   };
 
   const renderCell = React.useCallback((data, columnKey) => {
+    console.log(data, "datacolumnKey", columnKey);
     switch (columnKey) {
       case "photo":
         return (
