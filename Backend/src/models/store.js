@@ -93,6 +93,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true
       },
+      location: {
+        type: DataTypes.TEXT,
+        allowNull: true
+      },
       closeTime: {
         type: DataTypes.STRING,
         allowNull: true

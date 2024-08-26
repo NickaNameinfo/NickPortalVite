@@ -100,7 +100,7 @@ const ProductsList = () => {
             <Dropdown>
               <DropdownTrigger>
                 <Button size="sm" variant="flat">
-                  action
+                  Action
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>

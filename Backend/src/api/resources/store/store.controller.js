@@ -29,8 +29,6 @@ module.exports = {
         openTime,
         closeTime,
       } = req.body;
-      console.log(id, "id452342");
-      console.log(areaId, "areaId3452345");
 
       db.store
         .findOne({ where: { id: id ? id : null } })
@@ -42,7 +40,9 @@ module.exports = {
               {
                 storename: storename ? storename : supplier.storename,
                 status: status ? status : supplier.status,
-                storeaddress: storeaddress ? storeaddress : supplier.storeaddress,
+                storeaddress: storeaddress
+                  ? storeaddress
+                  : supplier.storeaddress,
                 storedesc: storedesc ? storedesc : supplier.storedesc,
                 ownername: ownername ? ownername : supplier.ownername,
                 owneraddress: owneraddress
@@ -63,7 +63,7 @@ module.exports = {
                 website: website ? website : supplier.website,
                 openTime: openTime ? openTime : supplier.openTime,
                 closeTime: closeTime ? closeTime : supplier.closeTime,
-                storeImage: req.file ? req.file.location : supplier.storeImage
+                storeImage: req.file ? req.file.location : supplier.storeImage,
               },
               { where: { id: id } }
             );
@@ -95,22 +95,11 @@ module.exports = {
           });
         })
         .then((store) => {
-          if (areaId) {
-            let areaList = [];
-            for (var i = 0; i < areaId.length; i++) {
-              areaList.push({
-                storeId: store.id,
-                areaId: areaId[i],
-              });
-            }
-            return db.store_area.bulkCreate(areaList);
-          }
-          return true;
-        })
-        .then((success) => {
-          res
-            .status(200)
-            .json({ success: true, msg: "Successfully inserted supplier" });
+          res.status(200).json({
+            success: true,
+            msg: "Successfully inserted supplier",
+            data: store,
+          });
         })
         .catch(function (err) {
           console.log(err);
@@ -286,6 +275,19 @@ module.exports = {
         email,
         password,
         phone,
+        areaId,
+        accountNo,
+        accountHolderName,
+        IFSC,
+        bankName,
+        branch,
+        adharCardNo,
+        panCardNo,
+        GSTNo,
+        website,
+        openTime,
+        closeTime,
+        location
       } = req.body;
       db.store
         .findOne({ where: { id: id } })
@@ -293,23 +295,40 @@ module.exports = {
           if (list) {
             return db.store.update(
               {
-                storename: storename,
-                status: parseInt(status) ? "active" : "inactive",
-                storeaddress: storeaddress ? storeaddress : list.storeaddress,
-                storedesc: storedesc ? storedesc : list.storedesc,
-                ownername: ownername ? ownername : list.ownername,
-                owneraddress: owneraddress ? owneraddress : list.owneraddress,
-                email: email ? email : list.email,
-                password: password ? password : list.password,
-                phone: phone ? phone : list.phone,
+                storename: storename ? storename : list?.storename,
+                status: status ? status : list?.status,
+                storeaddress: storeaddress ? storeaddress : list?.storeaddress,
+                storedesc: storedesc ? storedesc : list?.storedesc,
+                ownername: ownername ? ownername : list?.ownername,
+                owneraddress: owneraddress ? owneraddress : list?.owneraddress,
+                email: email ? email : list?.email,
+                password: password ? password : list?.password,
+                phone: phone ? phone : list?.phone,
+                accountNo: accountNo ? accountNo : list?.accountNo,
+                accountHolderName: accountHolderName ? accountHolderName : list?.accountHolderName,
+                IFSC: IFSC ? IFSC : list?.IFSC,
+                bankName: bankName ? bankName : list?.bankName,
+                branch: branch ? branch : list?.branch,
+                adharCardNo: adharCardNo ? adharCardNo : list?.adharCardNo,
+                panCardNo: panCardNo ? panCardNo : list?.panCardNo,
+                GSTNo: GSTNo ? GSTNo : list?.GSTNo,
+                areaId: areaId ? areaId : list?.areaId,
+                website: website ? website : list?.website,
+                openTime: openTime ? openTime : list?.openTime,
+                closeTime: closeTime ? closeTime : list?.closeTime,
+                location : location ? location : list?.location,
+                storeImage: req?.file ? req?.file?.path : list?.storeImage,
               },
               { where: { id: id } }
             );
           }
           throw new RequestError("No data found", 409);
         })
-        .then((e) => {
-          res.status(200).json({ success: true, msg: "Updated Successfully" });
+        .then((store) => {
+          console.log(store, "store3423453")
+          res
+            .status(200)
+            .json({ success: true, msg: "Updated Successfully", data: store });
         })
         .catch(function (err) {
           next(err);

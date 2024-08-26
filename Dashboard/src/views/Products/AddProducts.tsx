@@ -69,7 +69,6 @@ const AddProducts = () => {
     if (!productData?.data) {
       const result = await addProducts(formData).unwrap();
       if (result?.success) {
-        console.log(result, "result3452345");
         const tempStoreValueAPI = {
           supplierId: currentStoreUserId
             ? currentStoreUserId
@@ -82,7 +81,6 @@ const AddProducts = () => {
           const storeResult = await addStoreProducts(
             tempStoreValueAPI
           ).unwrap();
-          console.log(currentStoreUserId, storeResult, "currentUserId");
           if (storeResult) {
             navigate("/ProductsList");
           }
@@ -202,9 +200,7 @@ const AddProducts = () => {
                   {...field}
                 >
                   {categoryData?.data?.map((item) => (
-                    <SelectItem key={item.id} value={String(item.id)}>
-                      {item.name}
-                    </SelectItem>
+                    <SelectItem key={item.id}>{item.name}</SelectItem>
                   ))}
                 </Select>
 
@@ -238,7 +234,6 @@ const AddProducts = () => {
               rules={{ required: true }}
               render={({ field }) => (
                 <Select
-                  defaultSelectedKeys={String(productData?.data?.status)}
                   classNames={{
                     label: "group-data-[filled=true]:-translate-y-3",
                     trigger: [
@@ -272,6 +267,7 @@ const AddProducts = () => {
                   label="Status"
                   variant="faded"
                   size="sm"
+                  selectedKeys={String(tempFormData?.status)}
                   {...field}
                 >
                   <SelectItem key={1} value={"1"}>

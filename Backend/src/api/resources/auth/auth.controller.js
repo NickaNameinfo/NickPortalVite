@@ -117,7 +117,7 @@ module.exports = {
   },
 
   async userUpdate(req, res, next) {
-    const { id, firstName, lastName, email, address, password, role, verify, vendorId } =
+    const { id, firstName, lastName, email, address, password, role, verify, vendorId, storeId } =
       req.body;
     var passwordHash = bcrypt.hashSync(password);
     db.user
@@ -135,6 +135,7 @@ module.exports = {
             role: role ? role : user.role,
             verify: verify ? verify : user.verify,
             vendorId: vendorId ? vendorId : user.vendorId,
+            storeId: storeId ? storeId : user.storeId,
           },
           { where: { id: id } }
         );

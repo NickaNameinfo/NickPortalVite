@@ -30,7 +30,7 @@ storeRouter.route('/list').get(sanitize(), storeController.getAllstore);
 storeRouter.route('/list/:id').get(sanitize(), storeController.getstoreStockById);
 storeRouter.route('/product-list').get(sanitize(), storeController.getAllstoreProduct);
 storeRouter.route('/product/getAllProductById/:id').get(sanitize(), storeController.getProductBystore);
-storeRouter.route('/update').post(sanitize(),upload.single("storeImage"), storeController.storeUpdate);
+storeRouter.route('/update').post(upload.single("storeImage"), storeController.storeUpdate);
 storeRouter.route('/delete/:id').delete(sanitize(), storeController.storeDelete);
 storeRouter.route('/product-delete').post(sanitize(), storeController.storeProductDelete);
 storeRouter.route('/product-add').post(storeController.storeAddProduct);

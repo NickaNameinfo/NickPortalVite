@@ -58,7 +58,6 @@ const Add = () => {
       setValue("storename", currentloginDetails?.data?.firstName);
       setValue("email", currentloginDetails?.data?.email);
       setValue("phone", currentloginDetails?.data?.phone);
-      setValue("status", "0");
     }
   }, [data, currentloginDetails]);
 
@@ -195,7 +194,7 @@ const Add = () => {
                   size="sm"
                   label="Select an Status"
                   {...field}
-                  selectedKeys={formData?.status}
+                  selectedKeys={String(formData?.status)}
                 >
                   <SelectItem key={1}>{"Active"}</SelectItem>
                   <SelectItem key={0}>{"InActive"}</SelectItem>

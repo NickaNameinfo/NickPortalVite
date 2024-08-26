@@ -1,6 +1,7 @@
 import {
   Button,
   Chip,
+  Image,
   Input,
   Select,
   SelectItem,
@@ -20,6 +21,7 @@ import TeaxtareaNextUI from "../../Components/Common/Ddropdown/Textarea";
 import { getCookie, setCookie } from "../../JsFiles/CommonFunction.mjs";
 import { useAppSelector } from "../../Common/hooks";
 import { useUpdatUserMutation } from "../../Service.mjs";
+import { infoData } from "../../configData";
 const AddStore = () => {
   const navigate = useNavigate();
 
@@ -40,13 +42,10 @@ const AddStore = () => {
   const storeId = getCookie("storeId");
   const currentUserRole = getCookie("role");
   const { itemId } = useParams();
-  const {
-    data: getStoreByID,
-    error: errorStoreID,
-    refetch: refetchStoreID,
-  } = useGetStoresByIDQuery(storeId ? storeId : null);
-  console.log(getStoreByID, "getStoreByIDkmsdfosfjl", currentloginDetails);
-
+  const { data, error, refetch } = useGetStoresByIDQuery(
+    itemId || storeId || null
+  );
+  console.log(formData, "data079809809");
   const [updateStores] = useUpdateStoreMutation();
   const [updateUser] = useUpdatUserMutation();
 
@@ -54,34 +53,63 @@ const AddStore = () => {
     setValue("storename", currentloginDetails?.data?.firstName);
     setValue("email", currentloginDetails?.data?.email);
     setValue("phone", currentloginDetails?.data?.phone);
-    setValue("status", "0");
+    setValue("status", String(data?.data?.[0]?.status));
     setValue("areaId", 3);
-    if (getStoreByID?.data.length > 0) {
-      reset(getStoreByID?.data?.[0]);
+    if (data?.data.length > 0) {
+      reset(data?.data?.[0]);
     }
-  }, [getStoreByID, currentloginDetails]);
+  }, [data, currentloginDetails]);
 
   const onSubmit = async (data: any) => {
-    let tempAPIUserData = {
-      id: currentloginDetails?.data?.id,
-      firstName: data?.["storename"],
-      email: data?.["email"],
-      address: data?.["address"],
-      password: data?.["password"] ? data?.["password"] : null,
-      storeId: storeId,
-    };
-    if (storeId) {
-      const result = await updateStores(data);
-      if (result?.data?.success) {
-        navigate("/Vendors/Products");
+    if (storeId || itemId) {
+      let tempAPIData = {
+        ...data,
+        areaId: 3,
+      };
+      const formData = new FormData();
+      for (const key in tempAPIData) {
+        formData.append(key, tempAPIData[key]);
       }
-    } else {
-      const result = await addStores(data);
+      const result = await updateStores(formData);
       if (result?.data?.success) {
-        setCookie("storeId", result?.data?.data?.[0]?.storeId, 60);
+        let tempAPIUserData = {
+          id: currentloginDetails?.data?.id,
+          firstName: data?.["storename"],
+          email: data?.["email"],
+          address: data?.["address"],
+          password: data?.["password"] ? data?.["password"] : null,
+          storeId: result?.data?.data?.id
+            ? result?.data?.data?.id
+            : storeId
+            ? storeId
+            : itemId,
+        };
+        setCookie("storeId", storeId ? storeId : itemId, 60);
         let userResult = updateUser(tempAPIUserData);
         if (userResult) {
-          refetchStoreID();
+          refetch();
+          navigate("/Dashboard");
+        }
+      }
+    } else {
+      const result = await addStores(formData);
+      if (result?.data?.success) {
+        let tempAPIUserData = {
+          id: currentloginDetails?.data?.id,
+          firstName: data?.["storename"],
+          email: data?.["email"],
+          address: data?.["address"],
+          password: data?.["password"] ? data?.["password"] : null,
+          storeId: result?.data?.data?.id
+            ? result?.data?.data?.id
+            : storeId
+            ? storeId
+            : itemId,
+        };
+        setCookie("storeId", result?.data?.data?.id, 60);
+        let userResult = updateUser(tempAPIUserData);
+        if (userResult) {
+          refetch();
           navigate("/Dashboard");
         }
       }
@@ -193,24 +221,24 @@ const AddStore = () => {
                   size="sm"
                   label="Select an Status"
                   {...field}
-                  selectedKeys={formData?.status}
+                  selectedKeys={String(formData?.status)}
                 >
-                  <SelectItem key={1}>{"Active"}</SelectItem>
-                  <SelectItem key={0}>{"InActive"}</SelectItem>
+                  <SelectItem key={"1"}>{"Active"}</SelectItem>
+                  <SelectItem key={"0"}>{"InActive"}</SelectItem>
                 </Select>
               )}
             />
           )}
 
           <Controller
-            name="shopaddress" // Changed to reflect a text input
+            name="storeaddress" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
               <TeaxtareaNextUI label="Shop Address" {...field} />
             )}
           />
           <Controller
-            name="shopdesc" // Changed to reflect a text input
+            name="storedesc" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
               <TeaxtareaNextUI label="Discription" {...field} />
@@ -252,22 +280,29 @@ const AddStore = () => {
               <InputNextUI type="text" label="Close Time" {...field} />
             )}
           />
-          <Controller
-            name="vendorImage" // Changed to reflect a text input
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <Input
-                type="file"
-                // labelPlacement=""
-                label="Image"
-                size="lg"
-                onChange={(e) => {
-                  field.onChange(e.target.files[0]); // Don't forget to call field.onChange to update the form state
-                }}
-              />
-            )}
-          />
+          <div className="flex">
+            <Controller
+              name="storeImage" // Changed to reflect a text input
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <Input
+                  type="file"
+                  // labelPlacement=""
+                  label="Image"
+                  size="lg"
+                  onChange={(e) => {
+                    field.onChange(e.target.files[0]); // Don't forget to call field.onChange to update the form state
+                  }}
+                />
+              )}
+            />
+            <Image
+              src={`${infoData.baseApi}/${data?.data?.[0]?.storeImage}`}
+              className="h-fit"
+              width={100}
+            />
+          </div>
         </div>
         <div className="flex flex-col flex-wrap gap-4 border-b pb-3 mb-4">
           <Chip
@@ -348,14 +383,7 @@ const AddStore = () => {
             control={control}
             render={({ field }) => (
               // <Input type="number" label="Phone Number" size="lg" {...field} />
-              <InputNextUI
-                type="number"
-                label="Phone Number"
-                onChange={(value) => {
-                  console.log(value, "ownername");
-                }}
-                {...field}
-              />
+              <InputNextUI type="text" label="Phone Number" {...field} />
             )}
           />
 
@@ -406,26 +434,13 @@ const AddStore = () => {
               //   size="lg"
               //   {...field}
               // />
-              <InputNextUI
-                type="number"
-                label="Accoutn Number"
-                onChange={(value) => {
-                  console.log(value, "ownername");
-                }}
-                {...field}
-              />
+              <InputNextUI type="text" label="Accoutn Number" {...field} />
             )}
           />
           <Controller
             name="accountHolderName" // Changed to reflect a text input
             control={control}
             render={({ field }) => (
-              // <Input
-              //   type="text"
-              //   label="Accoutn Holder Name"
-              //   size="lg"
-              //   {...field}
-              // />
               <InputNextUI
                 type="text"
                 label="Accoutn Holder Name"
