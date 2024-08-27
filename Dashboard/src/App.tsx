@@ -13,6 +13,7 @@ import { getCookie } from "./JsFiles/CommonFunction.mjs";
 import { useAppDispatch } from "./Common/hooks.js";
 import { updateLoginDetails } from "./Common/globalSlice.js";
 import { useGetUserQuery } from "./Service.mjs";
+import "react-toastify/dist/ReactToastify.css";
 const loading = (
   <div className="pt-3 text-center">
     <div className="sk-spinner sk-spinner-pulse"></div>

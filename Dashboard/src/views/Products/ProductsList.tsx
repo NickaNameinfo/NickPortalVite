@@ -33,7 +33,7 @@ const ProductsList = () => {
     refetch: stroeRefetch,
   } = useGetStoresProductByIDQuery(Number(storeId));
 
-  const currentPlan = getCookie("role");
+  const currentRole = getCookie("role");
   const defaultCloumns = [
     "id",
     "name",
@@ -68,7 +68,7 @@ const ProductsList = () => {
     { name: "image", id: "photo", sortable: true },
     { name: "Status", id: "status" },
     { name: "Created", id: "createdType" },
-    { name: "Actions", id: "actions" },
+    ...(currentRole !== "1" ? [{ name: "Actions", id: "actions" }] : []),
   ];
 
   React.useEffect(() => {
@@ -124,7 +124,9 @@ const ProductsList = () => {
           <div className="relative flex justify-center items-center gap-2">
             {
               <Image
-                src={`${infoData?.baseApi}/${data?.product?.photo ? data?.product?.photo : data?.photo}`}
+                src={`${infoData?.baseApi}/${
+                  data?.product?.photo ? data?.product?.photo : data?.photo
+                }`}
                 width={50}
                 height={50}
               />
@@ -143,7 +145,9 @@ const ProductsList = () => {
             size="lg"
             variant="flat"
           >
-            {data?.product?.status === "1" || data?.status === "1" ? "Active" : "In Active"}
+            {data?.product?.status === "1" || data?.status === "1"
+              ? "Active"
+              : "In Active"}
           </Chip>
         );
       default:
@@ -157,13 +161,13 @@ const ProductsList = () => {
     <div className="mx-2">
       {data && (
         <TableList
-          defaultCloumns={currentPlan !== "1" ? byuserProduct : defaultCloumns}
+          defaultCloumns={currentRole !== "1" ? byuserProduct : defaultCloumns}
           renderCell={renderCell}
-          columns={currentPlan !== "1" ? byuserCloumn : columns}
+          columns={currentRole !== "1" ? byuserCloumn : columns}
           tableItems={
-            currentPlan === "1"
+            currentRole === "1"
               ? data?.["data"]
-              : currentPlan === "2"
+              : currentRole === "2"
               ? vendorProducts?.data
               : storeProducts?.data
           }

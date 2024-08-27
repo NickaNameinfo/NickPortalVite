@@ -178,11 +178,11 @@ module.exports = {
   },
 
   //Get by Id
-  async getstoreStockById(req, res, next) {
+  async getstoreById(req, res, next) {
     try {
       const { id } = req.params;
       db.store
-        .findAll({
+        .findOne({
           where: { id: id },
           include: [
             {
@@ -287,7 +287,7 @@ module.exports = {
         website,
         openTime,
         closeTime,
-        location
+        location,
       } = req.body;
       db.store
         .findOne({ where: { id: id } })
@@ -305,7 +305,9 @@ module.exports = {
                 password: password ? password : list?.password,
                 phone: phone ? phone : list?.phone,
                 accountNo: accountNo ? accountNo : list?.accountNo,
-                accountHolderName: accountHolderName ? accountHolderName : list?.accountHolderName,
+                accountHolderName: accountHolderName
+                  ? accountHolderName
+                  : list?.accountHolderName,
                 IFSC: IFSC ? IFSC : list?.IFSC,
                 bankName: bankName ? bankName : list?.bankName,
                 branch: branch ? branch : list?.branch,
@@ -316,7 +318,7 @@ module.exports = {
                 website: website ? website : list?.website,
                 openTime: openTime ? openTime : list?.openTime,
                 closeTime: closeTime ? closeTime : list?.closeTime,
-                location : location ? location : list?.location,
+                location: location ? location : list?.location,
                 storeImage: req?.file ? req?.file?.path : list?.storeImage,
               },
               { where: { id: id } }
@@ -325,7 +327,7 @@ module.exports = {
           throw new RequestError("No data found", 409);
         })
         .then((store) => {
-          console.log(store, "store3423453")
+          console.log(store, "store3423453");
           res
             .status(200)
             .json({ success: true, msg: "Updated Successfully", data: store });

@@ -15,6 +15,9 @@ import React from "react";
 import {
   IconHeart,
   IconLocation,
+  IconMapRound,
+  IconNext,
+  IconPrev,
   IconShare,
   IconTick,
   ModalCloseIcon,
@@ -24,18 +27,18 @@ import RelatedProducts from "../Card/RelatedProducts";
 import { IconNxt, IconPrv } from "../../Icons";
 import { infoData } from "../../configData";
 import { useAppDispatch, useAppSelector } from "../Common/hooks";
-import { useParams } from "react-router-dom";
-import {
-  useGetVendorsQuery,
-  useGetVendorsByIdQuery,
-} from "../../views/pages/Vendor/Service.mjs";
+import { Link, useParams } from "react-router-dom";
 import {
   useGetCartByProductIdQuery,
   useAddCartMutation,
   useUpdateCartMutation,
+  useGetStoresByIdQuery,
+  useGetStoresQuery,
 } from "../../views/pages/Store/Service.mjs";
 import { onRefreshCart } from "../Common/globalSlice";
-
+import StoreCard from "../Card/StoreCard";
+import { toast } from "react-toastify";
+import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 interface ProductDetailProps {
   isOpen: any;
   onClose: any;
@@ -45,15 +48,18 @@ interface ProductDetailProps {
 export const ProductDetail = (props: ProductDetailProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
-  const { id } = useParams();
+  const notify = (value) => toast(value);
+  const id = getCookie("id");
   const {
-    data: vendors,
-    error: vendorsError,
-    refetch: vendorRefetch,
-  } = useGetVendorsQuery();
-  const { data, error, refetch } = useGetVendorsByIdQuery(
-    Number(props?.item?.supplierId)
-  );
+    data: stores,
+    error: storesError,
+    refetch: storesRefetch,
+  } = useGetStoresQuery();
+  const {
+    data: storeDetails,
+    error,
+    refetch,
+  } = useGetStoresByIdQuery(Number(props?.item?.supplierId));
   let productId = {
     id: id,
     productId: props?.item?.product?.id,
@@ -67,10 +73,12 @@ export const ProductDetail = (props: ProductDetailProps) => {
   const [updateCart] = useUpdateCartMutation();
   const dispatch = useAppDispatch();
 
+  console.log(storeDetails, "data80980980");
+
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
     refetch();
-    vendorRefetch();
+    storesRefetch();
   }, [onRefresh]);
 
   const handleAddCart = async (type) => {
@@ -106,6 +114,18 @@ export const ProductDetail = (props: ProductDetailProps) => {
         console.log(error);
       }
     }
+  };
+
+  const handleShare = () => {
+    const url = window.location.href; // Get the current URL
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        notify("URL copied to clipboard!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy the URL: ", err);
+      });
   };
 
   return (
@@ -150,8 +170,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                       </p>
                       <div className="flex justify-between items-center">
                         <p className="text-black text-lg font-normal">
-                          Price:Rs {props?.item?.price} ({props?.item?.unitSize}
-                          )
+                          Rs: {props?.item?.price} ({props?.item?.unitSize})
                         </p>
                         <div className="text-sm">120 Stocks</div>
                       </div>
@@ -198,38 +217,59 @@ export const ProductDetail = (props: ProductDetailProps) => {
                         <div className="col-span-8">
                           <div className="flex items-center justify-between pb-2.5">
                             <p className="text-sm font-normal">Per Order</p>
-                            <IconTick fill="#49A84C" />
+                            <IconTick
+                              fill={
+                                props?.item?.product?.paymentMode?.includes("1")
+                                  ? "#49A84C"
+                                  : "#E6E6E6"
+                              }
+                            />
                           </div>
                           <div className="flex items-center justify-between pb-2.5">
                             <p className="text-sm font-normal">
                               Online Payment
                             </p>
-                            <IconTick fill="#49A84C" />
+                            <IconTick
+                              fill={
+                                props?.item?.product?.paymentMode?.includes("1")
+                                  ? "#49A84C"
+                                  : "#E6E6E6"
+                              }
+                            />
                           </div>
                           <div className="flex items-center justify-between">
                             <p className="text-sm font-normal">
                               Cash On Delivery
                             </p>
-                            <IconTick fill="#E6E6E6" />
+                            <IconTick
+                              fill={
+                                props?.item?.product?.paymentMode?.includes("1")
+                                  ? "#49A84C"
+                                  : "#E6E6E6"
+                              }
+                            />
                           </div>
                         </div>
                         <div className="col-span-4 ms-4 flex flex-col justify-between h-full">
                           <div className="flex items-center justify-end ">
                             <div className="flex gap-5 items-center">
-                              <Button
-                                size="sm"
-                                isIconOnly
-                                aria-label="Like"
-                                color="primary"
-                                variant="bordered"
-                              >
-                                <IconLocation fill="#4C86F9" />
-                              </Button>
+                              <Link to={storeDetails?.location} target="_blank">
+                                <Button
+                                  size="sm"
+                                  isIconOnly
+                                  aria-label="Like"
+                                  color="primary"
+                                  variant="bordered"
+                                >
+                                  <IconLocation fill="#4C86F9" />
+                                </Button>
+                              </Link>
                               <Button
                                 size="sm"
                                 color="success"
                                 variant="bordered"
                                 isIconOnly
+                                onClick={() => handleShare()}
                               >
                                 <IconShare fill="#49A84C" />
                               </Button>
@@ -237,15 +277,17 @@ export const ProductDetail = (props: ProductDetailProps) => {
                           </div>
                           <div className="flex items-center justify-end mb-1.5">
                             <div className="flex gap-5 items-center">
-                              <Button
-                                size="sm"
-                                isIconOnly
-                                aria-label="Like"
-                                color="danger"
-                                variant="bordered"
-                              >
-                                <IconHeart fill="#FF0000" />
-                              </Button>
+                              <Link to={storeDetails?.website} target="_blank">
+                                <Button
+                                  size="sm"
+                                  isIconOnly
+                                  aria-label="Like"
+                                  color="danger"
+                                  variant="bordered"
+                                >
+                                  <IconMapRound fill="#FF0000" />
+                                </Button>
+                              </Link>
                               <Button
                                 size="sm"
                                 color="danger"
@@ -260,7 +302,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex xl:order-3 lg:order-3 mm:justify-center ml:justify-center md:items-center xm:items-center mm:items-center ml:items-center">
+                  <div className="flex xl:order-3 lg:order-3">
                     <div className="relative mm:w-10/12 ml:w-10/12 ">
                       <span className="bg-red z-50 right-0 absolute text-white text-xs font-medium px-2.5 py-1 rounded-se-xl rounded-es-xl dark:bg-gray-700 dark:text-gray-300">
                         Ad
@@ -278,7 +320,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
 
                 <div className="sm:px-2 mt-3 flex justify-between items-center ">
                   <div className="font-semibold md:text-xl xm:text-md">
-                    Related Products
+                    Related Stores
                   </div>
                   <div className="flex flex  items-center">
                     <Button
@@ -288,7 +330,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                       aria-label="Like"
                       variant="bordered"
                     >
-                      <IconPrv fill="#000000" />
+                      <IconPrev fill="#000000" />
                     </Button>
                     <Button
                       className=" bg-gray-200"
@@ -297,13 +339,13 @@ export const ProductDetail = (props: ProductDetailProps) => {
                       aria-label="Like"
                       variant="bordered"
                     >
-                      <IconNxt fill="#000000" />
+                      <IconNext fill="#000000" />
                     </Button>
                   </div>
                 </div>
                 <div className="grid xm:grid-cols-1 mm:grid-cols-1 ml:grid-cols-1 sm:grid-cols-2  md:grid-cols-2  lg:grid-cols-2  xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-4 gap-2">
-                  {vendors?.data?.map((item, index) => {
-                    return <RelatedProducts item={item} key={index} />;
+                  {stores?.data?.map((item, index) => {
+                    return <StoreCard item={item} key={index} />;
                   })}
                 </div>
               </ModalBody>

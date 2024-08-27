@@ -7,7 +7,6 @@ import { useGetStoresQuery } from "./Service.mjs";
 
 const Store = () => {
   const { data, error, refetch } = useGetStoresQuery();
-  console.log(data?.data, "sadfasdf");
 
   React.useEffect(() => {
     refetch();

@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { AppContent, AppSidebar } from "../Components";
 import { getCookie } from "../JsFiles/CommonFunction.mjs";
+import { ToastContainer } from "react-toastify";
 const DefaultLayout = () => {
   const navigate = useNavigate();
   const token = getCookie("token")
@@ -30,6 +31,18 @@ const DefaultLayout = () => {
         </div>
         {/* <AppFooter /> */}
       </main>
+      <ToastContainer
+        position="top-center"
+        autoClose={1000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 };

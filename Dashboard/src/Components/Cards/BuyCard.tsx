@@ -34,6 +34,7 @@ import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import { infoData } from "../../configData";
 import { useAppDispatch, useAppSelector } from "../../Common/hooks";
 import { onRefreshCart } from "../../Common/globalSlice";
+import { useNavigate } from "react-router-dom";
 
 const columns = [
   { name: "Sl.No", uid: "id" },
@@ -44,7 +45,7 @@ const columns = [
 
 export const BuyCard = (props: any) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
-  const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart)
+  const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
   const id = getCookie("id");
   const {
     data: cart,
@@ -54,10 +55,11 @@ export const BuyCard = (props: any) => {
   const [updateCart] = useUpdateCartMutation();
   const [deleteCartItem] = useDeleteCartItemMutation();
   const [deletId, setDeleteId] = React.useState(null);
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   React.useEffect(() => {
-    onRefresh && dispatch(onRefreshCart(false))
+    onRefresh && dispatch(onRefreshCart(false));
     cartRefetch();
   }, [id, onRefresh]);
 
@@ -94,7 +96,7 @@ export const BuyCard = (props: any) => {
     if (result) {
       onClose();
       setDeleteId(null);
-      dispatch(onRefreshCart(true))
+      dispatch(onRefreshCart(true));
     }
   };
 
@@ -208,31 +210,13 @@ export const BuyCard = (props: any) => {
                     <Button
                       size="sm"
                       color="primary"
-                      className="me-3"
-                      // className="ml:min-h-unit-6 xm:min-h-unit-6 mm:min-h-unit-6 xm:min-w-unit-6 xm:w-unit-4 xm:h-unit-4 mm:min-w-unit-6 mm:w-unit-4 mm:h-unit-4 ml:min-w-unit-6 ml:w-unit-4 ml:h-unit-4"
-                    >
-                      Clear Cart
-                    </Button>
-                    <Button
-                      size="sm"
-                      color="primary"
                       variant="bordered"
                       className="ms-3"
-                      // className="ml:min-h-unit-6 xm:min-h-unit-6 mm:min-h-unit-6 xm:min-w-unit-6 xm:w-unit-4 xm:h-unit-4 mm:min-w-unit-6 mm:w-unit-4 mm:h-unit-4 ml:min-w-unit-6 ml:w-unit-4 ml:h-unit-4"
+                      onClick={() => navigate(-1)}
                     >
                       Buy More Items
                     </Button>
                   </div>
-                  {/* <div className="items-center flex justify-center">
-                    <ModalFooter>
-                      <Button size="sm" color="primary" className="me-5">
-                        Clear Cart
-                      </Button>
-                      <Button size="sm" color="primary" variant="bordered">
-                        Buy More Items
-                      </Button>
-                    </ModalFooter>
-                  </div> */}
                 </div>
                 <div>
                   <div className=" BuycarBg mx-3">
@@ -331,100 +315,18 @@ export const BuyCard = (props: any) => {
                         <Button size="sm" color="primary" className="me-5">
                           Book Order
                         </Button>
-                        <Button size="sm" color="primary" variant="bordered">
+                        <Button
+                          size="sm"
+                          color="primary"
+                          variant="bordered"
+                          onClick={() => navigate(-1)}
+                        >
                           Back To Shop
                         </Button>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                {/* <div className=" BuycarBg mx-4">
-                  <div className="flex justify-between py-1 mx-3 font-medium text-sm m-2.5">
-                    <div>Total Products (4 Items )</div>
-                    <div> Rs : 5050</div>
-                  </div>
-                  <div className="flex justify-between py-1 mx-3 font-medium text-sm m-2.5">
-                    <div>Discount</div>
-                    <div> 100%</div>
-                  </div>
-                  <div className="flex justify-between py-1 mx-3 font-medium text-sm m-2.5">
-                    <div>Delivery Charge</div>
-                    <div> Free</div>
-                  </div>
-                  <Divider orientation="horizontal" className="my-3" />
-                  <div className="flex justify-between py-1 mx-3 text-base font-medium  m-2.5">
-                    <div>Total Amount</div>
-                    <div> Rs. 3500</div>
-                  </div>
-                  <Divider orientation="horizontal" className="my-3" />
-                  <div className="paymetoptionBg mx-3 mt-2 rounded-lg">
-                    <div className="font-medium paymetoption text-base mx-3 pb-4 pt-2">
-                      Payment Options
-                    </div>
-                    <RadioGroup className="w-full">
-                      <div className="flex  justify-between items-center mx-3 w-full">
-                        <div className="w-2/4 m-1 items-center">
-                          <Radio
-                            value=" Google-Pay "
-                            size="sm"
-                            className="items-center"
-                          >
-                            Google Pay
-                          </Radio>
-                        </div>
-                        <div className="w-2/4 m-1 items-center">
-                          <Radio
-                            value="Phone-Pay"
-                            size="sm"
-                            className="items-center"
-                          >
-                            Phone Pay
-                          </Radio>
-                        </div>
-                      </div>
-                      <div className="flex  justify-between items-center mx-3 w-full">
-                        <div className="w-2/4 m-1 items-center">
-                          <Radio
-                            value=" Debit-Card"
-                            size="sm"
-                            className="items-center"
-                          >
-                            Debit Card
-                          </Radio>
-                        </div>
-                        <div className="w-2/4 m-1 items-center">
-                          <Radio
-                            value="Credit-Card"
-                            size="sm"
-                            className="items-center"
-                          >
-                            Credit Card
-                          </Radio>
-                        </div>
-                      </div>
-                      <div className="justify-between mx-3 flex w-full items-center">
-                        <div className="w-2/4 m-1 items-center">
-                          <Radio
-                            value="Cash-on-Delivery"
-                            size="sm"
-                            className="items-center"
-                          >
-                            Cash on Delivery
-                          </Radio>
-                        </div>
-                      </div>
-                    </RadioGroup>
-                    <div className="flex items-center justify-center mt-4 pb-3">
-                      <Button size="sm" color="primary" className="me-5">
-                        Book Order
-                      </Button>
-                      <Button size="sm" color="primary" variant="bordered">
-                        Back To Shop
-                      </Button>
-                    </div>
-                  </div>
-                </div> */}
               </div>
             </ModalBody>
           </>

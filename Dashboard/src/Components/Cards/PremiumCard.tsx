@@ -38,6 +38,7 @@ import { useAppDispatch, useAppSelector } from "../../Common/hooks";
 import { onRefreshCart } from "../../Common/globalSlice";
 
 export const PremiumCard = ({ item = null }) => {
+  console.log(item, "item435234")
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: cartIsOpen,
@@ -103,7 +104,7 @@ export const PremiumCard = ({ item = null }) => {
       <Card className="Storecard pt-3.5 px-3">
         <CardBody className="overflow-visible p-0 relative">
           <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
-            90%
+            {item?.product?.discount}%
           </span>
 
           <Image
@@ -132,21 +133,21 @@ export const PremiumCard = ({ item = null }) => {
             </div>
             <div className="w-full flex justify-between mt-2">
               <p className="font-normal text-sm  Pricecolor TextMaincolor p-0">
-                Per Order
+                Per order
               </p>
-              <IconTick fill="#49A84C" />
+              <IconTick fill={item?.product?.paymentMode?.includes("1") ?  "#49A84C" : "#E6E6E6"} />
             </div>
             <div className="w-full flex justify-between pt-2">
               <p className="font-normal text-sm  Pricecolor TextMaincolor p-0">
-                Online Payment
+                Online payment
               </p>
-              <IconTick fill="#49A84C" />
+              <IconTick fill={item?.product?.paymentMode?.includes("2") ?  "#49A84C" : "#E6E6E6"} />
             </div>
             <div className="w-full flex justify-between pt-2 pb-2">
               <p className="font-normal text-sm  Pricecolor TextMaincolor p-0">
-                Online Payment
+                Cash on delivery
               </p>
-              <IconTick fill="#00000" />
+              <IconTick fill={item?.product?.paymentMode?.includes("3") ?  "#49A84C" : "#E6E6E6"} />
             </div>
             <div className="w-full flex justify-around pb-3">
               <div className="PrimiumCardFooterBg rounded-lg flex w-full justify-around items-center">

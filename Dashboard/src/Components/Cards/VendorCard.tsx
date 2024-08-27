@@ -26,8 +26,6 @@ export const VendorCard = ({ item = null }) => {
     Number(item?.id)
   );
 
-  console.log(item, "data452938742");
-
   return (
     <Card className="ps-1 Storecard p-0">
       <CardHeader className="pb-0 pt-3 ps-2 flex-col items-start ">

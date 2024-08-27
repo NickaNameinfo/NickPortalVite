@@ -7,6 +7,7 @@ import { getCookie } from "../src/JsFiles/CommonFunction.mjs";
 import { useGetUserQuery } from "./Service.mjs";
 import { useAppDispatch } from "./Components/Common/hooks.js";
 import { updateLoginDetails } from "./Components/Common/globalSlice.js";
+import "react-toastify/dist/ReactToastify.css";
 
 const loading = (
   <div className="pt-3 text-center">

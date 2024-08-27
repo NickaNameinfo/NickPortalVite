@@ -20,7 +20,6 @@ const VendorDetails = () => {
     refetch: vendorRefetch,
   } = useGetVendorsByIdQuery(id);
 
-  console.log(data, "data3462354", error, vendorDetails, id);
   // Refetch the data when the id changes
   React.useEffect(() => {
     if (id) {

@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { AppContent, AppHeader, AppSidebar } from "../Components";
+import { ToastContainer } from "react-toastify";
 
 const DefaultLayout = () => {
   return (
@@ -17,6 +18,18 @@ const DefaultLayout = () => {
         </div>
         {/* <AppFooter /> */}
       </main>
+      <ToastContainer
+        position="top-center"
+        autoClose={1000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 };

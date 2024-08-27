@@ -23,6 +23,12 @@ export const StoreApi = createApi({
         method: "GET",
       }),
     }),
+    getStoresById: builder.query({
+      query: (id) => ({
+        url: `/store/list/${id}`,
+        method: "GET",
+      }),
+    }),
     getCartByProductId: builder.query({
       query: (body) => ({
         url: `/cart/list/${body?.id}/${body?.productId}`,
@@ -67,5 +73,6 @@ export const {
   useGetCartByOrderIdQuery,
   useGetCartByProductIdQuery,
   useUpdateCartMutation,
+  useGetStoresByIdQuery
 } = StoreApi;
 export const { endpoints } = StoreApi;

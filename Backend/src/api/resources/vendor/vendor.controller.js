@@ -268,6 +268,9 @@ module.exports = {
                 "sortDesc",
                 "unitSize",
                 "price",
+                "discount",
+                "discountPer",
+                "paymentMode"
               ],
             },
           ],

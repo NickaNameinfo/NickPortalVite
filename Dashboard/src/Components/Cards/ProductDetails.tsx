@@ -16,6 +16,7 @@ import {
   IconHeart,
   IconInfo,
   IconLocation,
+  IconMapRound,
   IconNext,
   IconPrev,
   IconShare,
@@ -36,6 +37,8 @@ import {
 import { BuyCard } from "./BuyCard";
 import { useAppDispatch, useAppSelector } from "../../Common/hooks";
 import { onRefreshCart } from "../../Common/globalSlice";
+import { ToastContainer, toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 interface VendorDetailsProps {
   isOpen: any;
@@ -45,27 +48,36 @@ interface VendorDetailsProps {
 
 export const ProductDetails = (props: VendorDetailsProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart)
+  const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
+  const notify = (value) => toast(value);
   const id = getCookie("id");
   const {
     data: vendors,
     error: vendorsError,
     refetch: vendorRefetch,
   } = useGetVendorsQuery();
-  const { data, error, refetch } = useGetVendorsByIdQuery(
-    Number(props?.item?.supplierId)
-  );
+  const {
+    data: storeDetails,
+    error,
+    refetch,
+  } = useGetVendorsByIdQuery(Number(props?.item?.supplierId));
   let productId = {
     id: id,
     productId: props?.item?.product?.id,
   };
-  const { data:cart, error:cartError, refetch:cartRefetch } = useGetCartByProductIdQuery(productId);
+  const {
+    data: cart,
+    error: cartError,
+    refetch: cartRefetch,
+  } = useGetCartByProductIdQuery(productId);
   const [addCart] = useAddCartMutation();
   const [updateCart] = useUpdateCartMutation();
-  const dispatch = useAppDispatch()
-  
-React.useEffect(() => {
-  onRefresh && dispatch(onRefreshCart(false))
+  const dispatch = useAppDispatch();
+
+  console.log(storeDetails, "data80980980");
+
+  React.useEffect(() => {
+    onRefresh && dispatch(onRefreshCart(false));
     refetch();
     vendorRefetch();
   }, [onRefresh]);
@@ -103,6 +115,18 @@ React.useEffect(() => {
         console.log(error);
       }
     }
+  };
+
+  const handleShare = () => {
+    const url = window.location.href; // Get the current URL
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        notify("URL copied to clipboard!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy the URL: ", err);
+      });
   };
 
   return (
@@ -147,8 +171,7 @@ React.useEffect(() => {
                       </p>
                       <div className="flex justify-between items-center">
                         <p className="text-black text-lg font-normal">
-                          Price:Rs {props?.item?.price} ({props?.item?.unitSize}
-                          )
+                          Rs: {props?.item?.price} ({props?.item?.unitSize})
                         </p>
                         <div className="text-sm">120 Stocks</div>
                       </div>
@@ -195,38 +218,59 @@ React.useEffect(() => {
                         <div className="col-span-8">
                           <div className="flex items-center justify-between pb-2.5">
                             <p className="text-sm font-normal">Per Order</p>
-                            <IconTick fill="#49A84C" />
+                            <IconTick
+                              fill={
+                                props?.item?.product?.paymentMode?.includes("1")
+                                  ? "#49A84C"
+                                  : "#E6E6E6"
+                              }
+                            />
                           </div>
                           <div className="flex items-center justify-between pb-2.5">
                             <p className="text-sm font-normal">
                               Online Payment
                             </p>
-                            <IconTick fill="#49A84C" />
+                            <IconTick
+                              fill={
+                                props?.item?.product?.paymentMode?.includes("1")
+                                  ? "#49A84C"
+                                  : "#E6E6E6"
+                              }
+                            />
                           </div>
                           <div className="flex items-center justify-between">
                             <p className="text-sm font-normal">
                               Cash On Delivery
                             </p>
-                            <IconTick fill="#E6E6E6" />
+                            <IconTick
+                              fill={
+                                props?.item?.product?.paymentMode?.includes("1")
+                                  ? "#49A84C"
+                                  : "#E6E6E6"
+                              }
+                            />
                           </div>
                         </div>
                         <div className="col-span-4 ms-4 flex flex-col justify-between h-full">
                           <div className="flex items-center justify-end ">
                             <div className="flex gap-5 items-center">
-                              <Button
-                                size="sm"
-                                isIconOnly
-                                aria-label="Like"
-                                color="primary"
-                                variant="bordered"
-                              >
-                                <IconLocation fill="#4C86F9" />
-                              </Button>
+                              <Link to={storeDetails?.location} target="_blank">
+                                <Button
+                                  size="sm"
+                                  isIconOnly
+                                  aria-label="Like"
+                                  color="primary"
+                                  variant="bordered"
+                                >
+                                  <IconLocation fill="#4C86F9" />
+                                </Button>
+                              </Link>
                               <Button
                                 size="sm"
                                 color="success"
                                 variant="bordered"
                                 isIconOnly
+                                onClick={() => handleShare()}
                               >
                                 <IconShare fill="#49A84C" />
                               </Button>
@@ -234,15 +278,17 @@ React.useEffect(() => {
                           </div>
                           <div className="flex items-center justify-end mb-1.5">
                             <div className="flex gap-5 items-center">
-                              <Button
-                                size="sm"
-                                isIconOnly
-                                aria-label="Like"
-                                color="danger"
-                                variant="bordered"
-                              >
-                                <IconHeart fill="#FF0000" />
-                              </Button>
+                              <Link to={storeDetails?.website} target="_blank">
+                                <Button
+                                  size="sm"
+                                  isIconOnly
+                                  aria-label="Like"
+                                  color="danger"
+                                  variant="bordered"
+                                >
+                                  <IconMapRound fill="#FF0000" />
+                                </Button>
+                              </Link>
                               <Button
                                 size="sm"
                                 color="danger"
