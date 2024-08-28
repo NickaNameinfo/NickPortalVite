@@ -8,6 +8,7 @@ import { useGetUserQuery } from "./Service.mjs";
 import { useAppDispatch } from "./Components/Common/hooks.js";
 import { updateLoginDetails } from "./Components/Common/globalSlice.js";
 import "react-toastify/dist/ReactToastify.css";
+import 'sweetalert2/src/sweetalert2.scss'
 
 const loading = (
   <div className="pt-3 text-center">

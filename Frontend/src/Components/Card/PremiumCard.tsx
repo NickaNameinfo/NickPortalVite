@@ -38,7 +38,10 @@ import { useAppDispatch, useAppSelector } from "../Common/hooks";
 import { onRefreshCart } from "../Common/globalSlice";
 import { infoData } from "../../configData";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
-export const PremiumCard = ({ item = null }) => {
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+
+export const PremiumCard = ({ item = null, isHideImage = false }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: cartIsOpen,
@@ -56,6 +59,7 @@ export const PremiumCard = ({ item = null }) => {
     productId: item?.product?.id,
   };
   const { data, error, refetch } = useGetCartByProductIdQuery(productId);
+  const MySwal = withReactContent(Swal);
 
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
@@ -78,23 +82,31 @@ export const PremiumCard = ({ item = null }) => {
     };
     if (data?.data) {
       try {
-        const result = await updateCart(tempCartValue);
+        const result = await updateCart(tempCartValue).wrap();
         if (result) {
           refetch();
           dispatch(onRefreshCart(true));
         }
       } catch (error) {
-        console.log(error);
+        Swal.fire({
+          title: "Error!",
+          text: "Do you want to continue",
+          icon: "error",
+          confirmButtonText: "Cool",
+        });
       }
     } else {
       try {
-        const result = await addCart(tempCartValue);
+        const result = await addCart(tempCartValue).wrap();
+        console.log(result, "result432345234");
         if (result) {
           refetch();
           dispatch(onRefreshCart(true));
         }
       } catch (error) {
-        console.log(error);
+        MySwal.fire({
+          title: <p>Please login and continue the shoping</p>,
+        });
       }
     }
   };
@@ -102,21 +114,24 @@ export const PremiumCard = ({ item = null }) => {
   return (
     <>
       <Card className="Storecard pt-3.5 px-3">
-        <CardBody className="overflow-visible p-0 relative">
-          <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
-            {item?.product?.discount}%
-          </span>
+        {!isHideImage && (
+          <CardBody className="overflow-visible p-0 relative">
+            <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
+              {item?.product?.discount}%
+            </span>
 
-          <Image
-            isZoomed
-            alt="Here no Image"
-            shadow="md"
-            width="100%"
-            radius="lg"
-            className="w-full object-cover min-h-[176px]"
-            src={`${infoData?.baseApi}/${item?.product?.photo}`}
-          />
-        </CardBody>
+            <Image
+              isZoomed
+              alt="Here no Image"
+              shadow="md"
+              width="100%"
+              radius="lg"
+              className="w-full object-cover min-h-[176px]"
+              src={`${infoData?.baseApi}/${item?.product?.photo}`}
+            />
+          </CardBody>
+        )}
+
         <CardFooter className="p-0">
           <div className="grid grid-cols-1 w-full">
             <div className="font-semibold text-base mt-2 TextMaincolor">

@@ -11,7 +11,7 @@ export const VendorCard = ({ item = null }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
-      <Card className="Storecard" isPressable onClick={() => onOpen()}>
+      <Card className="Storecard">
         <CardBody className="overflow-visible p-0 relative align-middle justify-evenly p-4">
           <Image
             isZoomed

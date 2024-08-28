@@ -39,6 +39,8 @@ import { onRefreshCart } from "../Common/globalSlice";
 import StoreCard from "../Card/StoreCard";
 import { toast } from "react-toastify";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 interface ProductDetailProps {
   isOpen: any;
   onClose: any;
@@ -49,6 +51,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
   const notify = (value) => toast(value);
+  const MySwal = withReactContent(Swal);
   const id = getCookie("id");
   const {
     data: stores,
@@ -97,21 +100,25 @@ export const ProductDetail = (props: ProductDetailProps) => {
     };
     if (cart?.data) {
       try {
-        const result = await updateCart(tempCartValue);
+        const result = await updateCart(tempCartValue).wrap();
         if (result) {
           cartRefetch();
         }
       } catch (error) {
-        console.log(error);
+        MySwal.fire({
+          title: <p>Please login and continue the shoping</p>,
+        });
       }
     } else {
       try {
-        const result = await addCart(tempCartValue);
+        const result = await addCart(tempCartValue).wrap();
         if (result) {
           cartRefetch();
         }
       } catch (error) {
-        console.log(error);
+        MySwal.fire({
+          title: <p>Please login and continue the shoping</p>,
+        });
       }
     }
   };

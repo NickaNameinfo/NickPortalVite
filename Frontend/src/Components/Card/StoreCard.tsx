@@ -41,7 +41,7 @@ export const StoreCard = ({ item = null, key = null }) => {
               radius="lg"
               className="w-full object-cover h-[112px]"
               alt="Card background"
-              src={`${infoData.baseApi}/${item.storeImage}`}
+              src={`${infoData.baseApi}/${item?.storeImage}`}
             />
           </div>
           <div className="col-span-7 ps-3">
@@ -101,7 +101,7 @@ export const StoreCard = ({ item = null, key = null }) => {
 
               <div className="mt-0 basis-3/12 justify-end flex pe-0">
                 <div className="iconbox flex items-center justify-center cursor-pointer">
-                  <Link to={`/Store/StoreDetails/${item.id}`}>
+                  <Link to={`/Store/StoreDetails/${item?.id}`}>
                     <Button
                       radius="full"
                       isIconOnly
