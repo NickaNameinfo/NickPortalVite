@@ -56,8 +56,8 @@ export const ProductViewCard = ({ item = null }) => {
           isPressable
         >
           <CardBody className="overflow-visible p-0 relative">
-            <span className="badgeBG-Midtransparent z-50 right-0 absolute text-white text-xs font-medium px-2.5 py-1 rounded-se-xl rounded-es-xl dark:bg-gray-700 dark:text-gray-300">
-              10 Store
+          <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
+              {item?.discount} %
             </span>
             <Image
               alt="Here no Image"

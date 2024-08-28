@@ -111,13 +111,15 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
     }
   };
 
+  console.log(item, "item9098")
+
   return (
     <>
       <Card className="Storecard pt-3.5 px-3">
         {!isHideImage && (
           <CardBody className="overflow-visible p-0 relative">
             <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
-              {item?.product?.discount}%
+              {item?.product?.discount} %
             </span>
 
             <Image

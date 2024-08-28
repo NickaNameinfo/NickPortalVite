@@ -247,7 +247,7 @@ module.exports = {
           include: [
             {
               model: db.product,
-              attributes: ["id", "name", "brand", "photo", "status"],
+              attributes: ["id", "name", "brand", "photo", "status", "discount"],
             },
           ],
         })
