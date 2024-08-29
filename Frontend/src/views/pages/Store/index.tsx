@@ -4,13 +4,16 @@ import RelatedProducts from "../../../Components/Card/RelatedProducts";
 import PremiumCard from "../../../Components/Card/PremiumCard";
 import StoreCard from "../../../Components/Card/StoreCard";
 import { useGetStoresQuery } from "./Service.mjs";
+import { useAppSelector } from "../../../Components/Common/hooks";
 
 const Store = () => {
   const { data, error, refetch } = useGetStoresQuery();
-
+  const globalSearch = useAppSelector((state) => state.globalConfig.globalSearch)
+  console.log(globalSearch, "globalSearch8098", data)
   React.useEffect(() => {
     refetch();
   }, []);
+
   return (
     <>
     <div className="grid mm:grid-cols-2 ml:grid-cols-2 sm:grid-cols-4  md:grid-cols-4  lg:grid-cols-4  xl:grid-cols-4 2xl:grid-cols-4 3xl:grid-cols-4 gap-2 mt-2">

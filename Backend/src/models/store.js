@@ -1,105 +1,105 @@
-'use strict';
+"use strict";
 
 module.exports = (sequelize, DataTypes) => {
   const Store = sequelize.define(
-    'store',
+    "store",
     {
       storename: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       status: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
       },
       storeaddress: {
         type: DataTypes.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       storedesc: {
         type: DataTypes.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       ownername: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       owneraddress: {
         type: DataTypes.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
+        unique: true,
       },
       password: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       phone: {
         type: DataTypes.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       areaId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'areas', // Name of the areas table
-          key: 'id'
-        }
+          model: "areas", // Name of the areas table
+          key: "id",
+        },
       },
       accountNo: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
       },
       accountHolderName: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
       },
       bankName: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
       },
       IFSC: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
       },
       branch: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
       },
       adharCardNo: {
         type: DataTypes.INTEGER,
-        allowNull: true
+        allowNull: true,
       },
       panCardNo: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
       },
       GSTNo: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
       },
       website: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
       },
       storeImage: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
       },
       openTime: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
       },
       location: {
         type: DataTypes.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       closeTime: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
       },
     },
     {}
@@ -107,9 +107,13 @@ module.exports = (sequelize, DataTypes) => {
 
   Store.associate = function (models) {
     // Associations can be defined here
-    Store.belongsTo(models.area, { foreignKey: 'areaId' });
+    Store.belongsTo(models.area, { foreignKey: "areaId" });
+    // models.store.belongsTo(models.product, {
+    //   foreignKey: "createdId",
+    // });
     // Store.hasMany(models.product, { foreignKey: 'productId' });
-    Store.hasMany(models.category, { foreignKey: 'categoryId' });
+    Store.hasMany(models.category, { foreignKey: "categoryId" });
+    Store.hasMany(models.product, { foreignKey: "createdId" });
   };
 
   return Store;

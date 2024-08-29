@@ -164,6 +164,10 @@ module.exports = {
               attributes: ["id", "name"],
               include: [{ model: db.location, attributes: ["id", "name"] }],
             },
+            {
+              model: db.product,
+              attributes: ["id", "name", "categoryId"],
+            },
           ],
         })
         .then((list) => {
@@ -247,7 +251,14 @@ module.exports = {
           include: [
             {
               model: db.product,
-              attributes: ["id", "name", "brand", "photo", "status", "discount"],
+              attributes: [
+                "id",
+                "name",
+                "brand",
+                "photo",
+                "status",
+                "discount",
+              ],
             },
           ],
         })

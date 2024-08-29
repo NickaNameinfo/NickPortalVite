@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
       sortDesc: DataTypes.TEXT,
       desc: DataTypes.TEXT,
       paymentMode: DataTypes.STRING,
-      createdId: DataTypes.TEXT,
+      createdId: DataTypes.INTEGER,
       createdType: DataTypes.TEXT,
     },
     {}
@@ -39,6 +39,7 @@ module.exports = (sequelize, DataTypes) => {
     });
     models.product.hasMany(models.vendor_product, { foreignKey: "productId" });
     models.product.hasMany(models.store_product, { foreignKey: "productId" });
+    models.product.hasMany(models.store, { foreignKey: "id" });
   };
   return product;
 };

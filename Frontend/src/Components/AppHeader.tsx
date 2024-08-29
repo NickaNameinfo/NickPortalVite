@@ -25,8 +25,8 @@ import { NavHeaderSearchIcon, NavSearchIcon } from "../Icons";
 import { InfoCard } from "./Card/InfoCard";
 import Login from "../views/pages/login/Login";
 import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
-import { useAppSelector } from "./Common/hooks";
-
+import { useAppDispatch, useAppSelector } from "./Common/hooks";
+import { onSearchGlobal } from "../Components/Common/globalSlice";
 export const AppHeader = () => {
   const location = useLocation();
   const currentloginDetails = useAppSelector(
@@ -38,6 +38,7 @@ export const AppHeader = () => {
   const [startIndex, setStartIndex] = React.useState(0);
   const [sliderLabel, setSliderLabel] = React.useState([]);
   const { data: category } = useGetCategoryQuery();
+  const dispatch = useAppDispatch();
 
   const itemsPerPage = 12;
   React.useEffect(() => {
@@ -87,8 +88,7 @@ export const AppHeader = () => {
               radius="lg"
               size="md"
               type="Search"
-              // autoFocus
-              // color="default"
+              onChange={(e) => dispatch(onSearchGlobal(e.target.value))}
               variant="flat"
               placeholder="Search Here..."
               // style={{ backgroundColor:"whitesmoke"}}
@@ -102,7 +102,7 @@ export const AppHeader = () => {
                   "group-data-[has-value=true]:text-black/90",
                 ],
                 innerWrapper: " text-black/90 dark:text-black/70",
-                inputWrapper: [                
+                inputWrapper: [
                   "bg-[#ffffff3b]",
                   "dark:bg-[#ffffff3b]",
                   "backdrop-blur-xl",
@@ -282,7 +282,7 @@ export const AppHeader = () => {
                 <Login />
               ) : (
                 <User
-                  name={''}
+                  name={""}
                   avatarProps={{
                     src: "https://avatars.githubusercontent.com/u/30373425?v=4",
                   }}
