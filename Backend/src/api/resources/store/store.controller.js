@@ -398,4 +398,36 @@ module.exports = {
       throw new RequestError("Error");
     }
   },
+
+  async getAllStoreByCategory(req, res, next) {
+    try {
+      // First, find all product IDs in the specified category
+      const products = await db.product.findAll({
+        where: { categoryId: req.params.categoryId },
+        attributes: ["id"],
+      });
+  
+      const productIds = products.map((product) => product.id);
+      // Then, find all stores that are associated with those products via store_product
+      const stores = await db.store.findAll({
+        attributes: ["id", "storename", "ownername"],
+        include: [
+          {
+            model: db.store_product,
+            where: {
+              productId: {
+                [db.Sequelize.Op.in]: productIds,
+              },
+            },
+            attributes: [], // No need to fetch attributes from store_product
+          },
+        ],
+        group: ["store.id"], // Group to avoid duplicates
+      });
+      res.status(200).json({ success: true, data: stores });
+    } catch (err) {
+      console.log(err, "err978707")
+      next(new RequestError("Error"));
+    }
+  }  
 };

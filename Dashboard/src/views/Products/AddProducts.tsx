@@ -50,14 +50,12 @@ const AddProducts = () => {
     refetch: productRefetch,
   } = useGetProductsByIdQuery(productId);
 
-  console.log(productData, "productData234");
-
   const onSubmit = async (data: any) => {
     let tempData = {
       ...data,
       subCategoryId: 3,
       childCategoryId: 3,
-      slug: currentStoreUserId ? currentStoreUserId : currentVendorUserId,
+      slug: data?.name,
       createdId: currentStoreUserId ? currentStoreUserId : currentVendorUserId,
       createdType: currentStoreUserId ? "Store" : "Vendor",
       paymentMode: String(tempFormData?.paymentMode || ""),

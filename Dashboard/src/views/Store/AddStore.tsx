@@ -45,7 +45,7 @@ const AddStore = () => {
   const { data, error, refetch } = useGetStoresByIDQuery(
     itemId || storeId || null
   );
-  console.log(formData, "data079809809");
+  console.log(data?.data, "data079809809");
   const [updateStores] = useUpdateStoreMutation();
   const [updateUser] = useUpdatUserMutation();
 
@@ -55,8 +55,8 @@ const AddStore = () => {
     setValue("phone", currentloginDetails?.data?.phone);
     setValue("status", String(data?.data?.[0]?.status));
     setValue("areaId", 3);
-    if (data?.data.length > 0) {
-      reset(data?.data?.[0]);
+    if (data?.data) {
+      reset(data?.data);
     }
   }, [data, currentloginDetails]);
 
