@@ -399,16 +399,28 @@ module.exports = {
     }
   },
 
-  async getAllStoreByCategory(req, res, next) {
+  async getAllStoresByCategories(req, res, next) {
     try {
-      // First, find all product IDs in the specified category
+      const { categoryIds } = req.query; // Assuming the category IDs are passed as a query parameter
+
+      // Parse categoryIds into an array if it's a string (e.g., "1,2,3")
+      const categoryArray = Array.isArray(categoryIds)
+        ? categoryIds
+        : categoryIds.split(",");
+
+      // Find all product IDs that belong to the specified categories
       const products = await db.product.findAll({
-        where: { categoryId: req.params.categoryId },
+        where: {
+          categoryId: {
+            [db.Sequelize.Op.in]: categoryArray,
+          },
+        },
         attributes: ["id"],
       });
-  
+
       const productIds = products.map((product) => product.id);
-      // Then, find all stores that are associated with those products via store_product
+
+      // Find all stores associated with those products via store_product
       const stores = await db.store.findAll({
         attributes: ["id", "storename", "ownername"],
         include: [
@@ -424,10 +436,86 @@ module.exports = {
         ],
         group: ["store.id"], // Group to avoid duplicates
       });
+
       res.status(200).json({ success: true, data: stores });
     } catch (err) {
-      console.log(err, "err978707")
+      console.log(err, "err978707");
       next(new RequestError("Error"));
     }
-  }  
+  },
+
+  async getAllStoresByFilters(req, res, next) {
+    try {
+      const { search, paymentModes } = req.query; // Extract filters from query parameters
+  
+      // Initialize filter conditions for products
+      const productWhere = {};
+      const paymentModeArray = paymentModes ? paymentModes.split(',').map(pm => parseInt(pm.trim(), 10)) : []; // Ensure integers
+  
+      // Apply filter by product name if provided
+      if (search) {
+        productWhere.name = {
+          [db.Sequelize.Op.like]: `%${search}%`,
+        };
+      }
+  
+      // Apply filter by payment modes if provided
+      if (paymentModes) {
+        productWhere.paymentMode = {
+          [db.Sequelize.Op.or]: paymentModeArray.map(mode => ({
+            [db.Sequelize.Op.like]: `%${mode}%`
+          })),
+        };
+      }
+  
+      // Find all product IDs that match the filters
+      const products = await db.product.findAll({
+        where: productWhere,
+        attributes: ["id"],
+      });
+      console.log("Filtered Products:", products);
+  
+      const productIds = products.map((product) => product.id);
+      console.log("Product IDs:", productIds);
+  
+      // Check if productIds is empty
+      if (productIds.length === 0) {
+        return res.status(200).json({ success: true, data: [] });
+      }
+  
+      // Find all stores that are associated with those products
+      const stores = await db.store.findAll({
+        attributes: ["id", "storename", "ownername"],
+        include: [
+          {
+            model: db.store_product,
+            where: {
+              productId: {
+                [db.Sequelize.Op.in]: productIds,
+              },
+            },
+            attributes: [], // No need to fetch attributes from store_product
+            include: [
+              {
+                model: db.product,
+                attributes: [], // No need to fetch attributes from product again
+              },
+            ],
+          },
+        ],
+        group: ["store.id"], // Group to avoid duplicates
+      });
+      console.log("Stores:", stores);
+  
+      res.status(200).json({ success: true, data: stores });
+    } catch (err) {
+      console.log(err, "Error");
+      next(new RequestError("Error"));
+    }
+  }
+  
+  
+  
+  
+  
 };

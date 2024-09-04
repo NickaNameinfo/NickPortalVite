@@ -542,69 +542,85 @@ module.exports = {
   },
 
   // filter product
-
   async getFilterbyProduct(req, res, next) {
     try {
       let search = "%%";
       if (req.query.search) {
         search = "%" + req.query.search + "%";
       }
-      db.subcategories
-        .findAll({
-          attributes: ["id", "sub_name"],
-          include: [
-            {
-              model: db.product,
-              order: [["createdAt", "DESC"]],
-              required: true,
-              where: {
-                [Op.or]: [
-                  { name: { [Op.like]: search }, slug: { [Op.like]: search } },
-                ],
-              },
-            },
-          ],
-        })
 
-        .then((product) => {
-          res.status(200).json({ success: true, data: product });
-        })
-        .catch(function (err) {
-          next(err);
-        });
+      // Extract paymentModes from query parameters and convert to array of integers
+      const paymentModes = req.query.paymentModes
+        ? req.query.paymentModes.split(",").map((pm) => parseInt(pm.trim(), 10))
+        : [];
+
+      // Define product filter conditions
+      const productWhere = {
+        [Op.or]: [
+          { name: { [Op.like]: search } },
+          { slug: { [Op.like]: search } },
+        ],
+      };
+
+      // Apply paymentModes filter if provided
+      if (paymentModes.length > 0) {
+        productWhere.paymentMode = {
+          [db.Sequelize.Op.or]: paymentModes.map((mode) => ({
+            [db.Sequelize.Op.like]: `%${mode}%`,
+          })),
+        };
+      }
+
+      // Find subcategories with filtered products
+      const subcategories = await db.subcategories.findAll({
+        attributes: ["id", "sub_name"],
+        include: [
+          {
+            model: db.product,
+            order: [["createdAt", "DESC"]],
+            required: true,
+            where: productWhere,
+          },
+        ],
+      });
+
+      res.status(200).json({ success: true, data: subcategories });
     } catch (err) {
-      throw new RequestError("Error");
+      console.log(err, "Error");
+      next(new RequestError("Error"));
     }
   },
 
-  async GetAllByCategory(req, res, next) {
+  async GetAllByCategories(req, res, next) {
     try {
-      db.subcategories
-        .findOne({
-          where: { sub_name: req.body.name },
-          include: [
-            {
-              model: db.subchildcategories,
-              include: [
-                {
-                  model: db.product,
-                  order: [["createdAt", "DESC"]],
-                  include: [
-                    { model: db.productphoto, attributes: ["id", "imgUrl"] },
-                  ],
-                },
-              ],
-            },
-          ],
-        })
-        .then((product) => {
-          res.status(200).json({ success: true, data: product });
-        })
-        .catch(function (err) {
-          next(err);
-        });
+      // Extract categoryIds from the query parameters
+      const { categoryIds } = req.query;
+
+      // Ensure categoryIds is an array, even if a single ID is passed
+      const categoryArray = Array.isArray(categoryIds)
+        ? categoryIds
+        : categoryIds.split(",");
+
+      // Find all products that belong to the specified categories
+      const products = await db.product.findAll({
+        where: {
+          categoryId: {
+            [db.Sequelize.Op.in]: categoryArray,
+          },
+        },
+        order: [["createdAt", "DESC"]],
+        include: [
+          {
+            model: db.productphoto,
+            attributes: ["id", "imgUrl"],
+          },
+        ],
+      });
+
+      res.status(200).json({ success: true, data: products });
     } catch (err) {
-      throw new RequestError("Error");
+      console.log(err, "Error");
+      next(new RequestError("Error"));
     }
   },
 

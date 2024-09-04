@@ -34,6 +34,6 @@ storeRouter.route('/update').post(upload.single("storeImage"), storeController.s
 storeRouter.route('/delete/:id').delete(sanitize(), storeController.storeDelete);
 storeRouter.route('/product-delete').post(sanitize(), storeController.storeProductDelete);
 storeRouter.route('/product-add').post(storeController.storeAddProduct);
-storeRouter.route('/filterByCategory/:categoryId').get(storeController.getAllStoreByCategory);
-
+storeRouter.route('/filterByCategory').get(storeController.getAllStoresByCategories);
+storeRouter.route('/getAllStoresByFilters').get(storeController.getAllStoresByFilters);
 module.exports = { storeRouter };

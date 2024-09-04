@@ -74,7 +74,7 @@ productRouter
   .get(sanitize(), productController.getAllProductBySlug);
 productRouter
   .route("/getAllByCategory")
-  .post(sanitize(), productController.GetAllByCategory);
+  .get(sanitize(), productController.GetAllByCategories);
 productRouter
   .route("/getallProductbySubChildCat")
   .post(sanitize(), productController.getProductSubChildCat);
