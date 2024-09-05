@@ -36,4 +36,5 @@ storeRouter.route('/product-delete').post(sanitize(), storeController.storeProdu
 storeRouter.route('/product-add').post(storeController.storeAddProduct);
 storeRouter.route('/filterByCategory').get(storeController.getAllStoresByCategories);
 storeRouter.route('/getAllStoresByFilters').get(storeController.getAllStoresByFilters);
+storeRouter.route('/getOpenStores').get(storeController.getOpenStores);
 module.exports = { storeRouter };

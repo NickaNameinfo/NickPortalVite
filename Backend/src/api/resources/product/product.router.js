@@ -34,6 +34,9 @@ productRouter
   .route("/getAllproductList")
   .get(sanitize(), productController.getAllProductList);
 productRouter
+  .route("/getProductsByOpenStores")
+  .get(sanitize(), productController.getProductsByOpenStores);
+productRouter
   .route("/update")
   .post(sanitize(), upload.single("photo"), productController.update);
 productRouter

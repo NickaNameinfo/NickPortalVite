@@ -668,4 +668,47 @@ module.exports = {
       // res.status(500).json({ 'success':false, msg: err})
     }
   },
+
+  async getProductsByOpenStores(req, res, next) {
+    try {
+      const currentHour = new Date().getHours(); // Get the current hour
+  
+      // Find all stores that are currently open
+      const openStores = await db.store.findAll({
+        where: {
+          openTime: { [db.Sequelize.Op.lte]: currentHour }, // Store must be open at or before the current hour
+          closeTime: { [db.Sequelize.Op.gte]: currentHour }, // Store must close at or after the current hour
+        },
+        attributes: ["id"], // Only need store IDs for filtering
+      });
+  
+      const openStoreIds = openStores.map(store => store.id);
+  
+      // Query to find products that are sold in the open stores
+      const products = await db.product.findAll({
+        include: [
+          {
+            model: db.store_product, // Ensure this association exists
+            where: {
+              supplierId: {
+                [db.Sequelize.Op.in]: openStoreIds, // Filter by stores that are currently open
+              },
+            },
+            attributes: [], // No need to fetch attributes from store_product
+          },
+        ],
+      });
+  
+      if (products.length > 0) { // Check if there are any products
+        res.status(200).json({ success: true, data: products });
+      } else {
+        res.status(404).json({ success: false, message: "No products found from open stores" });
+      }
+    } catch (err) {
+      console.error(err, "Error");
+      next(new RequestError("Error"));
+    }
+  }
+  
+  
 };

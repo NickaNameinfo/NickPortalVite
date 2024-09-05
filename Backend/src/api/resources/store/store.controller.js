@@ -447,42 +447,44 @@ module.exports = {
   async getAllStoresByFilters(req, res, next) {
     try {
       const { search, paymentModes } = req.query; // Extract filters from query parameters
-  
+
       // Initialize filter conditions for products
       const productWhere = {};
-      const paymentModeArray = paymentModes ? paymentModes.split(',').map(pm => parseInt(pm.trim(), 10)) : []; // Ensure integers
-  
+      const paymentModeArray = paymentModes
+        ? paymentModes.split(",").map((pm) => parseInt(pm.trim(), 10))
+        : []; // Ensure integers
+
       // Apply filter by product name if provided
       if (search) {
         productWhere.name = {
           [db.Sequelize.Op.like]: `%${search}%`,
         };
       }
-  
+
       // Apply filter by payment modes if provided
       if (paymentModes) {
         productWhere.paymentMode = {
-          [db.Sequelize.Op.or]: paymentModeArray.map(mode => ({
-            [db.Sequelize.Op.like]: `%${mode}%`
+          [db.Sequelize.Op.or]: paymentModeArray.map((mode) => ({
+            [db.Sequelize.Op.like]: `%${mode}%`,
           })),
         };
       }
-  
+
       // Find all product IDs that match the filters
       const products = await db.product.findAll({
         where: productWhere,
         attributes: ["id"],
       });
       console.log("Filtered Products:", products);
-  
+
       const productIds = products.map((product) => product.id);
       console.log("Product IDs:", productIds);
-  
+
       // Check if productIds is empty
       if (productIds.length === 0) {
         return res.status(200).json({ success: true, data: [] });
       }
-  
+
       // Find all stores that are associated with those products
       const stores = await db.store.findAll({
         attributes: ["id", "storename", "ownername"],
@@ -506,16 +508,42 @@ module.exports = {
         group: ["store.id"], // Group to avoid duplicates
       });
       console.log("Stores:", stores);
-  
+
       res.status(200).json({ success: true, data: stores });
     } catch (err) {
       console.log(err, "Error");
       next(new RequestError("Error"));
     }
+  },
+
+  async getOpenStores(req, res, next) {
+    try {
+      const currentHour = new Date().getHours(); // Get the current hour
+      // Query to find open stores based on current hour
+      const openStores = await db.store.findAll({
+        where: {
+          openTime: { [db.Sequelize.Op.lte]: currentHour }, // Store must be open at or before the current hour
+          closeTime: { [db.Sequelize.Op.gte]: currentHour }, // Store must close at or after the current hour
+        },
+        include: [
+          {
+            model: db.area,
+            attributes: ["id", "name"],
+            include: [{ model: db.location, attributes: ["id", "name"] }],
+          },
+        ],
+      });
+  
+      if (openStores.length > 0) { // Check if there are any open stores
+        res.status(200).json({ success: true, data: openStores });
+      } else {
+        res.status(404).json({ success: false, message: "No open stores found" });
+      }
+    } catch (err) {
+      console.error(err, "Error");
+      next(new RequestError("Error"));
+    }
   }
-  
-  
-  
   
   
 };
