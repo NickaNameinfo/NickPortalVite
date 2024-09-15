@@ -62,6 +62,30 @@ export const StoreApi = createApi({
         body,
       }),
     }),
+    getStoresByCategory:  builder.query({
+      query: (id) => ({
+        url: `/store/filterByCategory?categoryIds=${id}`,
+        method: "GET",
+      }),
+    }),
+    getStoresByFilters:  builder.query({
+      query: (query) => ({
+        url: `/store/getAllStoresByFilters?search=${query}`,
+        method: "GET",
+      }),
+    }),
+    getStoresByPaymentType:  builder.query({
+      query: (query) => ({
+        url: `/store/getAllStoresByFilters?paymentModes=${query}`,
+        method: "GET",
+      }),
+    }),
+    getStoresByOpenStore:  builder.query({
+      query: (query) => ({
+        url: `/store/getOpenStores`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -73,6 +97,10 @@ export const {
   useGetCartByOrderIdQuery,
   useGetCartByProductIdQuery,
   useUpdateCartMutation,
-  useGetStoresByIdQuery
+  useGetStoresByIdQuery,
+  useGetStoresByCategoryQuery,
+  useGetStoresByFiltersQuery,
+  useGetStoresByPaymentTypeQuery,
+  useGetStoresByOpenStoreQuery
 } = StoreApi;
 export const { endpoints } = StoreApi;

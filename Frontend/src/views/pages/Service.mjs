@@ -26,9 +26,8 @@ export const AuthApi = createApi({
         method: "POST",
         body,
       }),
-    }),
+    })
   }),
 });
-
 export const { useRegisterMutation, useLoginMutation } = AuthApi;
 export const { endpoints } = AuthApi;

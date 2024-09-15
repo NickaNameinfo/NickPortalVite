@@ -20,13 +20,18 @@ import {
   IconPrev,
   IconProfile,
   Iconwhatsup,
+  SearchIcon,
 } from "./Icons";
 import { NavHeaderSearchIcon, NavSearchIcon } from "../Icons";
 import { InfoCard } from "./Card/InfoCard";
 import Login from "../views/pages/login/Login";
 import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
 import { useAppDispatch, useAppSelector } from "./Common/hooks";
-import { onSearchGlobal } from "../Components/Common/globalSlice";
+import {
+  onGlobalCategorySearch,
+  onSearchGlobal,
+  onUpdateOpenStore,
+} from "../Components/Common/globalSlice";
 export const AppHeader = () => {
   const location = useLocation();
   const currentloginDetails = useAppSelector(
@@ -37,13 +42,14 @@ export const AppHeader = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [startIndex, setStartIndex] = React.useState(0);
   const [sliderLabel, setSliderLabel] = React.useState([]);
+  const [searchValues, setSearchValues] = React.useState(null);
   const { data: category } = useGetCategoryQuery();
   const dispatch = useAppDispatch();
 
   const itemsPerPage = 12;
   React.useEffect(() => {
     if (category?.data) {
-      const labels = category.data.map((item) => item?.name);
+      const labels = category.data.map((item) => item);
       setSliderLabel(labels);
     } else {
       setSliderLabel([]);
@@ -61,6 +67,18 @@ export const AppHeader = () => {
     setStartIndex((prevIndex) =>
       Math.min(prevIndex + 1, sliderLabel?.length - itemsPerPage)
     );
+  };
+
+  const onSearchByCategory = (id) => {
+    dispatch(onSearchGlobal(null));
+    dispatch(onGlobalCategorySearch(id));
+    dispatch(onUpdateOpenStore(false));
+
+  };
+
+  const onSearch = () => {
+    dispatch(onSearchGlobal(searchValues));
+    dispatch(onUpdateOpenStore(false));
   };
 
   return (
@@ -88,7 +106,7 @@ export const AppHeader = () => {
               radius="lg"
               size="md"
               type="Search"
-              onChange={(e) => dispatch(onSearchGlobal(e.target.value))}
+              onChange={(e) => setSearchValues(e.target.value)}
               variant="flat"
               placeholder="Search Here..."
               // style={{ backgroundColor:"whitesmoke"}}
@@ -126,6 +144,12 @@ export const AppHeader = () => {
                 </p>
               }
             />
+            <p
+              className="ms-1.5 bg-[#ffffff3b] items-center flex p-3 rounded-full bg-[#8465F7] cursor-pointer"
+              onClick={() => onSearch()}
+            >
+              <SearchIcon color={"white"} />
+            </p>
           </div>
         </div>
 
@@ -331,8 +355,9 @@ export const AppHeader = () => {
                         size="sm"
                         className="font-medium text-sm w-auto h-10 bg-stripe-gradient"
                         radius="full"
+                        onClick={() => onSearchByCategory(item?.id)}
                       >
-                        {item}
+                        {item?.name}
                       </Button>
                     </div>
                   ))}

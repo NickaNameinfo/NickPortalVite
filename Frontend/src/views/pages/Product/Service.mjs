@@ -30,6 +30,30 @@ export const ProductApi = createApi({
         params: { id },
       }),
     }),
+    getProductsByCategory: builder.query({
+      query: (id) => ({
+        url: `/product/getAllByCategory?categoryIds=${id}`,
+        method: "GET",
+      }),
+    }),
+    getProductsBySearch: builder.query({
+      query: (query) => ({
+        url: `/product/gcatalogsearch/result?search=${query}`,
+        method: "GET",
+      }),
+    }),
+    getProductsByPaymenType: builder.query({
+      query: (query) => ({
+        url: `/product/gcatalogsearch/result?paymentModes=${query}`,
+        method: "GET",
+      }),
+    }),
+    getProductsByOpenShop: builder.query({
+      query: (query) => ({
+        url: `/product/getProductsByOpenStores`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -37,5 +61,9 @@ export const {
   useGetProductsQuery,
   useGetProductsByIdQuery,
   useGetProductImgQuery,
+  useGetProductsByCategoryQuery,
+  useGetProductsBySearchQuery,
+  useGetProductsByPaymenTypeQuery,
+  useGetProductsByOpenShopQuery
 } = ProductApi;
 export const { endpoints } = ProductApi;

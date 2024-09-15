@@ -29,16 +29,26 @@ import {
 } from "./Icons";
 import { _nav } from "../_nav";
 import { Link, useNavigate } from "react-router-dom";
-import { useAppSelector } from "./Common/hooks";
+import { useAppDispatch, useAppSelector } from "./Common/hooks";
 import Login from "../views/pages/login/Login";
-import {eraseCookie} from "../JsFiles/CommonFunction.mjs"
+import { eraseCookie } from "../JsFiles/CommonFunction.mjs";
+import {
+  onGlobalCategorySearch,
+  onGlobalPaymentSearch,
+  onSearchGlobal,
+  onUpdateOpenStore,
+} from "../Components/Common/globalSlice";
+import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
 export const AppSidebar = () => {
   const [menuToggle, setMenuToggle] = React.useState(false);
   const [mobileExpand, setMobileExpand] = React.useState(false);
+  const [selectedCategory, setSelectedCategory] = React.useState([]);
   const navigate = useNavigate();
   const currentloginDetails = useAppSelector(
     (state) => state.globalConfig.currentloginDetails
   );
+  const { data, refetch } = useGetCategoryQuery();
+
   const itemClasses = {
     base: "py-0 w-full",
     title: "text-black text-sm font-normal",
@@ -47,10 +57,20 @@ export const AppSidebar = () => {
     indicator: "text-medium",
     content: "text-small px-2",
   };
+
   const slots = {
     base: "border-default hover:bg-default-200",
     content: "text-default-500",
   };
+
+  React.useEffect(() => {
+    refetch();
+  }, []);
+
+
+  React.useEffect(() => {
+    onSearchByCategory(selectedCategory?.length > 0 ?  selectedCategory?.join(",") : null);
+  }, [selectedCategory]);
 
   const handleLogOut = () => {
     eraseCookie("token");
@@ -59,9 +79,21 @@ export const AppSidebar = () => {
     eraseCookie("vendorId");
     eraseCookie("storeId");
     eraseCookie("plan");
-    navigate("/")
+    navigate("/");
   };
 
+  const dispatch = useAppDispatch();
+  const onSearchByPayment = (item) => {
+    dispatch(onSearchGlobal(null));
+    dispatch(onGlobalCategorySearch(null));
+    dispatch(onGlobalPaymentSearch(item?.key));
+  };
+
+  const onSearchByCategory = (id) => {
+    dispatch(onSearchGlobal(null));
+    dispatch(onGlobalCategorySearch(id));
+    dispatch(onGlobalPaymentSearch(null));
+  };
 
   return (
     <>
@@ -134,12 +166,26 @@ export const AppSidebar = () => {
                 result?.menuType === "single" ? (
                   <div
                     style={{ backgroundColor: "#ffffff80" }}
-                    className="rounded-lg"
+                    className="rounded-lg cursor-pointer"
+                    onClick={() => {
+                      if (result?.key === "Hospitals") {
+                        onSearchByCategory(20);
+                        dispatch(onUpdateOpenStore(false));
+                      } else if (result?.key === "Hotels") {
+                        onSearchByCategory(21);
+                        dispatch(onUpdateOpenStore(false));
+                      } else if (result?.key === "Open Shop") {
+                        dispatch(onSearchGlobal(null));
+                        dispatch(onGlobalCategorySearch(null));
+                        dispatch(onGlobalPaymentSearch(null));
+                        dispatch(onUpdateOpenStore(true));
+                      } else {
+                        onSearchByPayment(result);
+                        dispatch(onUpdateOpenStore(false));
+                      }
+                    }}
                   >
-                    <Link
-                      to="#"
-                      className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white"
-                    >
+                    <div className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white">
                       <div className="flex justify-between w-full items-center">
                         {menuToggle ? (
                           <span>
@@ -150,7 +196,7 @@ export const AppSidebar = () => {
                             {result?.name}
                           </p>
                         )}
-                        <Switch
+                        {/* <Switch
                           color="secondary"
                           size="md"
                           defaultSelected
@@ -174,9 +220,9 @@ export const AppSidebar = () => {
                             ),
                           }}
                           aria-label="Automatic updates"
-                        />
+                        /> */}
                       </div>
-                    </Link>
+                    </div>
                   </div>
                 ) : (
                   <div className="rounded-lg mb-3">
@@ -196,129 +242,65 @@ export const AppSidebar = () => {
                         className="p-0 m-0 text-foreground"
                       >
                         <ul className="">
-                          <li className="p-0 m-0">
-                            <div className="flex items-center justify-between mb-0.5">
-                              <div className="flex  items-center">
-                                <p
-                                  className="me-2 text-black mt-0.5"
-                                  style={{
-                                    height: "4px",
-                                    width: "4px",
-                                    borderRadius: "8px",
-                                    backgroundColor: "black",
-                                  }}
-                                ></p>
-                                <p className="ms-2 text-black font-normal text-sm">
-                                  Grocery
-                                </p>
-                              </div>
-                              <div>
-                                <Checkbox
-                                  classNames={{
-                                    label: [
-                                      "text-small",
-                                      "text-yellow-300",
-                                      "font-light",
-                                      "hover:bg-cyan-500",
-                                      "data-[hover=true]:bg-cyan-500",
-                                    ],
-                                    wrapper: [
-                                      "before:border-0",
-                                      "before:bg-cyan-500",
-                                      "data-[hover=true]:bg-cyan-500",
-                                    ],
-                                  }}
-                                  className="m-0 p-0"
-                                  // defaultSelected
-                                  size="sm"
-                                  color="success"
-                                  radius="none"
-                                />
-                              </div>
-                            </div>
-                          </li>
-                          <li>
-                            <div className="flex items-center justify-between mb-0.5">
-                              <div className="flex  items-center">
-                                <p
-                                  className="me-2 text-black mt-0.5"
-                                  style={{
-                                    height: "4px",
-                                    width: "4px",
-                                    borderRadius: "8px",
-                                    backgroundColor: "black",
-                                  }}
-                                ></p>
-                                <p className="ms-2 text-black font-normal text-sm">
-                                  Mobiles
-                                </p>
-                              </div>
-                              <div>
-                                <Checkbox
-                                  classNames={{
-                                    label: [
-                                      "text-small",
-                                      "text-yellow-300",
-                                      "font-light",
-                                      "hover:bg-cyan-500",
-                                      "data-[hover=true]:bg-cyan-500",
-                                    ],
-                                    wrapper: [
-                                      "before:border-0",
-                                      "before:bg-cyan-500",
-                                      "data-[hover=true]:bg-cyan-500",
-                                    ],
-                                  }}
-                                  className="m-0 p-0"
-                                  // defaultSelected
-                                  size="sm"
-                                  color="success"
-                                  radius="none"
-                                />
-                              </div>
-                            </div>
-                          </li>
-                          <li>
-                            <div className="flex items-center justify-between">
-                              <div className="flex  items-center">
-                                <p
-                                  className="me-2 text-black mt-0.5"
-                                  style={{
-                                    height: "4px",
-                                    width: "4px",
-                                    borderRadius: "8px",
-                                    backgroundColor: "black",
-                                  }}
-                                ></p>
-                                <p className="ms-2 text-black font-normal text-sm">
-                                  Beauty, Toys & More
-                                </p>
-                              </div>
-                              <div>
-                                <Checkbox
-                                  classNames={{
-                                    label: [
-                                      "text-small",
-                                      "text-yellow-300",
-                                      "font-light",
-                                      "hover:bg-cyan-500",
-                                      "data-[hover=true]:bg-cyan-500",
-                                    ],
-                                    wrapper: [
-                                      "before:border-0",
-                                      "before:bg-cyan-500",
-                                      "data-[hover=true]:bg-cyan-500",
-                                    ],
-                                  }}
-                                  className="m-0 p-0"
-                                  // defaultSelected
-                                  size="sm"
-                                  color="success"
-                                  radius="none"
-                                />
-                              </div>
-                            </div>
-                          </li>
+                          {data?.data?.map((data) => {
+                            return (
+                              <li className="p-0 m-0">
+                                <div className="flex items-center justify-between mb-0.5">
+                                  <div className="flex  items-center">
+                                    <p
+                                      className="me-2 text-black mt-0.5"
+                                      style={{
+                                        height: "4px",
+                                        width: "4px",
+                                        borderRadius: "8px",
+                                        backgroundColor: "black",
+                                      }}
+                                    ></p>
+                                    <p className="ms-2 text-black font-normal text-sm">
+                                      {data?.name}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <Checkbox
+                                      classNames={{
+                                        label: [
+                                          "text-small",
+                                          "text-yellow-300",
+                                          "font-light",
+                                          "hover:bg-cyan-500",
+                                          "data-[hover=true]:bg-cyan-500",
+                                        ],
+                                        wrapper: [
+                                          "before:border-0",
+                                          "before:bg-cyan-500",
+                                          "data-[hover=true]:bg-cyan-500",
+                                        ],
+                                      }}
+                                      value={data?.id}
+                                      className="m-0 p-0"
+                                      onChange={(e) => {
+                                        setSelectedCategory((prev) => {
+                                          // Check if the category is already selected
+                                          if (prev.includes(data?.id)) {
+                                            // If it is, remove it from the array
+                                            return prev.filter(
+                                              (id) => id !== data?.id
+                                            );
+                                          } else {
+                                            // If not, add it to the array
+                                            return [...prev, data?.id];
+                                          }
+                                        });
+                                      }}
+                                      size="sm"
+                                      color="success"
+                                      radius="none"
+                                    />
+                                  </div>
+                                </div>
+                              </li>
+                            );
+                          })}
                         </ul>
                       </AccordionItem>
                     </Accordion>

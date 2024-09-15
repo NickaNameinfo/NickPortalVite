@@ -422,7 +422,6 @@ module.exports = {
 
       // Find all stores associated with those products via store_product
       const stores = await db.store.findAll({
-        attributes: ["id", "storename", "ownername"],
         include: [
           {
             model: db.store_product,
@@ -487,7 +486,6 @@ module.exports = {
 
       // Find all stores that are associated with those products
       const stores = await db.store.findAll({
-        attributes: ["id", "storename", "ownername"],
         include: [
           {
             model: db.store_product,

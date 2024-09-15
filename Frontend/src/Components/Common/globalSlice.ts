@@ -6,6 +6,9 @@ export interface GlobalConfigState {
   currentloginDetails?: any;
   onRefreshCart?: boolean;
   globalSearch?: string;
+  globalCategorySearch?: any;
+  gloablSearchByPayment?: any;
+  onSearchOpenStore?: boolean;
 }
 
 const initialState: GlobalConfigState = {
@@ -13,7 +16,9 @@ const initialState: GlobalConfigState = {
   isOpenLogin: false,
   currentloginDetails: null,
   onRefreshCart: false,
-  globalSearch: null,
+  globalCategorySearch: null,
+  gloablSearchByPayment : null,
+  onSearchOpenStore: false,
 };
 
 const globalConfigSlice = createSlice({
@@ -35,6 +40,15 @@ const globalConfigSlice = createSlice({
     onSearchGlobal: (state, action) => {
       state.globalSearch = action.payload;
     },
+    onGlobalCategorySearch: (state, action) => {
+      state.globalCategorySearch = action.payload;
+    },
+    onGlobalPaymentSearch: (state, action) => {
+      state.gloablSearchByPayment = action.payload;
+    },
+    onUpdateOpenStore: (state, action) => {
+      state.onSearchOpenStore = action.payload;
+    },
   },
 });
 
@@ -43,6 +57,9 @@ export const {
   onOpenLogin,
   updateLoginDetails,
   onRefreshCart,
-  onSearchGlobal
+  onSearchGlobal,
+  onGlobalCategorySearch,
+  onGlobalPaymentSearch,
+  onUpdateOpenStore
 } = globalConfigSlice.actions;
 export default globalConfigSlice.reducer;

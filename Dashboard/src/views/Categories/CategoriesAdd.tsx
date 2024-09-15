@@ -20,6 +20,7 @@ const CategoriesAdd = () => {
   const navigate = useNavigate();
   const vendorId = getCookie("vendorId");
   const storeId = getCookie("storeId");
+  const id = getCookie("id");
   const { data, error, refetch } = useGetCategoriesQuery();
   const [addCategories] = useAddCategoriesMutation();
   const [refresh, setRefresh] = React.useState(false);
@@ -27,7 +28,7 @@ const CategoriesAdd = () => {
   const onSubmit = async (formData: any) => {
     let tempApiParams = {
       ...formData,
-      createdId: vendorId ? vendorId : storeId,
+      createdId: id ? id : vendorId ? vendorId : storeId,
       createdType: vendorId ? "Vendor" : "Store",
     };
     const result = await addCategories(tempApiParams);

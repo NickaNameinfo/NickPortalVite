@@ -45,15 +45,15 @@ export const _nav = [
         },
       ]
     : []),
-  ...(tempRole !== "1"
-    ? [
+  // ...(tempRole !== "1"
+  //   ? [
         {
           menuType: "multiple",
           name: "Categories",
           key: "Categories",
           link: "/",
           icons: <IconHome />,
-          menuItems: [
+          menuItems: [ 
             {
               menuType: "single",
               name: "Add",
@@ -63,8 +63,8 @@ export const _nav = [
             },
           ],
         },
-      ]
-    : []),
+    //   ]
+    // : []),
   {
     menuType: "multiple",
     name: "Products",
