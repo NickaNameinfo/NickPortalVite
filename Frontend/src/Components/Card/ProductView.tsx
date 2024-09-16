@@ -24,7 +24,7 @@ import {
   IconstoreCardNext,
   Iconwhatsup,
 } from "../../Icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { infoData } from "../../configData";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import PremiumCard from "./PremiumCard";
@@ -35,6 +35,7 @@ import {
 } from "../../views/pages/Store/Service.mjs";
 export const ProductViewCard = ({ item = null }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate()
   const { data, error, refetch } = useGetStoresByIdQuery(
     Number(item?.createdId)
   );
@@ -160,16 +161,15 @@ export const ProductViewCard = ({ item = null }) => {
 
                       <div className="mt-0 basis-3/12 justify-end flex pe-0">
                         <div className="iconbox flex items-center justify-center cursor-pointer">
-                          <Link to={`/Store/StoreDetails/${data?.data?.id}`}>
                             <Button
                               radius="full"
                               isIconOnly
                               size="sm"
                               className="iconboxProduct"
+                              onClick={() => navigate(`/Store/StoreDetails/${data?.data?.id}`)}
                             >
                               <IconstoreCardNext fill="#ffffff" />
                             </Button>
-                          </Link>
                         </div>
                       </div>
                     </div>

@@ -1,7 +1,4 @@
 import React from "react";
-import StoreHeaderCard from "../../../Components/Card/StoreHeaderCard";
-import RelatedProducts from "../../../Components/Card/RelatedProducts";
-import PremiumCard from "../../../Components/Card/PremiumCard";
 import StoreCard from "../../../Components/Card/StoreCard";
 import {
   useGetStoresQuery,
@@ -11,8 +8,10 @@ import {
   useGetStoresByOpenStoreQuery
 } from "./Service.mjs";
 import { useAppDispatch, useAppSelector } from "../../../Components/Common/hooks";
+import { onUpdateStoreList } from "../../../Components/Common/globalSlice";
 
 const Store = () => {
+  const dispatch = useAppDispatch();
   const { data, error, refetch } = useGetStoresQuery();
   const globalSearch = useAppSelector(
     (state) => state.globalConfig.globalSearch
@@ -56,6 +55,12 @@ const Store = () => {
   React.useEffect(() => {
     refetch();
   }, []);
+
+  React.useEffect(() => {
+    if(storeDataList){
+      dispatch(onUpdateStoreList(storeDataList?.data))
+    }
+  }, [storeDataList])
 
   React.useEffect(() => {
     storeByCategoryRefetch();

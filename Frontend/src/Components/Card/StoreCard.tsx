@@ -17,13 +17,17 @@ import {
   IconstoreCardNext,
   Iconwhatsup,
 } from "../Icons";
-import { Link } from "react-router-dom";
 import { infoData } from "../../configData";
 import { useGetStoresProductByIDQuery } from "../../views/pages/Store/Service.mjs";
+import { useAppSelector } from "../Common/hooks";
+import { Link, useNavigate } from "react-router-dom";
 export const StoreCard = ({ item = null, key = null }) => {
   const { data, error, refetch } = useGetStoresProductByIDQuery(
     Number(item?.id)
   );
+
+  const navigate = useNavigate()
+
   return (
     <Card className="ps-1 Storecard p-0">
       <CardHeader className="pb-0 pt-3 ps-2 flex-col items-start ">
@@ -101,16 +105,16 @@ export const StoreCard = ({ item = null, key = null }) => {
 
               <div className="mt-0 basis-3/12 justify-end flex pe-0">
                 <div className="iconbox flex items-center justify-center cursor-pointer">
-                  <Link to={`/Store/StoreDetails/${item?.id}`}>
                     <Button
                       radius="full"
                       isIconOnly
                       size="sm"
                       className="iconbox"
+                      type="button"
+                      onClick={() => navigate(`/Store/StoreDetails/${item?.id}`)}
                     >
                       <IconstoreCardNext fill="#6942CB" />
                     </Button>
-                  </Link>
                 </div>
               </div>
             </div>

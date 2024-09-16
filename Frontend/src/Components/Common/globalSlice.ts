@@ -9,6 +9,7 @@ export interface GlobalConfigState {
   globalCategorySearch?: any;
   gloablSearchByPayment?: any;
   onSearchOpenStore?: boolean;
+  storeList?:any;
 }
 
 const initialState: GlobalConfigState = {
@@ -19,6 +20,7 @@ const initialState: GlobalConfigState = {
   globalCategorySearch: null,
   gloablSearchByPayment : null,
   onSearchOpenStore: false,
+  storeList:null
 };
 
 const globalConfigSlice = createSlice({
@@ -49,6 +51,9 @@ const globalConfigSlice = createSlice({
     onUpdateOpenStore: (state, action) => {
       state.onSearchOpenStore = action.payload;
     },
+    onUpdateStoreList: (state, action) => {
+      state.storeList = action?.payload;
+    }
   },
 });
 
@@ -60,6 +65,7 @@ export const {
   onSearchGlobal,
   onGlobalCategorySearch,
   onGlobalPaymentSearch,
-  onUpdateOpenStore
+  onUpdateOpenStore,
+  onUpdateStoreList
 } = globalConfigSlice.actions;
 export default globalConfigSlice.reducer;

@@ -6,7 +6,8 @@ import Page500 from "./views/pages/page500/Page500.js";
 import { getCookie } from "../src/JsFiles/CommonFunction.mjs";
 import { useGetUserQuery } from "./Service.mjs";
 import { useAppDispatch } from "./Components/Common/hooks.js";
-import { updateLoginDetails } from "./Components/Common/globalSlice.js";
+import { onUpdateStoreList, updateLoginDetails } from "./Components/Common/globalSlice.js";
+import {useGetStoresQuery} from "./views/pages/Store/Service.mjs";
 import "react-toastify/dist/ReactToastify.css";
 import 'sweetalert2/src/sweetalert2.scss'
 
@@ -20,6 +21,7 @@ function App() {
   const id = getCookie("id");
   const dispatch = useAppDispatch();
   const { data, error, refetch } = useGetUserQuery(id);
+  const { data:storeDetails, error:storeDetailsError, refetch:storeDetailsRefetch } = useGetStoresQuery();
 
   React.useEffect(() => {
     refetch();
@@ -30,6 +32,13 @@ function App() {
       dispatch(updateLoginDetails(data));
     }
   }, [data]);
+
+  React.useEffect(() => {
+    if(storeDetails){
+      dispatch(onUpdateStoreList(storeDetails?.data))
+    }
+  }, [storeDetails])
+
 
   return (
     <Suspense fallback={loading}>

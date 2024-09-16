@@ -17,19 +17,25 @@ import { infoData } from "../../configData";
 import {
   useGetStoresByIdQuery,
   useGetStoresProductByIDQuery,
+  useGetStoresQuery
 } from "../../views/pages/Store/Service.mjs";
 import { toast } from "react-toastify";
+import { useAppSelector } from "../Common/hooks";
 export const StoreHeaderCard = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data, error, refetch } = useGetStoresByIdQuery(Number(id));
+  const { data, error, refetch } = useGetStoresByIdQuery(Number(id));  
+  const storeList = useAppSelector(
+    (state) => state.globalConfig.storeList
+  );
+
   const {
     data: productData,
     error: productError,
     refetch: productRefetch,
   } = useGetStoresProductByIDQuery(Number(id));
   const notify = (value) => toast(value);
-
+  
   const handleShare = () => {
     const url = window.location.href; // Get the current URL
     navigator.clipboard
@@ -186,7 +192,7 @@ export const StoreHeaderCard = () => {
         <div className="w-4/12 items-center justify-between flex  ">
           <div className=" px-1 w-full items-center justify-between Boxshadow rounded-xl xm:min-h-[30px] mm:min-h-[35px] ml:min-h-[35px] lg:min-h-[45px] xl:min-h-[45px] 2xl:min-h-[45px] 3x l:min-h-[45px] flex ">
             <Button
-              onClick={() => navigate(`/Vendors/Products`)}
+              onClick={() => navigate(`/`)}
               radius="full"
               isIconOnly
               aria-label="Like"
@@ -202,11 +208,11 @@ export const StoreHeaderCard = () => {
             </Button>
             <Button
               onClick={() =>
-                data?.id
+                 storeList.findIndex((store) => store.id === data?.data?.id) !== 0
                   ? navigate(
-                      `/Vendors/Products/Details/${Number(data?.data?.id) - 1}`
+                      `/Store/StoreDetails/${storeList?.[Number(storeList?.findIndex((store) => store.id === data?.data?.id)) - 1]?.id}`
                     )
-                  : navigate(`/Vendors/Products`)
+                  : navigate(`/`)
               }
               radius="full"
               isIconOnly
@@ -227,19 +233,19 @@ export const StoreHeaderCard = () => {
 
             <Button
               onClick={() =>
-                data?.id
+                storeList?.[storeList?.length-1]?.id !== data?.data?.id
                   ? navigate(
-                      `/Vendors/Products/Details/${Number(data?.data?.id) + 1}`
+                      `/Store/StoreDetails/${storeList?.[Number(storeList?.findIndex((store) => store.id === data?.data?.id)) + 1]?.id}`
                     )
-                  : navigate(`/Vendors/Products`)
+                  : navigate(`/`)
               }
-              // disabled={!item ? true : false}
+              disabled={storeList?.[storeList?.length-1]?.id !== data?.data?.id ? false : true}
               radius="full"
               isIconOnly
               aria-label="Like"
               size="md"
               className={`bgnone flex mm:justify-start ml:justify-center ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6 ${
-                !data?.data ? "cursor-not-allowed" : "cursor-pointer"
+                storeList?.[storeList?.length-1]?.id !== data?.data?.id ? "cursor-pointer" : "cursor-not-allowed"
               }`}
             >
               <IconNext
