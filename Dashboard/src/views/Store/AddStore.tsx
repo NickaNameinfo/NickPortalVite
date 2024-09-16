@@ -45,7 +45,6 @@ const AddStore = () => {
   const { data, error, refetch } = useGetStoresByIDQuery(
     itemId || storeId || null
   );
-  console.log(data?.data, "data079809809");
   const [updateStores] = useUpdateStoreMutation();
   const [updateUser] = useUpdatUserMutation();
 

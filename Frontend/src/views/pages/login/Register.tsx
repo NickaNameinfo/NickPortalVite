@@ -25,7 +25,6 @@ import {
 } from "../../../Components/Common/globalSlice";
 import { useDispatch } from "react-redux";
 import Login from "./Login";
-import { authenticate } from "../../../Components/Common/CustomHooks";
 import { useNavigate } from "react-router-dom";
 
 export const Register = () => {
@@ -64,7 +63,6 @@ export const Register = () => {
   };
 
   const onCloseModal = () => {
-    reset();
     onClose();
     dispatch(onOpenResigter(false));
   };

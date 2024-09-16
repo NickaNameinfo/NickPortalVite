@@ -5,6 +5,7 @@ import InputNextUI from "../../../Components/Input/input";
 import ModalUI from "../../../Components/Modal";
 import { useDispatch } from "react-redux";
 import {
+  onOpenForget,
   onOpenLogin,
   onOpenResigter,
   updateLoginDetails,
@@ -14,6 +15,7 @@ import { Register } from "./Register";
 import { Controller, useForm } from "react-hook-form";
 import { useLoginMutation } from "./Service.mjs";
 import { authenticate } from "../../../Components/Common/CustomHooks";
+import { ForgotPassword } from "./ForgotPassword";
 const Login = () => {
   const {
     handleSubmit,
@@ -26,21 +28,30 @@ const Login = () => {
   const formData = watch();
   const [login] = useLoginMutation();
   const dispatch = useDispatch();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+
   const isOpenRegister = useAppSelector(
     (state) => state.globalConfig.isOpenRegister
   );
   const isOpenLogin = useAppSelector((state) => state.globalConfig.isOpenLogin);
+  const isOpenForget = useAppSelector((state) => state.globalConfig.isOpenForget);
 
   const onCloseModal = () => {
-    onClose();
+    onClose()
     dispatch(onOpenLogin(false));
   };
 
   const onClickRegister = () => {
+    onClose()
     dispatch(onOpenResigter(true));
     dispatch(onOpenLogin(false));
-    onClose();
+  };
+
+  const onClickForget = () => {
+    onClose()
+    dispatch(onOpenResigter(false));
+    dispatch(onOpenLogin(false));
+    dispatch(onOpenForget(true))
   };
 
   const onSubmit = async () => {
@@ -48,7 +59,6 @@ const Login = () => {
       const result = await login(formData);
       if (result?.data?.success) {
         authenticate(result?.data, () => {
-          onClose();
           dispatch(onOpenLogin(false));
           dispatch(updateLoginDetails(result?.data));
         });
@@ -127,12 +137,12 @@ const Login = () => {
                 </div>
                 <div className="w-1/2 justify-end flex ">
                   <Link
-                    className="cursor-pointer p-0 m-0 #7358D7 max-w-md "
+                    className="cursor-pointer p-0 m-0 #7358D7 max-w-md"
                     style={{
                       color: "#4C86F9",
                     }}
                     // color="foreground"
-                    onPress={() => {}}
+                    onPress={() => onClickForget ()}
                     size="sm"
                   >
                     Forgot Password?
@@ -184,6 +194,7 @@ const Login = () => {
         }
       />
       {isOpenRegister && <Register />}
+      {isOpenForget && <ForgotPassword />}
     </div>
   );
 };

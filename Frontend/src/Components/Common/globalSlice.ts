@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 export interface GlobalConfigState {
   isOpenRegister?: boolean;
   isOpenLogin?: boolean;
+  isOpenForget?: boolean;
   currentloginDetails?: any;
   onRefreshCart?: boolean;
   globalSearch?: string;
@@ -15,6 +16,7 @@ export interface GlobalConfigState {
 const initialState: GlobalConfigState = {
   isOpenRegister: false,
   isOpenLogin: false,
+  isOpenForget: false,
   currentloginDetails: null,
   onRefreshCart: false,
   globalCategorySearch: null,
@@ -32,6 +34,9 @@ const globalConfigSlice = createSlice({
     },
     onOpenLogin: (state, action) => {
       state.isOpenLogin = action.payload;
+    },
+    onOpenForget: (state, action) => {
+      state.isOpenForget = action.payload;
     },
     updateLoginDetails: (state, action) => {
       state.currentloginDetails = action.payload;
@@ -60,6 +65,7 @@ const globalConfigSlice = createSlice({
 export const {
   onOpenResigter,
   onOpenLogin,
+  onOpenForget,
   updateLoginDetails,
   onRefreshCart,
   onSearchGlobal,
