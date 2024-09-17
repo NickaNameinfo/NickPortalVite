@@ -37,6 +37,7 @@ import {
   onGlobalPaymentSearch,
   onSearchGlobal,
   onUpdateOpenStore,
+  updateLoginDetails
 } from "../Components/Common/globalSlice";
 import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
 export const AppSidebar = () => {
@@ -79,7 +80,8 @@ export const AppSidebar = () => {
     eraseCookie("vendorId");
     eraseCookie("storeId");
     eraseCookie("plan");
-    navigate("/");
+    dispatch(updateLoginDetails(null));
+    location.reload()
   };
 
   const dispatch = useAppDispatch();
@@ -312,7 +314,7 @@ export const AppSidebar = () => {
               style={{ backgroundColor: "#ffffff80" }}
               className="absolute bottom-[5%] rounded-lg w-11/12"
             >
-              {!currentloginDetails?.token ? (
+              {!currentloginDetails?.data?.email ? (
                 <Login />
               ) : (
                 <div className="flex justify-between w-full items-center">
@@ -342,7 +344,11 @@ export const AppSidebar = () => {
                             <CardBody className="p-0 w-full">
                               <Listbox
                                 aria-label="User Menu"
-                                onAction={(key) => alert(key)}
+                                onAction={(key) => {
+                                  if(key === "logOut"){
+                                    handleLogOut()
+                                  }
+                                }}
                                 itemClasses={{
                                   base: "first:rounded-t-medium last:rounded-b-medium rounded-none gap-3 h-12 data-[hover=true]:bg-default-100/80",
                                 }}
@@ -369,10 +375,8 @@ export const AppSidebar = () => {
                                   Profile
                                 </ListboxItem>
                                 <ListboxItem
-                                  key="discussions"
-                                  // endContent={90}
+                                  key="logOut"
                                   startContent={<IconHome />}
-                                  onClick={() => handleLogOut()}
                                 >
                                   Log Out
                                 </ListboxItem>

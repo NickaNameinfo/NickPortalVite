@@ -100,8 +100,8 @@ export const ProductDetail = (props: ProductDetailProps) => {
     };
     if (cart?.data) {
       try {
-        const result = await updateCart(tempCartValue).wrap();
-        if (result) {
+        const result = await updateCart(tempCartValue);
+        if (result?.data?.success) {
           cartRefetch();
         }
       } catch (error) {
@@ -111,8 +111,8 @@ export const ProductDetail = (props: ProductDetailProps) => {
       }
     } else {
       try {
-        const result = await addCart(tempCartValue).wrap();
-        if (result) {
+        const result = await addCart(tempCartValue);
+        if (result?.data?.success) {
           cartRefetch();
         }
       } catch (error) {

@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt-nodejs");
 const speakeasy = require("speakeasy");
 const { validateEmail } = require("./../../../functions");
 const db = require("../../../models");
+const { Op } = require('sequelize'); // Import Sequelize Op for logical operators
 
 function JWTSign(user, date) {
   return JWT.sign(
@@ -117,8 +118,18 @@ module.exports = {
   },
 
   async userUpdate(req, res, next) {
-    const { id, firstName, lastName, email, address, password, role, verify, vendorId, storeId } =
-      req.body;
+    const {
+      id,
+      firstName,
+      lastName,
+      email,
+      address,
+      password,
+      role,
+      verify,
+      vendorId,
+      storeId,
+    } = req.body;
     var passwordHash = bcrypt.hashSync(password);
     db.user
       .findOne({ where: { email: email }, paranoid: false })
@@ -137,7 +148,14 @@ module.exports = {
             vendorId: vendorId ? vendorId : user.vendorId,
             storeId: storeId ? storeId : user.storeId,
           },
-          { where: { id: id } }
+          {
+            where: {
+              [Op.or]: [
+                { id: id ? id : null }, // Check if the `id` matches
+                { email: email ? email : null }, // Or if the `email` matches
+              ],
+            },
+          }
         );
       })
       .then((user) => {

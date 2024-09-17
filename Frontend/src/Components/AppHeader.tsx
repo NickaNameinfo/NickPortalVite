@@ -81,6 +81,8 @@ export const AppHeader = () => {
     dispatch(onUpdateOpenStore(false));
   };
 
+  console.log(currentloginDetails, "currentloginDetails709")
+
   return (
     <>
       <div className="flex justify-between navBarStyle gap-4 items-center p-3">
@@ -302,7 +304,7 @@ export const AppHeader = () => {
               </Button>
             </div>
             <div className="ms-3">
-              {!currentloginDetails?.token ? (
+              {!currentloginDetails?.data?.email ? (
                 <Login />
               ) : (
                 <User

@@ -7,7 +7,7 @@ import {
   RadioGroup,
   useDisclosure,
 } from "@nextui-org/react";
-import React from "react";
+import React, { useState } from "react";
 import {
   EyeFilledIcon,
   EyeSlashFilledIcon,
@@ -28,6 +28,8 @@ import { useDispatch } from "react-redux";
 import Login from "./Login";
 import { useNavigate } from "react-router-dom";
 import { Otp } from "./Otp";
+import { useUpdatUserMutation } from "./Service.mjs";
+
 
 export const ForgotPassword = () => {
   const dispatch = useDispatch();
@@ -40,36 +42,51 @@ export const ForgotPassword = () => {
     formState: { errors },
   } = useForm();
   const formData = watch();
-  const navigate = useNavigate();
-  const [register] = useRegisterMutation();
+
+  const [updateUser] = useUpdatUserMutation();
+
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+  const [otpValue, setOtpValues] = useState(null);
+  const [enteredOtp, setEnteredOpt] = React.useState(null);
+  const [isEnableNewPassword, setIsEnableNewPassword] = React.useState(false);
 
-  const isOpenRegister = useAppSelector(
-    (state) => state.globalConfig.isOpenRegister
-  );
   const isOpenLogin = useAppSelector((state) => state.globalConfig.isOpenLogin);
-  const isOpenForget = useAppSelector((state) => state.globalConfig.isOpenForget);
+  const isOpenForget = useAppSelector(
+    (state) => state.globalConfig.isOpenForget
+  );
 
-console.log(isOpenForget, "isOpenForget9879")
-  const onSubmit = async () => {
+  const onSubmit = async (data) => {
     try {
-      // let tempApiValue = {
-      //   ...formData,
-      //   verify: 0,
-      // };
-      // const result = await register(tempApiValue);
-      // if (result?.data?.success) {
-      //   dispatch(onOpenResigter(false));
-      //   dispatch(onOpenLogin(true));
-      //   dispatch(onOpenForget(false));
-      // }
+      if(!formData?.password){
+        if (otpValue) {
+          if (otpValue === Number(enteredOtp?.join(""))) {
+            setIsEnableNewPassword(true)
+          } else {
+            alert("Please enter otp sent your mail id");
+          }
+        } else {
+          setOtpValues(9078);
+        }
+      }else{
+        try{
+          let result = await updateUser(data)
+          console.log(result, "resultrr5234")
+          if(result?.data?.success){
+            onClickLogin()
+          }
+        }catch(error){
+          console.log(error, "errrorr")
+        }
+        
+      }
     } catch (error) {
       console.log(error, "Error");
     }
   };
 
+
   const onCloseModal = () => {
-    onClose()
+    onClose();
     dispatch(onOpenForget(false));
   };
 
@@ -90,45 +107,47 @@ console.log(isOpenForget, "isOpenForget9879")
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="px-3 m-0">
               <div className="mt-2">
-                <Input
-                  className="max-w-xs"
-                  classNames={{
-                    label: "text-black/50 dark:text-white/50",
-                    input: [
-                      "bg-transparent",
-                      "text-black/90 dark:text-white/100",
-                      "placeholder:text-default-100/50 dark:placeholder:text-white/10",
-                    ],
-                    innerWrapper: "bg-transparent",
-                    inputWrapper: [
-                      // "shadow-xl",
-                      "bg-default-100/50",
-                      "dark:bg-default/60",
-                      "backdrop-blur-xl",
-                      "backdrop-saturate-50",
-                      "hover:bg-default-100/40",
-                      "focus-within:!bg-default-50/10",
-                      "dark:hover:bg-default/10",
-                      "dark:focus-within:!bg-default/90",
-                      "!cursor-text",
-                    ],
-                  }}
-                  // isRequired
-
-                  autoFocus
-                  label="Email Id"
-                  labelPlacement="inside"
-                  color="default"
-                  variant="faded"
-                  size="sm"
-                />
+              <Controller
+                    name="email" // Changed to reflect a text input
+                    control={control}
+                    rules={{ required: "Please select a user name" }} // Validation rule with custom message
+                    render={({ field }) => (
+                      <InputNextUI
+                        type="text"
+                        label="Email"
+                        {...field}
+                        errorMessage={errors.email?.message}
+                      />
+                    )}
+                  />
               </div>
-
+              {isEnableNewPassword && (
+                <div className="mt-2">
+                 <Controller
+                    name="password" // Changed to reflect a text input
+                    control={control}
+                    rules={{ required: "Please enter new password" }} // Validation rule with custom message
+                    render={({ field }) => (
+                      <InputNextUI
+                        type="text"
+                        label="New Password"
+                        {...field}
+                        errorMessage={errors.password?.message}
+                      />
+                    )}
+                  />
+                </div>
+              )}
+              {otpValue && !isEnableNewPassword && (
+                <div className="my-2">
+                  <Otp enteredOtp={(value) => setEnteredOpt(value)} />
+                </div>
+              )}
               <div className="w-full justify-center pt-5">
                 <Button
                   size="sm"
                   type="submit"
-                  className="w-full  font-normal "
+                  className="w-full  font-normal"
                   style={{
                     padding: 0,
                     margin: 0,
@@ -136,7 +155,7 @@ console.log(isOpenForget, "isOpenForget9879")
                     color: "#FFFFFF",
                   }}
                 >
-                  {"Register"}
+                  {otpValue ? "Submit" : "Change Password"}
                   <IconLogin fill="white" />
                 </Button>
               </div>

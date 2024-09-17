@@ -82,24 +82,22 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
     };
     if (data?.data) {
       try {
-        const result = await updateCart(tempCartValue).wrap();
-        if (result) {
+        const result = await updateCart(tempCartValue);
+        console.log(result, "result90987")
+        if (result?.data?.success) {
           refetch();
           dispatch(onRefreshCart(true));
         }
       } catch (error) {
-        Swal.fire({
-          title: "Error!",
-          text: "Do you want to continue",
-          icon: "error",
-          confirmButtonText: "Cool",
+        MySwal.fire({
+          title: <p>{error?.data?.error}</p>,
         });
       }
     } else {
       try {
-        const result = await addCart(tempCartValue).wrap();
+        const result = await addCart(tempCartValue);
         console.log(result, "result432345234");
-        if (result) {
+        if (result?.data?.success) {
           refetch();
           dispatch(onRefreshCart(true));
         }
@@ -110,8 +108,6 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
       }
     }
   };
-
-  console.log(item, "item9098")
 
   return (
     <>

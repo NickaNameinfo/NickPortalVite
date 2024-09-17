@@ -1,7 +1,7 @@
 import React from "react";
 import { Input } from "@nextui-org/react";
 
-export const Otp = () => {
+export const Otp = ({enteredOtp=null}) => {
   const [otpValues, setOtpValues] = React.useState(["", "", "", ""]);
 
   const handleInputChange = (index: any, value: any) => {
@@ -9,6 +9,7 @@ export const Otp = () => {
     const newValues = [...otpValues];
     newValues[index] = value;
     setOtpValues(newValues);
+    enteredOtp(newValues)
     // Move focus to the next input box if not the last box
     if (index < newValues.length - 1 && value !== "") {
       // document.getElementById(`otp-input-${index + 1}`).focus();

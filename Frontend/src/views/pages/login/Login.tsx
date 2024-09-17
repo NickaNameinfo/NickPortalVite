@@ -61,6 +61,7 @@ const Login = () => {
         authenticate(result?.data, () => {
           dispatch(onOpenLogin(false));
           dispatch(updateLoginDetails(result?.data));
+          location.reload()
         });
       }
     } catch (error) {
