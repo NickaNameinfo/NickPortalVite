@@ -211,7 +211,6 @@ module.exports = {
     try {
       db.product
         .findAll({
-          attributes: ["id", "name", "brand"],
           include: [
             {
               model: db.store_product,
@@ -225,7 +224,6 @@ module.exports = {
               include: [
                 {
                   model: db.store,
-                  attributes: ["id", "storename", "ownername"],
                 },
               ],
             },
@@ -246,19 +244,10 @@ module.exports = {
     try {
       db.store_product
         .findAll({
-          attributes: ["id", "supplierId", "productId", "unitSize", "price"],
           where: { supplierId: req.params.id },
           include: [
             {
-              model: db.product,
-              attributes: [
-                "id",
-                "name",
-                "brand",
-                "photo",
-                "status",
-                "discount",
-              ],
+              model: db.product
             },
           ],
         })
