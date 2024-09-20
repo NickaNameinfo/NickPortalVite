@@ -178,7 +178,8 @@ const Login = () => {
                   color: "#A5A5A5",
                 }}
               >
-                {"Not A Member ? "}
+                {"Not A Member ? "} 
+                
               </p>
               <Link
                 className="cursor-pointer font-medium p-0 m-0"
