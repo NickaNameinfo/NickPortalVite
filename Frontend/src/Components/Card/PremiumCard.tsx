@@ -83,7 +83,7 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
     if (data?.data) {
       try {
         const result = await updateCart(tempCartValue);
-        console.log(result, "result90987")
+        console.log(result, "result90987");
         if (result?.data?.success) {
           refetch();
           dispatch(onRefreshCart(true));
@@ -124,7 +124,7 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
               shadow="md"
               width="100%"
               radius="lg"
-              className="w-full object-cover min-h-[176px]"
+              className="w-full object-cover min-h-[176px] max-h-[176px]"
               src={`${infoData?.baseApi}/${item?.product?.photo}`}
             />
           </CardBody>

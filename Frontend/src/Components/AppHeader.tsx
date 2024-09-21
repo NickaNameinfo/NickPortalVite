@@ -73,7 +73,6 @@ export const AppHeader = () => {
     dispatch(onSearchGlobal(null));
     dispatch(onGlobalCategorySearch(id));
     dispatch(onUpdateOpenStore(false));
-
   };
 
   const onSearch = () => {
@@ -81,7 +80,7 @@ export const AppHeader = () => {
     dispatch(onUpdateOpenStore(false));
   };
 
-  console.log(currentloginDetails, "currentloginDetails709")
+  console.log(currentloginDetails, "currentloginDetails709");
 
   return (
     <>
@@ -107,7 +106,7 @@ export const AppHeader = () => {
               className="w-[280px]"
               radius="lg"
               size="md"
-              type="Search"
+              // type="Search"
               onChange={(e) => setSearchValues(e.target.value)}
               variant="flat"
               placeholder="Search Here..."
@@ -331,11 +330,12 @@ export const AppHeader = () => {
               className={`Iconwhatsup ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6 ${
                 startIndex === 0 ? "cursor-not-allowed" : "cursor-pointer"
               }`}
+              style={{ backgroundColor: "#0000004a" }}
               onClick={handlePrev}
               disabled={startIndex === 0}
             >
               <IconPrev
-                fill="#FFFFFF"
+                fill="#ffffffcc"
                 width="21px"
                 height="18px"
                 className="ml:h-[16px] ml:w-[18px] xm:h-[12px] xm:w-[16px]"
@@ -355,7 +355,11 @@ export const AppHeader = () => {
                     <div className="slider-item" key={index}>
                       <Button
                         size="sm"
-                        className="font-medium text-sm w-auto h-10 bg-stripe-gradient"
+                        className="font-medium text-sm w-auto h-10 text-black"
+                        style={{
+                          backgroundColor: "rgba(255, 255, 255, 0.5)",
+                          borderRadius: "14px",
+                        }}
                         radius="full"
                         onClick={() => onSearchByCategory(item?.id)}
                       >
@@ -374,11 +378,12 @@ export const AppHeader = () => {
                   ? "cursor-not-allowed"
                   : "cursor-pointer"
               }`}
+              style={{ backgroundColor: "#0000004a" }}
               onClick={handleNext}
               disabled={startIndex + itemsPerPage >= sliderLabel?.length}
             >
               <IconNext
-                fill="#FFFFFF"
+                fill="#ffffffcc"
                 width="21px"
                 height="18px"
                 className="ml:h-[16px] ml:w-[16px] xm:h-[12px] xm:w-[16px]"

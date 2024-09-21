@@ -190,7 +190,7 @@ export const StoreHeaderCard = () => {
           </div>
         </div>
         <div className="w-4/12 items-center justify-between flex  ">
-          <div className=" px-1 w-full items-center justify-between Boxshadow rounded-xl xm:min-h-[30px] mm:min-h-[35px] ml:min-h-[35px] lg:min-h-[45px] xl:min-h-[45px] 2xl:min-h-[45px] 3x l:min-h-[45px] flex ">
+          <div className="p-1 w-full items-center justify-between Boxshadow rounded-xl xm:min-h-[30px] mm:min-h-[35px] ml:min-h-[35px] lg:min-h-[45px] xl:min-h-[45px] 2xl:min-h-[45px] 3x l:min-h-[45px] flex ">
             <Button
               onClick={() => navigate(`/`)}
               radius="full"
