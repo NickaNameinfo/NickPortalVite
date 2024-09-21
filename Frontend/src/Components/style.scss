@@ -191,3 +191,23 @@ aside {
 .badgeBG-Midtransparent {
   background-color: #3c3c3c80;
 }
+.cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: "Oswald", sans-serif;
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.cover h1 {
+  font-size: 5vw; /* Responsive font size */
+  margin: 0;
+}
+
+.cover h3 {
+  font-size: 3vw; /* Responsive font size */
+  margin: 0;
+}

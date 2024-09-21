@@ -35,7 +35,7 @@ import {
 } from "../../views/pages/Store/Service.mjs";
 export const ProductViewCard = ({ item = null }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { data, error, refetch } = useGetStoresByIdQuery(
     Number(item?.createdId)
   );
@@ -45,6 +45,7 @@ export const ProductViewCard = ({ item = null }) => {
     refetch: storeProductRefetch,
   } = useGetStoresProductByIDQuery(Number(data?.data?.id));
   const currentPlan = getCookie("plan");
+  console.log(currentPlan, "currentASDFSAFSDFPlan");
   return (
     <Popover showArrow placement="right" key={item?.id}>
       <PopoverTrigger>
@@ -57,7 +58,7 @@ export const ProductViewCard = ({ item = null }) => {
           isPressable
         >
           <CardBody className="overflow-visible p-0 relative">
-          <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
+            <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
               {item?.discount} %
             </span>
             <Image
@@ -65,7 +66,7 @@ export const ProductViewCard = ({ item = null }) => {
               shadow="md"
               width={250}
               radius="lg"
-              className="object-cover"
+              className="w-full object-cover min-h-[176px] max-h-[176px]"
               src={`${infoData.baseApi}/${item?.photo}`}
               height={250}
             />
@@ -161,15 +162,17 @@ export const ProductViewCard = ({ item = null }) => {
 
                       <div className="mt-0 basis-3/12 justify-end flex pe-0">
                         <div className="iconbox flex items-center justify-center cursor-pointer">
-                            <Button
-                              radius="full"
-                              isIconOnly
-                              size="sm"
-                              className="iconboxProduct"
-                              onClick={() => navigate(`/Store/StoreDetails/${data?.data?.id}`)}
-                            >
-                              <IconstoreCardNext fill="#ffffff" />
-                            </Button>
+                          <Button
+                            radius="full"
+                            isIconOnly
+                            size="sm"
+                            className="iconboxProduct"
+                            onClick={() =>
+                              navigate(`/Store/StoreDetails/${data?.data?.id}`)
+                            }
+                          >
+                            <IconstoreCardNext fill="#ffffff" />
+                          </Button>
                         </div>
                       </div>
                     </div>

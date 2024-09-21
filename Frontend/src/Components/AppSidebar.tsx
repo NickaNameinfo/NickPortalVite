@@ -37,7 +37,7 @@ import {
   onGlobalPaymentSearch,
   onSearchGlobal,
   onUpdateOpenStore,
-  updateLoginDetails
+  updateLoginDetails,
 } from "../Components/Common/globalSlice";
 import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
 export const AppSidebar = () => {
@@ -68,9 +68,10 @@ export const AppSidebar = () => {
     refetch();
   }, []);
 
-
   React.useEffect(() => {
-    onSearchByCategory(selectedCategory?.length > 0 ?  selectedCategory?.join(",") : null);
+    onSearchByCategory(
+      selectedCategory?.length > 0 ? selectedCategory?.join(",") : null
+    );
   }, [selectedCategory]);
 
   const handleLogOut = () => {
@@ -81,7 +82,7 @@ export const AppSidebar = () => {
     eraseCookie("storeId");
     eraseCookie("plan");
     dispatch(updateLoginDetails(null));
-    location.reload()
+    location.reload();
   };
 
   const dispatch = useAppDispatch();
@@ -128,6 +129,7 @@ export const AppSidebar = () => {
                   : "max-h-[42px] min-w-[190px]"
               }`}
               src="https://nextui-docs-v2.vercel.app/images/album-cover.png"
+              // src="../assets/logo.jpg"
             />
           </div>
           {mobileExpand ? (
@@ -161,8 +163,8 @@ export const AppSidebar = () => {
             </span>
           )}
         </Link>
-        <aside id="default-sidebar" className="h-[84vh]" aria-label="Sidebar">
-          <div className="h-full px-3 pb-4 pt-0 overflow-y-auto custom-scrollbar">
+        <aside id="default-sidebar" className="h-[72vh]" aria-label="Sidebar">
+          <div className="h-full px-3 pb-2 pt-0 overflow-y-auto custom-scrollbar">
             <div className="scroll-content h-fit left-0 top-0 transition-transform z-40">
               {_nav?.map((result) =>
                 result?.menuType === "single" ? (
@@ -194,9 +196,16 @@ export const AppSidebar = () => {
                             <FormeIcon />
                           </span>
                         ) : (
-                          <p className="text-black text-sm font-normal">
-                            {result?.name}
-                          </p>
+                          <div className={result?.isSoon ? "flex w-full justify-between" : ""}>
+                            <p className="text-black text-sm font-normal">
+                              {result?.name}
+                            </p>
+                            {result?.isSoon && (
+                              <p className="text-gray-400 text-xs font-mono">
+                                coming soon
+                              </p>
+                            )}
+                          </div>
                         )}
                         {/* <Switch
                           color="secondary"
@@ -312,7 +321,7 @@ export const AppSidebar = () => {
             </div>
             <div
               style={{ backgroundColor: "#ffffff80" }}
-              className="absolute bottom-[5%] rounded-lg w-11/12"
+              className="absolute bottom-[4%] rounded-lg w-11/12"
             >
               {!currentloginDetails?.data?.email ? (
                 <Login />
@@ -345,8 +354,8 @@ export const AppSidebar = () => {
                               <Listbox
                                 aria-label="User Menu"
                                 onAction={(key) => {
-                                  if(key === "logOut"){
-                                    handleLogOut()
+                                  if (key === "logOut") {
+                                    handleLogOut();
                                   }
                                 }}
                                 itemClasses={{

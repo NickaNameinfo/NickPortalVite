@@ -7,6 +7,7 @@ export const _nav = [
     key: "For Me",
     link: "/",
     icons: <IconHome />,
+    isSoon: true,
   },
   {
     menuType: "single",
@@ -14,6 +15,7 @@ export const _nav = [
     key: "Other For You",
     link: "/",
     icons: <IconHome />,
+    isSoon: true,
   },
   {
     menuType: "single",
@@ -21,6 +23,7 @@ export const _nav = [
     key: "Within 5Km",
     link: "/",
     icons: <IconHome />,
+    isSoon: true,
   },
   {
     menuType: "multiple",
