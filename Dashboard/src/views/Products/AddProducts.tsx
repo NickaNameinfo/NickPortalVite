@@ -407,14 +407,60 @@ const AddProducts = () => {
                 control={control}
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <Input
-                    type="file"
-                    label="Image"
-                    size="lg"
-                    onChange={(e) => {
-                      field.onChange(e.target.files[0]); // Don't forget to call field.onChange to update the form state
-                    }}
-                  />
+                  <div style={{ position: "relative", width: "100%" }}>
+                    <input
+                      type="file"
+                      id="file"
+                      style={{
+                        opacity: 0,
+                        position: "absolute",
+                        zIndex: -1,
+                        width: "100%",
+                        
+                      }}
+                      onChange={(e) => {
+                        console.log(e, "Selected file");
+                        field.onChange(e.target.files[0]); // Update form state with selected file
+                        document.getElementById("fileLabel").innerText = e
+                          .target.files[0]
+                          ? e.target.files[0].name
+                          : "No file selected"; // Update label dynamically
+                      }} 
+                    />
+                    <label
+                      htmlFor="file"
+                      style={{
+                        border: "1px solid rgba(128, 128, 128, 0.3)",
+                        borderRadius: "7px",
+                        padding: "10px",
+                        width: "100%",
+                        display: "inline-block",
+                        textAlign: "center",
+                        cursor: "pointer",
+                        fontSize:"14px"
+                      }}
+                    >
+                      Choose File
+                    </label>
+                    <span  id="fileLabel" style={{ marginLeft: "10px", textAlign: "start", fontSize:"12px"  }}>
+                      No file selected
+                    </span>
+                  </div>
+                  // <input
+                  //   style={{
+                  //     border: "1px solid rgba(128, 128, 128, 0.3)",
+                  //       borderRadius: "px",
+                  //   }}
+                  //   // className="border"
+                  //   type="file"
+                  //   // label="Image"
+                  //   // size="lg"
+                  //   onChange={(e) => {
+                  //     console.log(e, "eeeeeefile");
+
+                  //     field.onChange(e.target.files[0]); // Don't forget to call field.onChange to update the form state
+                  //   }}
+                  // />
                 )}
               />
               <Image
