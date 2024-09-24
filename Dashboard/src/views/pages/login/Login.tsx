@@ -42,6 +42,7 @@ const Login = () => {
         backgroundColor: "white",
         // width: "1",
         // height: "500px",
+        // width: "850px ",
         // alignItems: "center",
         // justifyContent: "center",
         // display: "flex",
@@ -54,7 +55,7 @@ const Login = () => {
         <h2 className="text-2xl font-bold my-4 flex justify-center">Login</h2>
 
         <div className=" flex justify-center ">
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)} className="w-4/12">
             <div className="mb-3">
               <Controller
                 name="email" // Changed to reflect a text input
@@ -91,7 +92,7 @@ const Login = () => {
             </div>
             <div className="text-center">
               <Button color="primary" type="submit">
-                Submit
+                Login
               </Button>
             </div>
           </form>
