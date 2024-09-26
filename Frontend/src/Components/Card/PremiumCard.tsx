@@ -96,10 +96,11 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
     } else {
       try {
         const result = await addCart(tempCartValue);
-        console.log(result, "result432345234");
         if (result?.data?.success) {
           refetch();
           dispatch(onRefreshCart(true));
+        }else{
+          throw error
         }
       } catch (error) {
         MySwal.fire({

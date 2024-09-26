@@ -366,7 +366,6 @@ module.exports = {
 
   async vendorProductDelete(req, res, next) {
     try {
-      console.log("hi", req.body);
       db.vendor_product
         .findOne({ where: { id: req.body.id } })
         .then((data) => {

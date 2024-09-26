@@ -1,4 +1,7 @@
 const express = require("express");
+const { productFeedbackRouter } = require("./resources/feedback/productFeedback.router");
+const { subscriptionRouter } = require("./resources/subcription/subcription.router");
+const { adRouter } = require("./resources/ad/ad.router");
 const authRouter = require("./resources/auth").authRouter;
 const productRouter = require("./resources/product").productRouter;
 const vendorRouter = require("./resources/vendor").vendorRouter;
@@ -26,5 +29,8 @@ restRouter.use("/payment", paymentRouter);
 restRouter.use("/vendorStock", vendorStockRouter);
 restRouter.use("/cart", cartRouter);
 restRouter.use("/requestStore", requestStoreRouter);
+restRouter.use("/productFeedbackRouter", productFeedbackRouter);
+restRouter.use("/subscription", subscriptionRouter);
+restRouter.use("/ads", adRouter);
 
 module.exports = { restRouter };

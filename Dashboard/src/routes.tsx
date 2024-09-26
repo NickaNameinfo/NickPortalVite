@@ -19,6 +19,7 @@ const EditStores = React.lazy(() => import("../src/views/Store/AddStore"));
 const StoresList = React.lazy(() => import("../src/views/Store/StoreList"));
 const VendorProducts = React.lazy(() => import("../src/views/VendorProducts/index"));
 const VendorDetails = React.lazy(() => import("../src/views/VendorProducts/VendorDetails/index"));
+const Subscriptions = React.lazy(() => import("../src/views/Subscriptions/index"));
 
 const routes = [
   { path: "/", exact: false, name: "Home" },
@@ -34,6 +35,7 @@ const routes = [
   { path: "/Stores/List", name: "StoresList", element: StoresList },
   { path: "/Vendors/Products", name: "VendorProductList", element: VendorProducts },
   { path: "/Vendors/Products/Details/:id", name: "VendorProductDetails", element: VendorDetails },
+  { path: "/Subscriptions", name: "Subscriptions", element: Subscriptions },
 ];
 
 export default routes;

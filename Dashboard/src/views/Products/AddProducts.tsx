@@ -55,10 +55,7 @@ const AddProducts = () => {
       ...data,
       subCategoryId: 3,
       childCategoryId: 3,
-      slug:
-        data?.name + currentStoreUserId
-          ? currentStoreUserId
-          : currentVendorUserId,
+      slug:data?.name,
       createdId: currentStoreUserId ? currentStoreUserId : currentVendorUserId,
       createdType: currentStoreUserId ? "Store" : "Vendor",
       paymentMode: String(tempFormData?.paymentMode || ""),

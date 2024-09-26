@@ -6,7 +6,6 @@ const axiosBaseQuery = fetchBaseQuery({
   baseUrl: infoData.baseApi, // Set your base URL
   prepareHeaders: (headers, { getState }) => {
     const token = getCookie("token"); // Assuming getCookie is a function to retrieve the token from cookies
-    console.log(token, "token4352345");
     if (token) {
       headers.set("Authorization", `${token}`);
     }

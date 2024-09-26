@@ -12,40 +12,40 @@ const axiosBaseQuery = fetchBaseQuery({
   },
 });
 
-export const VendorApi = createApi({
-  reducerPath: "VendorApi",
+export const SucriptioniApi = createApi({
+  reducerPath: "SucriptioniApi",
   baseQuery: axiosBaseQuery,
   endpoints: (builder) => ({
     // Admin DetailPage API
-    getVendors: builder.query({
+    getSubcription: builder.query({
       query: (body) => ({
-        url: `/vendor/list`,
+        url: `/subscription`,
         method: "GET",
       }),
     }),
-    getVendorsByID: builder.query({
+    getSubcriptionByCustomerID: builder.query({
       query: (id) => ({
-        url: `/vendor/list/${id}`,
+        url: `/subscription/${id}`,
         method: "GET",
       }),
     }),
-    addVendors: builder.mutation({
+    addSubcription: builder.mutation({
       query: (body) => ({
-        url: `/vendor/create`,
+        url: `/subscription/create`,
         method: "POST",
         body,
       }),
     }),
-    updateVendors: builder.mutation({
+    updatesubscription: builder.mutation({
       query: (body) => ({
-        url: `/vendor/update`,
+        url: `/subscription/update`,
         method: "POST",
         body,
       }),
     }),
-    deleteVendors: builder.mutation({
+    deleteSubscription: builder.mutation({
       query: (id) => ({
-        url: `/vendor/delete/${id}`,
+        url: `/subscription/${id}`,
         method: "DELETE",
       }),
     }),
@@ -58,5 +58,5 @@ export const {
   useAddVendorsMutation,
   useUpdateVendorsMutation,
   useDeleteVendorsMutation,
-} = VendorApi;
-export const { endpoints } = VendorApi;
+} = SucriptioniApi;
+export const { endpoints } = SucriptioniApi;

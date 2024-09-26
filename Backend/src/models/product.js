@@ -1,18 +1,51 @@
 "use strict";
+
 module.exports = (sequelize, DataTypes) => {
   const product = sequelize.define(
     "product",
     {
-      categoryId: DataTypes.INTEGER,
-      subCategoryId: DataTypes.INTEGER,
-      childCategoryId: DataTypes.INTEGER,
-      name: DataTypes.STRING,
-      slug: DataTypes.STRING,
+      categoryId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "category", // Assumes a Category model exists
+          key: "id",
+        },
+      },
+      subCategoryId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "subcategories", // Assumes a Subcategories model exists
+          key: "id",
+        },
+      },
+      childCategoryId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "subchildcategories", // Assumes a Subchildcategories model exists
+          key: "id",
+        },
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      slug: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
       brand: DataTypes.STRING,
       unitSize: DataTypes.STRING,
-      status: DataTypes.STRING,
+      status: {
+        type: DataTypes.STRING,
+        defaultValue: "active",
+      },
       buyerPrice: DataTypes.INTEGER,
-      price: DataTypes.INTEGER,
+      price: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       qty: DataTypes.INTEGER,
       discountPer: DataTypes.INTEGER,
       discount: DataTypes.INTEGER,
@@ -27,19 +60,22 @@ module.exports = (sequelize, DataTypes) => {
     },
     {}
   );
+
   product.associate = function (models) {
-    // associations can be defined here
-    models.product.belongsTo(models.subcategories, {
+    // Defining associations
+    product.belongsTo(models.subcategories, {
       foreignKey: "subCategoryId",
     });
-    models.product.hasMany(models.productphoto, { foreignKey: "productId" });
-    models.product.hasMany(models.ProductOffer, { foreignKey: "productId" });
-    models.product.belongsTo(models.subchildcategories, {
+    product.belongsTo(models.subchildcategories, {
       foreignKey: "childCategoryId",
     });
-    models.product.hasMany(models.vendor_product, { foreignKey: "productId" });
-    models.product.hasMany(models.store_product, { foreignKey: "productId" });
-    models.product.hasMany(models.store, { foreignKey: "id" });
+    product.hasMany(models.productphoto, { foreignKey: "productId" });
+    product.hasMany(models.ProductOffer, { foreignKey: "productId" });
+    product.hasMany(models.vendor_product, { foreignKey: "productId" });
+    product.hasMany(models.store_product, { foreignKey: "productId" });
+    product.hasMany(models.productFeedback, { foreignKey: "productId" });
+    product.belongsTo(models.store, { foreignKey: "id" });
   };
+
   return product;
 };

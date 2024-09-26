@@ -76,8 +76,6 @@ export const ProductDetail = (props: ProductDetailProps) => {
   const [updateCart] = useUpdateCartMutation();
   const dispatch = useAppDispatch();
 
-  console.log(storeDetails, "data80980980");
-
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
     refetch();
@@ -114,6 +112,8 @@ export const ProductDetail = (props: ProductDetailProps) => {
         const result = await addCart(tempCartValue);
         if (result?.data?.success) {
           cartRefetch();
+        }else{
+          throw error
         }
       } catch (error) {
         MySwal.fire({

@@ -142,7 +142,14 @@ export const _nav = [
     menuType: "single",
     name: "Customer",
     key: "Customer",
-    link: "/",
+    link: "/Subscriptions",
+    icons: <IconHome />,
+  },
+  {
+    menuType: "single",
+    name: "Subscriptions",
+    key: "Subscriptions",
+    link: "/Subscriptions",
     icons: <IconHome />,
   },
   {
