@@ -57,6 +57,8 @@ module.exports = (sequelize, DataTypes) => {
       paymentMode: DataTypes.STRING,
       createdId: DataTypes.INTEGER,
       createdType: DataTypes.TEXT,
+      isEnableEcommerce: DataTypes.TEXT,
+      isEnableCustomize: DataTypes.TEXT,
     },
     {}
   );

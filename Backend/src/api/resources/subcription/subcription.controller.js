@@ -1,4 +1,5 @@
 const db = require("../../../models");
+const { Op } = require("sequelize");
 
 module.exports = {
   // Get all subscriptions
@@ -17,12 +18,20 @@ module.exports = {
   async getSubscriptionById(req, res, next) {
     try {
       const { id } = req.params;
+      const { subscriptionType } = req.query; // Assuming subscriptionType is passed as a query parameter
       const subscription = await db.Subscription.findAll({
-        where: { customerId: id },
+        where: {
+          [Op.and]: [
+            { customerId: id },
+            { subscriptionType: subscriptionType } // This will filter by subscription type
+          ]
+        },
       });
-      if (!subscription) {
+  
+      if (!subscription || subscription.length === 0) {
         return res.status(404).json({ success: false, message: "Subscription not found" });
       }
+  
       res.status(200).json({ success: true, data: subscription });
     } catch (error) {
       next(error);

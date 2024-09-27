@@ -24,8 +24,8 @@ export const SucriptioniApi = createApi({
       }),
     }),
     getSubcriptionByCustomerID: builder.query({
-      query: (id) => ({
-        url: `/subscription/${id}`,
+      query: (body) => ({
+        url: `/subscription/${body?.id}?subscriptionType=${body?.subscriptionType}`,
         method: "GET",
       }),
     }),
@@ -53,10 +53,10 @@ export const SucriptioniApi = createApi({
 });
 
 export const {
-  useGetVendorsQuery,
-  useGetVendorsByIDQuery,
-  useAddVendorsMutation,
-  useUpdateVendorsMutation,
-  useDeleteVendorsMutation,
+  useAddSubcriptionMutation,
+  useGetSubcriptionQuery,
+  useGetSubcriptionByCustomerIDQuery,
+  useUpdatesubscriptionMutation,
+  useDeleteSubscriptionMutation,
 } = SucriptioniApi;
 export const { endpoints } = SucriptioniApi;

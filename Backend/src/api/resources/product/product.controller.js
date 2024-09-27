@@ -64,6 +64,8 @@ module.exports = {
         paymentMode,
         createdId,
         createdType,
+        isEnableEcommerce,
+        isEnableCustomize
       } = req.body;
       return db.product
         .create({
@@ -88,6 +90,8 @@ module.exports = {
           photo: req?.file ? req?.file?.path : "",
           createdId: createdId,
           createdType: createdType,
+        isEnableEcommerce: isEnableEcommerce,
+        isEnableCustomize: isEnableCustomize
         })
         .then((product) => {
           res.status(200).json({
@@ -180,6 +184,8 @@ module.exports = {
         paymentMode,
         createdId,
         createdType,
+        isEnableEcommerce,
+        isEnableCustomize
       } = req.body;
       db.product
         .findOne({ where: { id: id } })
@@ -199,18 +205,20 @@ module.exports = {
                 status: status,
                 brand: brand ? brand : product?.brand,
                 unitSize: unitSize ? unitSize : product.unitSize,
-                desc: desc,
-                buyerPrice: buyerPrice,
-                price: price,
-                qty: qty,
-                discount: discount,
-                discountPer: discountPer,
-                total: total,
-                netPrice: netPrice,
-                paymentMode: paymentMode,
+                desc: desc ? desc : product.desc,
+                buyerPrice: buyerPrice ? buyerPrice : product.buyerPrice,
+                price: price ? price : product.price,
+                qty: qty ? qty : product.qty,
+                discount: discount ? discount : product.discount,
+                discountPer: discountPer ? discountPer : product.discountPer,
+                total: total ? total : product.total,
+                netPrice: netPrice ? netPrice : product.netPrice,
+                paymentMode: paymentMode ? paymentMode : product.paymentMode,
                 photo: req.file ? req.file.location : product.photo,
-                createdId: createdId,
-                createdType: createdType,
+                createdId: createdId ? createdId : product.createdId,
+                createdType: createdType ? createdType : product.createdType,
+                isEnableEcommerce: isEnableEcommerce ? isEnableEcommerce : product.isEnableEcommerce,
+                isEnableCustomize: isEnableCustomize ? isEnableCustomize : product.isEnableCustomize
               },
               { where: { id: product.id } }
             );

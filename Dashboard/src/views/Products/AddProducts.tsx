@@ -55,10 +55,12 @@ const AddProducts = () => {
       ...data,
       subCategoryId: 3,
       childCategoryId: 3,
-      slug:data?.name,
+      slug: data?.name,
       createdId: currentStoreUserId ? currentStoreUserId : currentVendorUserId,
       createdType: currentStoreUserId ? "Store" : "Vendor",
       paymentMode: String(tempFormData?.paymentMode || ""),
+      isEnableCustomize: tempFormData?.isEnableCustomize ? "1" : "0",
+      isEnableEcommerce: tempFormData?.isEnableEcommerce ? "1" : "0",
     };
     const formData = new FormData();
     for (const key in tempData) {
@@ -106,8 +108,12 @@ const AddProducts = () => {
       reset(productData?.data);
       setValue("grand_total", productData?.data?.total);
       setValue("paymentMode", productData?.data?.paymentMode?.split(","));
+      setValue("isEnableCustomize", productData?.data?.isEnableCustomize);
+      setValue("isEnableEcommerce", productData?.data?.isEnableEcommerce);
     }
   }, [productData]);
+
+  console.log(tempFormData, "tempFormData9078");
 
   return (
     <div className="mx-3">
@@ -413,7 +419,6 @@ const AddProducts = () => {
                         position: "absolute",
                         zIndex: -1,
                         width: "100%",
-                        
                       }}
                       onChange={(e) => {
                         console.log(e, "Selected file");
@@ -422,7 +427,7 @@ const AddProducts = () => {
                           .target.files[0]
                           ? e.target.files[0].name
                           : "No file selected"; // Update label dynamically
-                      }} 
+                      }}
                     />
                     <label
                       htmlFor="file"
@@ -434,12 +439,19 @@ const AddProducts = () => {
                         display: "inline-block",
                         textAlign: "center",
                         cursor: "pointer",
-                        fontSize:"14px"
+                        fontSize: "14px",
                       }}
                     >
                       Choose File
                     </label>
-                    <span  id="fileLabel" style={{ marginLeft: "10px", textAlign: "start", fontSize:"12px"  }}>
+                    <span
+                      id="fileLabel"
+                      style={{
+                        marginLeft: "10px",
+                        textAlign: "start",
+                        fontSize: "12px",
+                      }}
+                    >
                       No file selected
                     </span>
                   </div>
@@ -501,6 +513,48 @@ const AddProducts = () => {
                 </CheckboxGroup>
               )}
             />
+            <div className="w-100">
+              <div className="mb-3">
+                <Controller
+                  name="isEnableEcommerce"
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      defaultSelected={
+                        String(productData?.data?.isEnableEcommerce) === "1"
+                          ? true
+                          : false
+                      }
+                      checked={field.value === "1"} // Set checked based on the field's value
+                      onChange={(e) =>
+                        field.onChange(e.target.checked ? "1" : "0")
+                      } // Update value on change
+                    >
+                      Enable Ecommerce
+                    </Checkbox>
+                  )}
+                />
+              </div>
+              <Controller
+                name="isEnableCustomize"
+                control={control}
+                render={({ field }) => (
+                  <Checkbox
+                    defaultSelected={
+                      String(productData?.data?.isEnableCustomize) === "1"
+                        ? true
+                        : false
+                    }
+                    checked={field.value === "1"} // Set checked based on the field's value
+                    onChange={(e) =>
+                      field.onChange(e.target.checked ? "1" : "0")
+                    } // Update value on change
+                  >
+                    Enable Customize
+                  </Checkbox>
+                )}
+              />
+            </div>
           </div>
         </div>
         {/* <div className="text-center">
