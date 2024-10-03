@@ -10,6 +10,8 @@ import {
   ModalHeader,
   useDisclosure,
   Image,
+  Tabs,
+  Tab,
 } from "@nextui-org/react";
 import React from "react";
 import {
@@ -67,6 +69,8 @@ export const ProductDetail = (props: ProductDetailProps) => {
     id: id,
     productId: props?.item?.product?.id,
   };
+  console.log(props?.item, "asdkgjnqujlk");
+  
   const {
     data: cart,
     error: cartError,
@@ -112,8 +116,8 @@ export const ProductDetail = (props: ProductDetailProps) => {
         const result = await addCart(tempCartValue);
         if (result?.data?.success) {
           cartRefetch();
-        }else{
-          throw error
+        } else {
+          throw error;
         }
       } catch (error) {
         MySwal.fire({
@@ -325,35 +329,78 @@ export const ProductDetail = (props: ProductDetailProps) => {
                   </div>
                 </div>
 
-                <div className="sm:px-2 mt-3 flex justify-between items-center ">
-                  <div className="font-semibold md:text-xl xm:text-md">
-                    Related Stores
+                <div className="grid grid-cols-2">
+                  <div className="">
+                    <div className="description me-2">
+                      <div className="flex w-full flex-col">
+                        <Tabs
+                          aria-label="Options"
+                          color="primary"
+                          variant="bordered"
+                          className="flex-col"
+                        >
+                          <Tab
+                            key="photos"
+                            title={
+                              <div className="flex items-center space-x-2">
+                                {/* <GalleryIcon /> */}
+                                <span>Description</span>
+                              </div>
+                            }
+                          >
+                            <Card>
+                              <CardBody>
+                                {props?.item?.product?.slug}
+                              </CardBody>
+                            </Card>
+                          </Tab>
+                          <Tab
+                            key="music"
+                            title={
+                              <div className="flex items-center space-x-2">
+                                {/* <MusicIcon /> */}
+                                <span>Shipping Info</span>
+                              </div>
+                            }
+                          >
+                            <Card>
+                              <CardBody>
+                                Lorem ipsum dolor sit amet, consectetur
+                                adipiscing elit, sed do eiusmod tempor
+                                incididunt ut labore et dolore magna aliqua. Ut
+                                enim ad minim veniam, quis nostrud exercitation
+                                ullamco laboris nisi ut aliquip ex ea commodo
+                                consequat.
+                              </CardBody>
+                            </Card>
+                          </Tab>
+                          <Tab
+                            key="videos"
+                            title={
+                              <div className="flex items-center space-x-2">
+                                {/* <VideoIcon /> */}
+                                <span>Seller Profile</span>
+                              </div>
+                            }
+                          >
+                            <Card>
+                              <CardBody>
+                                Lorem ipsum dolor sit amet, consectetur
+                                adipiscing elit, sed do eiusmod tempor
+                                incididunt ut labore et dolore magna aliqua. Ut
+                                enim ad minim veniam, quis nostrud exercitation
+                                ullamco laboris nisi ut aliquip ex ea commodo
+                                consequat.
+                              </CardBody>
+                            </Card>
+                          </Tab>
+                        </Tabs>
+                      </div>
+                    </div>
+                    <div className="feedback"></div>
+                    <div className="rating"></div>
                   </div>
-                  <div className="flex flex  items-center">
-                    <Button
-                      className="bg-gray-200 me-5"
-                      size="md"
-                      isIconOnly
-                      aria-label="Like"
-                      variant="bordered"
-                    >
-                      <IconPrev fill="#000000" />
-                    </Button>
-                    <Button
-                      className=" bg-gray-200"
-                      size="md"
-                      isIconOnly
-                      aria-label="Like"
-                      variant="bordered"
-                    >
-                      <IconNext fill="#000000" />
-                    </Button>
-                  </div>
-                </div>
-                <div className="grid xm:grid-cols-1 mm:grid-cols-1 ml:grid-cols-1 sm:grid-cols-2  md:grid-cols-2  lg:grid-cols-2  xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-4 gap-2">
-                  {stores?.data?.map((item, index) => {
-                    return <StoreCard item={item} key={index} />;
-                  })}
+                  <div className="">asdfasfasdfd</div>
                 </div>
               </ModalBody>
               <ModalFooter className="pt-0 p-3 flex justify-between"></ModalFooter>
