@@ -308,7 +308,7 @@ export const TableList = (props: TableProps) => {
         wrapper: "min-h-[382px] min-w-full min-w-unit-6",
       }}
       selectedKeys={selectedKeys}
-      selectionMode="multiple"
+      // selectionMode="multiple"
       sortDescriptor={sortDescriptor}
       topContent={topContent}
       topContentPlacement="outside"

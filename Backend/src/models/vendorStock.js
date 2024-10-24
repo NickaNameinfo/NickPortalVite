@@ -51,7 +51,7 @@ module.exports = (sequelize, DataTypes) => {
 
   vendorStock.associate = function (models) {
     models.vendorStock.belongsTo(models.category, {
-      foreignKey: "categoryId",
+      foreignKey: "id",
     });
     models.vendorStock.belongsTo(models.vendor, {
       foreignKey: "vendorId",

@@ -18,25 +18,34 @@ module.exports = {
   async getSubscriptionById(req, res, next) {
     try {
       const { id } = req.params;
-      const { subscriptionType } = req.query; // Assuming subscriptionType is passed as a query parameter
+      const { subscriptionType } = req.query; // Optional subscriptionType
+      
+      // Build the "where" condition
+      const whereCondition = {
+        customerId: id,
+      };
+  
+      if (subscriptionType) {
+        whereCondition.subscriptionType = subscriptionType; // Only add if provided
+      }
+  
+      // Query the database
       const subscription = await db.Subscription.findAll({
-        where: {
-          [Op.and]: [
-            { customerId: id },
-            { subscriptionType: subscriptionType } // This will filter by subscription type
-          ]
-        },
+        where: whereCondition,
       });
   
+      // Check if the subscription exists
       if (!subscription || subscription.length === 0) {
         return res.status(404).json({ success: false, message: "Subscription not found" });
       }
   
+      // Return the subscription data
       res.status(200).json({ success: true, data: subscription });
     } catch (error) {
       next(error);
     }
   },
+  
 
   // Add new subscription
   async addSubscription(req, res, next) {

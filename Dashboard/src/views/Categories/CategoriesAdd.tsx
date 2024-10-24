@@ -16,7 +16,11 @@ import { useGetCategoriesQuery, useAddCategoriesMutation } from "./Service.mjs";
 import InputNextUI from "../../Components/Common/Input/input";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 const CategoriesAdd = () => {
-  const { handleSubmit, control, reset } = useForm();
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm();
   const navigate = useNavigate();
   const vendorId = getCookie("vendorId");
   const storeId = getCookie("storeId");
@@ -28,13 +32,16 @@ const CategoriesAdd = () => {
   const onSubmit = async (formData: any) => {
     let tempApiParams = {
       ...formData,
+      slug: formData.name,
       createdId: id ? id : vendorId ? vendorId : storeId,
       createdType: vendorId ? "Vendor" : "Store",
     };
     const result = await addCategories(tempApiParams);
-    if (result) {
+    if (result?.data) {
       setRefresh(true);
       refetch();
+    } else {
+      alert(result?.error?.data?.message);
     }
   };
 
@@ -46,15 +53,13 @@ const CategoriesAdd = () => {
     setRefresh((prev) => !prev);
   }, [data]);
 
-  console.log(data, "data3245425343")
-
-  const defaultCloumns = ["id", "name", "createdType", "actions"];
+  const defaultCloumns = ["id", "name", "createdType"];
 
   const columns = [
     { name: "S.No", id: "id", sortable: true },
     { name: "name", id: "name", sortable: true },
     { name: "Created Type", id: "createdType", sortable: true },
-    { name: "Actions", id: "actions" },
+    // { name: "Actions", id: "actions" },
   ];
 
   const renderCell = React.useCallback((user, columnKey) => {
@@ -136,19 +141,33 @@ const CategoriesAdd = () => {
             <Controller
               name="name" // Changed to reflect a text input
               control={control}
-              rules={{ required: true }}
+              rules={{ required: "Please enter value" }}
               render={({ field }) => (
-                <InputNextUI type="text" label="Name" size="sm" {...field} />
+                <InputNextUI
+                  type="text"
+                  label="Name"
+                  size="sm"
+                  {...field}
+                  isRequired={true}
+                  isInvalid={errors?.["name"] ? true : false}
+                  errorMessage={errors?.["name"]?.message}
+                />
               )}
             />
-            <Controller
+            {/* <Controller
               name="slug" // Changed to reflect a text input
               control={control}
-              rules={{ required: true }}
               render={({ field }) => (
-                <InputNextUI type="text" label="Slug" size="sm" {...field} />
+                <InputNextUI
+                  type="text"
+                  label="Slug"
+                  size="sm"
+                  value={}
+                  isDisabled
+                  {...field}
+                />
               )}
-            />
+            /> */}
           </div>
         </div>
       </form>

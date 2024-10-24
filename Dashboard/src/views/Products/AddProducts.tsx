@@ -29,7 +29,14 @@ import InputNextUI from "../../Components/Common/Input/input";
 import { infoData } from "../../configData";
 
 const AddProducts = () => {
-  const { handleSubmit, control, reset, watch, setValue } = useForm();
+  const {
+    handleSubmit,
+    control,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm();
   const currentStoreUserId = getCookie("storeId");
   const currentVendorUserId = getCookie("vendorId");
   const navigate = useNavigate();
@@ -113,8 +120,6 @@ const AddProducts = () => {
     }
   }, [productData]);
 
-  console.log(tempFormData, "tempFormData9078");
-
   return (
     <div className="mx-3">
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -164,9 +169,12 @@ const AddProducts = () => {
             <Controller
               name="categoryId" // Changed to reflect a text input
               control={control}
-              rules={{ required: true }}
+              rules={{ required: "Please select value" }}
               render={({ field }) => (
                 <Select
+                  isRequired={true}
+                  isInvalid={errors?.["categoryId"] ? true : false}
+                  errorMessage={errors?.["categoryId"]?.message}
                   defaultSelectedKeys={String(productData?.data?.categoryId)}
                   classNames={{
                     label: "group-data-[filled=true]:-translate-y-3",
@@ -219,7 +227,7 @@ const AddProducts = () => {
             <Controller
               name="name" // Changed to reflect a text input
               control={control}
-              rules={{ required: true }}
+              rules={{ required: "Please enter value" }}
               render={({ field }) => (
                 <InputNextUI
                   type="text"
@@ -228,6 +236,9 @@ const AddProducts = () => {
                     console.log(value, "ownername");
                   }}
                   {...field}
+                  isRequired={true}
+                  isInvalid={errors?.["name"] ? true : false}
+                  errorMessage={errors?.["name"]?.message}
                 />
               )}
             />
@@ -235,7 +246,7 @@ const AddProducts = () => {
             <Controller
               name="status" // Changed to reflect a text input
               control={control}
-              rules={{ required: true }}
+              rules={{ required: "Please select value" }}
               render={({ field }) => (
                 <Select
                   classNames={{
@@ -269,10 +280,13 @@ const AddProducts = () => {
                     },
                   }}
                   label="Status"
-                  variant="faded"
+                  variant="bordered"
                   size="sm"
                   selectedKeys={String(tempFormData?.status)}
                   {...field}
+                  isRequired={true}
+                  isInvalid={errors?.["status"] ? true : false}
+                  errorMessage={errors?.["status"]?.message}
                 >
                   <SelectItem key={1} value={"1"}>
                     {"Active"}
@@ -286,7 +300,7 @@ const AddProducts = () => {
             <Controller
               name="unitSize" // Changed to reflect a text input
               control={control}
-              rules={{ required: true }}
+              rules={{ required: "Please enter value" }}
               render={({ field }) => (
                 <InputNextUI
                   type="text"
@@ -295,6 +309,9 @@ const AddProducts = () => {
                     console.log(value, "ownername");
                   }}
                   {...field}
+                  isRequired={true}
+                  isInvalid={errors?.["unitSize"] ? true : false}
+                  errorMessage={errors?.["unitSize"]?.message}
                 />
               )}
             />
@@ -316,7 +333,7 @@ const AddProducts = () => {
             <Controller
               name="sortDesc" // Changed to reflect a text input
               control={control}
-              rules={{ required: true }}
+              rules={{ required: "Please enter value" }}
               render={({ field }) => (
                 <InputNextUI
                   type="text"
@@ -325,6 +342,9 @@ const AddProducts = () => {
                     console.log(value, "ownername");
                   }}
                   {...field}
+                  isRequired={true}
+                  isInvalid={errors?.["sortDesc"] ? true : false}
+                  errorMessage={errors?.["sortDesc"]?.message}
                 />
               )}
             />
@@ -332,7 +352,7 @@ const AddProducts = () => {
             <Controller
               name="price" // Changed to reflect a text input
               control={control}
-              rules={{ required: true }}
+              rules={{ required: "Please enter value" }}
               render={({ field }) => (
                 <InputNextUI
                   type="text"
@@ -341,13 +361,16 @@ const AddProducts = () => {
                     console.log(value, "ownername");
                   }}
                   {...field}
+                  isRequired={true}
+                  isInvalid={errors?.["price"] ? true : false}
+                  errorMessage={errors?.["price"]?.message}
                 />
               )}
             />
             <Controller
               name="qty" // Changed to reflect a text input
               control={control}
-              rules={{ required: true }}
+              rules={{ required: "Please enter value" }}
               render={({ field }) => (
                 <InputNextUI
                   type="text"
@@ -356,13 +379,16 @@ const AddProducts = () => {
                     console.log(value, "ownername");
                   }}
                   {...field}
+                  isRequired={true}
+                  isInvalid={errors?.["qty"] ? true : false}
+                  errorMessage={errors?.["qty"]?.message}
                 />
               )}
             />
             <Controller
               name="discount" // Changed to reflect a text input
               control={control}
-              rules={{ required: true }}
+              rules={{ required: "Please enter value" }}
               render={({ field }) => (
                 <InputNextUI
                   type="text"
@@ -371,13 +397,16 @@ const AddProducts = () => {
                     console.log(value, "ownername");
                   }}
                   {...field}
+                  isRequired={true}
+                  isInvalid={errors?.["discount"] ? true : false}
+                  errorMessage={errors?.["discount"]?.message}
                 />
               )}
             />
             <Controller
               name="discountPer" // Changed to reflect a text input
               control={control}
-              rules={{ required: true }}
+              rules={{ required: "Please enter value" }}
               render={({ field }) => (
                 <InputNextUI
                   type="text"
@@ -386,13 +415,15 @@ const AddProducts = () => {
                     console.log(value, "ownername");
                   }}
                   {...field}
+                  isRequired={true}
+                  isInvalid={errors?.["discountPer"] ? true : false}
+                  errorMessage={errors?.["discountPer"]?.message}
                 />
               )}
             />
             <Controller
               name="total" // Changed to reflect a text input
               control={control}
-              rules={{ required: true }}
               render={({ field }) => (
                 <InputNextUI
                   type="text"
@@ -408,7 +439,6 @@ const AddProducts = () => {
               <Controller
                 name="photo" // Changed to reflect a text input
                 control={control}
-                rules={{ required: true }}
                 render={({ field }) => (
                   <div style={{ position: "relative", width: "100%" }}>
                     <input
@@ -455,28 +485,15 @@ const AddProducts = () => {
                       No file selected
                     </span>
                   </div>
-                  // <input
-                  //   style={{
-                  //     border: "1px solid rgba(128, 128, 128, 0.3)",
-                  //       borderRadius: "px",
-                  //   }}
-                  //   // className="border"
-                  //   type="file"
-                  //   // label="Image"
-                  //   // size="lg"
-                  //   onChange={(e) => {
-                  //     console.log(e, "eeeeeefile");
-
-                  //     field.onChange(e.target.files[0]); // Don't forget to call field.onChange to update the form state
-                  //   }}
-                  // />
                 )}
               />
-              <Image
-                src={`${infoData.baseApi}/${productData?.data?.photo}`}
-                className="h-fit"
-                width={100}
-              />
+              {productData?.data?.photo && (
+                <Image
+                  src={`${infoData.baseApi}/${productData?.data?.photo}`}
+                  className="h-fit"
+                  width={100}
+                />
+              )}
             </div>
             <Controller
               name="grand_total" // Changed to reflect a text input
@@ -498,7 +515,7 @@ const AddProducts = () => {
             <Controller
               name="paymentMode" // Changed to reflect a text input
               control={control}
-              rules={{ required: true }}
+              rules={{ required: "Please enter value" }}
               render={({ field }) => (
                 <CheckboxGroup
                   label="Select Payment Type"

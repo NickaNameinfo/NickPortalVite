@@ -7,22 +7,30 @@ module.exports = {
   async addCategory(req, res, next) {
     try {
       const { name, slug, createdId, createdType } = req.body;
-      return db.category
-        .create({ name: name, slug: slug, createdId : createdId,  createdType:createdType})
-        .then((category) => {
-          res
-            .status(200)
-            .json({ success: true, msg: "Successfully inserted category" });
-        })
-        .catch(function (err) {
-          console.log(err, "errrrrrrrrrrrrrrrrrrr");
-          next(err);
-        });
+      console.log(req.body, "Incoming request body");
+  
+      // Check for an existing category by name
+      const existingCategory = await db.category.findOne({ where: { name } });
+  
+      if (existingCategory) {
+        return res.status(400).json({ success: false, message: "Category with this name already exists" });
+      }
+  
+      // Create the new category
+      const category = await db.category.create({
+        name,
+        slug,
+        createdId,
+        createdType,
+      });
+  
+      return res.status(200).json({ success: true, msg: "Successfully inserted category", category });
+  
     } catch (err) {
-      console.log(err, "erreo2034028");
-      throw new RequestError("Error");
+      console.log("Error occurred:", err);
+      next(err); // Pass the error to the error handler middleware
     }
-  },
+  },  
   async updateCategory(req, res, next) {
     try {
       const { name, slug, id } = req.body;
