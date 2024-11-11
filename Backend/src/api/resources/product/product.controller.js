@@ -214,7 +214,7 @@ module.exports = {
                 total: total ? total : product.total,
                 netPrice: netPrice ? netPrice : product.netPrice,
                 paymentMode: paymentMode ? paymentMode : product.paymentMode,
-                photo: req.file ? req.file.location : product.photo,
+                photo: req.file ? req.file.path : product.photo,
                 createdId: createdId ? createdId : product.createdId,
                 createdType: createdType ? createdType : product.createdType,
                 isEnableEcommerce: isEnableEcommerce ? isEnableEcommerce : product.isEnableEcommerce,

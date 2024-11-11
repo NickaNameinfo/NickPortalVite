@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import {
+  Badge,
   Button,
   Checkbox,
   CheckboxGroup,
@@ -27,6 +28,9 @@ import { useGetCategoriesQuery } from "../Categories/Service.mjs";
 import { getCookie } from "../.././JsFiles//CommonFunction.mjs";
 import InputNextUI from "../../Components/Common/Input/input";
 import { infoData } from "../../configData";
+import { useGetSubcriptionByCustomerIDQuery } from "../Subscriptions/Service.mjs";
+import { useGetVendorsProductByIdQuery } from "../VendorProducts/Service.mjs";
+import { useGetStoresProductByIDQuery } from "../Store/Service.mjs";
 
 const AddProducts = () => {
   const {
@@ -51,11 +55,76 @@ const AddProducts = () => {
     error: categoryerror,
     refetch: categoryrefetch,
   } = useGetCategoriesQuery();
+
+  let currentUserId = currentStoreUserId
+    ? currentStoreUserId
+    : currentVendorUserId;
+
+  let tempEcommereceValues = {
+    id: currentUserId,
+    subscriptionType: "Plan1",
+  };
+  const {
+    data: EcommereceSubcriptionData,
+    error,
+    refetch,
+  } = useGetSubcriptionByCustomerIDQuery(tempEcommereceValues);
+
+  let temCustomizeValues = {
+    id: currentUserId,
+    subscriptionType: "Plan2",
+  };
+  const {
+    data: customizeSubcriptionData,
+    error: customizeError,
+    refetch: customizeRefetch,
+  } = useGetSubcriptionByCustomerIDQuery(temCustomizeValues);
+
+  const {
+    data: vendorProducts,
+    error: vendorError,
+    refetch: vendorRefetch,
+  } = useGetVendorsProductByIdQuery(Number(currentVendorUserId));
+
+  const {
+    data: storeProducts,
+    error: storeError,
+    refetch: stroeRefetch,
+  } = useGetStoresProductByIDQuery(Number(currentStoreUserId));
+
   const {
     data: productData,
     error: productError,
     refetch: productRefetch,
   } = useGetProductsByIdQuery(productId);
+
+  React.useEffect(() => {
+    setValue("paymentMode", ["1", "2", "3"]);
+    productRefetch();
+    stroeRefetch();
+    vendorRefetch();
+    customizeRefetch();
+  }, []);
+
+  React.useEffect(() => {
+    if (productData?.data) {
+      reset(productData?.data);
+      setValue("grand_total", productData?.data?.total);
+      setValue("paymentMode", productData?.data?.paymentMode?.split(","));
+      setValue("isEnableCustomize", productData?.data?.isEnableCustomize);
+      setValue("isEnableEcommerce", productData?.data?.isEnableEcommerce);
+    }
+  }, [productData]);
+
+  React.useEffect(() => {
+    console.log(tempFormData, "tempFormData09789087");
+    const discountAmount = (tempFormData?.price * tempFormData?.discount) / 100;
+    const discountedPrice = tempFormData?.price - discountAmount;
+
+    setValue("grand_total", Number(discountedPrice * tempFormData?.qty));
+    setValue("total", Number(discountedPrice * tempFormData?.qty));
+    setValue("discountPer", Number(discountAmount));
+  }, [tempFormData?.price, tempFormData?.discount, tempFormData?.qty]);
 
   const onSubmit = async (data: any) => {
     let tempData = {
@@ -110,15 +179,17 @@ const AddProducts = () => {
     }
   };
 
-  React.useEffect(() => {
-    if (productData?.data) {
-      reset(productData?.data);
-      setValue("grand_total", productData?.data?.total);
-      setValue("paymentMode", productData?.data?.paymentMode?.split(","));
-      setValue("isEnableCustomize", productData?.data?.isEnableCustomize);
-      setValue("isEnableEcommerce", productData?.data?.isEnableEcommerce);
-    }
-  }, [productData]);
+  let productListValues =
+    vendorProducts?.data?.length > 0
+      ? vendorProducts?.data
+      : storeProducts?.data;
+
+  const filteredEcommereceData = productListValues?.filter(
+    (item) => item.product.isEnableEcommerce === "1"
+  );
+  const filteredCustomizeData = productListValues?.filter(
+    (item) => item.product.isEnableCustomize === 1
+  );
 
   return (
     <div className="mx-3">
@@ -153,6 +224,14 @@ const AddProducts = () => {
               {productData?.data ? "Update Product" : "Add Protuct"}
             </p>
           </Chip>
+          <Chip variant="flat" color="primary">
+            Total Ecommerce Subscription{" "}
+            {EcommereceSubcriptionData?.data?.[0]?.subscriptionCount}
+          </Chip>
+          <Chip variant="flat" color="warning">
+            Total Customize Subscription{" "}
+            {customizeSubcriptionData?.data?.[0]?.subscriptionCount}
+          </Chip>
           <div className="text-center">
             <Button
               color="primary"
@@ -175,7 +254,6 @@ const AddProducts = () => {
                   isRequired={true}
                   isInvalid={errors?.["categoryId"] ? true : false}
                   errorMessage={errors?.["categoryId"]?.message}
-                  defaultSelectedKeys={String(productData?.data?.categoryId)}
                   classNames={{
                     label: "group-data-[filled=true]:-translate-y-3",
                     trigger: [
@@ -210,9 +288,12 @@ const AddProducts = () => {
                   variant="faded"
                   size="sm"
                   {...field}
+                  selectedKeys={[String(tempFormData?.categoryId)]}
                 >
                   {categoryData?.data?.map((item) => (
-                    <SelectItem key={item.id}>{item.name}</SelectItem>
+                    <SelectItem key={String(item.id)} value={String(item.id)}>
+                      {item.name}
+                    </SelectItem>
                   ))}
                 </Select>
 
@@ -223,26 +304,6 @@ const AddProducts = () => {
                 // </Select>
               )}
             />
-
-            <Controller
-              name="name" // Changed to reflect a text input
-              control={control}
-              rules={{ required: "Please enter value" }}
-              render={({ field }) => (
-                <InputNextUI
-                  type="text"
-                  label="Name"
-                  onChange={(value) => {
-                    console.log(value, "ownername");
-                  }}
-                  {...field}
-                  isRequired={true}
-                  isInvalid={errors?.["name"] ? true : false}
-                  errorMessage={errors?.["name"]?.message}
-                />
-              )}
-            />
-
             <Controller
               name="status" // Changed to reflect a text input
               control={control}
@@ -295,6 +356,24 @@ const AddProducts = () => {
                     {"InActive"}
                   </SelectItem>
                 </Select>
+              )}
+            />
+            <Controller
+              name="name" // Changed to reflect a text input
+              control={control}
+              rules={{ required: "Please enter value" }}
+              render={({ field }) => (
+                <InputNextUI
+                  type="text"
+                  label="Name"
+                  onChange={(value) => {
+                    console.log(value, "ownername");
+                  }}
+                  {...field}
+                  isRequired={true}
+                  isInvalid={errors?.["name"] ? true : false}
+                  errorMessage={errors?.["name"]?.message}
+                />
               )}
             />
             <Controller
@@ -358,7 +437,7 @@ const AddProducts = () => {
                   type="text"
                   label="Price"
                   onChange={(value) => {
-                    console.log(value, "ownername");
+                    setValue("grand_total", value);
                   }}
                   {...field}
                   isRequired={true}
@@ -415,6 +494,7 @@ const AddProducts = () => {
                     console.log(value, "ownername");
                   }}
                   {...field}
+                  isDisabled
                   isRequired={true}
                   isInvalid={errors?.["discountPer"] ? true : false}
                   errorMessage={errors?.["discountPer"]?.message}
@@ -431,10 +511,28 @@ const AddProducts = () => {
                   onChange={(value) => {
                     console.log(value, "ownername");
                   }}
+                  isDisabled
                   {...field}
                 />
               )}
             />
+            <Controller
+              name="grand_total" // Changed to reflect a text input
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <InputNextUI
+                  type="text"
+                  label="Grant total"
+                  onChange={(value) => {
+                    console.log(value, "ownername");
+                  }}
+                  isDisabled
+                  {...field}
+                />
+              )}
+            />
+
             <div className="flex">
               <Controller
                 name="photo" // Changed to reflect a text input
@@ -487,29 +585,14 @@ const AddProducts = () => {
                   </div>
                 )}
               />
-              {productData?.data?.photo && (
-                <Image
-                  src={`${infoData.baseApi}/${productData?.data?.photo}`}
-                  className="h-fit"
-                  width={100}
-                />
-              )}
+              {/* {productData?.data?.photo && ( */}
+              <Image
+                src={`${infoData.baseApi}/${productData?.data?.photo}`}
+                className="h-20 ml-2"
+                width={100}
+              />
+              {/* )} */}
             </div>
-            <Controller
-              name="grand_total" // Changed to reflect a text input
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <InputNextUI
-                  type="text"
-                  label="Grant total"
-                  onChange={(value) => {
-                    console.log(value, "ownername");
-                  }}
-                  {...field}
-                />
-              )}
-            />
           </div>
           <div className="grid grid-cols-2 gap-4 mb-2">
             <Controller
@@ -531,14 +614,15 @@ const AddProducts = () => {
               )}
             />
             <div className="w-100">
-              <div className="mb-3">
+              <h3 className="mb-1">Subcriptions</h3>
+              <div className="mb-3 flex">
                 <Controller
                   name="isEnableEcommerce"
                   control={control}
                   render={({ field }) => (
                     <Checkbox
-                      defaultSelected={
-                        String(productData?.data?.isEnableEcommerce) === "1"
+                      isSelected={
+                        String(tempFormData?.isEnableEcommerce) === "1"
                           ? true
                           : false
                       }
@@ -546,39 +630,71 @@ const AddProducts = () => {
                       onChange={(e) =>
                         field.onChange(e.target.checked ? "1" : "0")
                       } // Update value on change
+                      isDisabled={
+                        String(productData?.data?.isEnableEcommerce) === "1" ||
+                        Number(
+                          EcommereceSubcriptionData?.data?.[0]
+                            ?.subscriptionCount
+                        ) -
+                          filteredEcommereceData?.length <=
+                          0
+                      }
                     >
                       Enable Ecommerce
+                      <span className="ml-2">
+                        <Chip variant="flat" color="primary">
+                          {Number(
+                            EcommereceSubcriptionData?.data?.[0]
+                              ?.subscriptionCount
+                          ) - filteredEcommereceData?.length}
+                        </Chip>
+                      </span>
                     </Checkbox>
                   )}
                 />
+                <span className="ml-3">
+                  <Controller
+                    name="isEnableCustomize"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        isSelected={
+                          String(tempFormData?.isEnableCustomize) === "1"
+                            ? true
+                            : false
+                        }
+                        checked={field.value === "1"} // Set checked based on the field's value
+                        onChange={(e) =>
+                          field.onChange(e.target.checked ? "1" : "0")
+                        } // Update value on change
+                        isDisabled={
+                          String(productData?.data?.isEnableCustomize) ===
+                            "1" ||
+                          Number(
+                            customizeSubcriptionData?.data?.[0]
+                              ?.subscriptionCount
+                          ) -
+                            filteredCustomizeData?.length <=
+                            0
+                        }
+                      >
+                        Enable Customize{" "}
+                        <span>
+                          <Chip variant="flat" color="primary">
+                            {Number(
+                              customizeSubcriptionData?.data?.[0]
+                                ?.subscriptionCount
+                            ) - filteredCustomizeData?.length}
+                          </Chip>
+                        </span>
+                      </Checkbox>
+                    )}
+                  />
+                </span>
               </div>
-              <Controller
-                name="isEnableCustomize"
-                control={control}
-                render={({ field }) => (
-                  <Checkbox
-                    defaultSelected={
-                      String(productData?.data?.isEnableCustomize) === "1"
-                        ? true
-                        : false
-                    }
-                    checked={field.value === "1"} // Set checked based on the field's value
-                    onChange={(e) =>
-                      field.onChange(e.target.checked ? "1" : "0")
-                    } // Update value on change
-                  >
-                    Enable Customize
-                  </Checkbox>
-                )}
-              />
             </div>
           </div>
         </div>
-        {/* <div className="text-center">
-          <Button color="primary" type="submit">
-            Add New Product
-          </Button>
-        </div> */}
       </form>
     </div>
   );

@@ -80,7 +80,6 @@ const ProductsList = () => {
   }, [vendorId, storeId]);
 
   const renderCell = React.useCallback((data, columnKey) => {
-    console.log(data, data);
     switch (columnKey) {
       case "product":
         return <p>{data?.product?.name}</p>;
