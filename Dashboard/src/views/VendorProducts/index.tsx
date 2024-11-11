@@ -4,8 +4,6 @@ import { useGetVendorsQuery } from "./Service.mjs";
 
 const VendroProducts = () => {
   const { data, error, refetch } = useGetVendorsQuery();
-  console.log(data?.data, "sadfasdf");
-
   React.useEffect(() => {
     refetch();
   }, []);

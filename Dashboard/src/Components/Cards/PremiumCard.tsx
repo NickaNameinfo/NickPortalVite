@@ -38,7 +38,6 @@ import { useAppDispatch, useAppSelector } from "../../Common/hooks";
 import { onRefreshCart } from "../../Common/globalSlice";
 
 export const PremiumCard = ({ item = null }) => {
-  console.log(item, "item435234")
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: cartIsOpen,

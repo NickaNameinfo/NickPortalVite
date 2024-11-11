@@ -13,14 +13,22 @@ import {
 } from "../Icons";
 import { Button, Image } from "@nextui-org/react";
 import { infoData } from "../../configData";
-import { useGetVendorsProductByIdQuery } from "../../views/VendorProducts/Service.mjs";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  useGetVendorsProductByIdQuery,
+  useGetVendorsQuery,
+} from "../../views/VendorProducts/Service.mjs";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export const VendorHeaderCard = ({ item = null }) => {
-  const { data, error, refetch } = useGetVendorsProductByIdQuery(
-    Number(item?.id)
-  );
+  const { id } = useParams();
+  const { data, error, refetch } = useGetVendorsProductByIdQuery(Number(id));
+  const {
+    data: vendorList,
+    error: vendorListError,
+    refetch: vendorListRefetch,
+  } = useGetVendorsQuery();
+
   const navigate = useNavigate();
   const notify = (value) => toast(value);
 
@@ -35,7 +43,6 @@ export const VendorHeaderCard = ({ item = null }) => {
         console.error("Failed to copy the URL: ", err);
       });
   };
-
   return (
     <>
       <div className=" mt-2 grid xm:grid-cols-1 mm:grid-cols-1  sm:grid-cols-1 ml:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-3 4xl:grid-cols-3  StorecardHeader  mb-2">
@@ -197,9 +204,19 @@ export const VendorHeaderCard = ({ item = null }) => {
               </Button>
               <Button
                 onClick={() =>
-                  item?.id
+                  vendorList?.data.findIndex(
+                    (store) => store.id === data?.data?.[0]?.supplierId
+                  ) !== 0
                     ? navigate(
-                        `/Vendors/Products/Details/${Number(item?.id) - 1}`
+                        `/Vendors/Products/Details/${
+                          vendorList?.data?.[
+                            Number(
+                              vendorList?.data?.findIndex(
+                                (vendor) => vendor.id === data?.data?.[0]?.supplierId
+                              )
+                            ) - 1
+                          ]?.id
+                        }`
                       )
                     : navigate(`/Vendors/Products`)
                 }
@@ -222,19 +239,33 @@ export const VendorHeaderCard = ({ item = null }) => {
 
               <Button
                 onClick={() =>
-                  item?.id
+                  vendorList?.data?.[vendorList?.data?.length - 1]?.id !==
+                  data?.data?.[0]?.supplierId
                     ? navigate(
-                        `/Vendors/Products/Details/${Number(item?.id) + 1}`
+                        `/Vendors/Products/Details/${
+                          vendorList?.data?.[
+                            Number(
+                              vendorList?.data?.findIndex(
+                                (vendor) => vendor.id === data?.data?.[0]?.supplierId
+                              )
+                            ) + 1
+                          ]?.id
+                        }`
                       )
                     : navigate(`/Vendors/Products`)
                 }
-                // disabled={!item ? true : false}
+                disabled={
+                  vendorList?.data?.[vendorList?.data?.length - 1]?.id !==
+                  data?.data?.[0]?.supplierId
+                    ? false
+                    : true
+                }
                 radius="full"
                 isIconOnly
                 aria-label="Like"
                 size="md"
                 className={`bgnone flex mm:justify-start ml:justify-center ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6 ${
-                  !item ? "cursor-not-allowed" : "cursor-pointer"
+                  vendorList?.data?.[vendorList?.data?.length-1]?.id !== data?.data?.[0]?.supplierId ? "cursor-pointer" : "cursor-not-allowed"
                 }`}
               >
                 <IconNext

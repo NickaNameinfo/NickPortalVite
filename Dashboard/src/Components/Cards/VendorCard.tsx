@@ -36,15 +36,17 @@ export const VendorCard = ({ item = null }) => {
       <CardBody className="overflow-visible pt-2 pb-3.5 ps-2 pe-2  ">
         <div className="grid grid-cols-12">
           <div className="col-span-5">
-            <Image
-              isZoomed
-              shadow="md"
-              width="100%"
-              radius="lg"
-              className="w-full object-cover h-[112px]"
-              alt="Card background"
-              src={`${infoData.baseApi}/${item.vendorImage}`}
-            />
+            <Link to={`/Vendors/Products/Details/${item?.id}`}>
+              <Image
+                isZoomed
+                shadow="md"
+                width="100%"
+                radius="lg"
+                className="w-full object-cover h-[112px]"
+                alt="Card background"
+                src={`${infoData.baseApi}/${item.vendorImage}`}
+              />
+            </Link>
           </div>
           <div className="col-span-7 ps-3">
             <h2 className="font-medium text-sm TextMaincolor">Open :</h2>

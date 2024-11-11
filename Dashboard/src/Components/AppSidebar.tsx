@@ -61,13 +61,11 @@ export const AppSidebar = () => {
         >
           {/* <span className="">Logo</span>{" "} */}
           <div>
-            <Card className="p-0 m-0">
+            <Card className="p-0 m-0 w-20">
               <Image
                 alt="Woman listing to music"
-                className="object-cover  max-h-[40px] min-w-[140px]"
-                height={30}
-                width={140}
-                src="https://nextui-docs-v2.vercel.app/images/album-cover.png"
+                className="object-fit min-w-[100%]"
+                src="https://nicknameinfotech.com/img/new-logo.png"
               />
               {/* <CardHeader className="p-0 m-0"></CardHeader> */}
               <CardBody className="p-0 m-0">
