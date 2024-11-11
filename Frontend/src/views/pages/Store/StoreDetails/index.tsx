@@ -10,10 +10,7 @@ import { NoProductsFound } from "../../NoItems/NoProductsFound";
 
 const StoreDetails = () => {
   const { id } = useParams();
-  const currentPlan = getCookie("plan");
   const { data, error, refetch } = useGetStoresProductByIDQuery(Number(id));
-  console.log(data, "datqasedfeqa4432a");
-
   // Refetch the data when the id changes
   React.useEffect(() => {
     if (id) {

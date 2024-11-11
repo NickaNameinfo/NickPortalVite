@@ -19,7 +19,7 @@ export const AppSidebar = () => {
   const [menuToggle, setMenuToggle] = React.useState(false);
   const [mobileExpand, setMobileExpand] = React.useState(false);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const itemClasses = {
     title: "font-normal text-sm text-black ms-1",
@@ -34,7 +34,7 @@ export const AppSidebar = () => {
     eraseCookie("vendorId");
     eraseCookie("storeId");
     eraseCookie("plan");
-    navigate("/")
+    navigate("/");
   };
 
   return (
@@ -56,7 +56,7 @@ export const AppSidebar = () => {
         } ${menuToggle ? "min-w-[150px]" : "min-w-[250px]"}`}
       >
         <Link
-          to="#"
+          to="/Dashboard"
           className="flex items-center justify-between px-4 border-b-2 border-b-white text-gray-900 dark:text-white group logoCls"
         >
           {/* <span className="">Logo</span>{" "} */}
@@ -97,7 +97,7 @@ export const AppSidebar = () => {
                 {_nav?.map((result: any) =>
                   result?.menuType === "single" ? (
                     result?.["key"] === "LogOut" ? (
-                      <li className="bg-white rounded-xl">
+                      <li className="bg-white rounded-xl cursor-pointer">
                         <div
                           onClick={() => handleLogOut()}
                           className="mt-4 p-3 text-sm flex items-center text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"

@@ -44,7 +44,7 @@ interface InputFieldProps {
 const InputNextUI = (props: InputFieldProps) => {
   return (
     <>
-      <div className="w-100">
+      {/* <div className="w-100"> */}
         <Input
           {...props}
           classNames={{
@@ -80,7 +80,7 @@ const InputNextUI = (props: InputFieldProps) => {
             props.onChange(e.target.value);
           }}
         />
-      </div>
+      {/* </div> */}
     </>
   );
 };

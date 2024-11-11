@@ -36,26 +36,14 @@ const Login = () => {
   };
 
   return (
-    <div
-      className="mainLogin"
-      style={{
-        backgroundColor: "white",
-        // width: "1",
-        // height: "500px",
-        // width: "850px ",
-        // alignItems: "center",
-        // justifyContent: "center",
-        // display: "flex",
-      }}
-    >
-      <div className="mt-5">
+    <div className="mainLogin h-[100dvh] flex items-center justify-center">
+      <div className="bg-warning-50 p-5 rounded-[calc(theme(borderRadius.large)/1.5)] w-[30%]">
         <div className="flex justify-center">
           <IconLoginSVG width="250px" height="155px" />
         </div>
         <h2 className="text-2xl font-bold my-4 flex justify-center">Login</h2>
-
         <div className=" flex justify-center ">
-          <form onSubmit={handleSubmit(onSubmit)} className="w-4/12">
+          <form onSubmit={handleSubmit(onSubmit)} className="w-[100%]">
             <div className="mb-3">
               <Controller
                 name="email" // Changed to reflect a text input
