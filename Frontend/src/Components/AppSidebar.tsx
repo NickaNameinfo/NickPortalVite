@@ -52,16 +52,11 @@ export const AppSidebar = () => {
 
   const itemClasses = {
     base: "py-0 w-full",
-    title: "text-black text-sm font-normal",
+    title: "text-white text-sm font-normal",
     trigger:
-      "px-2 py-0 data-[hover=true]:bg-default-10 rounded-lg h-14 flex items-center",
+      "px-2 py-0 data-[hover=true]:bg-default-10 rounded-lg h-10 flex items-center",
     indicator: "text-medium",
     content: "text-small px-2",
-  };
-
-  const slots = {
-    base: "border-default hover:bg-default-200",
-    content: "text-default-500",
   };
 
   React.useEffect(() => {
@@ -117,18 +112,18 @@ export const AppSidebar = () => {
         } ${menuToggle ? "min-w-[150px]" : "min-w-[250px]"}`}
       >
         <Link
-          to="#"
+          to="/"
           className="flex items-center justify-between px-4 border-b-2 border-b-white text-gray-900 dark:text-white group logoCls"
         >
           <div className="rounded-sm">
             <Image
               alt="Woman listing to music"
-              className={` rounded-xl object-cover ${
+              className={` rounded-xl object-fit ${
                 menuToggle
                   ? "max-h-[42px] min-w-[100px]"
-                  : "max-h-[42px] min-w-[190px]"
+                  : "max-h-[42px] min-w-[80px]"
               }`}
-              src="https://nextui-docs-v2.vercel.app/images/album-cover.png"
+              src="https://nicknameinfotech.com/img/new-logo.png"
               // src="../assets/logo.jpg"
             />
           </div>
@@ -169,7 +164,9 @@ export const AppSidebar = () => {
               {_nav?.map((result) =>
                 result?.menuType === "single" ? (
                   <div
-                    style={{ backgroundColor: "#ffffff80" }}
+                    style={
+                      !result?.isSoon ? { backgroundColor: "#49a84cd4" } : {}
+                    }
                     className="rounded-lg cursor-pointer"
                     onClick={() => {
                       if (result?.key === "Hospitals") {
@@ -189,19 +186,29 @@ export const AppSidebar = () => {
                       }
                     }}
                   >
-                    <div className="my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg dark:text-white">
+                    <div
+                      className={`my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg ${
+                        result?.isSoon ? "bg-[#f6bc0085]" : "dark:text-white"
+                      } `}
+                    >
                       <div className="flex justify-between w-full items-center">
                         {menuToggle ? (
                           <span>
                             <FormeIcon />
                           </span>
                         ) : (
-                          <div className={result?.isSoon ? "flex w-full justify-between" : ""}>
+                          <div
+                            className={
+                              result?.isSoon
+                                ? "flex w-full justify-between"
+                                : ""
+                            }
+                          >
                             <p className="text-black text-sm font-normal">
                               {result?.name}
                             </p>
                             {result?.isSoon && (
-                              <p className="text-gray-400 text-xs font-mono">
+                              <p className="text-green-700 text-xs font-mono">
                                 coming soon
                               </p>
                             )}
@@ -241,8 +248,7 @@ export const AppSidebar = () => {
                       itemClasses={itemClasses}
                       className="text-foreground rounded-lg"
                       style={{
-                        backgroundColor: "rgba(236, 247, 255, 0.5)",
-                        // color: "black !important",
+                        backgroundColor: "#4c86f9",
                         // opacity: 4,
                       }}
                     >
@@ -250,24 +256,24 @@ export const AppSidebar = () => {
                         key="1"
                         aria-label={result?.name}
                         title={result?.name}
-                        className="p-0 m-0 text-foreground"
+                        className="p-0 m-0 text-white"
                       >
-                        <ul className="">
+                        <ul>
                           {data?.data?.map((data) => {
                             return (
-                              <li className="p-0 m-0">
+                              <li className="pb-2 m-0">
                                 <div className="flex items-center justify-between mb-0.5">
-                                  <div className="flex  items-center">
+                                  <div className="flex items-center">
                                     <p
-                                      className="me-2 text-black mt-0.5"
+                                      className="me-2 text-white mt-0.5"
                                       style={{
                                         height: "4px",
                                         width: "4px",
                                         borderRadius: "8px",
-                                        backgroundColor: "black",
+                                        backgroundColor: "#f6bc00",
                                       }}
                                     ></p>
-                                    <p className="ms-2 text-black font-normal text-sm">
+                                    <p className="ms-2 text-white font-normal text-sm">
                                       {data?.name}
                                     </p>
                                   </div>
@@ -320,8 +326,8 @@ export const AppSidebar = () => {
               )}
             </div>
             <div
-              style={{ backgroundColor: "#ffffff80" }}
-              className="absolute bottom-[4%] rounded-lg w-11/12"
+              style={{ textAlign: "right" }}
+              className={`absolute bottom-[3%] rounded-lg w-11/12 ${currentloginDetails?.data?.email ? "bg-white" : ""} p-1`}
             >
               {!currentloginDetails?.data?.email ? (
                 <Login />

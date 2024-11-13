@@ -149,7 +149,7 @@ export const AppHeader = () => {
               className="ms-1.5 bg-[#ffffff3b] items-center flex p-3 rounded-full bg-[#8465F7] cursor-pointer"
               onClick={() => onSearch()}
             >
-              <SearchIcon color={"white"} />
+              <SearchIcon color={"blue"} />
             </p>
           </div>
         </div>

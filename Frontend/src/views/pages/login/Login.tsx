@@ -74,11 +74,11 @@ const Login = () => {
       <Button
         isIconOnly
         color="primary"
-        className="bg-primary-900"
+        className="bg-warning"
         aria-label="Take a photo"
         onPress={() => dispatch(onOpenLogin(true))}
       >
-        <IconProfile />
+        <IconProfile color="whtie"/>
       </Button>
 
       <ModalUI

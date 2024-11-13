@@ -15,6 +15,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  Tooltip,
   useDisclosure,
 } from "@nextui-org/react";
 import {
@@ -99,8 +100,8 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
         if (result?.data?.success) {
           refetch();
           dispatch(onRefreshCart(true));
-        }else{
-          throw error
+        } else {
+          throw error;
         }
       } catch (error) {
         MySwal.fire({
@@ -151,9 +152,7 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
               </p>
               <IconTick
                 fill={
-                  item?.product?.paymentMode?.includes("1")
-                    ? "#49A84C"
-                    : "#E6E6E6"
+                  item?.product?.paymentMode?.includes("1") ? "#49A84C" : "red"
                 }
               />
             </div>
@@ -163,9 +162,7 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
               </p>
               <IconTick
                 fill={
-                  item?.product?.paymentMode?.includes("2")
-                    ? "#49A84C"
-                    : "#E6E6E6"
+                  item?.product?.paymentMode?.includes("2") ? "#49A84C" : "red"
                 }
               />
             </div>
@@ -175,51 +172,74 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
               </p>
               <IconTick
                 fill={
-                  item?.product?.paymentMode?.includes("3")
-                    ? "#49A84C"
-                    : "#E6E6E6"
+                  item?.product?.paymentMode?.includes("3") ? "#49A84C" : "red"
                 }
               />
             </div>
             <div className="w-full flex justify-around pb-3">
               <div className="PrimiumCardFooterBg rounded-lg flex w-full justify-around items-center">
                 <div className="PrimiumCardFooterBg rounded-lg flex w-full justify-around items-center">
-                  <Button
-                    className="bgnone p-0 m-0"
-                    radius="full"
-                    isIconOnly
-                    size="lg"
+                  <Tooltip
+                    content="Like"
+                    placement="top"
+                    className="bg-black text-white"
+                    showArrow
                   >
-                    <IconHeart fill="#FF0000" className="m-3 cursor-pointer" />
-                  </Button>
-                  <Button
-                    className="bgnone p-0 m-0"
-                    radius="full"
-                    isIconOnly
-                    size="lg"
-                    onClick={() => onOpen()}
+                    <Button
+                      className="bgnone p-0 m-0"
+                      radius="full"
+                      isIconOnly
+                      size="lg"
+                    >
+                      <IconHeart
+                        fill="#FF0000"
+                        className="m-3 cursor-pointer"
+                      />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip
+                    content="Product Details"
+                    placement="top"
+                    className="bg-black text-white"
+                    showArrow
                   >
-                    <IconsEye fill="#CFA007" className="m-3 cursor-pointer" />
-                  </Button>
-                  <Badge
-                    content={data?.data?.qty ? data?.data?.qty : 0}
-                    shape="circle"
-                    color="danger"
+                    <Button
+                      className="bgnone p-0 m-0"
+                      radius="full"
+                      isIconOnly
+                      size="lg"
+                      onClick={() => onOpen()}
+                    >
+                      <IconsEye fill="#CFA007" className="m-3 cursor-pointer" />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip
+                    content="Your Cart"
+                    placement="top"
+                    className="bg-black text-white"
+                    showArrow
                   >
-                    {/* <Button
+                    <Badge
+                      content={data?.data?.qty ? data?.data?.qty : 0}
+                      shape="circle"
+                      color="danger"
+                    >
+                      {/* <Button
                       className="bgnone p-0 m-0"
                       radius="full"
                       isIconOnly
                       size="lg"
                       onClick={() => cartOpen()}
                     > */}
-                    <IconShopBag
-                      onClick={() => cartOpen()}
-                      fill="#4C86F9"
-                      className="cursor-pointer"
-                    />
-                    {/* </Button> */}
-                  </Badge>
+                      <IconShopBag
+                        onClick={() => cartOpen()}
+                        fill="#4C86F9"
+                        className="cursor-pointer"
+                      />
+                      {/* </Button> */}
+                    </Badge>
+                  </Tooltip>
+
                   <Popover
                     placement="top"
                     showArrow={true}
@@ -239,6 +259,7 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
                         />
                       </Button>
                     </PopoverTrigger>
+
                     <PopoverContent className="addsub bg-white ">
                       <div className="flex justify-between items-center">
                         <Button

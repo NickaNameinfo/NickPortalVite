@@ -12,6 +12,7 @@ import {
   Image,
   Tabs,
   Tab,
+  Textarea,
 } from "@nextui-org/react";
 import React from "react";
 import {
@@ -232,7 +233,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               fill={
                                 props?.item?.product?.paymentMode?.includes("1")
                                   ? "#49A84C"
-                                  : "#E6E6E6"
+                                  : "red"
                               }
                             />
                           </div>
@@ -244,7 +245,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               fill={
                                 props?.item?.product?.paymentMode?.includes("1")
                                   ? "#49A84C"
-                                  : "#E6E6E6"
+                                  : "red"
                               }
                             />
                           </div>
@@ -256,7 +257,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               fill={
                                 props?.item?.product?.paymentMode?.includes("1")
                                   ? "#49A84C"
-                                  : "#E6E6E6"
+                                  : "red"
                               }
                             />
                           </div>
@@ -323,7 +324,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                         className="w-full object-cover md:h-[222px] xm:h-[150px] mm:h-[145px] ml:h-[145px]"
                         height={300}
                         alt="Here no Image"
-                        src="https://nextui-docs-v2.vercel.app/images/hero-card-complete.jpeg"
+                        src="https://nicknameinfotech.com/img/new-logo.png"
                       />
                     </div>
                   </div>
@@ -342,13 +343,13 @@ export const ProductDetail = (props: ProductDetailProps) => {
                           <Tab
                             key="photos"
                             title={
-                              <div className="flex items-center space-x-2">
+                              <div className="flex items-center space-x-2 ">
                                 {/* <GalleryIcon /> */}
                                 <span>Description</span>
                               </div>
                             }
                           >
-                            <Card>
+                            <Card className="min-h-[170px]">
                               <CardBody>
                                 {props?.item?.product?.slug}
                               </CardBody>
@@ -363,7 +364,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               </div>
                             }
                           >
-                            <Card>
+                            <Card className="min-h-[170px]">
                               <CardBody>
                                 Lorem ipsum dolor sit amet, consectetur
                                 adipiscing elit, sed do eiusmod tempor
@@ -383,7 +384,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               </div>
                             }
                           >
-                            <Card>
+                            <Card className="min-h-[170px]">
                               <CardBody>
                                 Lorem ipsum dolor sit amet, consectetur
                                 adipiscing elit, sed do eiusmod tempor
@@ -400,7 +401,9 @@ export const ProductDetail = (props: ProductDetailProps) => {
                     <div className="feedback"></div>
                     <div className="rating"></div>
                   </div>
-                  <div className="">asdfasfasdfd</div>
+                  <div className="min-h-[170px]">
+                    <Textarea cols={2}/>
+                  </div>
                 </div>
               </ModalBody>
               <ModalFooter className="pt-0 p-3 flex justify-between"></ModalFooter>

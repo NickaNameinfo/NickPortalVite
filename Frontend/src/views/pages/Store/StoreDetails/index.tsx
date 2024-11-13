@@ -17,13 +17,16 @@ const StoreDetails = () => {
       refetch();
     }
   }, [id, refetch]);
+
+  console.log(data, "data79087");
+
   return (
     <div>
       <StoreHeaderCard />
       {data?.data?.length > 0 ? (
         <div className="grid xm:grid-cols-1 mm:grid-cols-1 ml:grid-cols-1 sm:grid-cols-2  md:grid-cols-3  lg:grid-cols-3  xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-5 gap-2">
           {data?.data?.map((result, index) =>
-            result?.plan !== 0 ? (
+            Number(result?.product?.isEnableEcommerce) === 1 ? (
               <PremiumCard item={result} key={index} />
             ) : (
               <RelatedProducts item={result} key={index} />
