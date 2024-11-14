@@ -11,6 +11,7 @@ export interface GlobalConfigState {
   gloablSearchByPayment?: any;
   onSearchOpenStore?: boolean;
   storeList?:any;
+  isProductPopOver?: boolean;
 }
 
 const initialState: GlobalConfigState = {
@@ -22,7 +23,8 @@ const initialState: GlobalConfigState = {
   globalCategorySearch: null,
   gloablSearchByPayment : null,
   onSearchOpenStore: false,
-  storeList:null
+  storeList:null,
+  isProductPopOver : false
 };
 
 const globalConfigSlice = createSlice({
@@ -58,6 +60,9 @@ const globalConfigSlice = createSlice({
     },
     onUpdateStoreList: (state, action) => {
       state.storeList = action?.payload;
+    },
+    onUpdateProductPopOver: (state, action) => {
+      state.isProductPopOver = action?.payload;
     }
   },
 });
@@ -72,6 +77,7 @@ export const {
   onGlobalCategorySearch,
   onGlobalPaymentSearch,
   onUpdateOpenStore,
-  onUpdateStoreList
+  onUpdateStoreList,
+  onUpdateProductPopOver
 } = globalConfigSlice.actions;
 export default globalConfigSlice.reducer;

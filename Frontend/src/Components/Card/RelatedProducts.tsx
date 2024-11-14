@@ -14,12 +14,15 @@ export const RelatedProducts = ({
   item = null,
   key = null,
   isHideImage = false,
+  from = null,
+  popOverOnClose = null,
 }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
       <Card
         isPressable
-        // onPress={() => onOpen()}
+        onPress={() => onOpen()}
         className="Storecard pt-3.5 px-3 cursor-pointer"
       >
         {!isHideImage && (
@@ -36,15 +39,23 @@ export const RelatedProducts = ({
               shadow="md"
               width="100%"
               radius="lg"
-              className="w-full object-cover min-h-[176px]"
-              src={`${infoData.baseApi}/${item?.product?.photo}`}
+              className={`w-full object-cover  ${
+                from !== "ProductView"
+                  ? "min-h-[176px] max-h-[176px]"
+                  : "min-h-[50px] max-h-[100px]"
+              }`}
+              src={`${infoData.baseApi}/${
+                item?.product?.photo ? item?.product?.photo : item?.photo
+              }`}
             />
           </CardBody>
         )}
         <CardFooter className="p-0">
           <div className="grid grid-cols-1 w-full">
             <div className="font-semibold mt-3 text-sm  TextMaincolor justify-start flex">
-              <p className="truncate">{item?.product?.name}</p>
+              <p className="truncate">
+                {item?.product?.name ? item?.product?.name : item?.name}
+              </p>
             </div>
             <div className="font-normal text-sm mt-2  TextMaincolor justify-start flex">
               4 pcs (Approx. 550 - 640 g)
@@ -60,6 +71,7 @@ export const RelatedProducts = ({
           </div>
         </CardFooter>
       </Card>
+      <ProductDetail isOpen={isOpen} onClose={onClose} item={item} />
     </>
   );
 };

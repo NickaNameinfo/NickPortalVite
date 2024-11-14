@@ -187,6 +187,9 @@ aside {
 .modalIconClose {
   top: -20px !important;
   right: -20px !important;
+  position: absolute;
+  width: 40px;
+  cursor: pointer;
 }
 .badgeBG-Midtransparent {
   background-color: #3c3c3c80;

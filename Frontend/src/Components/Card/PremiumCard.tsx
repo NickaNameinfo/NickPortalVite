@@ -42,14 +42,18 @@ import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
-export const PremiumCard = ({ item = null, isHideImage = false }) => {
+export const PremiumCard = ({
+  item = null,
+  isHideImage = false,
+  from = null,
+  popOverOnClose = null,
+}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: cartIsOpen,
     onOpen: cartOpen,
     onClose: cartClose,
   } = useDisclosure();
-  const [cartPopup, setTrue, setFalse, toggle] = useBoolean(false);
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
   const id = getCookie("id");
   const [addCart] = useAddCartMutation();
@@ -61,7 +65,6 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
   };
   const { data, error, refetch } = useGetCartByProductIdQuery(productId);
   const MySwal = withReactContent(Swal);
-
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
     refetch();
@@ -69,8 +72,8 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
 
   const handleAddCart = async (type) => {
     let tempCartValue = {
-      productId: item?.product?.id,
-      name: item?.product?.name,
+      productId: item?.product?.id ? item?.product?.id : item?.id,
+      name: item?.product?.name ? item?.product?.name : item?.name,
       orderId: id,
       price: Number(item?.price),
       total: Number(data?.data?.qty) * Number(item?.price),
@@ -79,12 +82,11 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
           ? Number(data?.data?.qty) + 1
           : Number(data?.data?.qty) - 1
         : 1,
-      photo: item?.product?.photo,
+      photo: item?.product?.photo ? item?.product?.photo : item?.photo,
     };
     if (data?.data) {
       try {
         const result = await updateCart(tempCartValue);
-        console.log(result, "result90987");
         if (result?.data?.success) {
           refetch();
           dispatch(onRefreshCart(true));
@@ -111,13 +113,21 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
     }
   };
 
+  console.log("item79087", item?.product);
+
   return (
     <>
       <Card className="Storecard pt-3.5 px-3">
         {!isHideImage && (
-          <CardBody className="overflow-visible p-0 relative">
+          <CardBody
+            className="overflow-visible p-0 relative"
+            onClick={() => onOpen()}
+          >
             <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
-              {item?.product?.discount} %
+              {item?.product?.discount
+                ? item?.product?.discount
+                : item?.discount}{" "}
+              %
             </span>
 
             <Image
@@ -126,8 +136,14 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
               shadow="md"
               width="100%"
               radius="lg"
-              className="w-full object-cover min-h-[176px] max-h-[176px]"
-              src={`${infoData?.baseApi}/${item?.product?.photo}`}
+              className={`w-full object-cover ${
+                from !== "ProductView"
+                  ? "min-h-[176px] max-h-[176px]"
+                  : "min-h-[50px] max-h-[50px]"
+              }`}
+              src={`${infoData?.baseApi}/${
+                item?.product?.photo ? item?.product?.photo : item?.photo
+              }`}
             />
           </CardBody>
         )}
@@ -135,7 +151,9 @@ export const PremiumCard = ({ item = null, isHideImage = false }) => {
         <CardFooter className="p-0">
           <div className="grid grid-cols-1 w-full">
             <div className="font-semibold text-base mt-2 TextMaincolor">
-              <p className="truncate">{item?.product?.name}</p>
+              <p className="truncate">
+                {item?.product?.name ? item?.product?.name : item?.name}
+              </p>
             </div>
 
             <div className="w-full flex justify-between mt-2">

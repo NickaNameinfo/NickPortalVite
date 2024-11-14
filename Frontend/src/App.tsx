@@ -10,6 +10,8 @@ import { onUpdateStoreList, updateLoginDetails } from "./Components/Common/globa
 import {useGetStoresQuery} from "./views/pages/Store/Service.mjs";
 import "react-toastify/dist/ReactToastify.css";
 import 'sweetalert2/src/sweetalert2.scss'
+import "yet-another-react-lightbox/styles.css";
+import "react-photo-album/rows.css";
 
 const loading = (
   <div className="pt-3 text-center">

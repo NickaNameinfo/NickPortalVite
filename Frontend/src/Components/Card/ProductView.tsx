@@ -33,8 +33,13 @@ import {
   useGetStoresByIdQuery,
   useGetStoresProductByIDQuery,
 } from "../../views/pages/Store/Service.mjs";
+import { useAppDispatch, useAppSelector } from "../Common/hooks";
+import { onUpdateProductPopOver } from "../Common/globalSlice";
 export const ProductViewCard = ({ item = null }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const dispatch = useAppDispatch();
+  const isProductPopOver = useAppSelector(
+    (state) => state.globalConfig.isProductPopOver
+  );
   const navigate = useNavigate();
   const { data, error, refetch } = useGetStoresByIdQuery(
     Number(item?.createdId)
@@ -44,19 +49,16 @@ export const ProductViewCard = ({ item = null }) => {
     error: storeProductError,
     refetch: storeProductRefetch,
   } = useGetStoresProductByIDQuery(Number(data?.data?.id));
-  const currentPlan = getCookie("plan");
-  console.log(currentPlan, "currentASDFSAFSDFPlan");
   return (
-    <Popover showArrow placement="right" key={item?.id}>
+    <Popover
+      showArrow
+      placement="right"
+      key={item?.id}
+      isOpen={isProductPopOver}
+      onOpenChange={(open) => dispatch(onUpdateProductPopOver(open))}
+    >
       <PopoverTrigger>
-        <Card
-          key={item?.id}
-          onPress={() => {
-            onOpen();
-          }}
-          className="Storecard py-2.5 px-2.5"
-          isPressable
-        >
+        <Card key={item?.id} className="Storecard py-2.5 px-2.5">
           <CardBody className="overflow-visible p-0 relative">
             <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
               {item?.discount} %
@@ -82,10 +84,14 @@ export const ProductViewCard = ({ item = null }) => {
             Store Details : {data?.data?.storename}
           </div>
           <div className="px-1 flex">
-            {currentPlan !== "0" ? (
-              <PremiumCard item={item} isHideImage={true} />
+            {Number(item?.isEnableEcommerce) === 1 ? (
+              <PremiumCard item={item} isHideImage={false} from="ProductView" />
             ) : (
-              <RelatedProducts item={null} isHideImage={false} />
+              <RelatedProducts
+                item={item}
+                isHideImage={false}
+                from="ProductView"
+              />
             )}
             <Card className="ps-1 Storecard p-0 outline-none shadow-none max-w-[380px] ml-2">
               <CardBody className="overflow-visible pt-2 pb-3.5 ps-2 pe-2">
@@ -101,7 +107,7 @@ export const ProductViewCard = ({ item = null }) => {
                       src={`${infoData?.baseApi}/${data?.data?.storeImage}`}
                     />
                   </div>
-                  <div className="col-span-12 ps-3">
+                  <div className="col-span-12 ps-3 mt-2">
                     <div className="flex items-center">
                       <h2 className="font-medium text-sm TextMaincolor">
                         Open :
@@ -110,15 +116,7 @@ export const ProductViewCard = ({ item = null }) => {
                         {data?.data?.openTime} AM - {data?.data?.closeTime} PM
                       </p>
                     </div>
-                    <div className="flex items-center mt-2">
-                      <p className="mt-1 ">
-                        <IconStar fill="#FF9900" />
-                      </p>
-                      <p className="font-normal text-sm mt-1 ps-2 StortimingColor">
-                        4.3
-                      </p>
-                    </div>
-                    <div className="flex flex-row ">
+                    <div className="flex flex-row mt-1">
                       <div className="flex  justify-between basis-9/12  items-center">
                         <p className="cursor-pointer pe-1">
                           <Link
@@ -176,15 +174,21 @@ export const ProductViewCard = ({ item = null }) => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex">
-                      <div className="font-normal text-sm  TextMaincolor w-6/12">
+                    <div className="flex items-center justify-between mt-1">
+                      <div className="font-normal text-sm  TextMaincolor">
                         Products :{" "}
                         {storeProduct?.data?.length
                           ? storeProduct?.data?.length
                           : 0}
                       </div>
-                      <div className="font-normal text-sm  TextMaincolor w-6/12 justify-end flex">
-                        Near By : 15 Km
+
+                      <div className="flex items-center">
+                        <p className="">
+                          <IconStar fill="#FF9900" />
+                        </p>
+                        <p className="font-normal text-sm mt-1 ps-2 StortimingColor">
+                          4.3
+                        </p>
                       </div>
                     </div>
                   </div>

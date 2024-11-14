@@ -17,6 +17,7 @@ import {
   cn,
   Listbox,
   ListboxItem,
+  useDisclosure,
 } from "@nextui-org/react";
 import * as React from "react";
 import {
@@ -40,6 +41,7 @@ import {
   updateLoginDetails,
 } from "../Components/Common/globalSlice";
 import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
+import { BuyCard } from "./Card/BuyCard";
 export const AppSidebar = () => {
   const [menuToggle, setMenuToggle] = React.useState(false);
   const [mobileExpand, setMobileExpand] = React.useState(false);
@@ -49,6 +51,7 @@ export const AppSidebar = () => {
     (state) => state.globalConfig.currentloginDetails
   );
   const { data, refetch } = useGetCategoryQuery();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const itemClasses = {
     base: "py-0 w-full",
@@ -379,6 +382,7 @@ export const AppSidebar = () => {
                                   key="pull_requests"
                                   endContent={90}
                                   startContent={<IconHome />}
+                                  onClick={() => onOpen()}
                                 >
                                   Cart
                                 </ListboxItem>
@@ -408,6 +412,7 @@ export const AppSidebar = () => {
           </div>
         </aside>
       </div>
+      <BuyCard isOpen={isOpen} onClose={onClose} />
     </>
   );
 };

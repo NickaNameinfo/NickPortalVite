@@ -31,6 +31,8 @@ import { IconNxt, IconPrv } from "../../Icons";
 import { infoData } from "../../configData";
 import { useAppDispatch, useAppSelector } from "../Common/hooks";
 import { Link, useParams } from "react-router-dom";
+import Lightbox from "yet-another-react-lightbox";
+import { RowsPhotoAlbum } from "react-photo-album";
 import {
   useGetCartByProductIdQuery,
   useAddCartMutation,
@@ -38,12 +40,14 @@ import {
   useGetStoresByIdQuery,
   useGetStoresQuery,
 } from "../../views/pages/Store/Service.mjs";
-import { onRefreshCart } from "../Common/globalSlice";
+import { onRefreshCart, onUpdateProductPopOver } from "../Common/globalSlice";
 import StoreCard from "../Card/StoreCard";
 import { toast } from "react-toastify";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import StarRating from "../Input/Ratings";
+
 interface ProductDetailProps {
   isOpen: any;
   onClose: any;
@@ -68,10 +72,11 @@ export const ProductDetail = (props: ProductDetailProps) => {
   } = useGetStoresByIdQuery(Number(props?.item?.supplierId));
   let productId = {
     id: id,
-    productId: props?.item?.product?.id,
+    productId: props?.item?.product?.id
+      ? props?.item?.product?.id
+      : props?.item?.id,
   };
-  console.log(props?.item, "asdkgjnqujlk");
-  
+
   const {
     data: cart,
     error: cartError,
@@ -80,6 +85,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
   const [addCart] = useAddCartMutation();
   const [updateCart] = useUpdateCartMutation();
   const dispatch = useAppDispatch();
+  const [index, setIndex] = React.useState(-1);
 
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
@@ -89,8 +95,12 @@ export const ProductDetail = (props: ProductDetailProps) => {
 
   const handleAddCart = async (type) => {
     let tempCartValue = {
-      productId: props?.item?.product?.id,
-      name: props?.item?.product?.name,
+      productId: props?.item?.product?.id
+        ? props?.item?.product?.id
+        : props?.item?.id,
+      name: props?.item?.product?.name
+        ? props?.item?.product?.name
+        : props?.item?.name,
       orderId: id,
       price: Number(props?.item?.price),
       total: Number(cart?.data?.qty) * Number(props?.item?.price),
@@ -99,7 +109,9 @@ export const ProductDetail = (props: ProductDetailProps) => {
           ? Number(cart?.data?.qty) + 1
           : Number(cart?.data?.qty) - 1
         : 1,
-      photo: props?.item?.product?.photo,
+      photo: props?.item?.product?.photo
+        ? props?.item?.product?.photo
+        : props?.item?.photo,
     };
     if (cart?.data) {
       try {
@@ -140,23 +152,46 @@ export const ProductDetail = (props: ProductDetailProps) => {
       });
   };
 
+  const slides = [
+    {
+      src: "https://nicknameinfotech.com/img/new-logo.png",
+      width: 3840,
+      height: 3840,
+    },
+    {
+      src: "https://yet-another-react-lightbox.com/images/image02.jpeg",
+      width: 3840,
+      height: 3840,
+    },
+    {
+      src: "https://yet-another-react-lightbox.com/images/image03.jpeg",
+      width: 3840,
+      height: 3840,
+    },
+  ];
+
   return (
     <>
       <Modal
         size={"5xl"}
         isOpen={props.isOpen}
-        onClose={props.onClose}
+        // onClose={props.onClose}
         placement="bottom"
         scrollBehavior="inside"
-        backdrop="opaque"
-        classNames={{
-          closeButton: "modalIconClose",
-        }}
-        closeButton={<ModalCloseIcon />}
+        backdrop="blur"
+        hideCloseButton
+        // classNames={{
+        //   closeButton: "modalIconClose",
+        // }}
+        // closeButton={<ModalCloseIcon onClick={() => props.onClose()} />}
       >
         <ModalContent>
           {(onClose) => (
             <>
+              <ModalCloseIcon
+                onClick={() => props.onClose()}
+                className="modalIconClose"
+              />
               <ModalBody className="p-5">
                 <div className="grid xm:grid-cols-2 mm:grid-cols-2  sm:grid-cols-2 ml:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-3 gap-4">
                   <div className="">
@@ -164,7 +199,11 @@ export const ProductDetail = (props: ProductDetailProps) => {
                       <CardBody className="overflow-visible p-0 relative">
                         <Image
                           alt="Card background"
-                          src={`${infoData.baseApi}/${props?.item?.product?.photo}`}
+                          src={`${infoData.baseApi}/${
+                            props?.item?.product?.photo
+                              ? props?.item?.product?.photo
+                              : props?.item?.photo
+                          }`}
                           width="100%"
                           radius="lg"
                           className="w-full object-cover md:h-[222px] xm:h-[150px] mm:h-[150px]  ml:h-[150px]"
@@ -175,7 +214,9 @@ export const ProductDetail = (props: ProductDetailProps) => {
                   <div className="sm:px-2 xl:col-span-1 lg:col-span-1 md:order-3 xm:order-3 mm:order-3 ml:order-3 md:col-span-2 xm:col-span-2 mm:col-span-2 ml:col-span-2 ">
                     <div className="">
                       <h2 className="text-xl truncate font-bold">
-                        {props?.item?.product?.name}
+                        {props?.item?.product?.name
+                          ? props?.item?.product?.name
+                          : props?.item?.name}
                       </h2>
                       <p className="text-slate-300 text-lg line-through font-normal">
                         Rs : {props?.item?.price}
@@ -186,52 +227,58 @@ export const ProductDetail = (props: ProductDetailProps) => {
                         </p>
                         <div className="text-sm">120 Stocks</div>
                       </div>
-                      <div className="flex items-center justify-between mt-2">
-                        <div className="">
-                          <div className="flex justify-between items-center rounded-xl bg-gray-100 lg:h-unit-xl">
-                            <Button
-                              className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
-                              radius="full"
-                              isIconOnly
-                              size="md"
-                              onClick={() => handleAddCart("remove")}
-                            >
-                              -
-                            </Button>
-                            <p className="bg-gray-100 text-sm font-semibold p-0 m-0">
-                              {cart?.data?.qty ? cart?.data?.qty : 0}
-                            </p>
-                            <Button
-                              className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
-                              radius="full"
-                              isIconOnly
-                              size={"md"}
-                              onClick={() => handleAddCart("add")}
-                            >
-                              +
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="">
-                          <Button
-                            className="xm:h-unit-8 xm:px-4 lg:px-3 lg:h-unit-xl"
-                            color="primary"
-                            variant="ghost"
-                            radius="lg"
-                            size={"md"}
-                            onClick={() => onOpen()}
-                          >
-                            View Cart
-                          </Button>
-                        </div>
-                      </div>
+                      {Number(props?.item?.product?.isEnableEcommerce)
+                        ? props?.item?.product?.isEnableEcommerce
+                        : props?.item?.isEnableEcommerce === 1 && (
+                            <div className="flex items-center justify-between mt-2">
+                              <div className="">
+                                <div className="flex justify-between items-center rounded-xl bg-gray-100 lg:h-unit-xl">
+                                  <Button
+                                    className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
+                                    radius="full"
+                                    isIconOnly
+                                    size="md"
+                                    onClick={() => handleAddCart("remove")}
+                                  >
+                                    -
+                                  </Button>
+                                  <p className="bg-gray-100 text-sm font-semibold p-0 m-0">
+                                    {cart?.data?.qty ? cart?.data?.qty : 0}
+                                  </p>
+                                  <Button
+                                    className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
+                                    radius="full"
+                                    isIconOnly
+                                    size={"md"}
+                                    onClick={() => handleAddCart("add")}
+                                  >
+                                    +
+                                  </Button>
+                                </div>
+                              </div>
+                              <div className="">
+                                <Button
+                                  className="xm:h-unit-8 xm:px-4 lg:px-3 lg:h-unit-xl"
+                                  color="primary"
+                                  variant="ghost"
+                                  radius="lg"
+                                  size={"md"}
+                                  onClick={() => onOpen()}
+                                >
+                                  View Cart
+                                </Button>
+                              </div>
+                            </div>
+                          )}
                       <div className="grid grid-cols-12 justify-between items-center mt-4">
                         <div className="col-span-8">
                           <div className="flex items-center justify-between pb-2.5">
                             <p className="text-sm font-normal">Per Order</p>
                             <IconTick
                               fill={
-                                props?.item?.product?.paymentMode?.includes("1")
+                                props?.item?.product?.paymentMode?.includes(
+                                  "1"
+                                ) || props?.item?.paymentMode?.includes("1")
                                   ? "#49A84C"
                                   : "red"
                               }
@@ -243,7 +290,9 @@ export const ProductDetail = (props: ProductDetailProps) => {
                             </p>
                             <IconTick
                               fill={
-                                props?.item?.product?.paymentMode?.includes("1")
+                                props?.item?.product?.paymentMode?.includes(
+                                  "2"
+                                ) || props?.item?.paymentMode?.includes("2")
                                   ? "#49A84C"
                                   : "red"
                               }
@@ -255,7 +304,9 @@ export const ProductDetail = (props: ProductDetailProps) => {
                             </p>
                             <IconTick
                               fill={
-                                props?.item?.product?.paymentMode?.includes("1")
+                                props?.item?.product?.paymentMode?.includes(
+                                  "2"
+                                ) || props?.item?.paymentMode?.includes("2")
                                   ? "#49A84C"
                                   : "red"
                               }
@@ -336,9 +387,9 @@ export const ProductDetail = (props: ProductDetailProps) => {
                       <div className="flex w-full flex-col">
                         <Tabs
                           aria-label="Options"
-                          color="primary"
-                          variant="bordered"
-                          className="flex-col"
+                          color="default"
+                          variant="solid"
+                          // className="flex-col"
                         >
                           <Tab
                             key="photos"
@@ -351,7 +402,9 @@ export const ProductDetail = (props: ProductDetailProps) => {
                           >
                             <Card className="min-h-[170px]">
                               <CardBody>
-                                {props?.item?.product?.slug}
+                                {props?.item?.product?.slug
+                                  ? props?.item?.product?.slug
+                                  : props?.item?.slug}
                               </CardBody>
                             </Card>
                           </Tab>
@@ -360,53 +413,60 @@ export const ProductDetail = (props: ProductDetailProps) => {
                             title={
                               <div className="flex items-center space-x-2">
                                 {/* <MusicIcon /> */}
-                                <span>Shipping Info</span>
+                                <span>Product Images</span>
                               </div>
                             }
                           >
                             <Card className="min-h-[170px]">
                               <CardBody>
-                                Lorem ipsum dolor sit amet, consectetur
-                                adipiscing elit, sed do eiusmod tempor
-                                incididunt ut labore et dolore magna aliqua. Ut
-                                enim ad minim veniam, quis nostrud exercitation
-                                ullamco laboris nisi ut aliquip ex ea commodo
-                                consequat.
-                              </CardBody>
-                            </Card>
-                          </Tab>
-                          <Tab
-                            key="videos"
-                            title={
-                              <div className="flex items-center space-x-2">
-                                {/* <VideoIcon /> */}
-                                <span>Seller Profile</span>
-                              </div>
-                            }
-                          >
-                            <Card className="min-h-[170px]">
-                              <CardBody>
-                                Lorem ipsum dolor sit amet, consectetur
-                                adipiscing elit, sed do eiusmod tempor
-                                incididunt ut labore et dolore magna aliqua. Ut
-                                enim ad minim veniam, quis nostrud exercitation
-                                ullamco laboris nisi ut aliquip ex ea commodo
-                                consequat.
+                                {" "}
+                                <RowsPhotoAlbum
+                                  photos={slides}
+                                  targetRowHeight={150}
+                                  onClick={({ index: current }) =>
+                                    setIndex(current)
+                                  }
+                                />
                               </CardBody>
                             </Card>
                           </Tab>
                         </Tabs>
                       </div>
                     </div>
-                    <div className="feedback"></div>
-                    <div className="rating"></div>
                   </div>
                   <div className="min-h-[170px]">
-                    <Textarea cols={2}/>
+                    <h2 className="font-bold my-2">
+                      {props?.item?.product?.isEnableCustomize === 1 ||
+                      props?.item?.isEnableCustomize === 1
+                        ? "Customize Your Product"
+                        : "Write your feedback"}
+                    </h2>
+                    <Textarea
+                      classNames={{
+                        base: "max-w-[100%]",
+                        input: "resize-y min-h-[120px]",
+                      }}
+                      placeholder="Enter your details"
+                    />
+                    <div className="flex justify-between mt-2">
+                      <StarRating maxRating={5} />
+                      <Button variant="ghost" color="success">
+                        {props?.item?.product?.isEnableCustomize === 1 ||
+                        props?.item?.isEnableCustomize === 1
+                          ? "Place Order"
+                          : "Submit FeedBack"}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </ModalBody>
-              <ModalFooter className="pt-0 p-3 flex justify-between"></ModalFooter>
+
+              <Lightbox
+                index={index}
+                slides={slides}
+                open={index >= 0}
+                close={() => setIndex(-1)}
+              />
             </>
           )}
         </ModalContent>

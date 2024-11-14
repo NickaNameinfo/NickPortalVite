@@ -23,7 +23,7 @@ import {
   TableCell,
   getKeyValue,
 } from "@nextui-org/react";
-import { IconDelete } from "../Icons";
+import { IconDelete, ModalCloseIcon } from "../Icons";
 import { useBoolean } from "../Common/CustomHooks";
 import { useAppDispatch, useAppSelector } from "../Common/hooks";
 import { useNavigate, useParams } from "react-router-dom";
@@ -166,22 +166,28 @@ export const BuyCard = (props: any) => {
         placement="center"
         backdrop="blur"
         scrollBehavior="inside"
+        hideCloseButton
       >
         <ModalContent className="pb-3">
           <>
-            <ModalHeader></ModalHeader>
-            <ModalBody className=" p-0 m-0 mt-1 ">
+            <ModalCloseIcon
+              onClick={() => props.onClose()}
+              className="modalIconClose"
+            />
+            <ModalBody className="p-0 m-0 mt-1 pt-2">
               <div className="grid xm:grid-cols-1 mm:grid-cols-1  sm:grid-cols-1 ml:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 3xl:grid-cols-2 4xl:grid-cols-2">
                 <div className="">
                   <Table
-                    isStriped
+                    isHeaderSticky
                     classNames={{
-                      base: " xm:max-h-[250px] mm:max-h-[250px] ml:max-h-[250px] md:max-h-[340px] lg:max-h-[340px] xl:max-h-[340px] 2xl:max-h-[340px] 3xl:max-h-[340px] 3xl:max-h-[340px] overflow-scroll",
-                      table:
-                        "xm:min-h-[350px] ml:min-h-[350px] mm:min-h-[350px] lg:min-h-[340px] md:max-h-[340px] xl:max-h-[340px] 2xl:max-h-[340px] 3xl:max-h-[340px] 3xl:max-h-[340px] ",
+                      base: "xm:max-h-[250px] mm:max-h-[250px] ml:max-h-[250px] md:max-h-[340px] lg:max-h-[340px] xl:max-h-[340px] 2xl:max-h-[340px] 3xl:max-h-[340px] overflow-hidden",
+                      table: "w-full",
                     }}
                   >
-                    <TableHeader columns={columns} className="">
+                    <TableHeader
+                      columns={columns}
+                      className="sticky top-0 bg-white z-10"
+                    >
                       {(column) => (
                         <TableColumn
                           className="ps-0 m-0"
@@ -193,7 +199,10 @@ export const BuyCard = (props: any) => {
                       )}
                     </TableHeader>
 
-                    <TableBody items={cart?.data} className="m-0 p-0">
+                    <TableBody
+                      items={cart?.data}
+                      className="max-h-[340px] overflow-y-auto p-0 m-0"
+                    >
                       {(item: any) => (
                         <TableRow key={item?.["id"]} className="p-0 m-0">
                           {(columnKey) => (
