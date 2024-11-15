@@ -34,28 +34,47 @@ import {
   useGetStoresProductByIDQuery,
 } from "../../views/pages/Store/Service.mjs";
 import { useAppDispatch, useAppSelector } from "../Common/hooks";
-import { onUpdateProductPopOver } from "../Common/globalSlice";
 export const ProductViewCard = ({ item = null }) => {
-  const dispatch = useAppDispatch();
-  const isProductPopOver = useAppSelector(
-    (state) => state.globalConfig.isProductPopOver
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const isProductDetailsModalOpen = useAppSelector(
+    (state) => state.globalConfig.isProductDetailsModalOpen
   );
+
+  const isOpenCartModal = useAppSelector(
+    (state) => state.globalConfig.isOpenCartModal
+  );
+
   const navigate = useNavigate();
+
   const { data, error, refetch } = useGetStoresByIdQuery(
     Number(item?.createdId)
   );
+
   const {
     data: storeProduct,
     error: storeProductError,
     refetch: storeProductRefetch,
   } = useGetStoresProductByIDQuery(Number(data?.data?.id));
+
+  React.useEffect(() => {
+    if (isProductDetailsModalOpen?.isOpen || isOpenCartModal) {
+      setIsOpen(false);
+    }
+  }, [isProductDetailsModalOpen, isOpenCartModal]);
+
   return (
     <Popover
       showArrow
       placement="right"
       key={item?.id}
-      isOpen={isProductPopOver}
-      onOpenChange={(open) => dispatch(onUpdateProductPopOver(open))}
+      isOpen={isOpen}
+      onOpenChange={(open) => {
+        if (!isProductDetailsModalOpen?.isOpen) {
+          setIsOpen(true);
+        }
+      }}
+      onClose={() => setIsOpen(false)}
     >
       <PopoverTrigger>
         <Card key={item?.id} className="Storecard py-2.5 px-2.5">

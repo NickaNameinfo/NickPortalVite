@@ -7,18 +7,28 @@ import { useGetStoresProductByIDQuery } from "../Service.mjs";
 import { getCookie } from "../../../../JsFiles/CommonFunction.mjs";
 import { useAppSelector } from "../../../../Components/Common/hooks";
 import { NoProductsFound } from "../../NoItems/NoProductsFound";
+import { ProductDetail } from "../../../../Components/DetailsModales/ProductDetail";
+import { BuyCard } from "../../../../Components/Card/BuyCard";
 
 const StoreDetails = () => {
   const { id } = useParams();
   const { data, error, refetch } = useGetStoresProductByIDQuery(Number(id));
-  // Refetch the data when the id changes
+
+  const isProductDetailsModalOpen = useAppSelector(
+    (state) => state.globalConfig.isProductDetailsModalOpen
+  );
+
+  const isOpenCartModal = useAppSelector(
+    (state) => state.globalConfig.isOpenCartModal
+  );
+
   React.useEffect(() => {
     if (id) {
       refetch();
     }
   }, [id, refetch]);
 
-  console.log(data, "data79087");
+  console.log(isProductDetailsModalOpen, "data79087");
 
   return (
     <div>
@@ -36,6 +46,14 @@ const StoreDetails = () => {
       ) : (
         <NoProductsFound />
       )}
+      {isProductDetailsModalOpen?.isOpen && (
+        <ProductDetail
+          isOpen={isProductDetailsModalOpen?.isOpen}
+          item={isProductDetailsModalOpen?.item}
+        />
+      )}
+
+      {isOpenCartModal && <BuyCard isOpen={isOpenCartModal} />}
     </div>
   );
 };

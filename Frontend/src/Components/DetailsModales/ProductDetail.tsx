@@ -40,7 +40,11 @@ import {
   useGetStoresByIdQuery,
   useGetStoresQuery,
 } from "../../views/pages/Store/Service.mjs";
-import { onRefreshCart, onUpdateProductPopOver } from "../Common/globalSlice";
+import {
+  onRefreshCart,
+  onUpdateCartModal,
+  onUpdateProductDetailsModal,
+} from "../Common/globalSlice";
 import StoreCard from "../Card/StoreCard";
 import { toast } from "react-toastify";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
@@ -50,12 +54,11 @@ import StarRating from "../Input/Ratings";
 
 interface ProductDetailProps {
   isOpen: any;
-  onClose: any;
   item: any;
 }
 
 export const ProductDetail = (props: ProductDetailProps) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isOpen, setIsOpen] = React.useState(false);
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
   const notify = (value) => toast(value);
   const MySwal = withReactContent(Swal);
@@ -174,22 +177,34 @@ export const ProductDetail = (props: ProductDetailProps) => {
     <>
       <Modal
         size={"5xl"}
-        isOpen={props.isOpen}
-        // onClose={props.onClose}
+        isOpen={props?.isOpen}
+        onClose={() => {
+          if (props?.isOpen) {
+            dispatch(
+              onUpdateProductDetailsModal({
+                isOpen: false,
+                item: null,
+              })
+            );
+          }
+        }}
         placement="bottom"
         scrollBehavior="inside"
         backdrop="blur"
         hideCloseButton
-        // classNames={{
-        //   closeButton: "modalIconClose",
-        // }}
-        // closeButton={<ModalCloseIcon onClick={() => props.onClose()} />}
       >
         <ModalContent>
           {(onClose) => (
             <>
               <ModalCloseIcon
-                onClick={() => props.onClose()}
+                onClick={() => {
+                  dispatch(
+                    onUpdateProductDetailsModal({
+                      isOpen: false,
+                      item: null,
+                    })
+                  );
+                }}
                 className="modalIconClose"
               />
               <ModalBody className="p-5">
@@ -227,49 +242,48 @@ export const ProductDetail = (props: ProductDetailProps) => {
                         </p>
                         <div className="text-sm">120 Stocks</div>
                       </div>
-                      {Number(props?.item?.product?.isEnableEcommerce)
-                        ? props?.item?.product?.isEnableEcommerce
-                        : props?.item?.isEnableEcommerce === 1 && (
-                            <div className="flex items-center justify-between mt-2">
-                              <div className="">
-                                <div className="flex justify-between items-center rounded-xl bg-gray-100 lg:h-unit-xl">
-                                  <Button
-                                    className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
-                                    radius="full"
-                                    isIconOnly
-                                    size="md"
-                                    onClick={() => handleAddCart("remove")}
-                                  >
-                                    -
-                                  </Button>
-                                  <p className="bg-gray-100 text-sm font-semibold p-0 m-0">
-                                    {cart?.data?.qty ? cart?.data?.qty : 0}
-                                  </p>
-                                  <Button
-                                    className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
-                                    radius="full"
-                                    isIconOnly
-                                    size={"md"}
-                                    onClick={() => handleAddCart("add")}
-                                  >
-                                    +
-                                  </Button>
-                                </div>
-                              </div>
-                              <div className="">
-                                <Button
-                                  className="xm:h-unit-8 xm:px-4 lg:px-3 lg:h-unit-xl"
-                                  color="primary"
-                                  variant="ghost"
-                                  radius="lg"
-                                  size={"md"}
-                                  onClick={() => onOpen()}
-                                >
-                                  View Cart
-                                </Button>
-                              </div>
+                      {(Number(props?.item?.product?.isEnableEcommerce) === 1 ||
+                        Number(props?.item?.isEnableEcommerce) === 1) && (
+                        <div className="flex items-center justify-between mt-2">
+                          <div className="">
+                            <div className="flex justify-between items-center rounded-xl bg-gray-100 lg:h-unit-xl">
+                              <Button
+                                className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
+                                radius="full"
+                                isIconOnly
+                                size="md"
+                                onClick={() => handleAddCart("remove")}
+                              >
+                                -
+                              </Button>
+                              <p className="bg-gray-100 text-sm font-semibold p-0 m-0">
+                                {cart?.data?.qty ? cart?.data?.qty : 0}
+                              </p>
+                              <Button
+                                className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
+                                radius="full"
+                                isIconOnly
+                                size={"md"}
+                                onClick={() => handleAddCart("add")}
+                              >
+                                +
+                              </Button>
                             </div>
-                          )}
+                          </div>
+                          <div className="">
+                            <Button
+                              className="xm:h-unit-8 xm:px-4 lg:px-3 lg:h-unit-xl"
+                              color="primary"
+                              variant="ghost"
+                              radius="lg"
+                              size={"md"}
+                              onClick={() => dispatch(onUpdateCartModal(true))}
+                            >
+                              View Cart
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                       <div className="grid grid-cols-12 justify-between items-center mt-4">
                         <div className="col-span-8">
                           <div className="flex items-center justify-between pb-2.5">
@@ -471,7 +485,6 @@ export const ProductDetail = (props: ProductDetailProps) => {
           )}
         </ModalContent>
       </Modal>
-      <BuyCard isOpen={isOpen} onClose={onClose} />
     </>
   );
 };

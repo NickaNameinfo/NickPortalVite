@@ -36,7 +36,11 @@ import {
   useUpdateCartMutation,
 } from "../../views/pages/Store/Service.mjs";
 import { useAppDispatch, useAppSelector } from "../Common/hooks";
-import { onRefreshCart } from "../Common/globalSlice";
+import {
+  onRefreshCart,
+  onUpdateCartModal,
+  onUpdateProductDetailsModal,
+} from "../Common/globalSlice";
 import { infoData } from "../../configData";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import Swal from "sweetalert2";
@@ -48,7 +52,6 @@ export const PremiumCard = ({
   from = null,
   popOverOnClose = null,
 }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: cartIsOpen,
     onOpen: cartOpen,
@@ -113,15 +116,20 @@ export const PremiumCard = ({
     }
   };
 
-  console.log("item79087", item?.product);
-
   return (
     <>
       <Card className="Storecard pt-3.5 px-3">
         {!isHideImage && (
           <CardBody
             className="overflow-visible p-0 relative"
-            onClick={() => onOpen()}
+            onClick={() => {
+              dispatch(
+                onUpdateProductDetailsModal({
+                  isOpen: true,
+                  item: item,
+                })
+              );
+            }}
           >
             <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
               {item?.product?.discount
@@ -226,7 +234,14 @@ export const PremiumCard = ({
                       radius="full"
                       isIconOnly
                       size="lg"
-                      onClick={() => onOpen()}
+                      onClick={() => {
+                        dispatch(
+                          onUpdateProductDetailsModal({
+                            isOpen: true,
+                            item: item,
+                          })
+                        );
+                      }}
                     >
                       <IconsEye fill="#CFA007" className="m-3 cursor-pointer" />
                     </Button>
@@ -241,6 +256,9 @@ export const PremiumCard = ({
                       content={data?.data?.qty ? data?.data?.qty : 0}
                       shape="circle"
                       color="danger"
+                      onClick={() => {
+                        dispatch(onUpdateCartModal(true));
+                      }}
                     >
                       {/* <Button
                       className="bgnone p-0 m-0"
@@ -250,9 +268,11 @@ export const PremiumCard = ({
                       onClick={() => cartOpen()}
                     > */}
                       <IconShopBag
-                        onClick={() => cartOpen()}
                         fill="#4C86F9"
                         className="cursor-pointer"
+                        onClick={() => {
+                          dispatch(onUpdateCartModal(true));
+                        }}
                       />
                       {/* </Button> */}
                     </Badge>
@@ -310,7 +330,6 @@ export const PremiumCard = ({
           </div>
         </CardFooter>
       </Card>
-      <ProductDetail isOpen={isOpen} onClose={onClose} item={item} />
       <BuyCard isOpen={cartIsOpen} onClose={cartClose} />
     </>
   );

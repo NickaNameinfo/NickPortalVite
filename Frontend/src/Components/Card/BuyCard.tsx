@@ -28,7 +28,7 @@ import { useBoolean } from "../Common/CustomHooks";
 import { useAppDispatch, useAppSelector } from "../Common/hooks";
 import { useNavigate, useParams } from "react-router-dom";
 import { infoData } from "../../configData";
-import { onRefreshCart } from "../Common/globalSlice";
+import { onRefreshCart, onUpdateCartModal } from "../Common/globalSlice";
 import {
   useGetCartByOrderIdQuery,
   useUpdateCartMutation,
@@ -99,8 +99,8 @@ export const BuyCard = (props: any) => {
     }
   };
 
+  console.log(cart, "sdf7a09s");
   const renderCell = React.useCallback((data, columnKey) => {
-    console.log(data, "datacolumnKey", columnKey);
     switch (columnKey) {
       case "photo":
         return (
@@ -160,7 +160,11 @@ export const BuyCard = (props: any) => {
     <>
       <Modal
         isOpen={props.isOpen}
-        onClose={props.onClose}
+        onClose={() => {
+          if (props.isOpen) {
+            dispatch(onUpdateCartModal(false));
+          }
+        }}
         size={"5xl"}
         shadow="md"
         placement="center"
@@ -171,7 +175,9 @@ export const BuyCard = (props: any) => {
         <ModalContent className="pb-3">
           <>
             <ModalCloseIcon
-              onClick={() => props.onClose()}
+              onClick={() => {
+                dispatch(onUpdateCartModal(false));
+              }}
               className="modalIconClose"
             />
             <ModalBody className="p-0 m-0 mt-1 pt-2">
@@ -214,13 +220,19 @@ export const BuyCard = (props: any) => {
                       )}
                     </TableBody>
                   </Table>
+                  {cart?.data?.length <= 0 && (
+                    <p className="text-center my-3">No Item in Your Cart</p>
+                  )}
                   <div className="items-center flex justify-center ">
                     <Button
                       size="sm"
                       color="primary"
                       variant="bordered"
-                      className="ms-3"
+                      className={`ms-3 ${
+                        cart?.data?.length <= 0 ? "cursor-not-allowed" : ""
+                      }`}
                       onClick={() => navigate(-1)}
+                      disabled={cart?.data?.length <= 0}
                     >
                       Buy More Items
                     </Button>
@@ -320,7 +332,14 @@ export const BuyCard = (props: any) => {
                         </div>
                       </RadioGroup>
                       <div className="flex items-center justify-center mt-4 mb-1">
-                        <Button size="sm" color="primary" className="me-5">
+                        <Button
+                          size="sm"
+                          color="primary"
+                          className={`me-5 ${
+                            cart?.data?.length <= 0 ? "cursor-not-allowed" : ""
+                          }`}
+                          disabled={cart?.data?.length <= 0}
+                        >
                           Book Order
                         </Button>
                         <Button

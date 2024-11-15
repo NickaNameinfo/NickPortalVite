@@ -5,10 +5,20 @@ import {
   useGetStoresByCategoryQuery,
   useGetStoresByFiltersQuery,
   useGetStoresByPaymentTypeQuery,
-  useGetStoresByOpenStoreQuery
+  useGetStoresByOpenStoreQuery,
 } from "./Service.mjs";
-import { useAppDispatch, useAppSelector } from "../../../Components/Common/hooks";
-import { onUpdateStoreList } from "../../../Components/Common/globalSlice";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../Components/Common/hooks";
+import {
+  onResetModals,
+  onUpdateCartModal,
+  onUpdateProductDetailsModal,
+  onUpdateStoreList,
+} from "../../../Components/Common/globalSlice";
+import { ProductDetail } from "../../../Components/DetailsModales/ProductDetail";
+import { BuyCard } from "../../../Components/Card/BuyCard";
 
 const Store = () => {
   const dispatch = useAppDispatch();
@@ -51,22 +61,23 @@ const Store = () => {
   } = useGetStoresByOpenStoreQuery();
 
   const [storeDataList, setStoreDataList] = React.useState(null);
-  
+
   React.useEffect(() => {
     refetch();
+    dispatch(onResetModals());
   }, []);
 
   React.useEffect(() => {
-    if(storeDataList){
-      dispatch(onUpdateStoreList(storeDataList?.data))
+    if (storeDataList) {
+      dispatch(onUpdateStoreList(storeDataList?.data));
     }
-  }, [storeDataList])
+  }, [storeDataList]);
 
   React.useEffect(() => {
     storeByCategoryRefetch();
-    storeByFilterRefetch()
-    storesByPaymentRefetch()
-    storesByOpenStoreRefetch()
+    storeByFilterRefetch();
+    storesByPaymentRefetch();
+    storesByOpenStoreRefetch();
   }, [globalCategorySearch, globalSearch]);
 
   React.useEffect(() => {
@@ -74,12 +85,11 @@ const Store = () => {
       setStoreDataList(storesByFilter);
     } else if (storesByCategory?.data?.length > 0) {
       setStoreDataList(storesByCategory);
-    }else if(storesByPayment?.data?.length > 0 ){
-      setStoreDataList(storesByPayment)
-    }else if(storesByOpenStore?.data?.length > 0 && onSearchOpenStore){
+    } else if (storesByPayment?.data?.length > 0) {
+      setStoreDataList(storesByPayment);
+    } else if (storesByOpenStore?.data?.length > 0 && onSearchOpenStore) {
       setStoreDataList(storesByOpenStore);
-    }
-    else if (data?.data?.length > 0) {
+    } else if (data?.data?.length > 0) {
       setStoreDataList(data);
     }
   }, [storesByCategory, data, storesByFilter, storesByPayment]);

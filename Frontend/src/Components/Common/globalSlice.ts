@@ -10,8 +10,9 @@ export interface GlobalConfigState {
   globalCategorySearch?: any;
   gloablSearchByPayment?: any;
   onSearchOpenStore?: boolean;
-  storeList?:any;
-  isProductPopOver?: boolean;
+  storeList?: any;
+  isProductDetailsModalOpen?: any;
+  isOpenCartModal: any;
 }
 
 const initialState: GlobalConfigState = {
@@ -21,10 +22,14 @@ const initialState: GlobalConfigState = {
   currentloginDetails: null,
   onRefreshCart: false,
   globalCategorySearch: null,
-  gloablSearchByPayment : null,
+  gloablSearchByPayment: null,
   onSearchOpenStore: false,
-  storeList:null,
-  isProductPopOver : false
+  storeList: null,
+  isProductDetailsModalOpen: {
+    isOpen: false,
+    item: null,
+  },
+  isOpenCartModal: false,
 };
 
 const globalConfigSlice = createSlice({
@@ -61,9 +66,19 @@ const globalConfigSlice = createSlice({
     onUpdateStoreList: (state, action) => {
       state.storeList = action?.payload;
     },
-    onUpdateProductPopOver: (state, action) => {
-      state.isProductPopOver = action?.payload;
-    }
+    onUpdateProductDetailsModal: (state, action) => {
+      state.isProductDetailsModalOpen = action?.payload;
+    },
+    onUpdateCartModal: (state, action) => {
+      state.isOpenCartModal = action?.payload;
+    },
+    onResetModals: (state) => {
+      state.isProductDetailsModalOpen = {
+        isOpen: false,
+        item: null,
+      };
+      state.isOpenCartModal = false;
+    },
   },
 });
 
@@ -78,6 +93,8 @@ export const {
   onGlobalPaymentSearch,
   onUpdateOpenStore,
   onUpdateStoreList,
-  onUpdateProductPopOver
+  onUpdateProductDetailsModal,
+  onUpdateCartModal,
+  onResetModals,
 } = globalConfigSlice.actions;
 export default globalConfigSlice.reducer;

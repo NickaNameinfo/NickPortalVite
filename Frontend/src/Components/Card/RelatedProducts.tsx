@@ -9,6 +9,8 @@ import {
 } from "@nextui-org/react";
 import { ProductDetail } from "../DetailsModales/ProductDetail";
 import { infoData } from "../../configData";
+import { useAppDispatch } from "../Common/hooks";
+import { onUpdateProductDetailsModal } from "../Common/globalSlice";
 
 export const RelatedProducts = ({
   item = null,
@@ -17,12 +19,20 @@ export const RelatedProducts = ({
   from = null,
   popOverOnClose = null,
 }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const dispatch = useAppDispatch();
+
   return (
     <>
       <Card
         isPressable
-        onPress={() => onOpen()}
+        onPress={() => {
+          dispatch(
+            onUpdateProductDetailsModal({
+              isOpen: true,
+              item: item,
+            })
+          );
+        }}
         className="Storecard pt-3.5 px-3 cursor-pointer"
       >
         {!isHideImage && (
@@ -71,7 +81,6 @@ export const RelatedProducts = ({
           </div>
         </CardFooter>
       </Card>
-      <ProductDetail isOpen={isOpen} onClose={onClose} item={item} />
     </>
   );
 };
