@@ -9,4 +9,5 @@ export default defineConfig({
     port: 5173, // Set the desired port
     open: false,
   },
+  base: '/Admin/',
 });
