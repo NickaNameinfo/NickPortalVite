@@ -37,7 +37,7 @@ function App() {
 
   return (
     <Suspense fallback={loading}>
-      <Router>
+      <Router basename="/Admin">
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/404" element={<Page404 />} />
