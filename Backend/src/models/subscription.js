@@ -2,7 +2,7 @@
 
 module.exports = (sequelize, DataTypes) => {
   const Subscription = sequelize.define(
-    "Subscription",
+    "subscriptions",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -57,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Subscription.associate = function (models) {
-    models.Subscription.belongsTo(models.user, {
+    models.subscriptions.belongsTo(models.user, {
       foreignKey: "customerId",
     });
   };

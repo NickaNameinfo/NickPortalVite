@@ -31,7 +31,6 @@ function App() {
 
   React.useEffect(() => {
     if (data?.data) {
-      console.log(data?.data, "asdf7a0sd978")
       dispatch(updateLoginDetails(data));
     }
   }, [data]);

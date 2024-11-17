@@ -5,7 +5,7 @@ module.exports = {
   // Get all subscriptions
   async getAllSubscriptions(req, res, next) {
     try {
-      const subscriptions = await db.Subscription.findAll({
+      const subscriptions = await db.subscriptions.findAll({
         order: [["createdAt", "DESC"]],
       });
       res.status(200).json({ success: true, data: subscriptions });
@@ -30,7 +30,7 @@ module.exports = {
       }
   
       // Query the database
-      const subscription = await db.Subscription.findAll({
+      const subscription = await db.subscriptions.findAll({
         where: whereCondition,
       });
   
@@ -51,7 +51,7 @@ module.exports = {
   async addSubscription(req, res, next) {
     try {
       const { subscriptionType, subscriptionPlan, subscriptionPrice, customerId, status, subscriptionCount } = req.body;
-      const subscription = await db.Subscription.create({
+      const subscription = await db.subscriptions.create({
         subscriptionType,
         subscriptionPlan,
         subscriptionPrice,
@@ -69,7 +69,7 @@ module.exports = {
   async updateSubscription(req, res, next) {
     try {
       const { id, subscriptionType, subscriptionPlan, subscriptionPrice, status, subscriptionCount } = req.body;
-      const subscription = await db.Subscription.findOne({ where: { id: id } });
+      const subscription = await db.subscriptions.findOne({ where: { id: id } });
       if (!subscription) {
         return res.status(404).json({ success: false, message: "Subscription not found" });
       }
@@ -90,7 +90,7 @@ module.exports = {
   async deleteSubscription(req, res, next) {
     try {
       const { id } = req.params;
-      const subscription = await db.Subscription.findOne({ where: { id: id } });
+      const subscription = await db.subscriptions.findOne({ where: { id: id } });
       if (!subscription) {
         return res.status(404).json({ success: false, message: "Subscription not found" });
       }

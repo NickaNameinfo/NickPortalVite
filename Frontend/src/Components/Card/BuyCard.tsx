@@ -45,6 +45,8 @@ const columns = [
 export const BuyCard = (props: any) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
+  const isOpenCartModal = useAppSelector((state) => state.globalConfig.isOpenCartModal);
+
   const id = getCookie("id");
   const {
     data: cart,
@@ -99,7 +101,6 @@ export const BuyCard = (props: any) => {
     }
   };
 
-  console.log(cart, "sdf7a09s");
   const renderCell = React.useCallback((data, columnKey) => {
     switch (columnKey) {
       case "photo":
@@ -159,9 +160,9 @@ export const BuyCard = (props: any) => {
   return (
     <>
       <Modal
-        isOpen={props.isOpen}
+        isOpen={isOpenCartModal}
         onClose={() => {
-          if (props.isOpen) {
+          if (isOpenCartModal) {
             dispatch(onUpdateCartModal(false));
           }
         }}

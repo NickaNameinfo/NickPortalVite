@@ -63,6 +63,10 @@ export const AppHeader = () => {
     setStartIndex(Math.max(startIndex - 1, 0));
   };
 
+  const globalCategorySearch = useAppSelector(
+    (state) => state.globalConfig.globalCategorySearch
+  );
+
   const handleNext = () => {
     setStartIndex((prevIndex) =>
       Math.min(prevIndex + 1, sliderLabel?.length - itemsPerPage)
@@ -79,8 +83,6 @@ export const AppHeader = () => {
     dispatch(onSearchGlobal(searchValues));
     dispatch(onUpdateOpenStore(false));
   };
-
-  console.log(currentloginDetails, "currentloginDetails709");
 
   return (
     <>
@@ -106,7 +108,11 @@ export const AppHeader = () => {
               className="w-[280px]"
               radius="lg"
               size="md"
-              // type="Search"
+              onClear={() => {
+                dispatch(onSearchGlobal(null));
+                dispatch(onUpdateOpenStore(false));
+                setSearchValues(null);
+              }}
               onChange={(e) => setSearchValues(e.target.value)}
               variant="flat"
               placeholder="Search Here..."
@@ -357,11 +363,20 @@ export const AppHeader = () => {
                         size="sm"
                         className="font-medium text-sm w-auto h-10 text-black"
                         style={{
-                          backgroundColor: "rgba(255, 255, 255, 0.5)",
+                          backgroundColor:
+                            globalCategorySearch === item?.id
+                              ? "#f6bc00"
+                              : "#ffffff80",
                           borderRadius: "14px",
                         }}
                         radius="full"
-                        onClick={() => onSearchByCategory(item?.id)}
+                        onClick={() => {
+                          if (globalCategorySearch) {
+                            onSearchByCategory(null);
+                          } else {
+                            onSearchByCategory(item?.id);
+                          }
+                        }}
                       >
                         {item?.name}
                       </Button>

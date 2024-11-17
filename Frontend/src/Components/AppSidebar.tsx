@@ -37,11 +37,11 @@ import {
   onGlobalCategorySearch,
   onGlobalPaymentSearch,
   onSearchGlobal,
+  onUpdateCartModal,
   onUpdateOpenStore,
   updateLoginDetails,
 } from "../Components/Common/globalSlice";
 import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
-import { BuyCard } from "./Card/BuyCard";
 export const AppSidebar = () => {
   const [menuToggle, setMenuToggle] = React.useState(false);
   const [mobileExpand, setMobileExpand] = React.useState(false);
@@ -51,7 +51,7 @@ export const AppSidebar = () => {
     (state) => state.globalConfig.currentloginDetails
   );
   const { data, refetch } = useGetCategoryQuery();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const isOpenCartModal = useAppSelector((state) => state.globalConfig.isOpenCartModal);
 
   const itemClasses = {
     base: "py-0 w-full",
@@ -171,23 +171,6 @@ export const AppSidebar = () => {
                       !result?.isSoon ? { backgroundColor: "#49a84cd4" } : {}
                     }
                     className="rounded-lg cursor-pointer"
-                    onClick={() => {
-                      if (result?.key === "Hospitals") {
-                        onSearchByCategory(20);
-                        dispatch(onUpdateOpenStore(false));
-                      } else if (result?.key === "Hotels") {
-                        onSearchByCategory(21);
-                        dispatch(onUpdateOpenStore(false));
-                      } else if (result?.key === "Open Shop") {
-                        dispatch(onSearchGlobal(null));
-                        dispatch(onGlobalCategorySearch(null));
-                        dispatch(onGlobalPaymentSearch(null));
-                        dispatch(onUpdateOpenStore(true));
-                      } else {
-                        onSearchByPayment(result);
-                        dispatch(onUpdateOpenStore(false));
-                      }
-                    }}
                   >
                     <div
                       className={`my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg ${
@@ -211,37 +194,54 @@ export const AppSidebar = () => {
                               {result?.name}
                             </p>
                             {result?.isSoon && (
-                              <p className="text-green-700 text-xs font-mono">
+                              <p className="text-green-700 text-[0.6rem] font-mono me-2">
                                 coming soon
                               </p>
                             )}
                           </div>
                         )}
-                        {/* <Switch
-                          color="secondary"
+                        <Switch
                           size="md"
-                          defaultSelected
+                          defaultSelected={false}
+                          onValueChange={(value) => {
+                            console.log(value, "valueasdfasdf")
+                            if (result?.key === "Hospitals") {
+                              onSearchByCategory(20);
+                              dispatch(onUpdateOpenStore(false));
+                            } else if (result?.key === "Hotels") {
+                              onSearchByCategory(21);
+                              dispatch(onUpdateOpenStore(false));
+                            } else if (result?.key === "Open Shop") {
+                              dispatch(onSearchGlobal(null));
+                              dispatch(onGlobalCategorySearch(null));
+                              dispatch(onGlobalPaymentSearch(null));
+                              dispatch(onUpdateOpenStore(true));
+                            } else {
+                              onSearchByPayment(result);
+                              dispatch(onUpdateOpenStore(false));
+                            }
+                          }}
                           classNames={{
                             wrapper: [
-                              "p-0 h-3 w-9   overflow-visible group-data-[selected=true]: bg-cyan-400",
+                              "p-0 h-5 w-9 overflow-visible group-data-[selected=true]: bg-black",
                             ],
                             thumb: cn(
-                              "w-5 h-5  shadow-lg",
+                              "w-5 h-5  shadow-l",
 
                               "group-data-[hover=true]:border-secondary",
 
                               //selected bg-teal-400 , bg-yellow-600
-                              "group-data-[selected=true]:bg-green-500",
-                              "group-data-[selected=true]:ml-4 ",
+                              "group-data-[selected=true]:bg-white",
+                              "group-data-[selected=true]:ml-4",
 
                               // pressed bg-green-600
                               "group-data-[pressed=true]:w-7 ",
                               "group-data-[selected]:group-data-[pressed]:ml-4 ",
-                              "group-data-[selected=true]: bg-cyan-500"
+                              "group-data-[selected=true]: bg-white"
                             ),
                           }}
                           aria-label="Automatic updates"
-                        /> */}
+                        />
                       </div>
                     </div>
                   </div>
@@ -330,7 +330,9 @@ export const AppSidebar = () => {
             </div>
             <div
               style={{ textAlign: "right" }}
-              className={`absolute bottom-[3%] rounded-lg w-11/12 ${currentloginDetails?.data?.email ? "bg-white" : ""} p-1`}
+              className={`absolute bottom-[3%] rounded-lg w-11/12 ${
+                currentloginDetails?.data?.email ? "bg-white" : ""
+              } p-1`}
             >
               {!currentloginDetails?.data?.email ? (
                 <Login />
@@ -382,7 +384,7 @@ export const AppSidebar = () => {
                                   key="pull_requests"
                                   endContent={90}
                                   startContent={<IconHome />}
-                                  onClick={() => onOpen()}
+                                  onClick={() =>  dispatch(onUpdateCartModal(true))}
                                 >
                                   Cart
                                 </ListboxItem>
@@ -412,7 +414,6 @@ export const AppSidebar = () => {
           </div>
         </aside>
       </div>
-      <BuyCard isOpen={isOpen} onClose={onClose} />
     </>
   );
 };
