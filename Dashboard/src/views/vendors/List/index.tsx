@@ -41,7 +41,7 @@ const List = () => {
     "ownername",
     "phone",
     "email",
-    "actions",
+    "actions", 
     "status",
   ];
 

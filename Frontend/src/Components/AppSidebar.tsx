@@ -32,7 +32,7 @@ import { _nav } from "../_nav";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "./Common/hooks";
 import Login from "../views/pages/login/Login";
-import { eraseCookie } from "../JsFiles/CommonFunction.mjs";
+import { eraseCookie, getCookie } from "../JsFiles/CommonFunction.mjs";
 import {
   onGlobalCategorySearch,
   onGlobalPaymentSearch,
@@ -42,16 +42,24 @@ import {
   updateLoginDetails,
 } from "../Components/Common/globalSlice";
 import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
+import { useGetCartByOrderIdQuery } from "../views/pages/Store/Service.mjs";
+
 export const AppSidebar = () => {
   const [menuToggle, setMenuToggle] = React.useState(false);
   const [mobileExpand, setMobileExpand] = React.useState(false);
   const [selectedCategory, setSelectedCategory] = React.useState([]);
-  const navigate = useNavigate();
   const currentloginDetails = useAppSelector(
     (state) => state.globalConfig.currentloginDetails
   );
   const { data, refetch } = useGetCategoryQuery();
-  const isOpenCartModal = useAppSelector((state) => state.globalConfig.isOpenCartModal);
+  const [onSeletedItem, setOnSelectedItem] = React.useState(null);
+
+  const id = getCookie("id");
+  const {
+    data: cart,
+    error: cartError,
+    refetch: cartRefetch,
+  } = useGetCartByOrderIdQuery(Number(id));
 
   const itemClasses = {
     base: "py-0 w-full",
@@ -95,6 +103,8 @@ export const AppSidebar = () => {
     dispatch(onGlobalCategorySearch(id));
     dispatch(onGlobalPaymentSearch(null));
   };
+
+  console.log(onSeletedItem, "onSeletedItem");
 
   return (
     <>
@@ -168,9 +178,45 @@ export const AppSidebar = () => {
                 result?.menuType === "single" ? (
                   <div
                     style={
-                      !result?.isSoon ? { backgroundColor: "#49a84cd4" } : {}
+                      !result?.isSoon
+                        ? {
+                            backgroundColor: `${
+                              result?.key === onSeletedItem
+                                ? "white"
+                                : "#49a84cd4"
+                            } `,
+                          }
+                        : {}
                     }
-                    className="rounded-lg cursor-pointer"
+                    className={"rounded-lg cursor-pointer"}
+                    onClick={() => {
+                      if (onSeletedItem) {
+                        onSearchByPayment(result);
+                        dispatch(onUpdateOpenStore(false));
+                        setOnSelectedItem(null);
+                        dispatch(onSearchGlobal(null));
+                        dispatch(onGlobalCategorySearch(null));
+                        dispatch(onGlobalPaymentSearch(null));
+                      } else {
+                        setOnSelectedItem(result.key);
+                      }
+
+                      if (result?.key === "Hospitals") {
+                        onSearchByCategory(20);
+                        dispatch(onUpdateOpenStore(false));
+                      } else if (result?.key === "Hotels") {
+                        onSearchByCategory(21);
+                        dispatch(onUpdateOpenStore(false));
+                      } else if (result?.key === "Open Shop") {
+                        dispatch(onSearchGlobal(null));
+                        dispatch(onGlobalCategorySearch(null));
+                        dispatch(onGlobalPaymentSearch(null));
+                        dispatch(onUpdateOpenStore(true));
+                      } else {
+                        onSearchByPayment(result);
+                        dispatch(onUpdateOpenStore(false));
+                      }
+                    }}
                   >
                     <div
                       className={`my-3 p-2 text-sm flex items-center text-gray-900 rounded-lg ${
@@ -185,7 +231,7 @@ export const AppSidebar = () => {
                         ) : (
                           <div
                             className={
-                              result?.isSoon
+                              result?.isSoon || result?.key === onSeletedItem
                                 ? "flex w-full justify-between"
                                 : ""
                             }
@@ -193,55 +239,17 @@ export const AppSidebar = () => {
                             <p className="text-black text-sm font-normal">
                               {result?.name}
                             </p>
-                            {result?.isSoon && (
+                            {result?.isSoon ? (
                               <p className="text-green-700 text-[0.6rem] font-mono me-2">
                                 coming soon
                               </p>
-                            )}
+                            ) : result?.key === onSeletedItem ? (
+                              <p className="text-green-700 text-[0.6rem] font-mono me-2">
+                                Selected
+                              </p>
+                            ) : null}
                           </div>
                         )}
-                        <Switch
-                          size="md"
-                          defaultSelected={false}
-                          onValueChange={(value) => {
-                            console.log(value, "valueasdfasdf")
-                            if (result?.key === "Hospitals") {
-                              onSearchByCategory(20);
-                              dispatch(onUpdateOpenStore(false));
-                            } else if (result?.key === "Hotels") {
-                              onSearchByCategory(21);
-                              dispatch(onUpdateOpenStore(false));
-                            } else if (result?.key === "Open Shop") {
-                              dispatch(onSearchGlobal(null));
-                              dispatch(onGlobalCategorySearch(null));
-                              dispatch(onGlobalPaymentSearch(null));
-                              dispatch(onUpdateOpenStore(true));
-                            } else {
-                              onSearchByPayment(result);
-                              dispatch(onUpdateOpenStore(false));
-                            }
-                          }}
-                          classNames={{
-                            wrapper: [
-                              "p-0 h-5 w-9 overflow-visible group-data-[selected=true]: bg-black",
-                            ],
-                            thumb: cn(
-                              "w-5 h-5  shadow-l",
-
-                              "group-data-[hover=true]:border-secondary",
-
-                              //selected bg-teal-400 , bg-yellow-600
-                              "group-data-[selected=true]:bg-white",
-                              "group-data-[selected=true]:ml-4",
-
-                              // pressed bg-green-600
-                              "group-data-[pressed=true]:w-7 ",
-                              "group-data-[selected]:group-data-[pressed]:ml-4 ",
-                              "group-data-[selected=true]: bg-white"
-                            ),
-                          }}
-                          aria-label="Automatic updates"
-                        />
                       </div>
                     </div>
                   </div>
@@ -329,7 +337,9 @@ export const AppSidebar = () => {
               )}
             </div>
             <div
-              style={{ textAlign: "right" }}
+              style={{
+                textAlign: currentloginDetails?.data?.email ? "left" : "right",
+              }}
               className={`absolute bottom-[3%] rounded-lg w-11/12 ${
                 currentloginDetails?.data?.email ? "bg-white" : ""
               } p-1`}
@@ -343,8 +353,8 @@ export const AppSidebar = () => {
                       <FormeIcon />
                     </span>
                   ) : (
-                    <p className="text-black text-sm font-normal">
-                      <Popover showArrow placement="bottom">
+                    <p className="text-black text-sm font-normal w-full">
+                      <Popover showArrow placement="bottom" className="w-full">
                         <PopoverTrigger>
                           <User
                             as="button"
@@ -375,16 +385,18 @@ export const AppSidebar = () => {
                               >
                                 <ListboxItem
                                   key="issues"
-                                  endContent={90}
+                                  // endContent={90}
                                   startContent={<IconHome />}
                                 >
                                   Orders
                                 </ListboxItem>
                                 <ListboxItem
                                   key="pull_requests"
-                                  endContent={90}
+                                  endContent={cart?.data?.length}
                                   startContent={<IconHome />}
-                                  onClick={() =>  dispatch(onUpdateCartModal(true))}
+                                  onClick={() =>
+                                    dispatch(onUpdateCartModal(true))
+                                  }
                                 >
                                   Cart
                                 </ListboxItem>

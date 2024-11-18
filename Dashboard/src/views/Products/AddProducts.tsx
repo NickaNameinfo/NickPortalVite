@@ -65,7 +65,7 @@ const AddProducts = () => {
     subscriptionType: "Plan1",
   };
   const {
-    data: EcommereceSubcriptionData,
+    data: ecommereceSubcriptionData,
     error,
     refetch,
   } = useGetSubcriptionByCustomerIDQuery(tempEcommereceValues);
@@ -117,7 +117,6 @@ const AddProducts = () => {
   }, [productData]);
 
   React.useEffect(() => {
-    console.log(tempFormData, "tempFormData09789087");
     const discountAmount = (tempFormData?.price * tempFormData?.discount) / 100;
     const discountedPrice = tempFormData?.price - discountAmount;
 
@@ -226,7 +225,7 @@ const AddProducts = () => {
           </Chip>
           <Chip variant="flat" color="primary">
             Total Ecommerce Subscription{" "}
-            {EcommereceSubcriptionData?.data?.[0]?.subscriptionCount}
+            {ecommereceSubcriptionData?.data?.[0]?.subscriptionCount}
           </Chip>
           <Chip variant="flat" color="warning">
             Total Customize Subscription{" "}
@@ -631,9 +630,11 @@ const AddProducts = () => {
                         field.onChange(e.target.checked ? "1" : "0")
                       } // Update value on change
                       isDisabled={
+                        !ecommereceSubcriptionData?.data?.[0]
+                          ?.subscriptionCount ||
                         String(productData?.data?.isEnableEcommerce) === "1" ||
                         Number(
-                          EcommereceSubcriptionData?.data?.[0]
+                          ecommereceSubcriptionData?.data?.[0]
                             ?.subscriptionCount
                         ) -
                           filteredEcommereceData?.length <=
@@ -644,7 +645,7 @@ const AddProducts = () => {
                       <span className="ml-2">
                         <Chip variant="flat" color="primary">
                           {Number(
-                            EcommereceSubcriptionData?.data?.[0]
+                            ecommereceSubcriptionData?.data?.[0]
                               ?.subscriptionCount
                           ) - filteredEcommereceData?.length}
                         </Chip>
@@ -668,6 +669,8 @@ const AddProducts = () => {
                           field.onChange(e.target.checked ? "1" : "0")
                         } // Update value on change
                         isDisabled={
+                          !customizeSubcriptionData?.data?.[0]
+                            ?.subscriptionCount ||
                           String(productData?.data?.isEnableCustomize) ===
                             "1" ||
                           Number(

@@ -98,7 +98,7 @@ const Store = () => {
     <>
       <div className="grid mm:grid-cols-2 ml:grid-cols-2 sm:grid-cols-4  md:grid-cols-4  lg:grid-cols-4  xl:grid-cols-4 2xl:grid-cols-4 3xl:grid-cols-4 gap-2 mt-2">
         {storeDataList?.data?.map((item, index) => {
-          return <StoreCard item={item} key={index} />;
+          return item?.status === 1 && <StoreCard item={item} key={index} />;
         })}
       </div>
     </>

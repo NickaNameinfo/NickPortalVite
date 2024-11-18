@@ -175,8 +175,9 @@ module.exports = {
   async login(req, res, next) {
     var date = new Date();
     var token = JWTSign(req.user, date);
+    const currentDate = new Date();
     res.cookie("XSRF-token", token, {
-      expire: new Date().setMinutes(date.getMinutes() + 30),
+      expire: new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000),
       httpOnly: true,
       secure: config.app.secure,
     });

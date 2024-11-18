@@ -29,13 +29,10 @@ module.exports = {
         openTime,
         closeTime,
       } = req.body;
-
       db.store
         .findOne({ where: { id: id ? id : null } })
         .then((supplier) => {
           if (supplier) {
-            console.log(supplier, "supplier4234523");
-
             return db.store.update(
               {
                 storename: storename ? storename : supplier.storename,
@@ -69,21 +66,21 @@ module.exports = {
             );
           }
           return db.store.create({
-            storename: storename,
-            status: status,
-            storeaddress: storeaddress,
-            storedesc: storedesc,
-            ownername: ownername,
-            owneraddress: owneraddress,
-            email: email,
-            password: password,
-            phone: phone,
-            accountNo: accountNo,
-            accountHolderName: accountHolderName,
-            IFSC: IFSC,
-            bankName: bankName,
-            branch: branch,
-            adharCardNo: adharCardNo,
+            storename: storename ? storename : null,
+            status: status ? status : null,
+            storeaddress: storeaddress ? storeaddress : null,
+            storedesc: storedesc ? storedesc : null,
+            ownername: ownername ? ownername : null,
+            owneraddress: owneraddress ? owneraddress : null,
+            email: email ? email : null,
+            password: password ? password : null,
+            phone: phone ? phone : null,
+            accountNo: accountNo ? accountNo : null,
+            accountHolderName: accountHolderName ? accountHolderName : null,
+            IFSC: IFSC ? IFSC : null,
+            bankName: bankName ? bankName : null,
+            branch: branch ? branch : null,
+            adharCardNo: adharCardNo ? adharCardNo : null,
             panCardNo: panCardNo,
             GSTNo: GSTNo,
             areaId: areaId,
@@ -247,7 +244,7 @@ module.exports = {
           where: { supplierId: req.params.id },
           include: [
             {
-              model: db.product
+              model: db.product,
             },
           ],
         })
@@ -520,17 +517,18 @@ module.exports = {
           },
         ],
       });
-  
-      if (openStores.length > 0) { // Check if there are any open stores
+
+      if (openStores.length > 0) {
+        // Check if there are any open stores
         res.status(200).json({ success: true, data: openStores });
       } else {
-        res.status(404).json({ success: false, message: "No open stores found" });
+        res
+          .status(404)
+          .json({ success: false, message: "No open stores found" });
       }
     } catch (err) {
       console.error(err, "Error");
       next(new RequestError("Error"));
     }
-  }
-  
-  
+  },
 };

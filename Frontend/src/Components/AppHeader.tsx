@@ -333,28 +333,18 @@ export const AppHeader = () => {
               // variant="shadow"
               isIconOnly
               aria-label="Previous"
-              className={`Iconwhatsup ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6 ${
+              className={`Iconwhatsup ${
                 startIndex === 0 ? "cursor-not-allowed" : "cursor-pointer"
               }`}
               style={{ backgroundColor: "#0000004a" }}
               onClick={handlePrev}
               disabled={startIndex === 0}
             >
-              <IconPrev
-                fill="#ffffffcc"
-                width="21px"
-                height="18px"
-                className="ml:h-[16px] ml:w-[18px] xm:h-[12px] xm:w-[16px]"
-              />
+              <IconPrev fill="#ffffffcc" width="12px" height="12px" />
             </Button>
             <div className="w-[calc(100%_-_16px)] overflow-hidden">
               <div
                 className="slider-container"
-                // style={{
-                //   transform: `translateX(-${
-                //     (startIndex * 100) / itemsPerPage
-                //   }%)`,
-                // }}
               >
                 {displayedLabels.length > 0 &&
                   displayedLabels.map((item, index) => (
@@ -388,10 +378,10 @@ export const AppHeader = () => {
               radius="sm"
               isIconOnly
               aria-label="Next"
-              className={`Iconwhatsup ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6 ${
+              className={`Iconwhatsup  min-w-7 ${
                 startIndex + itemsPerPage >= sliderLabel?.length
                   ? "cursor-not-allowed"
-                  : "cursor-pointer"
+                  : "cursor-pointer w-7"
               }`}
               style={{ backgroundColor: "#0000004a" }}
               onClick={handleNext}
@@ -399,9 +389,9 @@ export const AppHeader = () => {
             >
               <IconNext
                 fill="#ffffffcc"
-                width="21px"
-                height="18px"
-                className="ml:h-[16px] ml:w-[16px] xm:h-[12px] xm:w-[16px]"
+                width="12px"
+                height="12px"
+                // className="ml:h-[12px] ml:w-[12px] xm:h-[12px] xm:w-[12px]"
               />
             </Button>
           </div>

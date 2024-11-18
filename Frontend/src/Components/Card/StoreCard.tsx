@@ -37,7 +37,7 @@ export const StoreCard = ({ item = null, key = null }) => {
       </CardHeader>
       <CardBody className="overflow-visible pt-2 pb-3.5 ps-2 pe-2  ">
         <div className="grid grid-cols-12">
-          <div className="col-span-5">
+          <div className="col-span-5" onClick={() => navigate(`/Store/StoreDetails/${item?.id}`)}>
             <Image
               isZoomed
               shadow="md"

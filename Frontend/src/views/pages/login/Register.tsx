@@ -44,13 +44,12 @@ export const Register = () => {
     (state) => state.globalConfig.isOpenRegister
   );
   const isOpenLogin = useAppSelector((state) => state.globalConfig.isOpenLogin);
-  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
   const onSubmit = async () => {
     try {
       let tempApiValue = {
         ...formData,
-        verify: 0,
+        verify: formData?.role === 0 ? 1 : 0,
       };
       const result = await register(tempApiValue);
       if (result?.data?.success) {
@@ -63,7 +62,6 @@ export const Register = () => {
   };
 
   const onCloseModal = () => {
-    onClose();
     dispatch(onOpenResigter(false));
   };
 
@@ -107,7 +105,7 @@ export const Register = () => {
                             {...field}
                           >
                             <Radio
-                              value="0"
+                              value="1"
                               color="success"
                               className="font-medium text-xs"
                             >

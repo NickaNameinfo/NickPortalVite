@@ -67,15 +67,15 @@ module.exports = {
             );
           }
           return db.vendor.create({
-            storename: storename,
-            status: status,
-            shopaddress: shopaddress,
-            shopdesc: shopdesc,
-            ownername: ownername,
-            owneraddress: owneraddress,
-            email: email,
-            password: password,
-            phone: phone,
+            storename: storename ? storename : null,
+            status: status ? status : null,
+            shopaddress: shopaddress ? shopaddress : null,
+            shopdesc: shopdesc ? shopdesc : null,
+            ownername: ownername ? ownername : null,
+            owneraddress: owneraddress ? owneraddress : null,
+            email: email ? email : null,
+            password: password ? password : null,
+            phone: phone ? phone : null,
             accountNo: accountNo,
             accountHolderName: accountHolderName,
             IFSC: IFSC,
@@ -270,7 +270,7 @@ module.exports = {
                 "price",
                 "discount",
                 "discountPer",
-                "paymentMode"
+                "paymentMode",
               ],
             },
           ],

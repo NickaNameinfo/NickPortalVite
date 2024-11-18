@@ -156,6 +156,7 @@ export const BuyCard = (props: any) => {
         return <p className="m-0 p-0">{data?.[columnKey]}</p>;
     }
   }, []);
+console.log(isOpenCartModal, "isOpenCartModal-089")
 
   return (
     <>

@@ -188,7 +188,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
             );
           }
         }}
-        placement="bottom"
+        placement="center"
         scrollBehavior="inside"
         backdrop="blur"
         hideCloseButton
@@ -422,11 +422,10 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               </CardBody>
                             </Card>
                           </Tab>
-                          <Tab
+                          {/* <Tab
                             key="music"
                             title={
                               <div className="flex items-center space-x-2">
-                                {/* <MusicIcon /> */}
                                 <span>Product Images</span>
                               </div>
                             }
@@ -443,7 +442,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                                 />
                               </CardBody>
                             </Card>
-                          </Tab>
+                          </Tab> */}
                         </Tabs>
                       </div>
                     </div>

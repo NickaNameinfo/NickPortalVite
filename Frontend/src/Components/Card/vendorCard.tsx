@@ -13,16 +13,20 @@ export const VendorCard = ({ item = null }) => {
     <>
       <Card className="Storecard">
         <CardBody className="overflow-visible p-0 relative align-middle justify-evenly p-4">
-          <Image
-            isZoomed
-            alt="Here no Image"
-            width="100%"
-            className="w-full object-cover"
-            src={`${infoData.baseApi}/${item.vendorImage}`}
-          />
+          {item.vendorImage !== "" || item.vendorImage ? (
+            <Image
+              isZoomed
+              alt="Here no Image"
+              width="100%"
+              className="w-full object-cover"
+              src={`${infoData.baseApi}/${item.vendorImage}`}
+            />
+          ) : (
+            <p className="text-black text-center p-2">{item?.storename}</p>
+          )}
         </CardBody>
       </Card>
-      <VendorDetails isOpen={isOpen} onClose={onClose} id={item.id}/>
+      {/* <VendorDetails isOpen={isOpen} onClose={onClose} id={item.id} /> */}
     </>
   );
 };

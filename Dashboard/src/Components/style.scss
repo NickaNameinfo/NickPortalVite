@@ -162,7 +162,8 @@ aside {
 }
 
 .slider-item {
-  width: 100%; // Adjust based on the number of items per view (25% for 4 items)
+  // width: 100%;
+  margin-right: 10px; // Adjust based on the number of items per view (25% for 4 items)
   box-sizing: border-box;
   padding: 0 10px; // Optional padding for spacing between items
   transition: background-color 0.3s ease;

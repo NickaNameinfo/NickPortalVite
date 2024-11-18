@@ -26,6 +26,7 @@ const StoreList = () => {
     "phone",
     "email",
     "actions",
+    "status",
   ];
 
   const columns = [
@@ -35,6 +36,7 @@ const StoreList = () => {
     { name: "email", id: "email", sortable: true },
     { name: "phone", id: "phone" },
     { name: "Actions", id: "actions" },
+    { name: "Status", id: "status" },
   ];
 
   const statusColorMap = {
