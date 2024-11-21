@@ -17,6 +17,18 @@ export const GlobalApi = createApi({
         method: "GET",
       }),
     }),
+    getAllUser: builder.query({
+      query: (id) => ({
+        url: `/auth/user/getAllUserList`,
+        method: "GET",
+      }),
+    }),
+    getAllOrderList: builder.query({
+      query: (id) => ({
+        url: `/order/list`,
+        method: "GET",
+      }),
+    }),
     updatUser: builder.mutation({
       query: (body) => ({
         url: `/auth/user/update`,
@@ -27,5 +39,5 @@ export const GlobalApi = createApi({
   }),
 });
 
-export const { useGetUserQuery,useUpdatUserMutation } = GlobalApi;
+export const { useGetUserQuery,useUpdatUserMutation, useGetAllUserQuery, useGetAllOrderListQuery } = GlobalApi;
 export const { endpoints } = GlobalApi;

@@ -47,24 +47,24 @@ export const _nav = [
     : []),
   // ...(tempRole !== "1"
   //   ? [
-        {
-          menuType: "multiple",
-          name: "Categories",
-          key: "Categories",
-          link: "/",
-          icons: <IconHome />,
-          menuItems: [ 
-            {
-              menuType: "single",
-              name: "Add",
-              key: "Add",
-              link: "/CategoriesAdd",
-              icons: <IconHome />,
-            },
-          ],
-        },
-    //   ]
-    // : []),
+  {
+    menuType: "multiple",
+    name: "Categories",
+    key: "Categories",
+    link: "/",
+    icons: <IconHome />,
+    menuItems: [
+      {
+        menuType: "single",
+        name: "Add",
+        key: "Add",
+        link: "/CategoriesAdd",
+        icons: <IconHome />,
+      },
+    ],
+  },
+  //   ]
+  // : []),
   {
     menuType: "multiple",
     name: "Products",
@@ -138,19 +138,51 @@ export const _nav = [
         },
       ]
     : []),
-  {
-    menuType: "single",
-    name: "Customer",
-    key: "Customer",
-    link: "/Subscriptions",
-    icons: <IconHome />,
-  },
+  ...(tempRole == "1"
+    ? [
+        {
+          menuType: "single",
+          name: "Customer",
+          key: "Customer",
+          link: "/Customers",
+          icons: <IconHome />,
+        },
+      ]
+    : []),
   {
     menuType: "single",
     name: "Subscriptions",
     key: "Subscriptions",
     link: "/Subscriptions",
     icons: <IconHome />,
+  },
+  
+  {
+    menuType: "multiple",
+    name: "Orders",
+    key: "Orders",
+    link: "/",
+    icons: <IconHome />,
+    menuItems: [
+      ...(tempRole !== "3"
+        ? [
+            {
+              menuType: "single",
+              name: "Stores",
+              key: "Stores",
+              link: "/",
+              icons: <IconHome />,
+            },
+          ]
+        : []),
+      {
+        menuType: "single",
+        name: "Customers",
+        key: "Customers",
+        link: "/CustomersOrderList",
+        icons: <IconHome />,
+      },
+    ],
   },
   {
     menuType: "multiple",
@@ -176,33 +208,6 @@ export const _nav = [
               menuType: "single",
               name: "Vendors",
               key: "Vendors",
-              link: "/",
-              icons: <IconHome />,
-            },
-          ]
-        : []),
-      {
-        menuType: "single",
-        name: "Customers",
-        key: "Customers",
-        link: "/",
-        icons: <IconHome />,
-      },
-    ],
-  },
-  {
-    menuType: "multiple",
-    name: "Orders",
-    key: "Orders",
-    link: "/",
-    icons: <IconHome />,
-    menuItems: [
-      ...(tempRole !== "3"
-        ? [
-            {
-              menuType: "single",
-              name: "Stores",
-              key: "Stores",
               link: "/",
               icons: <IconHome />,
             },

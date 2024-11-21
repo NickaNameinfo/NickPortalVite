@@ -16,6 +16,8 @@ const ProductsList = React.lazy(
 );
 const AddStores = React.lazy(() => import("../src/views/Store/AddStore"));
 const EditStores = React.lazy(() => import("../src/views/Store/AddStore"));
+const CustomersList = React.lazy(() => import("../src/views/Customers"));
+const CustomersOrderList = React.lazy(() => import("../src/views/Customers/CustomersOrderList"));
 const StoresList = React.lazy(() => import("../src/views/Store/StoreList"));
 const VendorProducts = React.lazy(
   () => import("../src/views/VendorProducts/index")
@@ -34,6 +36,8 @@ const routes = [
   { path: "/Vendors/Add", name: "Dashboard", element: AddVendors },
   { path: "/Vendors/Edit/:itemId", name: "Dashboard", element: EditVendors },
   { path: "/Vendors/List", name: "Dashboard", element: VendorsList },
+  { path: "/Customers", name: "Customers", element: CustomersList },
+  { path: "/CustomersOrderList", name: "Customers", element: CustomersOrderList },
   { path: "/CategoriesAdd", name: "CategoriesAdd", element: CategoriesAdd },
   {
     path: "/AddProducts/:productId?",

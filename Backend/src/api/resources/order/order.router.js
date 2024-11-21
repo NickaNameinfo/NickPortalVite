@@ -11,7 +11,7 @@ orderRouter
   .post(sanitize(), orderController.statusUpdate);
 orderRouter
   .route("/list")
-  .post(sanitize(), orderController.getAllOrderListById);
+  .post(sanitize(), orderController.getAllOrderListById); 
 orderRouter
   .route("/status")
   .post(sanitize(), orderController.getAllOrderStatus);

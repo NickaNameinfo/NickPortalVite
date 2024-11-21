@@ -104,18 +104,23 @@ module.exports = {
   },
 
   async getAllUserList(req, res, next) {
-    db.user
-      .findAll()
-      .then((user) => {
-        if (user) {
-          return res.status(200).json({ success: true, data: user });
-        } else res.status(500).json({ success: false });
-      })
-      .catch((err) => {
-        console.log(err);
-        next(err);
+    try {
+      const users = await db.user.findAll({
+        where: {
+          role: 3, // Filter users with role === 3
+        },
       });
-  },
+  
+      if (users && users.length > 0) {
+        return res.status(200).json({ success: true, data: users });
+      } else {
+        return res.status(404).json({ success: false, message: "No users found with role 3" });
+      }
+    } catch (err) {
+      console.error(err);
+      next(err);
+    }
+  },  
 
   async userUpdate(req, res, next) {
     const {

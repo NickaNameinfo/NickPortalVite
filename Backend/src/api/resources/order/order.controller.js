@@ -9,10 +9,12 @@ module.exports = {
         paymentmethod,
         orderId,
         deliveryAddress,
-        product,
+        productIds,
         grandTotal,
+        qty,
       } = req.body;
-      db.customer
+      console.log(customerId, grandTotal, "grandTotal79087890");
+      db.user
         .findOne({ where: { id: customerId } })
         .then((p) => {
           if (p) {
@@ -21,49 +23,17 @@ module.exports = {
               number: orderId,
               grandtotal: grandTotal,
               paymentmethod: paymentmethod,
+              productIds: productIds,
+              qty: qty,
             });
           }
           return res.status(500).json({ errors: ["User is not found"] });
         })
-        .then((order) => {
-          if (order) {
-            return db.addresses
-              .create({
-                orderId: order.id,
-                custId: customerId,
-                fullname: deliveryAddress ? deliveryAddress.name : "",
-                phone: deliveryAddress ? deliveryAddress.phone : "",
-                discrict: deliveryAddress ? deliveryAddress.discrict : "",
-                city: deliveryAddress ? deliveryAddress.city : "",
-                states: deliveryAddress ? deliveryAddress.states : "",
-                shipping: deliveryAddress ? deliveryAddress.address : "",
-              })
-              .then((p) => [order, p]);
-          }
-        })
-        .then(([order, p]) => {
-          if (order) {
-            let cartEntries = [];
-            for (var i = 0; i < product.length; i++) {
-              cartEntries.push({
-                orderId: order.id,
-                addressId: p.id,
-                productId: product[i].id,
-                name: product[i].name,
-                qty: product[i].qty,
-                price: product[i].price,
-                total: product[i].total,
-                photo: product[i].photo,
-              });
-            }
-            return db.carts.bulkCreate(cartEntries).then((r) => [r]);
-          }
-        })
         .then((success) => {
-          res.status(200).json({ success: true });
+          res.status(200).json({ success: true, data: success });
         })
         .catch(function (err) {
-          console.log(error);
+          console.log(err);
           res.status(500).json({ errors: ["Error adding cart"] });
         });
     } catch (err) {
@@ -72,30 +42,14 @@ module.exports = {
   },
 
   async getAllOrderList(req, res, next) {
-    let limit = 5000;
-    let sort = ["createdAt", "DESC"];
-    let offset = 0;
-    let page = 1;
-    if (req.query.limit != undefined) {
-      limit = parseInt(req.query.limit);
-    }
-    if (req.query.page != undefined) {
-      page = req.query.page;
-      if (page < 1) page = 1;
-    }
-    if (req.query.sort) {
-      if (req.query.sort == "name") {
-        sort = ["name"];
-      }
-    }
     try {
       db.orders
         .findAll({
           order: [["createdAt", "DESC"]],
-          include: [{ model: db.addresses }, { model: db.carts }],
+          include: [{ model: db.addresses }],
         })
         .then((list) => {
-          res.status(200).json({ success: true, order: list });
+          res.status(200).json({ success: true, data: list });
         })
         .catch(function (err) {
           next(err);

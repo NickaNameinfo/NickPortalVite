@@ -33,8 +33,11 @@ import {
   useGetCartByOrderIdQuery,
   useUpdateCartMutation,
   useDeleteCartItemMutation,
+  useAddOrderMutation,
 } from "../../views/pages/Store/Service.mjs";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
 const columns = [
   { name: "Sl.No", uid: "id" },
   { name: "Product", uid: "photo" },
@@ -45,8 +48,9 @@ const columns = [
 export const BuyCard = (props: any) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
-  const isOpenCartModal = useAppSelector((state) => state.globalConfig.isOpenCartModal);
-
+  const isOpenCartModal = useAppSelector(
+    (state) => state.globalConfig.isOpenCartModal
+  );
   const id = getCookie("id");
   const {
     data: cart,
@@ -55,9 +59,11 @@ export const BuyCard = (props: any) => {
   } = useGetCartByOrderIdQuery(Number(id));
   const [updateCart] = useUpdateCartMutation();
   const [deleteCartItem] = useDeleteCartItemMutation();
+  const [addOrder] = useAddOrderMutation();
   const [deletId, setDeleteId] = React.useState(null);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const MySwal = withReactContent(Swal);
 
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
@@ -85,6 +91,34 @@ export const BuyCard = (props: any) => {
       }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleAddOrder = async () => {
+    if (cart?.data?.length > 0) {
+      const promises = cart.data.map(async (item) => {
+        try {
+          const tempCartValue = {
+            customerId: item?.orderId,
+            paymentmethod: 1,
+            orderId: Number(id),
+            grandTotal: Number(
+              cart?.data?.reduce((sum, item) => sum + item.total, 0)
+            ),
+            productIds: item?.productId,
+            qty: item?.qty,
+          };
+          return await addOrder(tempCartValue);
+        } catch (error) {
+          console.error("Failed to add order for item:", item, error);
+          return null; // Return null for failed orders
+        }
+      });
+      if(promises){
+        MySwal.fire({
+          title: <p>Your order placed please vist your order page</p>,
+        });
+      }
     }
   };
 
@@ -124,7 +158,7 @@ export const BuyCard = (props: any) => {
                 isIconOnly
                 size="md"
                 onClick={() => handleAddCart("remove", data)}
-              >
+              > 
                 -
               </Button>
               <p className="bg-gray-200 p-0 m-0 text-sm font-semibold ">
@@ -156,7 +190,6 @@ export const BuyCard = (props: any) => {
         return <p className="m-0 p-0">{data?.[columnKey]}</p>;
     }
   }, []);
-console.log(isOpenCartModal, "isOpenCartModal-089")
 
   return (
     <>
@@ -284,7 +317,7 @@ console.log(isOpenCartModal, "isOpenCartModal-089")
                         <div className="flex  justify-between items-center mx-3 w-full">
                           <div className="w-2/4 m-1 items-center">
                             <Radio
-                              value=" Google-Pay "
+                              value="Google-Pay"
                               size="sm"
                               className="items-center"
                             >
@@ -341,6 +374,7 @@ console.log(isOpenCartModal, "isOpenCartModal-089")
                             cart?.data?.length <= 0 ? "cursor-not-allowed" : ""
                           }`}
                           disabled={cart?.data?.length <= 0}
+                          onClick={() => handleAddOrder()}
                         >
                           Book Order
                         </Button>

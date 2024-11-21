@@ -7,12 +7,13 @@ module.exports = (sequelize, DataTypes) => {
     deliverydate: DataTypes.DATE,
     grandtotal: DataTypes.INTEGER, 
     status: DataTypes.ENUM('processing','shipping','delieverd','cancel'),
+    productIds :  DataTypes.INTEGER,
+    qty :  DataTypes.INTEGER
   }, {});
   Order.associate = function(models) {
     // associations can be defined here
     models.orders.hasMany(models.addresses, { foreignKey: 'orderId' });
-    models.orders.hasMany(models.carts, { foreignKey: 'orderId' });
-
+    models.orders.hasMany(models.product, { foreignKey: 'id' });
     // models.orders.hasMany(models.payment, { foreignKey: 'orderCreationId' });  
 
   };
