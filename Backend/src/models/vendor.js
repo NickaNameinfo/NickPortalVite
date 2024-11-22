@@ -36,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
     models.vendor.hasMany(models.vendor_product, { foreignKey: "supplierId" });
     models.vendor.hasMany(models.vendorStock, { foreignKey: "vendorId" });
     models.vendor.hasMany(models.productFeedback, { foreignKey: "vendorId" });
+    models.vendor.hasMany(models.user, { foreignKey: "vendorId" }); // A vendor can have multiple users
   };
   return vendor;
 };

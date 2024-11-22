@@ -40,7 +40,6 @@ const AddStock = () => {
     error: categoryerror,
     refetch: categoryrefetch,
   } = useGetCategoriesQuery();
-  console.log("categoryDatakdsflj", vendorId);
 
   const [addStock] = useAddStockMutation();
   const [refresh, setRefresh] = React.useState(false);

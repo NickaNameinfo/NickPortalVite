@@ -13,7 +13,7 @@ export const StoreApi = createApi({
   endpoints: (builder) => ({
     getStoresProductByID: builder.query({
       query: (id) => ({
-        url: `/store/product/getAllProductById/${id}`,
+        url: `/store/product/getAllProductById/${id}`, 
         method: "GET",
       }),
     }),
@@ -21,6 +21,13 @@ export const StoreApi = createApi({
       query: (id) => ({
         url: `/store/list`,
         method: "GET",
+      }),
+    }),
+    addStore: builder.mutation({
+      query: (body) => ({
+        url: `/store/create`,
+        method: "POST",
+        body,
       }),
     }),
     getStoresById: builder.query({
@@ -109,6 +116,7 @@ export const {
   useGetStoresByFiltersQuery,
   useGetStoresByPaymentTypeQuery,
   useGetStoresByOpenStoreQuery,
-  useAddOrderMutation
+  useAddOrderMutation,
+  useAddStoreMutation
 } = StoreApi;
 export const { endpoints } = StoreApi;

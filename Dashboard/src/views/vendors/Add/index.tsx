@@ -33,10 +33,6 @@ const Add = () => {
     formState: { errors },
   } = useForm();
   const formData = watch();
-  const currentloginDetails = useAppSelector(
-    (state) => state.globalConfig.currentloginDetails
-  );
-  console.log(currentloginDetails?.data, "currentloginDetails");
   const navigate = useNavigate();
   const [addVendors] = useAddVendorsMutation();
   const [updateVendors] = useUpdateVendorsMutation();
@@ -51,15 +47,17 @@ const Add = () => {
 
   React.useEffect(() => {
     refetch();
-    if (data?.data.length > 0 || currentloginDetails) {
+    if (data?.data.length > 0) {
       reset(data?.data?.[0]);
       setValue("status", data?.data?.[0]?.status.toString());
       setValue("adharCardNo", Number(data?.data?.[0]?.adharCardNo));
-      setValue("storename", currentloginDetails?.data?.firstName);
-      setValue("email", currentloginDetails?.data?.email);
-      setValue("phone", currentloginDetails?.data?.phone);
+      setValue("storename", data?.data?.[0]?.storename);
+      setValue("email", data?.data?.[0]?.email);
+      setValue("phone", data?.data?.[0]?.phone);
+      setValue("phone", data?.data?.[0]?.phone);
+      setValue("userId", data?.data?.[0]?.users?.[0]?.id);
     }
-  }, [data, currentloginDetails]);
+  }, [data]);
 
   const onSubmit = async (data: any) => {
     let tempAPIData = {
@@ -67,33 +65,21 @@ const Add = () => {
       areaId: 3,
       adharCardNo: Number(data?.adharCardNo),
     };
-    let tempAPIUserData = {
-      id: currentloginDetails?.data?.id,
-      firstName: data?.["storename"],
-      email: data?.["email"],
-      address: data?.["address"],
-      password: data?.["password"] ? data?.["password"] : null,
-      vendorId: vendorId,
-    };
+
     const formData = new FormData();
     for (const key in tempAPIData) {
       formData.append(key, tempAPIData[key]);
     }
-    if (vendorId || itemId) {
-      const result = await updateVendors(formData);
-      if (result?.data?.success) {
-        let result = updateUser(tempAPIUserData);
+    let tempAPIUserData = {
+      id: data?.userId,
+      verify: data?.status,
+      email: data?.email,
+    };
+    if (data?.data?.[0]?.id) {
+      const resultVendor = await updateVendors(formData);
+      if (resultVendor?.data?.success) {
+        let result = await updateUser(tempAPIUserData);
         if (result) {
-          refetch();
-          navigate("/Dashboard");
-        }
-      }
-    } else {
-      const result = await addVendors(formData);
-      if (result?.data?.success) {
-        setCookie("vendorId", result?.data?.data?.[0]?.vendorId, 60);
-        let userResult = updateUser(tempAPIUserData);
-        if (userResult) {
           refetch();
           navigate("/Dashboard");
         }
@@ -148,18 +134,28 @@ const Add = () => {
           <Controller
             name="storename" // Changed to reflect a text input
             control={control}
-            rules={{ required: true }}
+            rules={{ required: "Please enter value" }}
             render={({ field }) => (
-              // <Input type="text" label="Store Name" size="lg" {...field} />
-              <InputNextUI type="text" label="Store Name" {...field} />
+              <InputNextUI
+                type="text"
+                label="Store Name"
+                {...field}
+                isRequired={true}
+                isInvalid={errors?.["storename"] ? true : false}
+                errorMessage={errors?.["storename"]?.message}
+              />
             )}
           />
-          {currentUserRole === "1" && (
+          {currentUserRole === "0" && (
             <Controller
               name="status" // Changed to reflect a text input
               control={control}
+              rules={{ required: "Please enter value" }}
               render={({ field }) => (
                 <Select
+                  isRequired={true}
+                  isInvalid={errors?.["status"] ? true : false}
+                  errorMessage={errors?.["status"]?.message}
                   classNames={{
                     label: "group-data-[filled=true]:-translate-y-3",
                     trigger: [
@@ -195,6 +191,7 @@ const Add = () => {
                   label="Select an Status"
                   {...field}
                   selectedKeys={String(formData?.status)}
+                  errorMessage={errors?.["status"]?.message}
                 >
                   <SelectItem key={1}>{"Active"}</SelectItem>
                   <SelectItem key={0}>{"InActive"}</SelectItem>
@@ -205,8 +202,15 @@ const Add = () => {
           <Controller
             name="shopaddress" // Changed to reflect a text input
             control={control}
+            rules={{ required: "Please enter value" }}
             render={({ field }) => (
-              <TeaxtareaNextUI label="Shop Address" {...field} />
+              <TeaxtareaNextUI
+                label="Shop Address"
+                {...field}
+                isRequired={true}
+                isInvalid={errors?.["shopaddress"] ? true : false}
+                errorMessage={errors?.["shopaddress"]?.message}
+              />
             )}
           />
           <Controller
@@ -219,44 +223,51 @@ const Add = () => {
           <Controller
             name="website" // Changed to reflect a text input
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
-              // <Input type="text" label="Store Name" size="lg" {...field} />
               <InputNextUI type="text" label="website" {...field} />
             )}
           />
           <Controller
             name="location" // Changed to reflect a text input
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
-              // <Input type="text" label="Store Name" size="lg" {...field} />
               <InputNextUI type="text" label="location" {...field} />
             )}
           />
           <Controller
             name="openTime" // Changed to reflect a text input
             control={control}
-            rules={{ required: true }}
+            rules={{ required: "Please enter value" }}
             render={({ field }) => (
-              // <Input type="text" label="Store Name" size="lg" {...field} />
-              <InputNextUI type="text" label="Open Time" {...field} />
+              <InputNextUI
+                type="text"
+                label="Open Time"
+                {...field}
+                isRequired={true}
+                isInvalid={errors?.["openTime"] ? true : false}
+                errorMessage={errors?.["openTime"]?.message}
+              />
             )}
           />
           <Controller
             name="closeTime" // Changed to reflect a text input
             control={control}
-            rules={{ required: true }}
+            rules={{ required: "Please enter value" }}
             render={({ field }) => (
-              // <Input type="text" label="Store Name" size="lg" {...field} />
-              <InputNextUI type="text" label="Close Time" {...field} />
+              <InputNextUI
+                type="text"
+                label="Close Time"
+                {...field}
+                isRequired={true}
+                isInvalid={errors?.["closeTime"] ? true : false}
+                errorMessage={errors?.["closeTime"]?.message}
+              />
             )}
           />
           <div className="flex">
             <Controller
               name="vendorImage" // Changed to reflect a text input
               control={control}
-              rules={{ required: true }}
               render={({ field }) => (
                 <div style={{ position: "relative", width: "100%" }}>
                   <input
@@ -303,16 +314,6 @@ const Add = () => {
                     No file selected
                   </span>
                 </div>
-                // <Input
-                //   type="file"
-                //   // labelPlacement=""
-                //   label="Image"
-                //   size="lg"
-                //   className="w-80"
-                //   onChange={(e) => {
-                //     field.onChange(e.target.files[0]); // Don't forget to call field.onChange to update the form state
-                //   }}
-                // />
               )}
             />
             <Image
@@ -354,8 +355,8 @@ const Add = () => {
           <Controller
             name="ownername" // Changed to reflect a text input
             control={control}
+            rules={{ required: "Please enter value" }}
             render={({ field }) => (
-              // <Input type="text" label="Owner Name" size="lg" {...field} />
               <InputNextUI
                 type="text"
                 label="Owner Name"
@@ -363,14 +364,17 @@ const Add = () => {
                   console.log(value, "ownername");
                 }}
                 {...field}
+                isRequired={true}
+                isInvalid={errors?.["ownername"] ? true : false}
+                errorMessage={errors?.["ownername"]?.message}
               />
             )}
           />
           <Controller
             name="email" // Changed to reflect a text input
             control={control}
+            rules={{ required: "Please enter value" }}
             render={({ field }) => (
-              // <Input type="email" label="Email" size="lg" {...field} />
               <InputNextUI
                 type="email"
                 label="Email"
@@ -378,6 +382,9 @@ const Add = () => {
                   console.log(value, "ownername");
                 }}
                 {...field}
+                isRequired={true}
+                isInvalid={errors?.["email"] ? true : false}
+                errorMessage={errors?.["email"]?.message}
               />
             )}
           />
@@ -398,6 +405,7 @@ const Add = () => {
           <Controller
             name="phone" // Changed to reflect a text input
             control={control}
+            rules={{ required: "Please enter value" }}
             render={({ field }) => (
               // <Input type="number" label="Phone Number" size="lg" {...field} />
               <InputNextUI
@@ -407,6 +415,9 @@ const Add = () => {
                   console.log(value, "ownername");
                 }}
                 {...field}
+                isRequired={true}
+                isInvalid={errors?.["phone"] ? true : false}
+                errorMessage={errors?.["phone"]?.message}
               />
             )}
           />

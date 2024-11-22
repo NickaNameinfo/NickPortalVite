@@ -191,6 +191,10 @@ module.exports = {
               attributes: ["id", "name"],
               include: [{ model: db.location, attributes: ["id", "name"] }],
             },
+            {
+              model: db.user, // Include related user data
+              attributes: ["id"], // Adjust attributes as needed
+            },
           ],
         })
         .then((list) => {

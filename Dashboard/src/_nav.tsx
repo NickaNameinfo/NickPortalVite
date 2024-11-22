@@ -14,7 +14,7 @@ export const _nav = [
         },
       ]
     : []),
-  ...(tempRole === "2" || tempRole === "1"
+  ...(tempRole === "2" || tempRole === "1" || tempRole === "0"
     ? [
         {
           menuType: tempRole === "2" ? "single" : "multiple",
@@ -45,8 +45,41 @@ export const _nav = [
         },
       ]
     : []),
-  // ...(tempRole !== "1"
-  //   ? [
+  ...(tempRole === "3" || tempRole === "1" || tempRole === "0"
+    ? [
+        {
+          menuType: tempRole === "3" ? "single" : "multiple",
+          name: tempRole === "3" ? "Profile" : "Stores",
+          key: "Stores",
+          link: "/Stores/Add",
+          icons: <IconHome />,
+          menuItems: [
+            ...(tempRole === "3"
+              ? [
+                  {
+                    menuType: "single",
+                    name: "Add",
+                    key: "Add",
+                    link: "/Stores/Add",
+                    icons: <IconHome />,
+                  },
+                ]
+              : []),
+            ...(tempRole === "0"
+              ? [
+                  {
+                    menuType: "single",
+                    name: "List",
+                    key: "List",
+                    link: "/Stores/List",
+                    icons: <IconHome />,
+                  },
+                ]
+              : []),
+          ],
+        },
+      ]
+    : []),
   {
     menuType: "multiple",
     name: "Categories",
@@ -63,8 +96,6 @@ export const _nav = [
       },
     ],
   },
-  //   ]
-  // : []),
   {
     menuType: "multiple",
     name: "Products",
@@ -72,7 +103,7 @@ export const _nav = [
     link: "/",
     icons: <IconHome />,
     menuItems: [
-      ...(tempRole !== "1"
+      ...(tempRole !== "0"
         ? [
             {
               menuType: "single",
@@ -103,42 +134,7 @@ export const _nav = [
       },
     ],
   },
-  ...(tempRole === "3" || tempRole === "1"
-    ? [
-        {
-          menuType: tempRole === "3" ? "single" : "multiple",
-          name: tempRole === "3" ? "Profile" : "Stores",
-          key: "Stores",
-          link: "/Stores/Add",
-          icons: <IconHome />,
-          menuItems: [
-            ...(tempRole === "3"
-              ? [
-                  {
-                    menuType: "single",
-                    name: "Add",
-                    key: "Add",
-                    link: "/Stores/Add",
-                    icons: <IconHome />,
-                  },
-                ]
-              : []),
-            ...(tempRole === "1"
-              ? [
-                  {
-                    menuType: "single",
-                    name: "List",
-                    key: "List",
-                    link: "/Stores/List",
-                    icons: <IconHome />,
-                  },
-                ]
-              : []),
-          ],
-        },
-      ]
-    : []),
-  ...(tempRole == "1"
+  ...(tempRole === "0"
     ? [
         {
           menuType: "single",
@@ -156,7 +152,7 @@ export const _nav = [
     link: "/Subscriptions",
     icons: <IconHome />,
   },
-  
+
   {
     menuType: "multiple",
     name: "Orders",
@@ -202,7 +198,7 @@ export const _nav = [
             },
           ]
         : []),
-      ...(tempRole === "1"
+      ...(tempRole === "0"
         ? [
             {
               menuType: "single",
@@ -240,7 +236,7 @@ export const _nav = [
             },
           ]
         : []),
-      ...(tempRole === "1"
+      ...(tempRole === "0"
         ? [
             {
               menuType: "single",

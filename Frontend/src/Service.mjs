@@ -17,7 +17,7 @@ export const GlobalApi = createApi({
         method: "GET",
       }),
     }),
-    updatUser: builder.mutation({
+    updateUser: builder.mutation({
       query: (body) => ({
         url: `/auth/user/update`,
         method: "POST",
@@ -27,5 +27,5 @@ export const GlobalApi = createApi({
   }),
 });
 
-export const { useGetUserQuery } = GlobalApi;
+export const { useGetUserQuery, useUpdateUserMutation } = GlobalApi;
 export const { endpoints } = GlobalApi;

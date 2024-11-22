@@ -26,6 +26,9 @@ import {
 import { useDispatch } from "react-redux";
 import Login from "./Login";
 import { useNavigate } from "react-router-dom";
+import { useAddVendorsMutation } from "../Vendor/Service.mjs";
+import { useAddStoreMutation } from "../Store/Service.mjs";
+import { useUpdateUserMutation } from "../../../Service.mjs";
 
 export const Register = () => {
   const dispatch = useDispatch();
@@ -44,20 +47,79 @@ export const Register = () => {
     (state) => state.globalConfig.isOpenRegister
   );
   const isOpenLogin = useAppSelector((state) => state.globalConfig.isOpenLogin);
+  const [addStores] = useAddStoreMutation();
+  const [updateUser] = useUpdateUserMutation();
+  const [addVendors] = useAddVendorsMutation();
 
   const onSubmit = async () => {
     try {
       let tempApiValue = {
         ...formData,
-        verify: formData?.role === 0 ? 1 : 0,
+        verify: formData?.role === 1 ? 1 : 0,
       };
       const result = await register(tempApiValue);
       if (result?.data?.success) {
-        dispatch(onOpenResigter(false));
-        dispatch(onOpenLogin(true));
+        if (formData?.role === "3") {
+          let tempAPIData = {
+            storename: formData?.firstName,
+            email: formData?.email,
+            phone: formData?.phoneNo,
+            status: 0,
+            ownername: formData?.firstName,
+            password: formData?.password,
+            areaId: 3,
+          };
+          const apiFormData = new FormData();
+          for (const key in tempAPIData) {
+            apiFormData.append(key, tempAPIData[key]);
+          }
+          const resultStore = await addStores(apiFormData);
+          if (resultStore?.data?.success) {
+            let tempAPIUserData = {
+              id: result?.data?.id,
+              storeId: resultStore?.data?.data?.id,
+              email: formData?.email,
+            };
+            let userResult = await updateUser(tempAPIUserData);
+            if (userResult?.data?.success) {
+              dispatch(onOpenResigter(false));
+              dispatch(onOpenLogin(true));
+            }
+          }
+        } else if (formData?.role === "2") {
+          let tempAPIData = {
+            storename: formData?.firstName,
+            email: formData?.email,
+            phone: formData?.phoneNo,
+            status: 0,
+            ownername: formData?.firstName,
+            password: formData?.password,
+            areaId: 3,
+          };
+          const apiFormData = new FormData();
+          for (const key in tempAPIData) {
+            apiFormData.append(key, tempAPIData[key]);
+          }
+          const resultVendor = await addVendors(apiFormData);
+          if (resultVendor?.data?.success) {
+            let tempAPIUserData = {
+              id:  resultVendor?.data?.data?.[0]?.id,
+              email: formData?.email,
+              vendorId: resultVendor?.data?.data?.[0]?.vendorId,
+            };
+            let userResult = await updateUser(tempAPIUserData);
+            if (userResult?.data?.success) {
+              dispatch(onOpenResigter(false));
+              dispatch(onOpenLogin(true));
+            }
+          }
+        } else {
+          dispatch(onOpenResigter(false));
+          dispatch(onOpenLogin(true));
+        }
       }
     } catch (error) {
-      console.log(error, "Error");
+      alert(error);
     }
   };
 

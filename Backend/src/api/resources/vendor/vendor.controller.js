@@ -193,27 +193,37 @@ module.exports = {
   async getVendorStockById(req, res, next) {
     try {
       const { id } = req.params;
-      db.vendor
-        .findAll({
-          where: { id: id },
-          include: [
-            {
-              model: db.area,
-              attributes: ["id", "name"],
-              include: [{ model: db.location, attributes: ["id", "name"] }],
-            },
-          ],
-        })
-        .then((list) => {
-          res.status(200).json({ success: true, data: list });
-        })
-        .catch(function (err) {
-          next(err);
-        });
+  
+      const vendorData = await db.vendor.findOne({
+        where: { id }, // Filter vendor by its ID
+        include: [
+          {
+            model: db.area, // Include related area data
+            attributes: ["id", "name"],
+            include: [
+              {
+                model: db.location, // Include related location data
+                attributes: ["id", "name"],
+              },
+            ],
+          },
+          {
+            model: db.user, // Include related user data
+            attributes: ["id"], // Adjust attributes as needed
+          },
+        ],
+      });
+  
+      if (vendorData) {
+        return res.status(200).json({ success: true, data: [vendorData] });
+      } else {
+        return res.status(404).json({ success: false, message: "Vendor not found" });
+      }
     } catch (err) {
-      throw new RequestError("Error");
+      console.error(err);
+      next(err);
     }
-  },
+  },  
 
   async getAllVendorProduct(req, res, next) {
     try {

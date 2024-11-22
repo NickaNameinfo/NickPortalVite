@@ -34,9 +34,6 @@ const AddStore = () => {
     formState: { errors },
   } = useForm();
   const formData = watch();
-  const currentloginDetails = useAppSelector(
-    (state) => state.globalConfig.currentloginDetails
-  );
   const [addStores] = useAddStoreMutation();
   const id = getCookie("id");
   const storeId = getCookie("storeId");
@@ -45,73 +42,42 @@ const AddStore = () => {
   const { data, error, refetch } = useGetStoresByIDQuery(
     itemId || storeId || null
   );
-  console.log(errors, "errors7609879");
   const [updateStores] = useUpdateStoreMutation();
   const [updateUser] = useUpdatUserMutation();
 
+  console.log(formData, "formData");
+
   React.useEffect(() => {
-    setValue("storename", currentloginDetails?.data?.firstName);
-    setValue("email", currentloginDetails?.data?.email);
-    setValue("phone", currentloginDetails?.data?.phone);
+    setValue("storename", data?.data?.[0]?.storename);
+    setValue("email", data?.data?.[0]?.email);
+    setValue("phone", data?.data?.[0]?.phone);
     setValue("status", String(data?.data?.[0]?.status));
     setValue("areaId", 3);
     if (data?.data) {
       reset(data?.data);
     }
-  }, [data, currentloginDetails]);
+  }, [data]);
 
   const onSubmit = async (data: any) => {
-    if (storeId || itemId) {
-      let tempAPIData = {
-        ...data,
-        areaId: 3,
+    let tempAPIData = {
+      ...data,
+      areaId: 3,
+    };
+    const apiFormData = new FormData();
+    for (const key in tempAPIData) {
+      apiFormData.append(key, tempAPIData[key]);
+    }
+    const result = await updateStores(apiFormData);
+    if (result?.data?.success) {
+      let tempAPIUserData = {
+        id: formData?.users?.[0]?.id,
+        email: data?.["email"],
+        verify: formData?.status,
       };
-      const formData = new FormData();
-      for (const key in tempAPIData) {
-        formData.append(key, tempAPIData[key]);
-      }
-      const result = await updateStores(formData);
-      if (result?.data?.success) {
-        let tempAPIUserData = {
-          id: currentloginDetails?.data?.id,
-          firstName: data?.["storename"],
-          email: data?.["email"],
-          address: data?.["address"],
-          password: data?.["password"] ? data?.["password"] : null,
-          storeId: result?.data?.data?.id
-            ? result?.data?.data?.id
-            : storeId
-            ? storeId
-            : itemId,
-        };
-        setCookie("storeId", storeId ? storeId : itemId, 60);
-        let userResult = updateUser(tempAPIUserData);
-        if (userResult) {
-          refetch();
-          navigate("/Dashboard");
-        }
-      }
-    } else {
-      const result = await addStores(formData);
-      if (result?.data?.success) {
-        let tempAPIUserData = {
-          id: currentloginDetails?.data?.id,
-          firstName: data?.["storename"],
-          email: data?.["email"],
-          address: data?.["address"],
-          password: data?.["password"] ? data?.["password"] : null,
-          storeId: result?.data?.data?.id
-            ? result?.data?.data?.id
-            : storeId
-            ? storeId
-            : itemId,
-        };
-        setCookie("storeId", result?.data?.data?.id, 60);
-        let userResult = updateUser(tempAPIUserData);
-        if (userResult) {
-          refetch();
-          navigate("/Dashboard");
-        }
+      let userResult = updateUser(tempAPIUserData);
+      if (userResult) {
+        refetch();
+        navigate("/Dashboard");
       }
     }
   };
@@ -162,7 +128,7 @@ const AddStore = () => {
               />
             )}
           />
-          {currentUserRole === "1" && (
+          {currentUserRole === "0" && (
             <Controller
               name="status" // Changed to reflect a text input
               control={control}
@@ -222,7 +188,7 @@ const AddStore = () => {
             render={({ field }) => (
               <TeaxtareaNextUI
                 label="Shop Address"
-                {...field} 
+                {...field}
                 isRequired={true}
                 isInvalid={errors?.["storeaddress"] ? true : false}
                 errorMessage={errors?.["storeaddress"]?.message}

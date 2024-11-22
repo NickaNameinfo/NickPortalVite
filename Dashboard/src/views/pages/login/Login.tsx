@@ -27,89 +27,15 @@ const Login = () => {
   const { handleSubmit, control, reset } = useForm();
   const navigate = useNavigate();
   const [login] = useLoginMutation();
-  const [addStores] = useAddStoreMutation();
-  const [updateUser] = useUpdatUserMutation();
-  const [addVendors] = useAddVendorsMutation();
 
   const onSubmit = async (data: any) => {
     const result = await login(data);
     if (result?.data?.success && result?.data?.data?.verify) {
-      if (
-        result?.data?.data?.role === "3" &&
-        (result?.data?.data?.storeId === "" ||
-          result?.data?.data?.storeId === null)
-      ) {
-        let tempAPIData = {
-          storename: result?.data?.data?.firstName,
-          email: result?.data?.data?.email,
-          phone: result?.data?.data?.phone,
-          status: 1,
-          ownername: result?.data?.data?.firstName,
-          password: result?.data?.data?.password,
-          areaId: 3,
-        };
-        const formData = new FormData();
-        for (const key in tempAPIData) {
-          formData.append(key, tempAPIData[key]);
-        }
-        const resultStore = await addStores(formData);
-        if (result?.data?.success) {
-          let tempAPIUserData = {
-            id: result?.data?.id,
-            storeId: resultStore?.data?.data?.id,
-            email: data?.["email"],
-          };
-          setCookie("storeId", resultStore?.data?.data?.id, 60);
-          let userResult = updateUser(tempAPIUserData);
-          if (userResult?.data?.success) {
-            dispatch(updateLoginDetails(result?.data));
-            authenticate(result?.data, () => {
-              navigate("/Dashboard");
-              window.location.reload();
-            });
-          }
-        }
-      } else if (
-        result?.data?.role === "2" &&
-        (result?.data?.data?.vendorId === "" ||
-          result?.data?.data?.vendorId === null)
-      ) {
-        let tempAPIData = {
-          storename: result?.data?.data?.firstName,
-          email: result?.data?.data?.email,
-          phone: result?.data?.data?.phone,
-          status: 1,
-          ownername: result?.data?.data?.firstName,
-          password: result?.data?.data?.password,
-          areaId: 3,
-        };
-        const formData = new FormData();
-        for (const key in tempAPIData) {
-          formData.append(key, tempAPIData[key]);
-        }
-        const resultVendor = await addVendors(formData);
-        if (result?.data?.success) {
-          let tempAPIUserData = {
-            id: result?.data?.id,
-            email: result?.data?.data?.email,
-            vendorId: resultVendor?.data?.data?.[0]?.vendorId,
-          };
-          setCookie("vendorId", resultVendor?.data?.data?.[0]?.vendorId, 60);
-          let userResult = updateUser(tempAPIUserData);
-          if (userResult?.data?.success) {
-            dispatch(updateLoginDetails(result?.data));
-            authenticate(result?.data, () => {
-              navigate("/Dashboard");
-              window.location.reload();
-            });
-          }
-        }
-      } else {
-        authenticate(result?.data, () => {
-          navigate("/Dashboard");
-          window.location.reload();
-        });
-      }
+      dispatch(updateLoginDetails(result?.data));
+      authenticate(result?.data, () => {
+        navigate("/Dashboard");
+        window.location.reload();
+      });
     } else {
       alert(
         "Please connect admin and activate your account Support : 8270564998"
