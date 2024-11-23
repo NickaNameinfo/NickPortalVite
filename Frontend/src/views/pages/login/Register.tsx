@@ -55,11 +55,11 @@ export const Register = () => {
     try {
       let tempApiValue = {
         ...formData,
-        verify: formData?.role === 1 ? 1 : 0,
+        verify: formData?.role === "1" ? 1 : 0,
       };
       const result = await register(tempApiValue);
       if (result?.data?.success) {
-        if (formData?.role === "3") {
+        if (result?.data?.user?.role === "3") {
           let tempAPIData = {
             storename: formData?.firstName,
             email: formData?.email,
@@ -86,7 +86,7 @@ export const Register = () => {
               dispatch(onOpenLogin(true));
             }
           }
-        } else if (formData?.role === "2") {
+        } else if (result?.data?.user?.role === "2") {
           let tempAPIData = {
             storename: formData?.firstName,
             email: formData?.email,
