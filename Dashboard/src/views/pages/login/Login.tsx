@@ -37,9 +37,13 @@ const Login = () => {
         window.location.reload();
       });
     } else {
-      alert(
-        "Please connect admin and activate your account Support : 8270564998"
-      );
+      if (result?.data?.data && !result?.data?.data?.verify) {
+        alert(
+          "Please connect admin and activate your account Support : 8270564998"
+        );
+      } else {
+        alert("Invalid Credentials");
+      }
     }
   };
 
