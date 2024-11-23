@@ -45,6 +45,8 @@ const Add = () => {
     itemId ? itemId : vendorId ? vendorId : null
   );
 
+  console.log(data, "errors70987");
+
   React.useEffect(() => {
     refetch();
     if (data?.data.length > 0) {
@@ -75,7 +77,7 @@ const Add = () => {
       verify: data?.status,
       email: data?.email,
     };
-    if (data?.data?.[0]?.id) {
+    if (data?.id) {
       const resultVendor = await updateVendors(formData);
       if (resultVendor?.data?.success) {
         let result = await updateUser(tempAPIUserData);
