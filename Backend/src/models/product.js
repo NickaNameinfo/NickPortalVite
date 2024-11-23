@@ -76,7 +76,6 @@ module.exports = (sequelize, DataTypes) => {
     product.hasMany(models.vendor_product, { foreignKey: "productId" });
     product.hasMany(models.store_product, { foreignKey: "productId" });
     product.hasMany(models.productFeedback, { foreignKey: "productId" });
-    product.belongsTo(models.store, { foreignKey: "id" });
   };
 
   return product;

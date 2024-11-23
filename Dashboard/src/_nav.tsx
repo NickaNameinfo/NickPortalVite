@@ -114,7 +114,7 @@ export const _nav = [
             },
           ]
         : []),
-      ...(tempRole === "3"
+      ...(tempRole === "2"
         ? [
             {
               menuType: "single",
