@@ -344,7 +344,7 @@ export const AppHeader = () => {
             </Button>
             <div className="w-[calc(100%_-_16px)] overflow-hidden">
               <div
-                className="slider-container"
+                className="slider-container custom-scrollbar"
               >
                 {displayedLabels.length > 0 &&
                   displayedLabels.map((item, index) => (
@@ -361,7 +361,7 @@ export const AppHeader = () => {
                         }}
                         radius="full"
                         onClick={() => {
-                          if (globalCategorySearch) {
+                          if (globalCategorySearch === item?.id) {
                             onSearchByCategory(null);
                           } else {
                             onSearchByCategory(item?.id);

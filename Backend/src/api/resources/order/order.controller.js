@@ -12,8 +12,8 @@ module.exports = {
         productIds,
         grandTotal,
         qty,
+        storeId
       } = req.body;
-      console.log(customerId, grandTotal, "grandTotal79087890");
       db.user
         .findOne({ where: { id: customerId } })
         .then((p) => {
@@ -25,6 +25,7 @@ module.exports = {
               paymentmethod: paymentmethod,
               productIds: productIds,
               qty: qty,
+              storeId : storeId
             });
           }
           return res.status(500).json({ errors: ["User is not found"] });

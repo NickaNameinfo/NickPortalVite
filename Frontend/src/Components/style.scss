@@ -9,6 +9,7 @@
 
 ::-webkit-scrollbar {
   width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -163,15 +164,18 @@ aside {
 .slider-container {
   display: flex;
   transition: transform 0.5s ease-in-out;
-  overflow: hidden;
+  overflow-x: auto;
   width: 100%; // Ensure the container takes full width
 }
 
 .slider-item {
-  // width: 100%; // Adjust based on the number of items per view (25% for 4 items)
   box-sizing: border-box;
-  margin: 0 8px; // Optional padding for spacing between items
+  margin: 0 8px;
   transition: background-color 0.3s ease;
+  border: 1px solid #4c86f91f;
+  border-radius: inherit;
+  margin: 4px 5px;
+  border-radius: 10px;
 }
 .tab-spacing {
   margin-right: 10px;

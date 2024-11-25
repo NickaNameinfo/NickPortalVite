@@ -8,7 +8,8 @@ module.exports = (sequelize, DataTypes) => {
     grandtotal: DataTypes.INTEGER, 
     status: DataTypes.ENUM('processing','shipping','delieverd','cancel'),
     productIds :  DataTypes.INTEGER,
-    qty :  DataTypes.INTEGER
+    qty :  DataTypes.INTEGER,
+    storeId: DataTypes.INTEGER,
   }, {});
   Order.associate = function(models) {
     // associations can be defined here

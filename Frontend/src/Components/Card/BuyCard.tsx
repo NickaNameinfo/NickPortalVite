@@ -51,12 +51,13 @@ export const BuyCard = (props: any) => {
   const isOpenCartModal = useAppSelector(
     (state) => state.globalConfig.isOpenCartModal
   );
-  const id = getCookie("id");
+  const userId = getCookie("id");
+  const { id } = useParams();
   const {
     data: cart,
     error: cartError,
     refetch: cartRefetch,
-  } = useGetCartByOrderIdQuery(Number(id));
+  } = useGetCartByOrderIdQuery(Number(userId));
   const [updateCart] = useUpdateCartMutation();
   const [deleteCartItem] = useDeleteCartItemMutation();
   const [addOrder] = useAddOrderMutation();
@@ -68,13 +69,13 @@ export const BuyCard = (props: any) => {
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
     cartRefetch();
-  }, [id, onRefresh]);
+  }, [userId, onRefresh]);
 
   const handleAddCart = async (type, product) => {
     let tempCartValue = {
       productId: product?.productId,
       name: product?.name,
-      orderId: id,
+      orderId: userId,
       price: Number(product?.price),
       total: Number(product?.qty) * Number(product?.price),
       qty: product?.qty
@@ -101,12 +102,13 @@ export const BuyCard = (props: any) => {
           const tempCartValue = {
             customerId: item?.orderId,
             paymentmethod: 1,
-            orderId: Number(id),
+            orderId: Number(userId),
             grandTotal: Number(
               cart?.data?.reduce((sum, item) => sum + item.total, 0)
             ),
             productIds: item?.productId,
             qty: item?.qty,
+            storeId: id,
           };
           return await addOrder(tempCartValue);
         } catch (error) {
@@ -114,7 +116,7 @@ export const BuyCard = (props: any) => {
           return null; // Return null for failed orders
         }
       });
-      if(promises){
+      if (promises) {
         MySwal.fire({
           title: <p>Your order placed please vist your order page</p>,
         });
@@ -124,7 +126,7 @@ export const BuyCard = (props: any) => {
 
   const onDeleteCartItems = async () => {
     let apiInfo = {
-      orderId: id,
+      orderId: userId,
       productId: deletId,
     };
     const result = await deleteCartItem(apiInfo);
@@ -158,7 +160,7 @@ export const BuyCard = (props: any) => {
                 isIconOnly
                 size="md"
                 onClick={() => handleAddCart("remove", data)}
-              > 
+              >
                 -
               </Button>
               <p className="bg-gray-200 p-0 m-0 text-sm font-semibold ">

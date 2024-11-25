@@ -4,7 +4,8 @@ module.exports = {
   // Create a new cart item
   async create(req, res, next) {
     try {
-      const { productId, name, orderId, price, total, qty, photo } = req.body;
+      const { productId, name, orderId, price, total, qty, photo, storeId } =
+        req.body;
       const newCart = await db.carts.create({
         productId,
         name,
@@ -13,6 +14,7 @@ module.exports = {
         total,
         qty,
         photo,
+        storeId,
       });
       res.status(201).json({ success: true, data: newCart });
     } catch (err) {

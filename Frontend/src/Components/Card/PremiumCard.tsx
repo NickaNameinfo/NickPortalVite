@@ -58,12 +58,13 @@ export const PremiumCard = ({
     onClose: cartClose,
   } = useDisclosure();
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
-  const id = getCookie("id");
+  const userId = getCookie("id");
+  const { id } = useParams();
   const [addCart] = useAddCartMutation();
   const [updateCart] = useUpdateCartMutation();
   const dispatch = useAppDispatch();
   let productId = {
-    id: id,
+    id: userId,
     productId: item?.product?.id,
   };
   const { data, error, refetch } = useGetCartByProductIdQuery(productId);
@@ -77,7 +78,7 @@ export const PremiumCard = ({
     let tempCartValue = {
       productId: item?.product?.id ? item?.product?.id : item?.id,
       name: item?.product?.name ? item?.product?.name : item?.name,
-      orderId: id,
+      orderId: userId,
       price: Number(item?.price),
       total: Number(data?.data?.qty) * Number(item?.price),
       qty: data?.data?.qty
@@ -86,6 +87,7 @@ export const PremiumCard = ({
           : Number(data?.data?.qty) - 1
         : 1,
       photo: item?.product?.photo ? item?.product?.photo : item?.photo,
+      storeId : id
     };
     if (data?.data) {
       try {

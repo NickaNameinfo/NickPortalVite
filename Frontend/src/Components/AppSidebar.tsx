@@ -190,7 +190,7 @@ export const AppSidebar = () => {
                     }
                     className={"rounded-lg cursor-pointer"}
                     onClick={() => {
-                      if (onSeletedItem) {
+                      if (onSeletedItem === result.key) {
                         onSearchByPayment(result);
                         dispatch(onUpdateOpenStore(false));
                         setOnSelectedItem(null);
