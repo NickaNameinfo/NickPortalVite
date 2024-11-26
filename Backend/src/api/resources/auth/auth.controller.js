@@ -178,22 +178,50 @@ module.exports = {
   },
 
   async login(req, res, next) {
-    var date = new Date();
-    var token = JWTSign(req.user, date);
-    const currentDate = new Date();
-    res.cookie("XSRF-token", token, {
-      expire: new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000),
-      httpOnly: true,
-      secure: config.app.secure,
-    });
-    return res.status(200).json({
-      success: true,
-      token,
-      role: req.user.role,
-      id: req.user.id,
-      data: req.user,
-    });
-  },
+    try {
+      // Check if user data exists
+      if (!req.user) {
+        return res.status(400).json({
+          success: false,
+          message: "User data is missing.",
+        });
+      }
+  
+      // Generate token
+      const currentDate = new Date();
+      const token = JWTSign(req.user, currentDate);
+  
+      if (!token) {
+        return res.status(500).json({
+          success: false,
+          message: "Failed to generate token.",
+        });
+      }
+  
+      // Set the cookie
+      res.cookie("XSRF-token", token, {
+        expires: new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000), // Cookie expiration set to 30 days
+        httpOnly: true, // Secure the cookie
+        secure: config.app.secure, // Use HTTPS if the app is in secure mode
+      });
+  
+      // Send the response
+      return res.status(200).json({
+        success: true,
+        token,
+        role: req.user.role,
+        id: req.user.id,
+        data: req.user,
+      });
+    } catch (error) {
+      // Catch any unexpected error and return a proper response
+      console.error("Login error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred during login.",
+      });
+    }
+  },  
 
   async deleteUserList(req, res, next) {
     db.user
