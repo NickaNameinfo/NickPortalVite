@@ -10,8 +10,8 @@ orderRouter
   .route("/status/update")
   .post(sanitize(), orderController.statusUpdate);
 orderRouter
-  .route("/list")
-  .post(sanitize(), orderController.getAllOrderListById); 
+  .route("/list/:id")
+  .get(sanitize(), orderController.getAllOrderListById); 
 orderRouter
   .route("/status")
   .post(sanitize(), orderController.getAllOrderStatus);

@@ -12,7 +12,7 @@ module.exports = {
         productIds,
         grandTotal,
         qty,
-        storeId
+        storeId,
       } = req.body;
       db.user
         .findOne({ where: { id: customerId } })
@@ -25,7 +25,7 @@ module.exports = {
               paymentmethod: paymentmethod,
               productIds: productIds,
               qty: qty,
-              storeId : storeId
+              storeId: storeId,
             });
           }
           return res.status(500).json({ errors: ["User is not found"] });
@@ -89,22 +89,32 @@ module.exports = {
 
   async getAllOrderListById(req, res, next) {
     try {
-      db.orders
-        .findAll({
-          where: { custId: req.body.id },
-          order: [["createdAt", "DESC"]],
-          include: [{ model: db.addresses, include: [{ model: db.carts }] }],
-        })
-        .then((list) => {
-          res.status(200).json({ success: true, order: list });
-        })
-        .catch(function (err) {
-          next(err);
-        });
+      const orders = await db.orders.findAll({
+        where: { custId: req.params.id },
+        order: [["createdAt", "DESC"]],
+        include: [{ model: db.addresses }],
+      });
+
+      const productIds = orders.flatMap((order) => order.productIds || []);
+      const uniqueProductIds = [...new Set(productIds)];
+
+      const products = await db.product.findAll({
+        where: { id: uniqueProductIds },
+      });
+
+      const ordersWithProducts = orders.map((order) => ({
+        ...order.toJSON(),
+        products: products.filter((product) =>
+          uniqueProductIds?.includes(product.id)
+        ),
+      }));
+
+      res.status(200).json({ success: true, data: ordersWithProducts });
     } catch (err) {
-      res.status(500).json({ errors: "" + err });
+      next(err);
     }
   },
+
   async getAllOrderStatus(req, res, next) {
     try {
       db.orders

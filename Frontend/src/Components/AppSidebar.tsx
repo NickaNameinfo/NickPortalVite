@@ -43,6 +43,7 @@ import {
 } from "../Components/Common/globalSlice";
 import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
 import { useGetCartByOrderIdQuery } from "../views/pages/Store/Service.mjs";
+import { OrderCard } from "./Card/OrderCard";
 
 export const AppSidebar = () => {
   const [menuToggle, setMenuToggle] = React.useState(false);
@@ -53,7 +54,7 @@ export const AppSidebar = () => {
   );
   const { data, refetch } = useGetCategoryQuery();
   const [onSeletedItem, setOnSelectedItem] = React.useState(null);
-
+  const [oderIsOpen, setOrderIsOpen] = React.useState(false);
   const id = getCookie("id");
   const {
     data: cart,
@@ -104,7 +105,7 @@ export const AppSidebar = () => {
     dispatch(onGlobalPaymentSearch(null));
   };
 
-  console.log(onSeletedItem, "onSeletedItem");
+  console.log(oderIsOpen, "onSeletedItem");
 
   return (
     <>
@@ -387,6 +388,7 @@ export const AppSidebar = () => {
                                   key="issues"
                                   // endContent={90}
                                   startContent={<IconHome />}
+                                  onClick={() => setOrderIsOpen(true)}
                                 >
                                   Orders
                                 </ListboxItem>
@@ -426,6 +428,7 @@ export const AppSidebar = () => {
           </div>
         </aside>
       </div>
+      <OrderCard isOpen={oderIsOpen} onClose={() => setOrderIsOpen(false)} />
     </>
   );
 };

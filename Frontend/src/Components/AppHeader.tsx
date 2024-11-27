@@ -327,25 +327,27 @@ export const AppHeader = () => {
       {/* //--------------------------- */}
       <div className="flex justify-between pt-3 pb-2">
         <div className="w-full">
-          <div className="flex w-full justify-between">
+          <div className="flex w-full justify-between items-center">
             <Button
               radius="sm"
               // variant="shadow"
               isIconOnly
               aria-label="Previous"
-              className={`Iconwhatsup ${
+              className={`Iconwhatsup w-7 min-w-7 h-7 ${
                 startIndex === 0 ? "cursor-not-allowed" : "cursor-pointer"
               }`}
               style={{ backgroundColor: "#0000004a" }}
               onClick={handlePrev}
               disabled={startIndex === 0}
             >
-              <IconPrev fill="#ffffffcc" width="12px" height="12px" />
+              <IconPrev
+                fill="#ffffffcc"
+                width="12px"
+                height="12px"
+              />
             </Button>
             <div className="w-[calc(100%_-_16px)] overflow-hidden">
-              <div
-                className="slider-container custom-scrollbar"
-              >
+              <div className="slider-container custom-scrollbar">
                 {displayedLabels.length > 0 &&
                   displayedLabels.map((item, index) => (
                     <div className="slider-item" key={index}>
@@ -378,10 +380,10 @@ export const AppHeader = () => {
               radius="sm"
               isIconOnly
               aria-label="Next"
-              className={`Iconwhatsup  min-w-7 ${
+              className={`Iconwhatsup w-7 min-w-7 h-7 ${
                 startIndex + itemsPerPage >= sliderLabel?.length
                   ? "cursor-not-allowed"
-                  : "cursor-pointer w-7"
+                  : "cursor-pointer "
               }`}
               style={{ backgroundColor: "#0000004a" }}
               onClick={handleNext}
@@ -391,7 +393,6 @@ export const AppHeader = () => {
                 fill="#ffffffcc"
                 width="12px"
                 height="12px"
-                // className="ml:h-[12px] ml:w-[12px] xm:h-[12px] xm:w-[12px]"
               />
             </Button>
           </div>
