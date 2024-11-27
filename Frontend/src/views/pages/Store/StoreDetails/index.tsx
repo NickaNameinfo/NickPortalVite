@@ -27,9 +27,7 @@ const StoreDetails = () => {
       refetch();
     }
   }, [id, refetch]);
-
-  console.log(isProductDetailsModalOpen, "data79087");
-
+  
   return (
     <div>
       <StoreHeaderCard />

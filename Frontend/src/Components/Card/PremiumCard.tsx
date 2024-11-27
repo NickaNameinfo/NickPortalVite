@@ -25,10 +25,6 @@ import {
   IconTick,
   IconsEye,
 } from "../Icons";
-import StoreHeaderCard from "./StoreHeaderCard";
-import { ProductDetail } from "../DetailsModales/ProductDetail";
-import { BuyCard } from "./BuyCard";
-import { useBoolean } from "../Common/CustomHooks";
 import { useParams } from "react-router-dom";
 import {
   useGetCartByProductIdQuery,
@@ -52,11 +48,6 @@ export const PremiumCard = ({
   from = null,
   popOverOnClose = null,
 }) => {
-  const {
-    isOpen: cartIsOpen,
-    onOpen: cartOpen,
-    onClose: cartClose,
-  } = useDisclosure();
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
   const userId = getCookie("id");
   const { id } = useParams();
@@ -332,7 +323,6 @@ export const PremiumCard = ({
           </div>
         </CardFooter>
       </Card>
-      <BuyCard isOpen={cartIsOpen} onClose={cartClose} />
     </>
   );
 };

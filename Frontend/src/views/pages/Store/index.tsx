@@ -17,8 +17,6 @@ import {
   onUpdateProductDetailsModal,
   onUpdateStoreList,
 } from "../../../Components/Common/globalSlice";
-import { ProductDetail } from "../../../Components/DetailsModales/ProductDetail";
-import { BuyCard } from "../../../Components/Card/BuyCard";
 
 const Store = () => {
   const dispatch = useAppDispatch();

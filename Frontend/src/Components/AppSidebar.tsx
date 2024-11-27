@@ -44,6 +44,7 @@ import {
 import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
 import { useGetCartByOrderIdQuery } from "../views/pages/Store/Service.mjs";
 import { OrderCard } from "./Card/OrderCard";
+import { BuyCard } from "./Card/BuyCard";
 
 export const AppSidebar = () => {
   const [menuToggle, setMenuToggle] = React.useState(false);
@@ -51,6 +52,9 @@ export const AppSidebar = () => {
   const [selectedCategory, setSelectedCategory] = React.useState([]);
   const currentloginDetails = useAppSelector(
     (state) => state.globalConfig.currentloginDetails
+  );
+  const isOpenCartModal = useAppSelector(
+    (state) => state.globalConfig.isOpenCartModal
   );
   const { data, refetch } = useGetCategoryQuery();
   const [onSeletedItem, setOnSelectedItem] = React.useState(null);
@@ -105,7 +109,7 @@ export const AppSidebar = () => {
     dispatch(onGlobalPaymentSearch(null));
   };
 
-  console.log(oderIsOpen, "onSeletedItem");
+  console.log(onSeletedItem, "onSeletedItem");
 
   return (
     <>
@@ -429,6 +433,7 @@ export const AppSidebar = () => {
         </aside>
       </div>
       <OrderCard isOpen={oderIsOpen} onClose={() => setOrderIsOpen(false)} />
+      {isOpenCartModal && <BuyCard isOpen={isOpenCartModal} />}
     </>
   );
 };

@@ -25,9 +25,6 @@ import {
   IconTick,
   ModalCloseIcon,
 } from "../Icons";
-import { BuyCard } from "../Card/BuyCard";
-import RelatedProducts from "../Card/RelatedProducts";
-import { IconNxt, IconPrv } from "../../Icons";
 import { infoData } from "../../configData";
 import { useAppDispatch, useAppSelector } from "../Common/hooks";
 import { Link, useParams } from "react-router-dom";
