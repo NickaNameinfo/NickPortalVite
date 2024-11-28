@@ -117,6 +117,9 @@ export const BuyCard = (props: any) => {
         }
       });
       if (promises) {
+        cart.data.map(async (item) => {
+          onDeleteCartItems(item?.productId);
+        });
         MySwal.fire({
           title: <p>Your order placed please vist your order page</p>,
         });
@@ -124,10 +127,10 @@ export const BuyCard = (props: any) => {
     }
   };
 
-  const onDeleteCartItems = async () => {
+  const onDeleteCartItems = async (productId?) => {
     let apiInfo = {
       orderId: userId,
-      productId: deletId,
+      productId: productId ? productId : deletId,
     };
     const result = await deleteCartItem(apiInfo);
     if (result) {

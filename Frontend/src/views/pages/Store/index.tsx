@@ -75,7 +75,7 @@ const Store = () => {
     storeByCategoryRefetch();
     storeByFilterRefetch();
     storesByPaymentRefetch();
-    storesByOpenStoreRefetch();
+    // storesByOpenStoreRefetch();
   }, [globalCategorySearch, globalSearch]);
 
   React.useEffect(() => {

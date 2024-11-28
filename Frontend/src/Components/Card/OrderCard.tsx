@@ -18,13 +18,11 @@ import {
   TableCell,
 } from "@nextui-org/react";
 import { ModalCloseIcon } from "../Icons";
-import { useAppDispatch } from "../Common/hooks";
-import { useNavigate } from "react-router-dom";
 import { infoData } from "../../configData";
 import { useGetOrderByOrderIdQuery } from "../../views/pages/Store/Service.mjs";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
-import withReactContent from "sweetalert2-react-content";
-import Swal from "sweetalert2";
+import { useAppDispatch } from "../Common/hooks";
+import { onUpdateProductDetailsModal } from "../Common/globalSlice";
 
 const columns = [
   { name: "Product", uid: "productImage" },
@@ -32,24 +30,22 @@ const columns = [
   { name: "Quantity", uid: "qty" },
   { name: "Price", uid: "grandtotal" },
   { name: "status", uid: "status" },
+  { name: "Delivery Date", uid: "deliverydate" },
   { name: "Action", uid: "actions" },
 ];
 
 export const OrderCard = (props: any) => {
   const userId = getCookie("id");
+  const dispatch = useAppDispatch();
   const {
     data: orderList,
     error: orderListError,
     refetch: orderListRefetch,
   } = useGetOrderByOrderIdQuery(Number(userId));
 
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-  const MySwal = withReactContent(Swal);
-
   React.useEffect(() => {
     orderListRefetch();
-  }, [userId]);
+  }, [props?.isOpen]);
 
   const renderCell = React.useCallback((data, columnKey) => {
     switch (columnKey) {
@@ -65,12 +61,19 @@ export const OrderCard = (props: any) => {
           ></User>
         );
       case "productName":
-        return (
-          <p>{data?.products?.[0]?.name}</p>
-        );
+        return <p>{data?.products?.[0]?.name}</p>;
       case "actions":
         return (
-          <Button variant="bordered" color="warning">view</Button>
+          <Button variant="bordered" color="warning" onClick={() => {
+            dispatch(
+              onUpdateProductDetailsModal({
+                isOpen: true,
+                item: data?.products?.[0],
+              })
+            );
+          }}>
+            view
+          </Button>
         );
       default:
         return <p className="m-0 p-0">{data?.[columnKey]}</p>;
@@ -102,7 +105,7 @@ export const OrderCard = (props: any) => {
               className="modalIconClose"
             />
             <ModalBody className="p-0 m-0 mt-1 pt-2">
-              <div className="grid xm:grid-cols-1 mm:grid-cols-1  sm:grid-cols-1 ml:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 3xl:grid-cols-2 4xl:grid-cols-2">
+              <div className="grid">
                 <div className="">
                   <Table
                     isHeaderSticky
@@ -142,7 +145,9 @@ export const OrderCard = (props: any) => {
                     </TableBody>
                   </Table>
                   {orderList?.data?.length <= 0 && (
-                    <p className="text-center my-3">No item in your order list</p>
+                    <p className="text-center my-3">
+                      No item in your order list
+                    </p>
                   )}
                   {/* <div className="items-center flex justify-center ">
                     <Button
@@ -159,22 +164,14 @@ export const OrderCard = (props: any) => {
                     </Button>
                   </div> */}
                 </div>
-                <div>
+                {/* <div>
+                  <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
+                    <div>Store and Product Details</div>
+                  </div>
                   <div className=" BuycarBg mx-3">
                     <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
-                      <div>Store and Product Details</div>
-                      <div>
-                        {" "}
-                        Rs :{" "}
-                        {orderList?.data
-                          ?.reduce((sum, item) => sum + item.total, 0)
-                          .toString()
-                          .replace(/(\d+)(\d{3})$/, "$1,$2")}
-                      </div>
-                    </div>
-                    <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
-                      <div>Discount</div>
-                      <div> 100%</div>
+                      <div>Store Name</div>
+                      <div>Nicknameinfotech</div>
                     </div>
                     <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
                       <div>Delivery Charge</div>
@@ -262,7 +259,7 @@ export const OrderCard = (props: any) => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </ModalBody>
           </>

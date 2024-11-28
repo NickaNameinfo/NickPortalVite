@@ -42,7 +42,7 @@ import {
   updateLoginDetails,
 } from "../Components/Common/globalSlice";
 import { useGetCategoryQuery } from "../views/pages/Category/Service.mjs";
-import { useGetCartByOrderIdQuery } from "../views/pages/Store/Service.mjs";
+import { useGetCartByOrderIdQuery, useGetOrderByOrderIdQuery } from "../views/pages/Store/Service.mjs";
 import { OrderCard } from "./Card/OrderCard";
 import { BuyCard } from "./Card/BuyCard";
 
@@ -65,6 +65,11 @@ export const AppSidebar = () => {
     error: cartError,
     refetch: cartRefetch,
   } = useGetCartByOrderIdQuery(Number(id));
+  const {
+    data: orderList,
+    error: orderListError,
+    refetch: orderListRefetch,
+  } = useGetOrderByOrderIdQuery(Number(id));
 
   const itemClasses = {
     base: "py-0 w-full",
@@ -77,6 +82,8 @@ export const AppSidebar = () => {
 
   React.useEffect(() => {
     refetch();
+    cartRefetch();
+    orderListRefetch();
   }, []);
 
   React.useEffect(() => {
@@ -108,8 +115,6 @@ export const AppSidebar = () => {
     dispatch(onGlobalCategorySearch(id));
     dispatch(onGlobalPaymentSearch(null));
   };
-
-  console.log(onSeletedItem, "onSeletedItem");
 
   return (
     <>
@@ -390,7 +395,7 @@ export const AppSidebar = () => {
                               >
                                 <ListboxItem
                                   key="issues"
-                                  // endContent={90}
+                                  endContent={orderList?.data?.length}
                                   startContent={<IconHome />}
                                   onClick={() => setOrderIsOpen(true)}
                                 >
