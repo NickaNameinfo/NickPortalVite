@@ -80,12 +80,8 @@ export const AppSidebar = () => {
               </CardBody>
             </Card>
           </div>
-          {mobileExpand ? (
+          {mobileExpand && (
             <span onClick={() => setMobileExpand((prev) => !prev)}>
-              <IconHome />
-            </span>
-          ) : (
-            <span onClick={() => setMenuToggle((prev) => !prev)}>
               <IconHome />
             </span>
           )}
@@ -103,13 +99,7 @@ export const AppSidebar = () => {
                           className="mt-4 p-3 text-sm flex items-center text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                         >
                           <div className="flex justify-between w-full items-center">
-                            {menuToggle ? (
-                              <span>
-                                <IconHome />
-                              </span>
-                            ) : (
-                              <p>{result?.["name"]}</p>
-                            )}
+                            <p>{result?.["name"]}</p>
                             {result?.["isToggle"] && (
                               <Switch
                                 color="secondary"
@@ -141,13 +131,7 @@ export const AppSidebar = () => {
                           className="mt-4 p-3 text-sm flex items-center text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                         >
                           <div className="flex justify-between w-full items-center">
-                            {menuToggle ? (
-                              <span>
-                                <IconHome />
-                              </span>
-                            ) : (
-                              <p>{result?.["name"]}</p>
-                            )}
+                            <p>{result?.["name"]}</p>
                             {result?.["isToggle"] && (
                               <Switch
                                 color="secondary"
@@ -187,13 +171,7 @@ export const AppSidebar = () => {
                           aria-label="Accordion 1"
                           title={
                             <div className="flex justify-between">
-                              {menuToggle ? (
-                                <span>
-                                  <IconHome />
-                                </span>
-                              ) : (
-                                <p>{result?.["name"]}</p>
-                              )}
+                              <p>{result?.["name"]}</p>
                               <p className="rounded-md bg-white text-secondary px-1 leading-4 text-xs flex items-center">
                                 {result?.["menuItems"]?.length}
                               </p>

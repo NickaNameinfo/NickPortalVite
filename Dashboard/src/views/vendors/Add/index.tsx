@@ -18,7 +18,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import * as React from "react";
 import InputNextUI from "../../../Components/Common/Input/input";
-import TeaxtareaNextUI from "../../../Components/Common/Ddropdown/Textarea";
+import TeaxtareaNextUI from "../../../Components/Common/Input/Textarea";
 import { useAppDispatch, useAppSelector } from "../../../Common/hooks";
 import { useUpdatUserMutation } from "../../../Service.mjs";
 import { getCookie, setCookie } from "../../../JsFiles/CommonFunction.mjs";

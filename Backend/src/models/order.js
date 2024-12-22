@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     productIds :  DataTypes.INTEGER,
     qty :  DataTypes.INTEGER,
     storeId: DataTypes.INTEGER,
+    customization : DataTypes.STRING,
   }, {});
   Order.associate = function(models) {
     // associations can be defined here

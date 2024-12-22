@@ -12,14 +12,30 @@ export const useBoolean = (initialValue = false) => {
 };
 
 export const authenticate = (user, next) => {
-  console.log(user, "user4352345");
+  const now = new Date();
   if (typeof window !== "undefined") {
-    setCookie("token", user.token, 60);
-    setCookie("role", user.role, 60);
-    setCookie("id", user.id, 60);
-    setCookie("vendorId", user?.data?.vendorId, 60);
-    setCookie("storeId", user?.data?.storeId, 60);
-    setCookie("plan", user?.data?.plan, 60);
+    setCookie(
+      "token",
+      user.token,
+      new Date(now.getTime() + 24 * 60 * 60 * 1000)
+    );
+    setCookie("role", user.role, new Date(now.getTime() + 24 * 60 * 60 * 1000));
+    setCookie("id", user.id, new Date(now.getTime() + 24 * 60 * 60 * 1000));
+    setCookie(
+      "vendorId",
+      user?.data?.vendorId,
+      new Date(now.getTime() + 24 * 60 * 60 * 1000)
+    );
+    setCookie(
+      "storeId",
+      user?.data?.storeId,
+      new Date(now.getTime() + 24 * 60 * 60 * 1000)
+    );
+    setCookie(
+      "plan",
+      user?.data?.plan,
+      new Date(now.getTime() + 24 * 60 * 60 * 1000)
+    );
     next();
   }
 };

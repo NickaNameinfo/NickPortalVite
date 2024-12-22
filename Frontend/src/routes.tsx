@@ -17,7 +17,7 @@ const routes = [
     name: "StoreDetails",
     element: StoreDetails,
   },
-  { path: "/VendoreView", name: "VendoreView", element: VendoreView },
+  { path: "/VendorView", name: "vendorView", element: VendoreView },
   { path: "/MapView", name: "MapView", element: MapView },
 ];
 

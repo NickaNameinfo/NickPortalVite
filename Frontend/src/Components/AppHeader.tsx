@@ -12,6 +12,7 @@ import * as React from "react";
 import "./style.scss";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
+  Arrowright,
   IconCall,
   IconHome,
   IconInfo,
@@ -31,6 +32,7 @@ import {
   onGlobalCategorySearch,
   onSearchGlobal,
   onUpdateOpenStore,
+  onUpdateSidebarExpand,
 } from "../Components/Common/globalSlice";
 export const AppHeader = () => {
   const location = useLocation();
@@ -38,6 +40,9 @@ export const AppHeader = () => {
     (state) => state.globalConfig.currentloginDetails
   );
   const currLocation = location?.pathname?.split("/");
+  const isSideBarExpand = useAppSelector(
+    (state) => state.globalConfig.isSideBarExpand
+  );
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [startIndex, setStartIndex] = React.useState(0);
@@ -86,104 +91,120 @@ export const AppHeader = () => {
 
   return (
     <>
-      <div className="flex justify-between navBarStyle gap-4 items-center p-3">
-        <div className="flex w-1/3">
-          <div className="text-center mx-2">
-            <Link to={"/"}>
-              <Button
-                isIconOnly
-                color="primary"
-                className="bg-white"
-                aria-label="Take a photo"
-              >
-                <IconHome height="16px" width="16px" />
-              </Button>
-            </Link>
-          </div>
-          {/* <div className="xm:hidden md:block w-webkit-fill-available"> */}
-          <div className=" flex justify-start">
-            <Input
-              autoFocus={false}
-              isClearable
-              className="w-[280px]"
-              radius="lg"
-              size="md"
-              onClear={() => {
-                dispatch(onSearchGlobal(null));
-                dispatch(onUpdateOpenStore(false));
-                setSearchValues(null);
-              }}
-              onChange={(e) => setSearchValues(e.target.value)}
-              variant="flat"
-              placeholder="Search Here..."
-              // style={{ backgroundColor:"whitesmoke"}}
-              classNames={{
-                label: " bg-[#ffffff3b] text-black/90 dark:text-black/90",
-                input: [
-                  "bg-[#ffffff3b]",
-                  "text-black/90 dark:text-black/100",
-                  "placeholder:text-black-100/30 dark:placeholder:text-black/10",
-                  "font-normal",
-                  "group-data-[has-value=true]:text-black/90",
-                ],
-                innerWrapper: " text-black/90 dark:text-black/70",
-                inputWrapper: [
-                  "bg-[#ffffff3b]",
-                  "dark:bg-[#ffffff3b]",
-                  "backdrop-blur-xl",
-                  "backdrop-saturate-50",
-                  "hover:bg-[#ffffff3b]",
-                  "hover:border-gray-600/10",
-                  "focus-within:!bg-[#ffffff3b]",
-                  "dark:hover:bg-[#ffffff3b]",
-                  "dark:focus-within:!bg-[#ffffff3b]",
-                  "!cursor-text",
-                  "shadow-none",
-                  "border-0",
-                  "data-[hover=true]:bg-[#ffffff3b]",
-                  "data-[hover=true]:bg-[#ffffff3b]",
-                  "dark:data-[hover=true]:bg-[#ffffff3b]",
-                ],
-              }}
-              startContent={
-                <p className="me-1.5">
-                  <NavHeaderSearchIcon />
-                </p>
-              }
-            />
-            <p
-              className="ms-1.5 bg-[#ffffff3b] items-center flex p-3 rounded-full bg-[#8465F7] cursor-pointer"
-              onClick={() => onSearch()}
+      <div className="flex flex-wrap md:flex-nowrap justify-between navBarStyle gap-4 items-center p-3">
+        {/* Left Section */}
+        <div className="flex w-full items-center md:w-1/3">
+          {isSideBarExpand && (
+            <Button
+              isIconOnly
+              color="primary"
+              className="hidden bg-white mx-2 md:flex"
+              aria-label="Home"
+              onClick={() => dispatch(onUpdateSidebarExpand(false))}
             >
-              <SearchIcon color={"blue"} />
-            </p>
-          </div>
+              <Arrowright height="16px" width="16px" />
+            </Button>
+          )}
+          <Button
+            isIconOnly
+            color="primary"
+            className="bg-white mx-2 md:hidden"
+            aria-label="Home"
+            onClick={() => dispatch(onUpdateSidebarExpand(!isSideBarExpand))}
+          >
+            <Arrowright height="16px" width="16px" />
+          </Button>
+
+          <Link to={"/"}>
+            <Button
+              isIconOnly
+              color="primary"
+              className="hidden bg-white mx-2 md:flex"
+              aria-label="Home"
+            >
+              <IconHome height="16px" width="16px" />
+            </Button>
+          </Link>
+          <Input
+            className="w-full md:w-[280px] md:mt-0"
+            radius="lg"
+            size="md"
+            isClearable
+            placeholder="Search Here..."
+            onChange={(e) => setSearchValues(e.target.value)}
+            onClear={() => {
+              dispatch(onSearchGlobal(null));
+              setSearchValues(null);
+            }}
+            classNames={{
+              label: " bg-[#ffffff3b] text-black/90 dark:text-black/90",
+              input: [
+                "bg-[#ffffff3b]",
+                "text-black/90 dark:text-black/100",
+                "placeholder:text-black-100/30 dark:placeholder:text-black/10",
+                "font-normal",
+                "group-data-[has-value=true]:text-black/90",
+              ],
+              innerWrapper: " text-black/90 dark:text-black/70",
+              inputWrapper: [
+                "bg-[#ffffff3b]",
+                "dark:bg-[#ffffff3b]",
+                "backdrop-blur-xl",
+                "backdrop-saturate-50",
+                "hover:bg-[#ffffff3b]",
+                "hover:border-gray-600/10",
+                "focus-within:!bg-[#ffffff3b]",
+                "dark:hover:bg-[#ffffff3b]",
+                "dark:focus-within:!bg-[#ffffff3b]",
+                "!cursor-text",
+                "shadow-none",
+                "border-0",
+                "data-[hover=true]:bg-[#ffffff3b]",
+                "data-[hover=true]:bg-[#ffffff3b]",
+                "dark:data-[hover=true]:bg-[#ffffff3b]",
+              ],
+            }}
+            startContent={
+              <p className="me-1.5">
+                <NavHeaderSearchIcon />
+              </p>
+            }
+          />
+          <Button
+            className="ml-2 md:flex bg-[#ffffff3b] items-cente"
+            onClick={() => onSearch()}
+          >
+            <SearchIcon color="blue" />
+          </Button>
         </div>
 
-        <div className="w-2/3 flex justify-end ">
-          <div className=" mx-3 flex  justify-around">
-            <div className="mx-1">
-              {/* <Tooltip
-                showArrow={true}
-                color="foreground"
-                offset={3}
-                content="Store View"
-              > */}
-              <Button
-                onClick={() => navigate(`/`)}
-                radius="lg"
-                // variant="shadow"
-                color="primary"
-                aria-label="Like"
-                className={`${
-                  currLocation?.[1] === "" ? "" : "text-slate-400 bg-white"
-                }  Iconwhatsup ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6`}
-                size="md"
-              >
-                <div className="">
-                  <div>Store View</div>
-                  {currLocation?.[1] === "" && (
-                    <div className="flex justify-center">
+        {/* Right Section */}
+        <div className="flex flex-wrap md:flex-nowrap w-full md:w-2/3 justify-end">
+          {/* Navigation Buttons */}
+          <div className="flex mx-auto md:mx-0">
+            {[
+              { name: "Store View", key: "" },
+              { name: "Product View", key: "ProductView" },
+              { name: "Vendor View", key: "VendorView" },
+              { name: "Map View", key: "MapView" },
+            ].map((view, index) => (
+              <div>
+                <Button
+                  key={index}
+                  color="primary"
+                  className={`mx-1 IconCalls ${
+                    currLocation[1] === view?.key
+                      ? ""
+                      : "text-slate-400 bg-white"
+                  }`}
+                  onClick={() => navigate(`/${view?.key}`)}
+                >
+                  <span className="hidden sm:block">{view?.name}</span>
+                  <span className="block md:hidden">
+                    <IconHome />
+                  </span>
+                  {currLocation[1] === view?.key && (
+                    <div className="justify-center">
                       <svg
                         width="6"
                         height="6"
@@ -195,125 +216,27 @@ export const AppHeader = () => {
                       </svg>
                     </div>
                   )}
-                </div>
-              </Button>
-              {/* </Tooltip> */}
-            </div>
-            <div className="mx-1">
-              <Button
-                onClick={() => navigate(`/ProductView`)}
-                radius="lg"
-                color="primary"
-                // variant="shadow"
-                aria-label="Like"
-                className={` ${
-                  currLocation?.[1] === "ProductView"
-                    ? ""
-                    : "text-slate-400 bg-white"
-                } IconCall ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6`}
-                size="md"
-              >
-                <div className="">
-                  <div>Product View</div>
-                  {currLocation?.[1] === "ProductView" && (
-                    <div className="flex justify-center">
-                      <svg
-                        width="6"
-                        height="6"
-                        viewBox="0 0 6 6"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <circle cx="3" cy="3" r="3" fill="white" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-              </Button>
-            </div>
-            <div className="mx-1">
-              <Button
-                onClick={() => navigate(`/VendoreView`)}
-                radius="lg"
-                color="primary"
-                // variant="shadow"
-                aria-label="Like"
-                className={` ${
-                  currLocation?.[1] === "VendoreView"
-                    ? ""
-                    : "text-slate-400 bg-white"
-                } IconCall ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6`}
-                size="md"
-              >
-                <div className="">
-                  <div>Vendor View</div>
-                  {currLocation?.[1] === "VendoreView" && (
-                    <div className="flex justify-center">
-                      <svg
-                        width="6"
-                        height="6"
-                        viewBox="0 0 6 6"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <circle cx="3" cy="3" r="3" fill="white" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-              </Button>
-            </div>
-            <div className="ms-1">
-              <Button
-                onClick={() => navigate(`/MapView`)}
-                radius="lg"
-                color="primary"
-                aria-label="Like"
-                className={` ${
-                  currLocation?.[1] === "MapView"
-                    ? ""
-                    : "text-slate-400 bg-white"
-                } IconCall ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6`}
-                size="md"
-              >
-                <div className="">
-                  <div>Map View</div>
-                  {currLocation?.[1] === "MapView" && (
-                    <div className="flex justify-center">
-                      <svg
-                        width="6"
-                        height="6"
-                        viewBox="0 0 6 6"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <circle cx="3" cy="3" r="3" fill="white" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-              </Button>
-            </div>
+                </Button>
+              </div>
+            ))}
           </div>
 
-          <div className="flex">
-            <div>
-              <Button
-                onPress={() => onOpen()}
-                isIconOnly
-                color="warning"
-                aria-label="Like"
-                className="bg-warning-900"
-              >
-                <IconInfo />
-              </Button>
-            </div>
-            <div className="ms-3">
+          {/* User Info */}
+          <div className="hidden md:flex items-center mt-3 md:mt-0">
+            <Button
+              isIconOnly
+              color="warning"
+              className="bg-warning-900"
+              onPress={() => onOpen()}
+            >
+              <IconInfo />
+            </Button>
+            <div className="ml-3">
               {!currentloginDetails?.data?.email ? (
                 <Login />
               ) : (
                 <User
-                  name={""}
+                  name={currentloginDetails?.data?.name}
                   avatarProps={{
                     src: "https://avatars.githubusercontent.com/u/30373425?v=4",
                   }}
@@ -324,82 +247,53 @@ export const AppHeader = () => {
         </div>
       </div>
 
-      {/* //--------------------------- */}
-      <div className="flex justify-between pt-3 pb-2">
-        <div className="w-full">
-          <div className="flex w-full justify-between items-center">
-            <Button
-              radius="sm"
-              // variant="shadow"
-              isIconOnly
-              aria-label="Previous"
-              className={`Iconwhatsup w-7 min-w-7 h-7 ${
-                startIndex === 0 ? "cursor-not-allowed" : "cursor-pointer"
-              }`}
-              style={{ backgroundColor: "#0000004a" }}
-              onClick={handlePrev}
-              disabled={startIndex === 0}
-            >
-              <IconPrev
-                fill="#ffffffcc"
-                width="12px"
-                height="12px"
-              />
-            </Button>
-            <div className="w-[calc(100%_-_16px)] overflow-hidden">
-              <div className="slider-container custom-scrollbar">
-                {displayedLabels.length > 0 &&
-                  displayedLabels.map((item, index) => (
-                    <div className="slider-item" key={index}>
-                      <Button
-                        size="sm"
-                        className="font-medium text-sm w-auto h-10 text-black"
-                        style={{
-                          backgroundColor:
-                            globalCategorySearch === item?.id
-                              ? "#f6bc00"
-                              : "#ffffff80",
-                          borderRadius: "14px",
-                        }}
-                        radius="full"
-                        onClick={() => {
-                          if (globalCategorySearch === item?.id) {
-                            onSearchByCategory(null);
-                          } else {
-                            onSearchByCategory(item?.id);
-                          }
-                        }}
-                      >
-                        {item?.name}
-                      </Button>
-                    </div>
-                  ))}
-              </div>
-            </div>
-            <Button
-              radius="sm"
-              isIconOnly
-              aria-label="Next"
-              className={`Iconwhatsup w-7 min-w-7 h-7 ${
-                startIndex + itemsPerPage >= sliderLabel?.length
-                  ? "cursor-not-allowed"
-                  : "cursor-pointer "
-              }`}
-              style={{ backgroundColor: "#0000004a" }}
-              onClick={handleNext}
-              disabled={startIndex + itemsPerPage >= sliderLabel?.length}
-            >
-              <IconNext
-                fill="#ffffffcc"
-                width="12px"
-                height="12px"
-              />
-            </Button>
+      {/* Slider */}
+      <div className="slider-wrapper w-full overflow-hidden">
+        <div className="flex items-center justify-between px-4 my-2">
+          <Button
+            isIconOnly
+            className={`Iconwhatsup w-7 min-w-7 h-7 ${
+              startIndex === 0 ? "cursor-not-allowed" : "cursor-pointer"
+            }`}
+            style={{ backgroundColor: "#0000004a" }}
+            onClick={handlePrev}
+            disabled={startIndex === 0}
+          >
+            <IconPrev fill="#ffffffcc" width="12px" height="12px" />
+          </Button>
+          <div className="slider-container custom-scrollbar">
+            {displayedLabels?.map((item, index) => (
+              <Button
+                key={index}
+                onClick={() => onSearchByCategory(item?.id)}
+                className="mx-2 font-medium text-sm w-auto h-10 text-black"
+                style={{
+                  backgroundColor:
+                    globalCategorySearch === item?.id ? "#f6bc00" : "#ffffff80",
+                  borderRadius: "14px",
+                }}
+                size="sm"
+              >
+                {item?.name}
+              </Button>
+            ))}
           </div>
+          <Button
+            radius="sm"
+            isIconOnly
+            style={{ backgroundColor: "#0000004a" }}
+            onClick={handleNext}
+            disabled={startIndex + itemsPerPage >= sliderLabel.length}
+            className={`Iconwhatsup w-7 min-w-7 h-7 ${
+              startIndex + itemsPerPage >= sliderLabel?.length
+                ? "cursor-not-allowed"
+                : "cursor-pointer "
+            }`}
+          >
+            <IconNext fill="#ffffffcc" width="12px" height="12px" />
+          </Button>
         </div>
       </div>
-
-      <InfoCard isOpen={isOpen} onClose={onClose} />
     </>
   );
 };

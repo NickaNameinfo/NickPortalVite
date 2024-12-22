@@ -173,9 +173,16 @@ export const _nav = [
         : []),
       {
         menuType: "single",
-        name: "Customers",
-        key: "Customers",
+        name: "Orders",
+        key: "Orders",
         link: "/CustomersOrderList",
+        icons: <IconHome />,
+      },
+      {
+        menuType: "single",
+        name: "Customized Orders",
+        key: "Customizedorders",
+        link: "/CustomizeOrderList",
         icons: <IconHome />,
       },
     ],

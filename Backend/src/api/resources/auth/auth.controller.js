@@ -8,13 +8,14 @@ const db = require("../../../models");
 const { Op } = require('sequelize'); // Import Sequelize Op for logical operators
 
 function JWTSign(user, date) {
+  const now = new Date();
   return JWT.sign(
     {
       iss: config.app.name,
       sub: user.id,
       iam: user.type,
       iat: date.getTime(),
-      exp: new Date().setMinutes(date.getMinutes() + 30),
+      exp: Number(new Date(now.getTime() + 24 * 60 * 60 * 1000)),
     },
     config.app.secret
   );

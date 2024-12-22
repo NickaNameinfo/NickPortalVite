@@ -29,6 +29,12 @@ export const GlobalApi = createApi({
         method: "GET",
       }),
     }),
+    getAllOrderListByStore: builder.query({
+      query: (id) => ({
+        url: `/order/store/list/${id}`,
+        method: "GET",
+      }),
+    }),
     updatUser: builder.mutation({
       query: (body) => ({
         url: `/auth/user/update`,
@@ -36,8 +42,15 @@ export const GlobalApi = createApi({
         body
       }),
     }),
+    updatOrder: builder.mutation({
+      query: (body) => ({
+        url: `/order/status/update`,
+        method: "POST",
+        body
+      }),
+    }),
   }),
 });
 
-export const { useGetUserQuery,useUpdatUserMutation, useGetAllUserQuery, useGetAllOrderListQuery } = GlobalApi;
+export const { useGetUserQuery,useUpdatUserMutation, useGetAllUserQuery, useGetAllOrderListQuery, useGetAllOrderListByStoreQuery, useUpdatOrderMutation } = GlobalApi;
 export const { endpoints } = GlobalApi;

@@ -13,6 +13,7 @@ module.exports = {
         grandTotal,
         qty,
         storeId,
+        customization,
       } = req.body;
       db.user
         .findOne({ where: { id: customerId } })
@@ -26,6 +27,7 @@ module.exports = {
               productIds: productIds,
               qty: qty,
               storeId: storeId,
+              customization: customization ? customization : null,
             });
           }
           return res.status(500).json({ errors: ["User is not found"] });
@@ -91,6 +93,34 @@ module.exports = {
     try {
       const orders = await db.orders.findAll({
         where: { custId: req.params.id },
+        order: [["createdAt", "DESC"]],
+        include: [{ model: db.addresses }],
+      });
+
+      const productIds = orders.flatMap((order) => order.productIds || []);
+      const uniqueProductIds = [...new Set(productIds)];
+
+      const products = await db.product.findAll({
+        where: { id: uniqueProductIds },
+      });
+
+      const ordersWithProducts = orders.map((order) => ({
+        ...order.toJSON(),
+        products: products.filter((product) =>
+          uniqueProductIds?.includes(product.id)
+        ),
+      }));
+
+      res.status(200).json({ success: true, data: ordersWithProducts });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getAllOrderListBySoreId(req, res, next) {
+    try {
+      const orders = await db.orders.findAll({
+        where: { storeId: req.params.id },
         order: [["createdAt", "DESC"]],
         include: [{ model: db.addresses }],
       });

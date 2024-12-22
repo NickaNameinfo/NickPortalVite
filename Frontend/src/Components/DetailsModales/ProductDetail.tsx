@@ -36,6 +36,7 @@ import {
   useUpdateCartMutation,
   useGetStoresByIdQuery,
   useGetStoresQuery,
+  useAddOrderMutation,
 } from "../../views/pages/Store/Service.mjs";
 import {
   onRefreshCart,
@@ -56,10 +57,11 @@ interface ProductDetailProps {
 
 export const ProductDetail = (props: ProductDetailProps) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [customization, setCustomization] = React.useState(null);
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
   const notify = (value) => toast(value);
   const MySwal = withReactContent(Swal);
-  const id = getCookie("id");
+  const userId = getCookie("id");
   const {
     data: stores,
     error: storesError,
@@ -71,7 +73,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
     refetch,
   } = useGetStoresByIdQuery(Number(props?.item?.supplierId));
   let productId = {
-    id: id,
+    id: userId,
     productId: props?.item?.product?.id
       ? props?.item?.product?.id
       : props?.item?.id,
@@ -82,7 +84,9 @@ export const ProductDetail = (props: ProductDetailProps) => {
     error: cartError,
     refetch: cartRefetch,
   } = useGetCartByProductIdQuery(productId);
+
   const [addCart] = useAddCartMutation();
+  const [addOrder] = useAddOrderMutation();
   const [updateCart] = useUpdateCartMutation();
   const dispatch = useAppDispatch();
   const [index, setIndex] = React.useState(-1);
@@ -101,7 +105,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
       name: props?.item?.product?.name
         ? props?.item?.product?.name
         : props?.item?.name,
-      orderId: id,
+      orderId: userId,
       price: Number(props?.item?.price),
       total: Number(cart?.data?.qty) * Number(props?.item?.price),
       qty: cart?.data?.qty
@@ -170,13 +174,45 @@ export const ProductDetail = (props: ProductDetailProps) => {
     },
   ];
 
+  const handleAddOrder = async () => {
+    if (cart?.data?.qty && cart?.data?.qty !== 0) {
+      console.log(cart?.data?.qty, "asdf7as9d078");
+      try {
+        const tempCartValue = {
+          customerId: userId,
+          paymentmethod: 1,
+          orderId: Number(userId),
+          grandTotal: Number(cart?.data?.qty) * Number(props?.item?.price),
+          productIds: props?.item?.product?.id
+            ? props?.item?.product?.id
+            : props?.item?.id,
+          qty: cart?.data?.qty,
+          storeId: Number(props?.item?.supplierId),
+          customization: customization,
+        };
+        let response = await addOrder(tempCartValue);
+        if (response?.data?.success) {
+          MySwal.fire({
+            title: <p>Your order placed please vist your order page</p>,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to add order for item:", error);
+      }
+    } else {
+      MySwal.fire({
+        title: <p>Please select quantity</p>,
+      });
+    }
+  };
+
   return (
     <>
       <Modal
         size={"5xl"}
         isOpen={props?.isOpen}
         onClose={() => {
-          if (props?.isOpen) {
+          if (props?.isOpen && cart?.data?.qty && cart?.data?.qty !== 0) {
             dispatch(
               onUpdateProductDetailsModal({
                 isOpen: false,
@@ -448,7 +484,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                     <h2 className="font-bold my-2">
                       {props?.item?.product?.isEnableCustomize === 1 ||
                       props?.item?.isEnableCustomize === 1
-                        ? "Customize Your Product"
+                        ? "Customize Product and order items *"
                         : "Write your feedback"}
                     </h2>
                     <Textarea
@@ -457,10 +493,29 @@ export const ProductDetail = (props: ProductDetailProps) => {
                         input: "resize-y min-h-[120px]",
                       }}
                       placeholder="Enter your details"
+                      onChange={(e) => setCustomization(e.target.value)}
+                      errorMessage={
+                        !customization
+                          ? "Please enter your customization details"
+                          : null
+                      }
                     />
-                    <div className="flex justify-between mt-2">
-                      <StarRating maxRating={5} />
-                      <Button variant="ghost" color="success">
+                    <div className="flex justify-end mt-2">
+                      {/* <StarRating maxRating={5} /> */}
+                      <Button
+                        variant="ghost"
+                        color={!customization ? "default" : "success"}
+                        disabled={!customization}
+                        className={!customization ? "cursor-not-allowed" : ""}
+                        onClick={() => {
+                          if (
+                            props?.item?.product?.isEnableCustomize === 1 ||
+                            props?.item?.isEnableCustomize === 1
+                          ) {
+                            handleAddOrder();
+                          }
+                        }}
+                      >
                         {props?.item?.product?.isEnableCustomize === 1 ||
                         props?.item?.isEnableCustomize === 1
                           ? "Place Order"

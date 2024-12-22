@@ -28,7 +28,7 @@ import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import { Controller, useForm } from "react-hook-form";
 import { parseDate, getLocalTimeZone } from "@internationalized/date";
 
-const CustomersOrderList = () => {
+const CustomizeOrderList = () => {
   const {
     handleSubmit,
     control,
@@ -66,6 +66,7 @@ const CustomersOrderList = () => {
     "status",
     "productIds",
     "qty",
+    "customization",
     "actions",
   ];
 
@@ -83,6 +84,7 @@ const CustomersOrderList = () => {
     { name: "status", id: "status" },
     { name: "productIds", id: "productIds" },
     { name: "qty", id: "qty" },
+    { name: "customization", id: "customization" },
     { name: "Actions", id: "actions" },
   ];
 
@@ -119,7 +121,7 @@ const CustomersOrderList = () => {
       case "actions":
         return (
           <Button
-            className="border-l-indigo-500"
+            className="bg-warning-500"
             onPress={onOpen}
             onClick={() => {
               console.log(user, "asdfa70s98d7fa");
@@ -165,8 +167,8 @@ const CustomersOrderList = () => {
           columns={columns}
           tableItems={
             currentRole === 0
-              ? data?.["data"]?.filter((item) => !item?.customization)
-              : storeOrder?.["data"]?.filter((item) => !item?.customization)
+              ? data?.["data"]?.filter((item) => item?.customization)
+              : storeOrder?.["data"]?.filter((item) => item?.customization)
           }
           isStatusFilter={false}
         />
@@ -282,4 +284,4 @@ const CustomersOrderList = () => {
   );
 };
 
-export default CustomersOrderList;
+export default CustomizeOrderList;

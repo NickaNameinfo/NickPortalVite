@@ -12,6 +12,9 @@ orderRouter
 orderRouter
   .route("/list/:id")
   .get(sanitize(), orderController.getAllOrderListById); 
+  orderRouter
+  .route("/store/list/:id")
+  .get(sanitize(), orderController.getAllOrderListBySoreId); 
 orderRouter
   .route("/status")
   .post(sanitize(), orderController.getAllOrderStatus);
