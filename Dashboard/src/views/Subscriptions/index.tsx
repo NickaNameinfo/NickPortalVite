@@ -24,7 +24,7 @@ const Subscriptions = () => {
             "Make beautiful websites regardless of your design experience.",
           label: "Enter number of item",
           price: 19,
-          defaultValue: 4,
+          defaultValue: 5,
         },
         {
           name: "Yearly",
@@ -33,7 +33,7 @@ const Subscriptions = () => {
             "Make beautiful websites regardless of your design experience.",
           label: "Enter number of item",
           price: 19,
-          defaultValue: 3,
+          defaultValue: 5,
         },
       ],
     },

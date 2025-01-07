@@ -49,9 +49,9 @@ export const StoreHeaderCard = () => {
   };
 
   return (
-    <div className=" mt-2 grid xm:grid-cols-1 mm:grid-cols-1  sm:grid-cols-1 ml:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-3 4xl:grid-cols-3  StorecardHeader  mb-2">
+    <div className=" mt-2 grid md:grid-cols-2 StorecardHeader  mb-2">
       {/* <div className="grid xm:grid-cols-3"> */}
-      <div className=" flex ">
+      <div className="flex">
         <div className="ps-2 items-center flex justify-start">
           <Image
             isZoomed

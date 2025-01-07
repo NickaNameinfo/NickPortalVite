@@ -19,6 +19,7 @@ import {
   useGetSubcriptionByCustomerIDQuery,
   useUpdatesubscriptionMutation,
 } from "../../views/Subscriptions/Service.mjs";
+import { useAppSelector } from "../../Common/hooks";
 const PriceingCard = ({ item = null, subscription = null }) => {
   const [formData, setFormData] = React.useState({
     itemCount: item.defaultValue,
@@ -34,11 +35,31 @@ const PriceingCard = ({ item = null, subscription = null }) => {
   };
   const { data, error, refetch } =
     useGetSubcriptionByCustomerIDQuery(tempValues);
+    const currentloginDetails = useAppSelector(
+      (state) => state.globalConfig.currentloginDetails
+    );
   const [addSubCription] = useAddSubcriptionMutation();
   const [updatesubscription] = useUpdatesubscriptionMutation();
+  const [scriptLoaded, setScriptLoaded] = React.useState(false);
 
   React.useEffect(() => {
     refetch();
+  }, []);
+
+  console.log(currentloginDetails?.data?.firstName, "currentloginDetails70987")
+
+  React.useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => {
+      setScriptLoaded(true);
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
   }, []);
 
   const onHandleFormData = (name, value) => {
@@ -49,6 +70,37 @@ const PriceingCard = ({ item = null, subscription = null }) => {
   };
 
   const handleSubmit = async () => {
+    if (scriptLoaded) {
+      const options = {
+        key: "rzp_live_O2BGPD9Tq493Ln",
+        amount: item?.price * formData?.itemCount, // amount in paisa
+        currency: "INR",
+        name: "Nickname infotech",
+        description: "For Subscriptions",
+        // image: "../src/assets/img/logo/logo_1.png",
+        handler: function (response: any) {
+          const paymentId = response.razorpay_payment_id;
+          if (paymentId) {
+            afterPaymentSuccess(formData);
+          }
+        },
+        prefill: {
+          name: `${currentloginDetails?.data?.firstName}`,
+          email: currentloginDetails?.data?.email,
+          contact: currentloginDetails?.data?.phone,
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } else {
+      console.error("Razorpay script not loaded");
+    }
+  };
+
+  const afterPaymentSuccess = async (formData) => {
     let tempApiValue = {
       subscriptionCount: formData?.itemCount,
       subscriptionPrice: item?.price * formData?.itemCount,
@@ -67,11 +119,15 @@ const PriceingCard = ({ item = null, subscription = null }) => {
     refetch();
   };
 
-  console.log(data?.data?.[0], "data?.data?.[0]9078", item);
-
   return (
     <div>
-      <Card className={`max-w-[400px] ${data?.data?.[0]?.subscriptionPlan === item.key? "bg-stripe-gradient" : ""}`}>
+      <Card
+        className={`max-w-[400px] ${
+          data?.data?.[0]?.subscriptionPlan === item.key
+            ? "bg-stripe-gradient"
+            : ""
+        }`}
+      >
         <CardHeader className="flex gap-3">
           <div className="flex justify-between w-[100%]">
             <div className="flex flex-col">
@@ -110,7 +166,7 @@ const PriceingCard = ({ item = null, subscription = null }) => {
             color="success"
             size="lg"
           >
-            $ {item?.price * formData?.itemCount}
+            &#8377; {item?.price * formData?.itemCount}
           </Chip>
           <Button
             onClick={() => handleSubmit()}

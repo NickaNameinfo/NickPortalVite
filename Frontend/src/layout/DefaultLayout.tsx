@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { AppContent, AppHeader, AppSidebar } from "../Components";
+import { AppContent, AppFooter, AppHeader, AppSidebar } from "../Components";
 import { ToastContainer } from "react-toastify";
 
 const DefaultLayout = () => {
@@ -16,8 +16,8 @@ const DefaultLayout = () => {
             </div>
           </div>
         </div>
-        {/* <AppFooter /> */}
       </main>
+      <AppFooter />
       <ToastContainer
         position="top-center"
         autoClose={1000}
