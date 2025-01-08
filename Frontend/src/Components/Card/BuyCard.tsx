@@ -101,7 +101,7 @@ export const BuyCard = (props: any) => {
         try {
           const tempCartValue = {
             customerId: item?.orderId,
-            paymentmethod: 1,
+            paymentmethod: 3,
             orderId: Number(userId),
             grandTotal: Number(
               cart?.data?.reduce((sum, item) => sum + item.total, 0)
@@ -319,12 +319,13 @@ export const BuyCard = (props: any) => {
                         Payment Options
                       </div>
                       <RadioGroup className="w-full">
-                        <div className="flex  justify-between items-center mx-3 w-full">
-                          <div className="w-2/4 m-1 items-center">
+                        {/* <div className="flex  justify-between items-center mx-3 w-full"> */}
+                          {/* <div className="w-2/4 m-1 items-center">
                             <Radio
                               value="Google-Pay"
                               size="sm"
                               className="items-center"
+                              disabled
                             >
                               Google Pay
                             </Radio>
@@ -334,6 +335,7 @@ export const BuyCard = (props: any) => {
                               value="Phone-Pay"
                               size="sm"
                               className="items-center"
+                              disabled
                             >
                               Phone Pay
                             </Radio>
@@ -345,6 +347,7 @@ export const BuyCard = (props: any) => {
                               value=" Debit-Card"
                               size="sm"
                               className="items-center"
+                              disabled
                             >
                               Debit Card
                             </Radio>
@@ -354,15 +357,16 @@ export const BuyCard = (props: any) => {
                               value="Credit-Card"
                               size="sm"
                               className="items-center"
+                              disabled
                             >
                               Credit Card
                             </Radio>
                           </div>
-                        </div>
+                        </div> */}
                         <div className="justify-between mx-3 flex w-full items-center">
                           <div className="w-2/4 m-1 items-center">
                             <Radio
-                              value="Cash-on-Delivery"
+                              value={"3"}
                               size="sm"
                               className="items-center"
                             >
