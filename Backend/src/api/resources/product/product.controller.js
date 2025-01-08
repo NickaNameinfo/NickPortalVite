@@ -707,6 +707,7 @@ module.exports = {
               supplierId: {
                 [db.Sequelize.Op.in]: openStoreIds, // Filter by stores that are currently open
               },
+              status: 1,
             },
             attributes: [], // No need to fetch attributes from store_product
           },

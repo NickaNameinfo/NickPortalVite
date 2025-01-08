@@ -249,6 +249,9 @@ module.exports = {
           include: [
             {
               model: db.product,
+              where: {
+                status: 1, // Filter products with status equal to 1
+              },
             },
           ],
         })
