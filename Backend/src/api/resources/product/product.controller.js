@@ -135,6 +135,7 @@ module.exports = {
     try {
       db.product
         .findAll({
+          where: { status: 1 },
           order: [["createdAt", "DESC"]],
           include: [
             {
