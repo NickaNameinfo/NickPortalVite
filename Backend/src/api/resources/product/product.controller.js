@@ -138,6 +138,12 @@ module.exports = {
           order: [["createdAt", "DESC"]],
           include: [
             {
+              model: db.store, // Include the associated store
+              attributes: ["id","status"], // Fetch only relevant store fields
+              where: { status: 1 }, // Filter active stores
+              required: true, // Ensure products without active stores are excluded
+            },
+            {
               model: db.subcategories,
               attributes: ["id", "sub_name"],
               include: [

@@ -67,7 +67,7 @@ const PrivacyPolicy = () => {
         </li>
         <li>
           <p>
-            <strong>Country</strong> refers to: Tamil Nadu, India
+            <strong>Country</strong> refers to: 15/7 sivaji street, t-nager chennai - 600017
           </p>
         </li>
         <li>
