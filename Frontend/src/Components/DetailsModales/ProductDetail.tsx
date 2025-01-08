@@ -267,7 +267,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                           : props?.item?.name}
                       </h2>
                       <p className="text-slate-300 text-lg line-through font-normal">
-                        Rs : {props?.item?.price}
+                        Rs : {props?.item?.product?.price}
                       </p>
                       <div className="flex justify-between items-center">
                         <p className="text-black text-lg font-normal">

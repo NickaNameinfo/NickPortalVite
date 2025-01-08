@@ -159,7 +159,7 @@ export const PremiumCard = ({
 
             <div className="w-full flex justify-between mt-2">
               <p className="font-semibold text-base Pricecolor p-0">
-                Rs : {item?.price}
+                Rs : {item?.product?.price}
               </p>
               <p className="font-normal text-sm  TextMaincolor p-0">
                 120 Stocks
