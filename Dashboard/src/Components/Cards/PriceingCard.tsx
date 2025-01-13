@@ -70,34 +70,36 @@ const PriceingCard = ({ item = null, subscription = null }) => {
   };
 
   const handleSubmit = async () => {
-    if (scriptLoaded) {
-      const options = {
-        key: "rzp_live_O2BGPD9Tq493Ln",
-        amount: item?.price * formData?.itemCount, // amount in paisa
-        currency: "INR",
-        name: "Nickname infotech",
-        description: "For Subscriptions",
-        // image: "../src/assets/img/logo/logo_1.png",
-        handler: function (response: any) {
-          const paymentId = response.razorpay_payment_id;
-          if (paymentId) {
-            afterPaymentSuccess(formData);
-          }
-        },
-        prefill: {
-          name: `${currentloginDetails?.data?.firstName}`,
-          email: currentloginDetails?.data?.email,
-          contact: currentloginDetails?.data?.phone,
-        },
-        theme: {
-          color: "#3399cc",
-        },
-      };
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } else {
-      console.error("Razorpay script not loaded");
-    }
+    // if (scriptLoaded) {
+    //   const options = {
+    //     key: "rzp_live_O2BGPD9Tq493Ln",
+    //     amount: item?.price * formData?.itemCount, // amount in paisa
+    //     currency: "INR",
+    //     name: "Nickname infotech",
+    //     description: "For Subscriptions",
+    //     // image: "../src/assets/img/logo/logo_1.png",
+    //     handler: function (response: any) {
+    //       const paymentId = response.razorpay_payment_id;
+    //       if (paymentId) {
+    //         afterPaymentSuccess(formData);
+    //       }
+    //     },
+    //     prefill: {
+    //       name: `${currentloginDetails?.data?.firstName}`,
+    //       email: currentloginDetails?.data?.email,
+    //       contact: currentloginDetails?.data?.phone,
+    //     },
+    //     theme: {
+    //       color: "#3399cc",
+    //     },
+    //   };
+    //   const rzp = new window.Razorpay(options);
+    //   rzp.open();
+    // } else {
+    //   console.error("Razorpay script not loaded");
+    // }
+    afterPaymentSuccess(formData);
+
   };
 
   const afterPaymentSuccess = async (formData) => {
