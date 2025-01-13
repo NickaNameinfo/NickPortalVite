@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const AppFooter = () => {
   return (
@@ -14,11 +15,11 @@ const AppFooter = () => {
         <span className="ms-1">&copy; 2024 Nickname.</span>
       </div>
       <ul className="flex space-x-3 ml-3">
-        <li><a href="/PrivacyPolicy" target="_blank">Privacy Policy</a></li>
-        <li><a href="/TermsAndCondition" target="_blank">Terms And  Condition</a></li>
-        <li><a href="/CancellationAndRefund" target="_blank">Cancellation And Refund</a></li>
-        <li><a href="/Contactus" target="_blank">Contact us</a></li> cla
-        <li><a href="/Aboutus" target="_blank">About us</a></li>
+        <li><Link to="/PrivacyPolicy">Privacy Policy</Link></li>
+        <li><Link to="/TermsAndCondition">Terms And  Condition</Link></li>
+        <li><Link to="/CancellationAndRefund">Cancellation And Refund</Link></li>
+        <li><Link to="/Contactus">Contact us</Link></li> 
+        <li><Link to="/Aboutus">About us</Link></li>
       </ul>
       <div className="ms-auto">
         <span className="me-1">Powered by</span>
