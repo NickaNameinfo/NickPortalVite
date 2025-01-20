@@ -16,6 +16,7 @@ const AppFooter = () => {
       </div>
       <ul className="flex space-x-3 ml-3">
         <li><Link to="/PrivacyPolicy">Privacy Policy</Link></li>
+        <li><Link to="/ShippingPolicy">Shipping Policy</Link></li>
         <li><Link to="/TermsAndCondition">Terms And  Condition</Link></li>
         <li><Link to="/CancellationAndRefund">Cancellation And Refund</Link></li>
         <li><Link to="/Contactus">Contact us</Link></li> 

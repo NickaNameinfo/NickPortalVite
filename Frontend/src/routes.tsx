@@ -11,6 +11,7 @@ const MapView = React.lazy(() => import("../src/views/pages/MapView/index"));
 const PrivacyPolicy = React.lazy(() => import("../src/views/pages/privacyPolicy/index"));
 const TermsAndCondition = React.lazy(() => import("../src/views/pages/termsAndCondition/index"));
 const CancellationAndRefund = React.lazy(() => import("../src/views/pages/cancellationAndRefund/index"));
+const ShippingPolicy = React.lazy(() => import("../src/views/pages/shippinPolicy/index"));
 const Contactus = React.lazy(() => import("../src/views/pages/contactus/index"));
 const Aboutus = React.lazy(() => import("../src/views/pages/aboutus/index"));
 
@@ -27,6 +28,7 @@ const routes = [
   { path: "/PrivacyPolicy", name: "PrivacyPolicy", element: PrivacyPolicy },
   { path: "/TermsAndCondition", name: "MapView", element: TermsAndCondition },
   { path: "/CancellationAndRefund", name: "MapView", element: CancellationAndRefund },
+  { path: "/ShippingPolicy", name: "ShippingPolicy", element: ShippingPolicy },
   { path: "/Contactus", name: "MapView", element: Contactus },
   { path: "/Aboutus", name: "MapView", element: Aboutus },
 ];
