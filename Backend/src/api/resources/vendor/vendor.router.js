@@ -46,6 +46,6 @@ vendorRouter
   .route("/product-delete")
   .post(sanitize(), vendorController.vendorProductDelete);
 vendorRouter.route("/product-add").post(vendorController.vendorAddProduct);
-vendorRouter.route("/wordtojson").post(upload.single("vendorImage"), vendorController.extractClustersFromDocx);
+// vendorRouter.route("/wordtojson").post(upload.single("vendorImage"), vendorController.extractClustersFromDocx);
 
 module.exports = { vendorRouter };
