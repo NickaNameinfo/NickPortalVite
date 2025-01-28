@@ -38,14 +38,14 @@ const ProductsList = () => {
     "id",
     "name",
     "actions",
-    "price",
+    "total",
     "sortDesc",
     "photo",
     "status",
     "createdType",
   ];
   const byuserProduct = [
-    "price",
+    "total",
     "unitSize",
     "product",
     "photo",
@@ -53,7 +53,7 @@ const ProductsList = () => {
     "status",
   ];
   const byuserCloumn = [
-    { name: "Price", id: "price", sortable: true },
+    { name: "Price", id: "total", sortable: true },
     { name: "Unit Size", id: "unitSize", sortable: true },
     { name: "Products", id: "product", sortable: true },
     { name: "Image", id: "photo", sortable: true },
@@ -63,7 +63,7 @@ const ProductsList = () => {
   const columns = [
     { name: "S.No", id: "id", sortable: true },
     { name: "name", id: "name", sortable: true },
-    { name: "price", id: "price", sortable: true },
+    { name: "total", id: "total", sortable: true },
     { name: "sortDesc", id: "sortDesc", sortable: true },
     { name: "image", id: "photo", sortable: true },
     { name: "Status", id: "status" },

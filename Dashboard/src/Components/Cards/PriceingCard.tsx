@@ -35,9 +35,9 @@ const PriceingCard = ({ item = null, subscription = null }) => {
   };
   const { data, error, refetch } =
     useGetSubcriptionByCustomerIDQuery(tempValues);
-    const currentloginDetails = useAppSelector(
-      (state) => state.globalConfig.currentloginDetails
-    );
+  const currentloginDetails = useAppSelector(
+    (state) => state.globalConfig.currentloginDetails
+  );
   const [addSubCription] = useAddSubcriptionMutation();
   const [updatesubscription] = useUpdatesubscriptionMutation();
   const [scriptLoaded, setScriptLoaded] = React.useState(false);
@@ -46,7 +46,7 @@ const PriceingCard = ({ item = null, subscription = null }) => {
     refetch();
   }, []);
 
-  console.log(currentloginDetails?.data?.firstName, "currentloginDetails70987")
+  console.log(currentloginDetails?.data?.firstName, "currentloginDetails70987");
 
   React.useEffect(() => {
     const script = document.createElement("script");
@@ -70,36 +70,50 @@ const PriceingCard = ({ item = null, subscription = null }) => {
   };
 
   const handleSubmit = async () => {
-    // if (scriptLoaded) {
-    //   const options = {
-    //     key: "rzp_live_O2BGPD9Tq493Ln",
-    //     amount: item?.price * formData?.itemCount, // amount in paisa
-    //     currency: "INR",
-    //     name: "Nickname infotech",
-    //     description: "For Subscriptions",
-    //     // image: "../src/assets/img/logo/logo_1.png",
-    //     handler: function (response: any) {
-    //       const paymentId = response.razorpay_payment_id;
-    //       if (paymentId) {
-    //         afterPaymentSuccess(formData);
-    //       }
-    //     },
-    //     prefill: {
-    //       name: `${currentloginDetails?.data?.firstName}`,
-    //       email: currentloginDetails?.data?.email,
-    //       contact: currentloginDetails?.data?.phone,
-    //     },
-    //     theme: {
-    //       color: "#3399cc",
-    //     },
-    //   };
-    //   const rzp = new window.Razorpay(options);
-    //   rzp.open();
-    // } else {
-    //   console.error("Razorpay script not loaded");
-    // }
-    afterPaymentSuccess(formData);
+    try {
+      if (!scriptLoaded) {
+        console.error("Razorpay script not loaded");
+        return;
+      }
 
+      const amountInRupees = (item?.price || 0) * (formData?.itemCount || 1); // Ensure safe access and default values
+      if (amountInRupees <= 0) {
+        console.error("Invalid payment amount");
+        return;
+      }
+
+      const amountInPaisa = Math.round(amountInRupees * 100); // Convert to paisa (1 INR = 100 paisa)
+
+      const options = {
+        key: "rzp_live_efRIa318ph9lot",
+        amount: amountInPaisa, // amount in paisa
+        currency: "INR",
+        name: "Nickname Infotech",
+        description: "For Subscriptions",
+        capture: true, // Enable auto-capture
+        handler: function (response: any) {
+          const paymentId = response.razorpay_payment_id;
+          if (paymentId) {
+            afterPaymentSuccess(formData);
+          } else {
+            console.error("Payment ID not received");
+          }
+        },
+        prefill: {
+          name: `${currentloginDetails?.data?.firstName || ""}`,
+          email: `${currentloginDetails?.data?.email || ""}`,
+          contact: `${currentloginDetails?.data?.phone || ""}`,
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error("Error initializing Razorpay:", error);
+    }
   };
 
   const afterPaymentSuccess = async (formData) => {
@@ -160,6 +174,9 @@ const PriceingCard = ({ item = null, subscription = null }) => {
             onChange={(value) => onHandleFormData("itemCount", value)}
             label={item?.label}
             size="md"
+            type="number"
+            min={1}
+            defaultValue={item?.defaultValue}
           />
           <Chip
             className="mx-2"
@@ -168,14 +185,15 @@ const PriceingCard = ({ item = null, subscription = null }) => {
             color="success"
             size="lg"
           >
-            &#8377; {item?.price * formData?.itemCount}
+            &#8377; {Number(item?.price * formData?.itemCount)}
           </Chip>
           <Button
             onClick={() => handleSubmit()}
             isDisabled={
-              subscription?.key !== "Plan1" &&
-              subscription?.key !== "Plan2" &&
-              subscription?.key !== "Plan3"
+              (subscription?.key !== "Plan1" &&
+                subscription?.key !== "Plan2" &&
+                subscription?.key !== "Plan3") ||
+              Number(item?.price * formData?.itemCount) <= 0
                 ? true
                 : false
             }

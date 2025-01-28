@@ -39,6 +39,8 @@ interface InputFieldProps {
   description?: any;
   value?: any;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+  min?:number | string;
+  defaultValue?:any | string;
 }
 
 const InputNextUI = (props: InputFieldProps) => {
@@ -79,6 +81,7 @@ const InputNextUI = (props: InputFieldProps) => {
           onChange={(e) => {
             props.onChange(e.target.value);
           }}
+          defaultValue={props?.defaultValue ?? ""}
         />
       {/* </div> */}
     </>

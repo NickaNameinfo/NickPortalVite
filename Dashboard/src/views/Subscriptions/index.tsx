@@ -14,8 +14,8 @@ const Subscriptions = () => {
           discription:
             "Make beautiful websites regardless of your design experience.",
           label: "Enter number of item",
-          price: 19,
-          defaultValue: 5,
+          price: 80,
+          defaultValue: 1,
         },
         {
           name: "Monthly",
@@ -23,8 +23,8 @@ const Subscriptions = () => {
           discription:
             "Make beautiful websites regardless of your design experience.",
           label: "Enter number of item",
-          price: 19,
-          defaultValue: 5,
+          price: 280,
+          defaultValue: 1,
         },
         {
           name: "Yearly",
@@ -32,8 +32,8 @@ const Subscriptions = () => {
           discription:
             "Make beautiful websites regardless of your design experience.",
           label: "Enter number of item",
-          price: 19,
-          defaultValue: 5,
+          price: 2800,
+          defaultValue: 1,
         },
       ],
     },
@@ -47,8 +47,8 @@ const Subscriptions = () => {
           discription:
             "Make beautiful websites regardless of your design experience.",
           label: "Enter number of item",
-          price: 19,
-          defaultValue: 5,
+          price: 27,
+          defaultValue: 1,
         },
         {
           name: "Monthly",
@@ -56,8 +56,8 @@ const Subscriptions = () => {
           discription:
             "Make beautiful websites regardless of your design experience.",
           label: "Enter number of item",
-          price: 19,
-          defaultValue: 4,
+          price: 110,
+          defaultValue: 1,
         },
         {
           name: "Yearly",
@@ -65,8 +65,8 @@ const Subscriptions = () => {
           discription:
             "Make beautiful websites regardless of your design experience.",
           label: "Enter number of item",
-          price: 19,
-          defaultValue: 3,
+          price: 1370,
+          defaultValue: 1,
         },
       ],
     },
@@ -80,8 +80,8 @@ const Subscriptions = () => {
           discription:
             "Make beautiful websites regardless of your design experience.",
           label: "Enter number of item",
-          price: 19,
-          defaultValue: 5,
+          price: 40,
+          defaultValue: 1,
         },
         {
           name: "Monthly",
@@ -89,8 +89,8 @@ const Subscriptions = () => {
           discription:
             "Make beautiful websites regardless of your design experience.",
           label: "Enter number of item",
-          price: 19,
-          defaultValue: 4,
+          price: 140,
+          defaultValue: 1,
         },
         {
           name: "Yearly",
@@ -98,8 +98,8 @@ const Subscriptions = () => {
           discription:
             "Make beautiful websites regardless of your design experience.",
           label: "Enter number of item",
-          price: 19,
-          defaultValue: 3,
+          price: 1780,
+          defaultValue: 1,
         },
       ],
     },
@@ -109,15 +109,15 @@ const Subscriptions = () => {
       plans: [
         {
           name: "3 Month",
-          price: 19,
+          price: 0,
         },
         {
           name: "6 Month",
-          price: 19,
+          price: 0,
         },
         {
           name: "12 Month",
-          price: 19,
+          price: 0,
         },
       ],
     },
@@ -127,15 +127,15 @@ const Subscriptions = () => {
       plans: [
         {
           name: "3 Month",
-          price: 19,
+          price: 0,
         },
         {
           name: "6 Month",
-          price: 19,
+          price: 0,
         },
         {
           name: "12 Month",
-          price: 19,
+          price: 0,
         },
       ],
     },
@@ -145,23 +145,23 @@ const Subscriptions = () => {
       plans: [
         {
           name: "Day's",
-          price: 19,
+          price: 0,
           defaultValue: 1,
         },
         {
           name: "Weekly",
-          price: 19,
-          defaultValue: 7,
+          price: 0,
+          defaultValue: 1,
         },
         {
           name: "Monthly",
-          price: 19,
-          defaultValue: 31,
+          price: 0,
+          defaultValue: 1,
         },
         {
           name: "Yearly",
-          price: 19,
-          defaultValue: 365,
+          price: 0,
+          defaultValue: 1,
         },
       ],
     },
@@ -171,18 +171,18 @@ const Subscriptions = () => {
       plans: [
         {
           name: "Weekly",
-          price: 19,
-          defaultValue: 5,
+          price: 0,
+          defaultValue: 1,
         },
         {
           name: "Monthly",
-          price: 19,
-          defaultValue: 5,
+          price: 0,
+          defaultValue: 1,
         },
         {
           name: "Yearly",
-          price: 19,
-          defaultValue: 5,
+          price: 0,
+          defaultValue: 1,
         },
       ],
     },

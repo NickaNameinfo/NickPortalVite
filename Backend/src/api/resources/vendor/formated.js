@@ -5,18 +5,6 @@ const jszip = require("jszip");
 const { createCanvas } = require("canvas");
 const xml2js = require("xml2js");
 const mammoth = require("mammoth"); // Simplifies extracting text from Word files
-const { PDFDocument } = require("pdf-lib");
-const pdf2json = require("pdf2json");
-const { PDFImage } = require("pdf-image");
-const { execSync } = require("child_process");
-var im = require("imagemagick");
-const pdf2pic = require("pdf2pic");
-const poppler = require("pdf-poppler");
-const sharp = require("sharp"); // For cropping the image
-const textract = require("textract");
-const { exec } = require("child_process");
-// const parser = new xml2js.Parser();
-const unzipper = require("unzipper");
 
 module.exports = {
   /* Add user api start here................................*/
@@ -418,98 +406,152 @@ module.exports = {
       throw new RequestError("Error");
     }
   },
-  async extractClustersFromDocx(req, res, next) {
+
+  async wordtojson(req, res, next) {
+    console.log(req.file.path, "Processing Word document");
+    const rgbPattern = /RGB[_-]?(\d{3,4})/gi; // Updated regex for RGB values like RGB_0169
+
+    const outputFolder = "./shapes";
+    const wordFilePath = req.file.path;
+
     try {
-      const wordFilePath = req.file.path; // The file path of the uploaded Word document
+      await fs.ensureDir(outputFolder);
+      const fileBuffer = await fs.readFile(wordFilePath);
+      const zip = await jszip.loadAsync(fileBuffer);
 
-      console.log("Received file:", req.file);
+      // Get document.xml and relationships
+      const documentXml = zip.files["word/document.xml"];
+      const relsFile = zip.files["word/_rels/document.xml.rels"];
 
-      // Create a read stream for the uploaded file and pipe it through unzipper
-      const zipStream = fs.createReadStream(wordFilePath);
-      const zip = zipStream.pipe(unzipper.Parse()); // Parsing the ZIP file
+      if (!documentXml) {
+        console.log("No document.xml found");
+        return res.status(400).json({
+          success: false,
+          message: "Invalid Word document format",
+        });
+      }
 
-      let documentXml = ""; // Variable to accumulate XML content
+      // Parse document content
+      const documentData = await documentXml.async("text");
+      const parser = new xml2js.Parser();
+      const result = await parser.parseStringPromise(documentData);
 
-      // Process the zip stream
-      zip.on("entry", (entry) => {
-        console.log("Zip entry:", entry.path); // Log the path of each entry in the ZIP
-        const fileName = entry.path;
-
-        if (fileName === "word/document.xml") {
-          entry.setEncoding("utf8");
-          entry.on("data", (chunk) => {
-            documentXml += chunk; // Accumulate the XML content
-          });
-
-          entry.on("end", async () => {
-            console.log(documentXml, "Finished reading document.xml");
-
-            try {
-              const text = await parseDocumentXml(documentXml);
-              const clusters = extractAlphaNumericClusters(text);
-              console.log("Extracted Clusters:", clusters);
-
-              // Return the extracted clusters as JSON response
-              return res.status(200).json({
-                success: true,
-                clusters: clusters,
-              });
-            } catch (err) {
-              console.error("Error parsing document.xml:", err);
-              return next(err);
-            }
-          });
-        } else {
-          entry.autodrain(); // Skip other files in the docx archive
-        }
+      // Extract text using mammoth
+      const { value: extractedText } = await mammoth.extractRawText({
+        buffer: fileBuffer,
       });
+      console.log("Extracted text:", extractedText);
 
-      // Handle errors in the ZIP stream
-      zip.on("error", (err) => {
-        console.error("Error while reading zip stream:", err);
-        return next(err);
-      });
+      // Parse questions from text (if needed)
+      const questionData = parseWordTable(extractedText);
 
-      // Handle when the entire ZIP is read
-      zip.on("close", function () {
-        console.log("Finished processing the ZIP file.");
+      // Combine question data and shape/RGB data
+      return res.status(200).json({
+        success: true,
+        data: {
+          questions: questionData.data,
+        },
       });
     } catch (err) {
-      console.error("Error processing the document:", err);
-      return next(err); // Pass the error to error-handling middleware
+      console.error("Error processing document:", err);
+      return next(err);
     }
   },
 };
-function extractAlphaNumericClusters(text) {
-  const pattern = /\b[A-Za-z]+\^\d+\b/g; // Regex pattern to match clusters like U^6, B^25, etc.
-  return text.match(pattern) || []; // Return all matches or empty array if no matches
-}
 
-function parseDocumentXml(xmlContent) {
-  return new Promise((resolve, reject) => {
-    xml2js.parseString(
-      xmlContent,
-      { explicitArray: false, trim: true },
-      (err, result) => {
-        if (err) {
-          return reject(err);
-        }
+function parseWordTable(text) {
+  const data = [];
+  const lines = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line); // Remove blank lines
 
-        let text = "";
-        const body = result["w:document"]["w:body"];
-        if (body && Array.isArray(body["w:p"])) {
-          body["w:p"].forEach((paragraph) => {
-            if (paragraph["w:r"] && Array.isArray(paragraph["w:r"])) {
-              paragraph["w:r"].forEach((run) => {
-                if (run["w:t"]) {
-                  text += run["w:t"] + " "; // Concatenate all text nodes
-                }
-              });
-            }
-          });
-        }
-        resolve(text);
+  let currentQuestion = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    // Start new question when we find "Question" followed by a number
+    if (line.match(/^Question\s+\d+/)) {
+      // Save previous question if exists
+      if (
+        currentQuestion &&
+        currentQuestion.question &&
+        currentQuestion.options?.length > 0
+      ) {
+        data.push(currentQuestion);
       }
-    );
-  });
+
+      // Create new question object
+      currentQuestion = {
+        question: "",
+        options: [],
+        correctAnswer: "",
+        positiveMark: "0",
+        negativeMark: "0",
+        type: "Multiple Choice",
+      };
+
+      // Get question text (it's in the next line)
+      if (i + 1 < lines.length) {
+        currentQuestion.question = lines[i + 1].trim();
+      }
+
+      continue;
+    }
+
+    if (!currentQuestion) continue;
+
+    // Handle options
+    if (line.match(/^Option [A-E]/i)) {
+      const optionMatch = line.match(/^Option ([A-E])\s*(.*)/i);
+      if (optionMatch && i + 1 < lines.length) {
+        const optionText = lines[i + 1].trim();
+        // Clean up option text by removing trailing slash and spaces
+        const cleanOption = optionText.replace(/\s*\/\s*$/, "").trim();
+        currentQuestion.options.push(cleanOption);
+      }
+    }
+    // Handle type
+    else if (line.startsWith("Type")) {
+      if (i + 1 < lines.length) {
+        currentQuestion.type = lines[i + 1].trim();
+      }
+    }
+    // Handle correct answer
+    else if (line.startsWith("Correct Answer")) {
+      if (i + 1 < lines.length) {
+        currentQuestion.correctAnswer = lines[i + 1].trim();
+      }
+    }
+    // Handle positive mark
+    else if (line.startsWith("Positive Mark")) {
+      if (i + 1 < lines.length) {
+        currentQuestion.positiveMark = lines[i + 1].trim();
+      }
+    }
+    // Handle negative mark
+    else if (line.startsWith("Negative Mark")) {
+      if (i + 1 < lines.length) {
+        currentQuestion.negativeMark = lines[i + 1].trim();
+      }
+    }
+  }
+
+  // Don't forget to add the last question
+  if (
+    currentQuestion &&
+    currentQuestion.question &&
+    currentQuestion.options?.length > 0
+  ) {
+    data.push(currentQuestion);
+  }
+
+  // Log the parsed data for debugging
+  console.log("Parsed questions:", JSON.stringify(data, null, 2));
+
+  return {
+    success: true,
+    data,
+  };
 }

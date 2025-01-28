@@ -13,10 +13,6 @@ var im = require("imagemagick");
 const pdf2pic = require("pdf2pic");
 const poppler = require("pdf-poppler");
 const sharp = require("sharp"); // For cropping the image
-const textract = require("textract");
-const { exec } = require("child_process");
-// const parser = new xml2js.Parser();
-const unzipper = require("unzipper");
 
 module.exports = {
   /* Add user api start here................................*/
@@ -418,98 +414,104 @@ module.exports = {
       throw new RequestError("Error");
     }
   },
-  async extractClustersFromDocx(req, res, next) {
+  async pdftorowImage(req, res, next) {
+    console.log(req.file.path, "Processing PDF document");
+    const pdfPath = req.file.path;
+    const outputDir = "./output/images"; // Directory to save extracted images
+
+    // Ensure the output directory exists
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+
     try {
-      const wordFilePath = req.file.path; // The file path of the uploaded Word document
+      // First convert PDF to images using pdf-poppler
+      const options = {
+        format: "png",
+        out_dir: outputDir,
+        out_prefix: "page",
+        page: null, // Convert all pages
+      };
 
-      console.log("Received file:", req.file);
+      await poppler.convert(pdfPath, options);
 
-      // Create a read stream for the uploaded file and pipe it through unzipper
-      const zipStream = fs.createReadStream(wordFilePath);
-      const zip = zipStream.pipe(unzipper.Parse()); // Parsing the ZIP file
+      // Use pdf2json to extract table data and coordinates
+      const pdfParser = new pdf2json();
 
-      let documentXml = ""; // Variable to accumulate XML content
+      const pdfData = await new Promise((resolve, reject) => {
+        pdfParser.loadPDF(pdfPath);
+        pdfParser.on("pdfParser_dataReady", (data) => resolve(data));
+        pdfParser.on("pdfParser_dataError", (err) => reject(err));
+      });
 
-      // Process the zip stream
-      zip.on("entry", (entry) => {
-        console.log("Zip entry:", entry.path); // Log the path of each entry in the ZIP
-        const fileName = entry.path;
+      const tables = [];
+      console.log(pdfData, "pdfData");
 
-        if (fileName === "word/document.xml") {
-          entry.setEncoding("utf8");
-          entry.on("data", (chunk) => {
-            documentXml += chunk; // Accumulate the XML content
-          });
-
-          entry.on("end", async () => {
-            console.log(documentXml, "Finished reading document.xml");
-
-            try {
-              const text = await parseDocumentXml(documentXml);
-              const clusters = extractAlphaNumericClusters(text);
-              console.log("Extracted Clusters:", clusters);
-
-              // Return the extracted clusters as JSON response
-              return res.status(200).json({
-                success: true,
-                clusters: clusters,
+      // Extract table rows from PDF data
+      pdfData.Pages.forEach((page, pageIndex) => {
+        let currentY = 0;
+        let currentRow = [];
+        console.log(page?.Texts, "page Texts");
+        // Group text elements into rows based on Y position
+        page.Texts.sort((a, b) => a.y - b.y).forEach((text) => {
+          if (Math.abs(text.y - currentY) > 2) {
+            // New row
+            if (currentRow.length > 0) {
+              tables.push({
+                pageIndex,
+                y: Math.round(currentY * 10), // Scale coordinates and round them
+                height: 30,
+                width: Math.round(page.Width * 10),
+                elements: [...currentRow],
               });
-            } catch (err) {
-              console.error("Error parsing document.xml:", err);
-              return next(err);
             }
-          });
+            currentY = text.y;
+            currentRow = [text];
+          } else {
+            currentRow.push(text);
+          }
+        });
+      });
+
+      // Extract row images using sharp
+      for (let i = 0; i < tables.length; i++) {
+        const row = tables[i];
+        const pageImagePath = path.join(
+          outputDir,
+          `page-${row.pageIndex + 1}.png`
+        );
+
+        if (fs.existsSync(pageImagePath)) {
+          const imagePath = path.join(outputDir, `row_${i + 1}.png`);
+
+          await sharp(pageImagePath)
+            .extract({
+              left: 0,
+              top: Math.round(row.y - 15), // Round to integer
+              width: 500,
+              height: 200,
+            })
+            .toFile(imagePath);
+
+          console.log(`Row ${i + 1} extracted to ${imagePath}`);
         } else {
-          entry.autodrain(); // Skip other files in the docx archive
+          console.error(`Page image not found: ${pageImagePath}`);
         }
-      });
+      }
 
-      // Handle errors in the ZIP stream
-      zip.on("error", (err) => {
-        console.error("Error while reading zip stream:", err);
-        return next(err);
+      return res.status(200).json({
+        success: true,
+        message: "PDF table rows extracted successfully",
+        outputDir,
+        rowCount: tables.length,
       });
-
-      // Handle when the entire ZIP is read
-      zip.on("close", function () {
-        console.log("Finished processing the ZIP file.");
+    } catch (error) {
+      console.error("Error processing PDF:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to process PDF",
+        error: error.message,
       });
-    } catch (err) {
-      console.error("Error processing the document:", err);
-      return next(err); // Pass the error to error-handling middleware
     }
   },
 };
-function extractAlphaNumericClusters(text) {
-  const pattern = /\b[A-Za-z]+\^\d+\b/g; // Regex pattern to match clusters like U^6, B^25, etc.
-  return text.match(pattern) || []; // Return all matches or empty array if no matches
-}
-
-function parseDocumentXml(xmlContent) {
-  return new Promise((resolve, reject) => {
-    xml2js.parseString(
-      xmlContent,
-      { explicitArray: false, trim: true },
-      (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-
-        let text = "";
-        const body = result["w:document"]["w:body"];
-        if (body && Array.isArray(body["w:p"])) {
-          body["w:p"].forEach((paragraph) => {
-            if (paragraph["w:r"] && Array.isArray(paragraph["w:r"])) {
-              paragraph["w:r"].forEach((run) => {
-                if (run["w:t"]) {
-                  text += run["w:t"] + " "; // Concatenate all text nodes
-                }
-              });
-            }
-          });
-        }
-        resolve(text);
-      }
-    );
-  });
-}

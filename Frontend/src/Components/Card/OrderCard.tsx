@@ -45,7 +45,7 @@ export const OrderCard = (props: any) => {
 
   React.useEffect(() => {
     orderListRefetch();
-  }, [props?.isOpen]);
+  }, []);
 
   const renderCell = React.useCallback((data, columnKey) => {
     switch (columnKey) {
@@ -79,9 +79,6 @@ export const OrderCard = (props: any) => {
         return <p className="m-0 p-0">{data?.[columnKey]}</p>;
     }
   }, []);
-
-  console.log(orderList, "orderList79087")
-
   return (
     <>
       <Modal

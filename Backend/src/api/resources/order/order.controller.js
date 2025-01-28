@@ -91,31 +91,42 @@ module.exports = {
 
   async getAllOrderListById(req, res, next) {
     try {
+      // Fetch orders for the given customer ID
       const orders = await db.orders.findAll({
         where: { custId: req.params.id },
         order: [["createdAt", "DESC"]],
         include: [{ model: db.addresses }],
       });
-
-      const productIds = orders.flatMap((order) => order.productIds || []);
+  
+      // Extract unique product IDs for all orders
+      const productIds = orders.flatMap((order) =>
+        Array.isArray(order.productIds) ? order.productIds : [order.productIds]
+      );
       const uniqueProductIds = [...new Set(productIds)];
-
+  
+      // Fetch all unique products
       const products = await db.product.findAll({
         where: { id: uniqueProductIds },
       });
-
-      const ordersWithProducts = orders.map((order) => ({
-        ...order.toJSON(),
-        products: products.filter((product) =>
-          uniqueProductIds?.includes(product.id)
-        ),
-      }));
-
+  
+      // Attach only relevant products to each order
+      const ordersWithProducts = orders.map((order) => {
+        const orderProductIds = Array.isArray(order.productIds)
+          ? order.productIds
+          : [order.productIds];
+        return {
+          ...order.toJSON(),
+          products: products.filter((product) =>
+            orderProductIds.includes(product.id)
+          ),
+        };
+      });
+  
       res.status(200).json({ success: true, data: ordersWithProducts });
     } catch (err) {
       next(err);
     }
-  },
+  },  
 
   async getAllOrderListBySoreId(req, res, next) {
     try {

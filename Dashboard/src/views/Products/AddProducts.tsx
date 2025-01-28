@@ -125,6 +125,8 @@ const AddProducts = () => {
     setValue("discountPer", Number(discountAmount));
   }, [tempFormData?.price, tempFormData?.discount, tempFormData?.qty]);
 
+  
+
   const onSubmit = async (data: any) => {
     let tempData = {
       ...data,
@@ -524,10 +526,11 @@ const AddProducts = () => {
                   type="text"
                   label="Grant total"
                   onChange={(value) => {
-                    console.log(value, "ownername");
+                    console.log(value, "Grant total");
                   }}
                   isDisabled
                   {...field}
+                  errorMessage={errors?.["grand_total"]?.message}
                 />
               )}
             />

@@ -103,9 +103,7 @@ export const BuyCard = (props: any) => {
             customerId: item?.orderId,
             paymentmethod: 3,
             orderId: Number(userId),
-            grandTotal: Number(
-              cart?.data?.reduce((sum, item) => sum + item.total, 0)
-            ),
+            grandTotal: Number(item?.qty * item?.price),
             productIds: item?.productId,
             qty: item?.qty,
             storeId: id,
@@ -288,15 +286,18 @@ export const BuyCard = (props: any) => {
                         {" "}
                         Rs :{" "}
                         {cart?.data
-                          ?.reduce((sum, item) => sum + item.total, 0)
-                          .toString()
-                          .replace(/(\d+)(\d{3})$/, "$1,$2")}
+                          ?.reduce(
+                            (sum, item) => sum + item.price * item.qty,
+                            0
+                          ) // Multiply price with qty
+                          .toFixed(2) // Ensures two decimal places
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       </div>
                     </div>
-                    <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
+                    {/* <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
                       <div>Discount</div>
                       <div> 100%</div>
-                    </div>
+                    </div> */}
                     <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
                       <div>Delivery Charge</div>
                       <div> Free</div>
@@ -308,9 +309,12 @@ export const BuyCard = (props: any) => {
                         {" "}
                         Rs.{" "}
                         {cart?.data
-                          ?.reduce((sum, item) => sum + item.total, 0)
-                          .toString()
-                          .replace(/(\d+)(\d{3})$/, "$1,$2")}
+                          ?.reduce(
+                            (sum, item) => sum + item.price * item.qty,
+                            0
+                          ) // Multiply price with qty
+                          .toFixed(2) // Ensures two decimal places
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       </div>
                     </div>
                     <Divider orientation="horizontal" className="my-2" />
@@ -320,7 +324,7 @@ export const BuyCard = (props: any) => {
                       </div>
                       <RadioGroup className="w-full">
                         {/* <div className="flex  justify-between items-center mx-3 w-full"> */}
-                          {/* <div className="w-2/4 m-1 items-center">
+                        {/* <div className="w-2/4 m-1 items-center">
                             <Radio
                               value="Google-Pay"
                               size="sm"
@@ -369,6 +373,7 @@ export const BuyCard = (props: any) => {
                               value={"3"}
                               size="sm"
                               className="items-center"
+                              checked={true}
                             >
                               Cash on Delivery
                             </Radio>
@@ -448,4 +453,3 @@ export const BuyCard = (props: any) => {
     </>
   );
 };
- 

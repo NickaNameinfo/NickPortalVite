@@ -65,13 +65,15 @@ export const PremiumCard = ({
     refetch();
   }, [onRefresh]);
 
+  console.log(item, "adfasdf986")
+
   const handleAddCart = async (type) => {
     let tempCartValue = {
       productId: item?.product?.id ? item?.product?.id : item?.id,
       name: item?.product?.name ? item?.product?.name : item?.name,
       orderId: userId,
-      price: Number(item?.price),
-      total: Number(data?.data?.qty) * Number(item?.price),
+      price: Number(item?.product?.total),
+      total: Number(data?.data?.qty) * Number(item?.product?.total),
       qty: data?.data?.qty
         ? type === "add"
           ? Number(data?.data?.qty) + 1
@@ -159,7 +161,7 @@ export const PremiumCard = ({
 
             <div className="w-full flex justify-between mt-2">
               <p className="font-semibold text-base Pricecolor p-0">
-                Rs : {item?.product?.price}
+                Rs : {item?.product?.total} <span style={{color:"black"}}>{`(${item?.product?.unitSize})`}</span>
               </p>
               <p className="font-normal text-sm  TextMaincolor p-0">
                 120 Stocks
