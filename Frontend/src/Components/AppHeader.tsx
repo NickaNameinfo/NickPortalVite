@@ -1,7 +1,14 @@
 import {
   Avatar,
   Button,
+  Card,
+  CardBody,
   Input,
+  Listbox,
+  ListboxItem,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Tab,
   Tabs,
   Tooltip,
@@ -33,7 +40,25 @@ import {
   onSearchGlobal,
   onUpdateOpenStore,
   onUpdateSidebarExpand,
+  updateLoginDetails,
+  onUpdateCartModal,
 } from "../Components/Common/globalSlice";
+import { eraseCookie, getCookie } from "../JsFiles/CommonFunction.mjs";
+import storeImageIcon from "../assets/icons/store.png";
+import vendorImageIcon from "../assets/icons/vendor.png";
+import productImageIcon from "../assets/icons/products.png";
+import mapImageIcon from "../assets/icons/map.png";
+import {
+  useGetCartByOrderIdQuery,
+  useGetOrderByOrderIdQuery,
+} from "../views/pages/Store/Service.mjs";
+const views = [
+  { name: "Store View", key: "" },
+  { name: "Product View", key: "ProductView" },
+  { name: "Vendor View", key: "VendorView" },
+  { name: "Map View", key: "MapView" },
+];
+
 export const AppHeader = () => {
   const location = useLocation();
   const currentloginDetails = useAppSelector(
@@ -48,9 +73,11 @@ export const AppHeader = () => {
   const [startIndex, setStartIndex] = React.useState(0);
   const [sliderLabel, setSliderLabel] = React.useState([]);
   const [searchValues, setSearchValues] = React.useState(null);
+  const [oderIsOpen, setOrderIsOpen] = React.useState(false);
+
   const { data: category } = useGetCategoryQuery();
   const dispatch = useAppDispatch();
-
+  const id = getCookie("id");
   const itemsPerPage = 12;
   React.useEffect(() => {
     if (category?.data) {
@@ -72,7 +99,17 @@ export const AppHeader = () => {
     (state) => state.globalConfig.globalCategorySearch
   );
 
-  console.log(globalCategorySearch, "globalCategorySearch790");
+  const {
+    data: cart,
+    error: cartError,
+    refetch: cartRefetch,
+  } = useGetCartByOrderIdQuery(Number(id));
+
+  const {
+    data: orderList,
+    error: orderListError,
+    refetch: orderListRefetch,
+  } = useGetOrderByOrderIdQuery(Number(id));
 
   const handleNext = () => {
     setStartIndex((prevIndex) =>
@@ -91,8 +128,20 @@ export const AppHeader = () => {
     dispatch(onUpdateOpenStore(false));
   };
 
+  const handleLogOut = () => {
+    eraseCookie("token");
+    eraseCookie("role");
+    eraseCookie("id");
+    eraseCookie("vendorId");
+    eraseCookie("storeId");
+    eraseCookie("plan");
+    dispatch(updateLoginDetails(null));
+    location.reload();
+  };
+
   return (
     <>
+      {/* Navbar Section */}
       <div className="flex flex-wrap md:flex-nowrap justify-between navBarStyle gap-4 items-center p-3">
         {/* Left Section */}
         <div className="flex w-full items-center md:w-1/3">
@@ -139,7 +188,7 @@ export const AppHeader = () => {
               setSearchValues(null);
             }}
             classNames={{
-              label: " bg-[#ffffff3b] text-black/90 dark:text-black/90",
+              label: "bg-[#ffffff3b] text-black/90 dark:text-black/90",
               input: [
                 "bg-[#ffffff3b]",
                 "text-black/90 dark:text-black/100",
@@ -147,7 +196,7 @@ export const AppHeader = () => {
                 "font-normal",
                 "group-data-[has-value=true]:text-black/90",
               ],
-              innerWrapper: " text-black/90 dark:text-black/70",
+              innerWrapper: "text-black/90 dark:text-black/70",
               inputWrapper: [
                 "bg-[#ffffff3b]",
                 "dark:bg-[#ffffff3b]",
@@ -173,7 +222,7 @@ export const AppHeader = () => {
             }
           />
           <Button
-            className="ml-2 md:flex bg-[#ffffff3b] items-cente"
+            className="ml-2 md:flex bg-[#ffffff3b] items-center"
             onClick={() => onSearch()}
           >
             <SearchIcon color="blue" />
@@ -181,75 +230,142 @@ export const AppHeader = () => {
         </div>
 
         {/* Right Section */}
-        <div className="flex flex-wrap md:flex-nowrap w-full md:w-2/3 justify-end">
+        <div className="justify-center flex flex-wrap md:flex-nowrap w-full md:w-2/3 md:justify-end items-center gap-3">
           {/* Navigation Buttons */}
-          <div className="flex mx-auto md:mx-0">
-            {[
-              { name: "Store View", key: "" },
-              { name: "Product View", key: "ProductView" },
-              { name: "Vendor View", key: "VendorView" },
-              { name: "Map View", key: "MapView" },
-            ].map((view, index) => (
-              <div>
-                <Button
-                  key={index}
-                  color="primary"
-                  className={`mx-1 IconCalls ${
-                    currLocation[1] === view?.key
-                      ? ""
-                      : "text-slate-400 bg-white"
-                  }`}
-                  onClick={() => navigate(`/${view?.key}`)}
-                >
-                  <span className="hidden sm:block">{view?.name}</span>
-                  <span className="block md:hidden">
-                    <IconHome />
-                  </span>
-                  {currLocation[1] === view?.key && (
-                    <div className="justify-center">
-                      <svg
-                        width="6"
-                        height="6"
-                        viewBox="0 0 6 6"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <circle cx="3" cy="3" r="3" fill="white" />
-                      </svg>
-                    </div>
-                  )}
-                </Button>
-              </div>
+          <div className="flex flex-wrap justify-center md:justify-start gap-2">
+            {views?.map((view, index) => (
+              <Button
+                key={index}
+                color="primary"
+                className={`mx-1 IconCalls transition  ${
+                  currLocation[1] === view.key
+                    ? "bg-primary text-white"
+                    : "text-slate-400 bg-white"
+                }`}
+                onClick={() => navigate(`/${view.key}`)}
+              >
+                <span className="hidden sm:block">{view.name}</span>
+                <span className="block sm:hidden">
+                  <img
+                    src={
+                      view.key === ""
+                        ? storeImageIcon
+                        : view.key === "ProductView"
+                        ? productImageIcon
+                        : view.key === "vendorImageIcon"
+                        ? vendorImageIcon
+                        : mapImageIcon
+                    }
+                    width={28}
+                  />
+                </span>
+                {currLocation[1] === view?.key && (
+                  <div className="justify-center">
+                    <svg
+                      width="6"
+                      height="6"
+                      viewBox="0 0 6 6"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle cx="3" cy="3" r="3" fill="white" />
+                    </svg>
+                  </div>
+                )}
+              </Button>
             ))}
           </div>
 
           {/* User Info */}
-          <div className="hidden md:flex items-center mt-3 md:mt-0">
+          <div className="flex items-center gap-3">
             <Button
               isIconOnly
               color="warning"
-              className="bg-warning-900"
+              className="bg-yellow-500 hidden"
               onPress={() => onOpen()}
             >
               <IconInfo />
             </Button>
-            <div className="ml-3">
+            <div>
               {!currentloginDetails?.data?.email ? (
                 <Login />
               ) : (
-                <User
-                  name={currentloginDetails?.data?.name}
-                  avatarProps={{
-                    src: "https://avatars.githubusercontent.com/u/30373425?v=4",
-                  }}
-                />
+                <div className="flex justify-between w-full items-center border-1 p-1 rounded-[calc(theme(borderRadius.large)/1.5)]">
+                  <p className="text-black text-sm font-normal w-full">
+                    <Popover showArrow placement="bottom" className="w-full">
+                      <PopoverTrigger>
+                        <User
+                          as="button"
+                          name={currentloginDetails?.data?.firstName}
+                          description="Your Details"
+                          className="transition-transform"
+                          // avatarProps={{
+                          //   src: "https://i.pravatar.cc/150?u=a04258114e29026702d",
+                          // }}
+                        />
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0">
+                        <Card
+                          shadow="none"
+                          className="min-w-[230px] border-none bg-transparent p-0"
+                        >
+                          <CardBody className="p-0 w-full">
+                            <Listbox
+                              aria-label="User Menu"
+                              onAction={(key) => {
+                                if (key === "logOut") {
+                                  handleLogOut();
+                                }
+                              }}
+                              itemClasses={{
+                                base: "first:rounded-t-medium last:rounded-b-medium rounded-none gap-3 h-12 data-[hover=true]:bg-default-100/80",
+                              }}
+                            >
+                              <ListboxItem
+                                key="issues"
+                                endContent={orderList?.data?.length}
+                                startContent={<IconHome />}
+                                onClick={() => setOrderIsOpen(true)}
+                              >
+                                Orders
+                              </ListboxItem>
+                              <ListboxItem
+                                key="pull_requests"
+                                endContent={cart?.data?.length}
+                                startContent={<IconHome />}
+                                onClick={() =>
+                                  dispatch(onUpdateCartModal(true))
+                                }
+                              >
+                                Cart
+                              </ListboxItem>
+                              <ListboxItem
+                                key="discussions"
+                                // endContent={90}
+                                startContent={<IconHome />}
+                              >
+                                Profile
+                              </ListboxItem>
+                              <ListboxItem
+                                key="logOut"
+                                startContent={<IconHome />}
+                              >
+                                Log Out
+                              </ListboxItem>
+                            </Listbox>
+                          </CardBody>
+                        </Card>
+                      </PopoverContent>
+                    </Popover>
+                  </p>
+                </div>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Slider */}
+      {/* Slider Section */}
       <div className="slider-wrapper w-full overflow-hidden">
         <div className="flex items-center justify-between px-4 my-2">
           <Button
@@ -263,7 +379,7 @@ export const AppHeader = () => {
           >
             <IconPrev fill="#ffffffcc" width="12px" height="12px" />
           </Button>
-          <div className="slider-container custom-scrollbar">
+          <div className="slider-container custom-scrollbar overflow-x-auto whitespace-nowrap">
             {displayedLabels?.map((item, index) => (
               <Button
                 key={index}
@@ -274,7 +390,7 @@ export const AppHeader = () => {
                     onSearchByCategory(item?.id);
                   }
                 }}
-                className="mx-2 font-medium text-sm w-auto h-10 text-black"
+                className="mx-2 font-medium text-sm w-auto h-10 text-black min-w-min"
                 style={{
                   backgroundColor:
                     globalCategorySearch === item?.id ? "#f6bc00" : "#ffffff80",
@@ -295,7 +411,7 @@ export const AppHeader = () => {
             className={`Iconwhatsup w-7 min-w-7 h-7 ${
               startIndex + itemsPerPage >= sliderLabel?.length
                 ? "cursor-not-allowed"
-                : "cursor-pointer "
+                : "cursor-pointer"
             }`}
           >
             <IconNext fill="#ffffffcc" width="12px" height="12px" />

@@ -336,9 +336,9 @@ export const AppSidebar = () => {
                           name={currentloginDetails?.data?.firstName}
                           description="Your Details"
                           className="transition-transform"
-                          avatarProps={{
-                            src: "https://i.pravatar.cc/150?u=a04258114e29026702d",
-                          }}
+                          // avatarProps={{
+                          //   src: "https://i.pravatar.cc/150?u=a04258114e29026702d",
+                          // }}
                         />
                       </PopoverTrigger>
                       <PopoverContent className="p-0">
