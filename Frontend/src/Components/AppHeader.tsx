@@ -72,6 +72,8 @@ export const AppHeader = () => {
     (state) => state.globalConfig.globalCategorySearch
   );
 
+  console.log(globalCategorySearch, "globalCategorySearch790");
+
   const handleNext = () => {
     setStartIndex((prevIndex) =>
       Math.min(prevIndex + 1, sliderLabel?.length - itemsPerPage)
@@ -265,7 +267,13 @@ export const AppHeader = () => {
             {displayedLabels?.map((item, index) => (
               <Button
                 key={index}
-                onClick={() => onSearchByCategory(item?.id)}
+                onClick={() => {
+                  if (globalCategorySearch) {
+                    dispatch(onGlobalCategorySearch(null));
+                  } else {
+                    onSearchByCategory(item?.id);
+                  }
+                }}
                 className="mx-2 font-medium text-sm w-auto h-10 text-black"
                 style={{
                   backgroundColor:
