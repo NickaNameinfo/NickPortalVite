@@ -70,7 +70,7 @@ const Product = () => {
     filterBySearchRefetch();
     storesByPaymentRefetch();
     storesByOpenStoreRefetch();
-  }, [globalCategorySearch, globalSearch]);
+  }, [globalCategorySearch, globalSearch, gloablSearchByPayment]);
 
   React.useEffect(() => {
     if (filterBySearch?.data?.length > 0) {

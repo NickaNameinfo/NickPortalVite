@@ -117,10 +117,31 @@ export const AppSidebar = () => {
     dispatch(onGlobalPaymentSearch(null));
   };
 
-  const onSearchByPayment = (item) => {
-    dispatch(onSearchGlobal(null));
-    dispatch(onGlobalCategorySearch(null));
-    dispatch(onGlobalPaymentSearch(item?.key));
+  const handleFilters = (result) => {
+    console.log(result, "asdf9a7s0df78sa");
+
+    if (onSeletedItem === result.key) {
+      dispatch(onGlobalPaymentSearch(null));
+      dispatch(onUpdateOpenStore(false));
+      setOnSelectedItem(null);
+      dispatch(onSearchGlobal(null));
+      dispatch(onGlobalCategorySearch(null));
+    } else {
+      dispatch(onGlobalPaymentSearch(result?.key));
+      setOnSelectedItem(result.key);
+    }
+    if (result?.key === "Hospitals") {
+      onSearchByCategory(20);
+      dispatch(onUpdateOpenStore(false));
+    } else if (result?.key === "Hotels") {
+      onSearchByCategory(21);
+      dispatch(onUpdateOpenStore(false));
+    } else if (result?.key === "Open Shop") {
+      dispatch(onSearchGlobal(null));
+      dispatch(onGlobalCategorySearch(null));
+      dispatch(onGlobalPaymentSearch(null));
+      dispatch(onUpdateOpenStore(true));
+    }
   };
 
   return (
@@ -180,32 +201,7 @@ export const AppSidebar = () => {
                     }
                     className={"rounded-lg cursor-pointer"}
                     onClick={() => {
-                      if (onSeletedItem === result.key) {
-                        onSearchByPayment(result);
-                        dispatch(onUpdateOpenStore(false));
-                        setOnSelectedItem(null);
-                        dispatch(onSearchGlobal(null));
-                        dispatch(onGlobalCategorySearch(null));
-                        dispatch(onGlobalPaymentSearch(null));
-                      } else {
-                        setOnSelectedItem(result.key);
-                      }
-
-                      if (result?.key === "Hospitals") {
-                        onSearchByCategory(20);
-                        dispatch(onUpdateOpenStore(false));
-                      } else if (result?.key === "Hotels") {
-                        onSearchByCategory(21);
-                        dispatch(onUpdateOpenStore(false));
-                      } else if (result?.key === "Open Shop") {
-                        dispatch(onSearchGlobal(null));
-                        dispatch(onGlobalCategorySearch(null));
-                        dispatch(onGlobalPaymentSearch(null));
-                        dispatch(onUpdateOpenStore(true));
-                      } else {
-                        onSearchByPayment(result);
-                        dispatch(onUpdateOpenStore(false));
-                      }
+                      handleFilters(result);
                     }}
                   >
                     <div

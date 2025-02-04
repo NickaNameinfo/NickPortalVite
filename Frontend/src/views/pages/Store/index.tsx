@@ -71,12 +71,14 @@ const Store = () => {
     }
   }, [storeDataList]);
 
+  console.log(gloablSearchByPayment, "asdf67a9s87")
+
   React.useEffect(() => {
     storeByCategoryRefetch();
     storeByFilterRefetch();
     storesByPaymentRefetch();
     // storesByOpenStoreRefetch();
-  }, [globalCategorySearch, globalSearch]);
+  }, [globalCategorySearch, globalSearch, gloablSearchByPayment]);
 
   React.useEffect(() => {
     if (storesByFilter?.data?.length > 0) {

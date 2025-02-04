@@ -72,6 +72,7 @@ const AddStore = () => {
       let tempAPIUserData = {
         id: formData?.users?.[0]?.id,
         email: data?.["email"],
+        password: data?.["password"],
         verify: formData?.status,
       };
       let userResult = updateUser(tempAPIUserData);
