@@ -182,7 +182,8 @@ export const ProductDetail = (props: ProductDetailProps) => {
           customerId: userId,
           paymentmethod: 1,
           orderId: Number(userId),
-          grandTotal: Number(cart?.data?.qty) * Number(props?.item?.product?.total),
+          grandTotal:
+            Number(cart?.data?.qty) * Number(props?.item?.product?.total),
           productIds: props?.item?.product?.id
             ? props?.item?.product?.id
             : props?.item?.id,
@@ -270,7 +271,10 @@ export const ProductDetail = (props: ProductDetailProps) => {
                       </p>
                       <div className="flex justify-between items-center">
                         <p className="text-black text-lg font-normal">
-                          Rs: {props?.item?.product?.total} ({props?.item?.product?.unitSize})
+                          Rs: {props?.item?.product?.total}{" "}
+                          <span style={{ color: "black", fontSize: "10px" }}>
+                            ({props?.item?.product?.unitSize})
+                          </span>
                         </p>
                         <div className="text-sm">120 Stocks</div>
                       </div>

@@ -55,7 +55,6 @@ const AddProducts = () => {
     error: categoryerror,
     refetch: categoryrefetch,
   } = useGetCategoriesQuery();
-
   let currentUserId = currentStoreUserId
     ? currentStoreUserId
     : currentVendorUserId;
@@ -125,8 +124,6 @@ const AddProducts = () => {
     setValue("discountPer", Number(discountAmount));
   }, [tempFormData?.price, tempFormData?.discount, tempFormData?.qty]);
 
-  
-
   const onSubmit = async (data: any) => {
     let tempData = {
       ...data,
@@ -139,6 +136,7 @@ const AddProducts = () => {
       isEnableCustomize: tempFormData?.isEnableCustomize ? "1" : "0",
       isEnableEcommerce: tempFormData?.isEnableEcommerce ? "1" : "0",
     };
+    console.log(tempData, "tempData123452345");
     const formData = new FormData();
     for (const key in tempData) {
       formData.append(key, tempData[key]);

@@ -49,6 +49,7 @@ export const PremiumCard = ({
   popOverOnClose = null,
 }) => {
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
+  const productItem = item.product ? item.product : item;
   const userId = getCookie("id");
   const { id } = useParams();
   const [addCart] = useAddCartMutation();
@@ -56,7 +57,7 @@ export const PremiumCard = ({
   const dispatch = useAppDispatch();
   let productId = {
     id: userId,
-    productId: item?.product?.id,
+    productId: productItem?.id,
   };
   const { data, error, refetch } = useGetCartByProductIdQuery(productId);
   const MySwal = withReactContent(Swal);
@@ -65,22 +66,20 @@ export const PremiumCard = ({
     refetch();
   }, [onRefresh]);
 
-  console.log(item, "adfasdf986")
-
   const handleAddCart = async (type) => {
     let tempCartValue = {
-      productId: item?.product?.id ? item?.product?.id : item?.id,
-      name: item?.product?.name ? item?.product?.name : item?.name,
+      productId: productItem?.id,
+      name: productItem?.name,
       orderId: userId,
-      price: Number(item?.product?.total),
-      total: Number(data?.data?.qty) * Number(item?.product?.total),
+      price: Number(productItem?.total),
+      total: Number(data?.data?.qty) * Number(productItem?.total),
       qty: data?.data?.qty
         ? type === "add"
           ? Number(data?.data?.qty) + 1
           : Number(data?.data?.qty) - 1
         : 1,
-      photo: item?.product?.photo ? item?.product?.photo : item?.photo,
-      storeId : id
+      photo: productItem?.photo ? productItem?.photo : item?.photo,
+      storeId: id,
     };
     if (data?.data) {
       try {
@@ -127,10 +126,7 @@ export const PremiumCard = ({
             }}
           >
             <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
-              {item?.product?.discount
-                ? item?.product?.discount
-                : item?.discount}{" "}
-              %
+              {productItem?.discount ? productItem?.discount : item?.discount} %
             </span>
 
             <Image
@@ -144,9 +140,7 @@ export const PremiumCard = ({
                   ? "min-h-[176px] max-h-[176px]"
                   : "min-h-[50px] max-h-[50px]"
               }`}
-              src={`${infoData?.baseApi}/${
-                item?.product?.photo ? item?.product?.photo : item?.photo
-              }`}
+              src={`${infoData?.baseApi}/${productItem?.photo}`}
             />
           </CardBody>
         )}
@@ -154,14 +148,15 @@ export const PremiumCard = ({
         <CardFooter className="p-0">
           <div className="grid grid-cols-1 w-full">
             <div className="font-semibold text-base mt-2 TextMaincolor">
-              <p className="truncate">
-                {item?.product?.name ? item?.product?.name : item?.name}
-              </p>
+              <p className="truncate">{productItem?.name}</p>
             </div>
 
             <div className="w-full flex justify-between mt-2">
               <p className="font-semibold text-base Pricecolor p-0">
-                Rs : {item?.product?.total} <span style={{color:"black"}}>{`(${item?.product?.unitSize})`}</span>
+                Rs : {productItem?.total}{" "}
+                <span
+                  style={{ color: "black", fontSize: "10px" }}
+                >{`(${productItem?.unitSize})`}</span>
               </p>
               <p className="font-normal text-sm  TextMaincolor p-0">
                 120 Stocks
@@ -173,7 +168,7 @@ export const PremiumCard = ({
               </p>
               <IconTick
                 fill={
-                  item?.product?.paymentMode?.includes("1") ? "#49A84C" : "red"
+                  productItem?.paymentMode?.includes("1") ? "#49A84C" : "red"
                 }
               />
             </div>
@@ -183,7 +178,7 @@ export const PremiumCard = ({
               </p>
               <IconTick
                 fill={
-                  item?.product?.paymentMode?.includes("2") ? "#49A84C" : "red"
+                  productItem?.paymentMode?.includes("2") ? "#49A84C" : "red"
                 }
               />
             </div>
@@ -193,7 +188,7 @@ export const PremiumCard = ({
               </p>
               <IconTick
                 fill={
-                  item?.product?.paymentMode?.includes("3") ? "#49A84C" : "red"
+                  productItem?.paymentMode?.includes("3") ? "#49A84C" : "red"
                 }
               />
             </div>

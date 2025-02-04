@@ -17,7 +17,6 @@ const StoreList = () => {
 
   const [DeleteData] = useDeleteStoreMutation();
   const { data, error, refetch } = useGetStoreQuery();
-  console.log(data, "useGetStoreQuery");
 
   const defaultCloumns = [
     "storename",
@@ -58,8 +57,6 @@ const StoreList = () => {
   };
 
   const renderCell = React.useCallback((user, columnKey) => {
-    console.log(user, columnKey, "asdfoij89wernk");
-
     const cellValue = user[columnKey];
     switch (columnKey) {
       case "storename":

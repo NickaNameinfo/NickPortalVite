@@ -42,6 +42,7 @@ module.exports = {
   /* Add user api start here................................*/
 
   async addProduct(req, res, next) {
+    console.log(req.body, "asdfa7s098df7")
     try {
       const {
         categoryId,
@@ -104,6 +105,7 @@ module.exports = {
           next(err);
         });
     } catch (err) {
+      console.error(err);
       throw new RequestError("Error");
     }
   },

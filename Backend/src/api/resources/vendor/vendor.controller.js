@@ -271,20 +271,7 @@ module.exports = {
           where: { supplierId: req.params.id },
           include: [
             {
-              model: db.product,
-              attributes: [
-                "id",
-                "name",
-                "brand",
-                "photo",
-                "status",
-                "sortDesc",
-                "unitSize",
-                "price",
-                "discount",
-                "discountPer",
-                "paymentMode",
-              ],
+              model: db.product
             },
           ],
         })

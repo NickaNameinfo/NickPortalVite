@@ -17,17 +17,15 @@ import { infoData } from "../../configData";
 import {
   useGetStoresByIdQuery,
   useGetStoresProductByIDQuery,
-  useGetStoresQuery
+  useGetStoresQuery,
 } from "../../views/pages/Store/Service.mjs";
 import { toast } from "react-toastify";
 import { useAppSelector } from "../Common/hooks";
 export const StoreHeaderCard = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data, error, refetch } = useGetStoresByIdQuery(Number(id));  
-  const storeList = useAppSelector(
-    (state) => state.globalConfig.storeList
-  );
+  const { data, error, refetch } = useGetStoresByIdQuery(Number(id));
+  const storeList = useAppSelector((state) => state.globalConfig.storeList);
 
   const {
     data: productData,
@@ -35,7 +33,7 @@ export const StoreHeaderCard = () => {
     refetch: productRefetch,
   } = useGetStoresProductByIDQuery(Number(id));
   const notify = (value) => toast(value);
-  
+
   const handleShare = () => {
     const url = window.location.href; // Get the current URL
     navigator.clipboard
@@ -208,9 +206,23 @@ export const StoreHeaderCard = () => {
             </Button>
             <Button
               onClick={() =>
-                 storeList.findIndex((store) => store.id === data?.data?.id) !== 0
+                storeList.findIndex((store) => store.id === data?.data?.id) !==
+                  0 &&
+                storeList?.[
+                  Number(
+                    storeList?.findIndex((store) => store.id === data?.data?.id)
+                  ) - 1
+                ]?.status
                   ? navigate(
-                      `/Store/StoreDetails/${storeList?.[Number(storeList?.findIndex((store) => store.id === data?.data?.id)) - 1]?.id}`
+                      `/Store/StoreDetails/${
+                        storeList?.[
+                          Number(
+                            storeList?.findIndex(
+                              (store) => store.id === data?.data?.id
+                            )
+                          ) - 1
+                        ]?.id
+                      }`
                     )
                   : navigate(`/`)
               }
@@ -233,19 +245,38 @@ export const StoreHeaderCard = () => {
 
             <Button
               onClick={() =>
-                storeList?.[storeList?.length-1]?.id !== data?.data?.id
+                storeList?.[storeList?.length - 1]?.id !== data?.data?.id &&
+                storeList?.[
+                  Number(
+                    storeList?.findIndex((store) => store.id === data?.data?.id)
+                  ) + 1
+                ]?.status
                   ? navigate(
-                      `/Store/StoreDetails/${storeList?.[Number(storeList?.findIndex((store) => store.id === data?.data?.id)) + 1]?.id}`
+                      `/Store/StoreDetails/${
+                        storeList?.[
+                          Number(
+                            storeList?.findIndex(
+                              (store) => store.id === data?.data?.id
+                            )
+                          ) + 1
+                        ]?.id
+                      }`
                     )
                   : navigate(`/`)
               }
-              disabled={storeList?.[storeList?.length-1]?.id !== data?.data?.id ? false : true}
+              disabled={
+                storeList?.[storeList?.length - 1]?.id !== data?.data?.id
+                  ? false
+                  : true
+              }
               radius="full"
               isIconOnly
               aria-label="Like"
               size="md"
               className={`bgnone flex mm:justify-start ml:justify-center ml:min-w-unit-8 ml:w-unit-8 ml:h-unit-8 mm:min-w-unit-8 mm:w-unit-8 mm:h-unit-8 xm:min-w-unit-6 xm:w-unit-6 xm:h-unit-6 ${
-                storeList?.[storeList?.length-1]?.id !== data?.data?.id ? "cursor-pointer" : "cursor-not-allowed"
+                storeList?.[storeList?.length - 1]?.id !== data?.data?.id
+                  ? "cursor-pointer"
+                  : "cursor-not-allowed"
               }`}
             >
               <IconNext

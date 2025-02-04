@@ -7,11 +7,6 @@ import {
   CardBody,
   CardFooter,
   Image,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -25,8 +20,6 @@ import {
   IconsEye,
 } from "../Icons";
 import { useBoolean } from "../../Common/CustomHooks";
-import { BuyCard } from "./BuyCard";
-import { ProductDetails } from "./ProductDetails";
 import { infoData } from "../../configData";
 import {
   useAddCartMutation,
@@ -105,7 +98,6 @@ export const PremiumCard = ({ item = null }) => {
           <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
             {item?.product?.discount}%
           </span>
-
           <Image
             isZoomed
             alt="Here no Image"
