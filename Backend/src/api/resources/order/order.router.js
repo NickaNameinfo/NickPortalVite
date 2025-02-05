@@ -19,5 +19,4 @@ orderRouter
   .route("/status")
   .post(sanitize(), orderController.getAllOrderStatus);
 orderRouter.route("/count").get(sanitize(), orderController.getAllOrderCount);
-
 module.exports = { orderRouter };

@@ -42,6 +42,7 @@ import {
   onUpdateSidebarExpand,
   updateLoginDetails,
   onUpdateCartModal,
+  onUpdateOrderModal,
 } from "../Components/Common/globalSlice";
 import { eraseCookie, getCookie } from "../JsFiles/CommonFunction.mjs";
 import storeImageIcon from "../assets/icons/store.png";
@@ -52,6 +53,7 @@ import {
   useGetCartByOrderIdQuery,
   useGetOrderByOrderIdQuery,
 } from "../views/pages/Store/Service.mjs";
+import { OrderCard } from "./Card/OrderCard";
 const views = [
   { name: "Store View", key: "" },
   { name: "Product View", key: "ProductView" },
@@ -65,20 +67,34 @@ export const AppHeader = () => {
     (state) => state.globalConfig.currentloginDetails
   );
   const currLocation = location?.pathname?.split("/");
+
   const isSideBarExpand = useAppSelector(
     (state) => state.globalConfig.isSideBarExpand
   );
+
+  const isProductDetailsModalOpen = useAppSelector(
+    (state) => state.globalConfig.isProductDetailsModalOpen
+  );
+
+  const isOpenCartModal = useAppSelector(
+    (state) => state.globalConfig.isOpenCartModal
+  );
+
+  const isOPenOrderModal = useAppSelector(
+    (state) => state.globalConfig.isOpenOrderModal
+  );
+
   const navigate = useNavigate();
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [startIndex, setStartIndex] = React.useState(0);
   const [sliderLabel, setSliderLabel] = React.useState([]);
   const [searchValues, setSearchValues] = React.useState(null);
-  const [oderIsOpen, setOrderIsOpen] = React.useState(false);
+  const [isPopOverOpen, setIsPopOverOpen] = React.useState(false);
 
   const { data: category } = useGetCategoryQuery();
   const dispatch = useAppDispatch();
   const id = getCookie("id");
   const itemsPerPage = 12;
+
   React.useEffect(() => {
     if (category?.data) {
       const labels = category.data.map((item) => item);
@@ -87,6 +103,12 @@ export const AppHeader = () => {
       setSliderLabel([]);
     }
   }, [category?.data]);
+
+  React.useEffect(() => {
+    if (isProductDetailsModalOpen?.isOpen || isOpenCartModal || isOPenOrderModal) {
+      setIsPopOverOpen(false);
+    }
+  }, [isProductDetailsModalOpen, isOpenCartModal, isOPenOrderModal]);
 
   const displayedLabels =
     sliderLabel?.slice(startIndex, startIndex + itemsPerPage) || [];
@@ -252,7 +274,7 @@ export const AppHeader = () => {
                         ? storeImageIcon
                         : view.key === "ProductView"
                         ? productImageIcon
-                        : view.key === "vendorImageIcon"
+                        : view.key === "VendorView"
                         ? vendorImageIcon
                         : mapImageIcon
                     }
@@ -282,7 +304,7 @@ export const AppHeader = () => {
               isIconOnly
               color="warning"
               className="bg-yellow-500 hidden"
-              onPress={() => onOpen()}
+              onPress={() => {}}
             >
               <IconInfo />
             </Button>
@@ -292,7 +314,18 @@ export const AppHeader = () => {
               ) : (
                 <div className="flex justify-between w-full items-center border-1 p-1 rounded-[calc(theme(borderRadius.large)/1.5)]">
                   <p className="text-black text-sm font-normal w-full">
-                    <Popover showArrow placement="bottom" className="w-full">
+                    <Popover
+                      showArrow
+                      placement="bottom"
+                      className="w-full"
+                      isOpen={isPopOverOpen}
+                      onOpenChange={(open) => {
+                        if (!isProductDetailsModalOpen?.isOpen) {
+                          setIsPopOverOpen(true);
+                        }
+                      }}
+                      onClose={() => setIsPopOverOpen(false)}
+                    >
                       <PopoverTrigger>
                         <User
                           as="button"
@@ -325,7 +358,9 @@ export const AppHeader = () => {
                                 key="issues"
                                 endContent={orderList?.data?.length}
                                 startContent={<IconHome />}
-                                onClick={() => setOrderIsOpen(true)}
+                                onClick={() =>
+                                  dispatch(onUpdateOrderModal(true))
+                                }
                               >
                                 Orders
                               </ListboxItem>
@@ -418,6 +453,7 @@ export const AppHeader = () => {
           </Button>
         </div>
       </div>
+      {isOPenOrderModal && <OrderCard />}
     </>
   );
 };

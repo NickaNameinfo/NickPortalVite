@@ -43,7 +43,7 @@ export const StoreCard = ({ item = null, key = null }) => {
               shadow="md"
               width="100%"
               radius="lg"
-              className="w-full object-cover h-[112px]"
+              className="w-full object-cover h-[112px] cursor-pointer"
               alt="Card background"
               src={`${infoData.baseApi}/${item?.storeImage}`}
             />

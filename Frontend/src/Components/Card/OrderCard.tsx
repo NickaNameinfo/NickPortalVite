@@ -21,8 +21,11 @@ import { ModalCloseIcon } from "../Icons";
 import { infoData } from "../../configData";
 import { useGetOrderByOrderIdQuery } from "../../views/pages/Store/Service.mjs";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
-import { useAppDispatch } from "../Common/hooks";
-import { onUpdateProductDetailsModal } from "../Common/globalSlice";
+import { useAppDispatch, useAppSelector } from "../Common/hooks";
+import {
+  onUpdateOrderModal,
+  onUpdateProductDetailsModal,
+} from "../Common/globalSlice";
 
 const columns = [
   { name: "Product", uid: "productImage" },
@@ -42,6 +45,10 @@ export const OrderCard = (props: any) => {
     error: orderListError,
     refetch: orderListRefetch,
   } = useGetOrderByOrderIdQuery(Number(userId));
+
+  const isOPenOrderModal = useAppSelector(
+    (state) => state.globalConfig.isOpenOrderModal
+  );
 
   React.useEffect(() => {
     orderListRefetch();
@@ -64,14 +71,18 @@ export const OrderCard = (props: any) => {
         return <p>{data?.products?.[0]?.name}</p>;
       case "actions":
         return (
-          <Button variant="bordered" color="warning" onClick={() => {
-            dispatch(
-              onUpdateProductDetailsModal({
-                isOpen: true,
-                item: data?.products?.[0],
-              })
-            );
-          }}>
+          <Button
+            variant="bordered"
+            color="warning"
+            onClick={() => {
+              dispatch(
+                onUpdateProductDetailsModal({
+                  isOpen: true,
+                  item: data?.products?.[0],
+                })
+              );
+            }}
+          >
             view
           </Button>
         );
@@ -82,10 +93,10 @@ export const OrderCard = (props: any) => {
   return (
     <>
       <Modal
-        isOpen={props.isOpen}
+        isOpen={isOPenOrderModal}
         onClose={() => {
-          if (props.isOpen) {
-            props.onClose();
+          if (isOPenOrderModal) {
+            dispatch(onUpdateOrderModal(false));
           }
         }}
         size={"5xl"}
@@ -99,7 +110,7 @@ export const OrderCard = (props: any) => {
           <>
             <ModalCloseIcon
               onClick={() => {
-                props.onClose();
+                dispatch(onUpdateOrderModal(false));
               }}
               className="modalIconClose"
             />

@@ -38,6 +38,7 @@ import {
   onGlobalPaymentSearch,
   onSearchGlobal,
   onUpdateCartModal,
+  onUpdateOrderModal,
   onUpdateOpenStore,
   updateLoginDetails,
   onUpdateSidebarExpand,
@@ -58,12 +59,19 @@ export const AppSidebar = () => {
   const isOpenCartModal = useAppSelector(
     (state) => state.globalConfig.isOpenCartModal
   );
+  const isOPenOrderModal = useAppSelector(
+    (state) => state.globalConfig.isOpenOrderModal
+  );
+  const isProductDetailsModalOpen = useAppSelector(
+    (state) => state.globalConfig.isProductDetailsModalOpen
+  );
   const isSideBarExpand = useAppSelector(
     (state) => state.globalConfig.isSideBarExpand
   );
   const { data, refetch } = useGetCategoryQuery();
   const [onSeletedItem, setOnSelectedItem] = React.useState(null);
   const [oderIsOpen, setOrderIsOpen] = React.useState(false);
+  const [isPopOverOpen, setIsPopOverOpen] = React.useState(false);
   const id = getCookie("id");
   const dispatch = useAppDispatch();
 
@@ -99,6 +107,12 @@ export const AppSidebar = () => {
       selectedCategory?.length > 0 ? selectedCategory?.join(",") : null
     );
   }, [selectedCategory]);
+
+  React.useEffect(() => {
+    if (isProductDetailsModalOpen?.isOpen || isOpenCartModal || isOPenOrderModal) {
+      setIsPopOverOpen(false);
+    }
+  }, [isProductDetailsModalOpen, isOpenCartModal, isOPenOrderModal]);
 
   const handleLogOut = () => {
     eraseCookie("token");
@@ -329,7 +343,18 @@ export const AppSidebar = () => {
               ) : (
                 <div className="flex justify-between w-full items-center">
                   <p className="text-black text-sm font-normal w-full">
-                    <Popover showArrow placement="bottom" className="w-full">
+                    <Popover
+                      showArrow
+                      placement="bottom"
+                      className="w-full"
+                      isOpen={isPopOverOpen}
+                      onOpenChange={(open) => {
+                        if (!isProductDetailsModalOpen?.isOpen) {
+                          setIsPopOverOpen(true);
+                        }
+                      }}
+                      onClose={() => setIsPopOverOpen(false)}
+                    >
                       <PopoverTrigger>
                         <User
                           as="button"
@@ -362,7 +387,9 @@ export const AppSidebar = () => {
                                 key="issues"
                                 endContent={orderList?.data?.length}
                                 startContent={<IconHome />}
-                                onClick={() => setOrderIsOpen(true)}
+                                onClick={() =>
+                                  dispatch(onUpdateOrderModal(true))
+                                }
                               >
                                 Orders
                               </ListboxItem>
@@ -401,8 +428,8 @@ export const AppSidebar = () => {
           </div>
         </aside>
       </div>
-      <OrderCard isOpen={oderIsOpen} onClose={() => setOrderIsOpen(false)} />
-      {isOpenCartModal && <BuyCard isOpen={isOpenCartModal} />}
+      {isOPenOrderModal && <OrderCard />}
+      {isOpenCartModal && <BuyCard />}
     </>
   );
 };

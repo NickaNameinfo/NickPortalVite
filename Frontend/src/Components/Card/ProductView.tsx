@@ -36,6 +36,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../Common/hooks";
 export const ProductViewCard = ({ item = null }) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isMobile, setIsMobile] = React.useState(false);
 
   const isProductDetailsModalOpen = useAppSelector(
     (state) => state.globalConfig.isProductDetailsModalOpen
@@ -57,6 +58,19 @@ export const ProductViewCard = ({ item = null }) => {
     refetch: storeProductRefetch,
   } = useGetStoresProductByIDQuery(Number(data?.data?.id));
 
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768); // 768px is typically md breakpoint
+    };
+    
+    // Initial check
+    handleResize();
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   React.useEffect(() => {
     if (isProductDetailsModalOpen?.isOpen || isOpenCartModal) {
       setIsOpen(false);
@@ -66,7 +80,7 @@ export const ProductViewCard = ({ item = null }) => {
   return (
     <Popover
       showArrow
-      placement="right"
+      placement={isMobile ? "bottom" : "right"}
       key={item?.id}
       isOpen={isOpen}
       onOpenChange={(open) => {
@@ -102,7 +116,7 @@ export const ProductViewCard = ({ item = null }) => {
           >
             Store Details : {data?.data?.storename}
           </div>
-          <div className="px-1 flex">
+          <div className="px-1 md:flex">
             {Number(item?.isEnableEcommerce) === 1 ? (
               <PremiumCard item={item} isHideImage={false} from="ProductView" />
             ) : (

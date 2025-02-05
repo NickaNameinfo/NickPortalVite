@@ -71,8 +71,6 @@ const Store = () => {
     }
   }, [storeDataList]);
 
-  console.log(gloablSearchByPayment, "asdf67a9s87")
-
   React.useEffect(() => {
     storeByCategoryRefetch();
     storeByFilterRefetch();
