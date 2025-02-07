@@ -10,11 +10,13 @@ import {
   ModalHeader,
   useDisclosure,
   Image,
+  Tabs,
+  Tab,
+  Textarea,
 } from "@nextui-org/react";
 import React from "react";
 import {
   IconHeart,
-  IconInfo,
   IconLocation,
   IconMapRound,
   IconNext,
@@ -23,34 +25,43 @@ import {
   IconTick,
   ModalCloseIcon,
 } from "../Icons";
-import { useGetVendorsByIdQuery } from "../../views/VendorProducts/Service.mjs";
 import { infoData } from "../../configData";
-import RelatedVendors from "./RelatedVendors";
-import { getCookie } from "../../JsFiles/CommonFunction.mjs";
-import { useGetVendorsQuery } from "../../views/vendors/Service.mjs";
-import VendorCard from "./VendorCard";
+import { Link, useParams } from "react-router-dom";
+import Lightbox from "yet-another-react-lightbox";
 import {
+  useGetVendorsQuery,
+  useGetVendorsByIdQuery,
+  useGetVendorsProductByIdQuery,
   useAddCartMutation,
+  useAddOrderMutation,
   useGetCartByProductIdQuery,
   useUpdateCartMutation,
+  useGetCartByOrderIdQuery,
+  useDeleteCartItemMutation,
 } from "../../views/VendorProducts/Service.mjs";
-import { BuyCard } from "./BuyCard";
+import { toast } from "react-toastify";
+import { getCookie } from "../../JsFiles/CommonFunction.mjs";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 import { useAppDispatch, useAppSelector } from "../../Common/hooks";
-import { onRefreshCart } from "../../Common/globalSlice";
-import { ToastContainer, toast } from "react-toastify";
-import { Link } from "react-router-dom";
+import {
+  onRefreshCart,
+  onUpdateCartModal,
+  onUpdateProductDetailsModal,
+} from "../../Common/globalSlice";
 
-interface VendorDetailsProps {
+interface ProductDetailProps {
   isOpen: any;
-  onClose: any;
   item: any;
 }
 
-export const ProductDetails = (props: VendorDetailsProps) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+export const ProductDetail = (props: ProductDetailProps) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [customization, setCustomization] = React.useState(null);
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
   const notify = (value) => toast(value);
-  const id = getCookie("id");
+  const MySwal = withReactContent(Swal);
+  const userId = getCookie("id");
   const {
     data: vendors,
     error: vendorsError,
@@ -61,20 +72,25 @@ export const ProductDetails = (props: VendorDetailsProps) => {
     error,
     refetch,
   } = useGetVendorsByIdQuery(Number(props?.item?.supplierId));
+
   let productId = {
-    id: id,
-    productId: props?.item?.product?.id,
+    id: userId,
+    productId: props?.item?.product?.id
+      ? props?.item?.product?.id
+      : props?.item?.id,
   };
+
   const {
     data: cart,
     error: cartError,
     refetch: cartRefetch,
   } = useGetCartByProductIdQuery(productId);
+
   const [addCart] = useAddCartMutation();
+  const [addOrder] = useAddOrderMutation();
   const [updateCart] = useUpdateCartMutation();
   const dispatch = useAppDispatch();
-
-  console.log(storeDetails, "data80980980");
+  const [index, setIndex] = React.useState(-1);
 
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
@@ -84,9 +100,13 @@ export const ProductDetails = (props: VendorDetailsProps) => {
 
   const handleAddCart = async (type) => {
     let tempCartValue = {
-      productId: props?.item?.product?.id,
-      name: props?.item?.product?.name,
-      orderId: id,
+      productId: props?.item?.product?.id
+        ? props?.item?.product?.id
+        : props?.item?.id,
+      name: props?.item?.product?.name
+        ? props?.item?.product?.name
+        : props?.item?.name,
+      orderId: userId,
       price: Number(props?.item?.price),
       total: Number(cart?.data?.qty) * Number(props?.item?.price),
       qty: cart?.data?.qty
@@ -94,25 +114,33 @@ export const ProductDetails = (props: VendorDetailsProps) => {
           ? Number(cart?.data?.qty) + 1
           : Number(cart?.data?.qty) - 1
         : 1,
-      photo: props?.item?.product?.photo,
+      photo: props?.item?.product?.photo
+        ? props?.item?.product?.photo
+        : props?.item?.photo,
     };
     if (cart?.data) {
       try {
         const result = await updateCart(tempCartValue);
-        if (result) {
+        if (result?.data?.success) {
           cartRefetch();
         }
       } catch (error) {
-        console.log(error);
+        MySwal.fire({
+          title: <p>Please login and continue the shoping</p>,
+        });
       }
     } else {
       try {
         const result = await addCart(tempCartValue);
-        if (result) {
+        if (result?.data?.success) {
           cartRefetch();
+        } else {
+          throw error;
         }
       } catch (error) {
-        console.log(error);
+        MySwal.fire({
+          title: <p>Please login and continue the shoping</p>,
+        });
       }
     }
   };
@@ -129,23 +157,90 @@ export const ProductDetails = (props: VendorDetailsProps) => {
       });
   };
 
+  const slides = [
+    {
+      src: "https://nicknameinfotech.com/img/new-logo.png",
+      width: 3840,
+      height: 3840,
+    },
+    {
+      src: "https://yet-another-react-lightbox.com/images/image02.jpeg",
+      width: 3840,
+      height: 3840,
+    },
+    {
+      src: "https://yet-another-react-lightbox.com/images/image03.jpeg",
+      width: 3840,
+      height: 3840,
+    },
+  ];
+
+  const handleAddOrder = async () => {
+    if (cart?.data?.qty && cart?.data?.qty !== 0) {
+      console.log(cart?.data?.qty, "asdf7as9d078");
+      try {
+        const tempCartValue = {
+          customerId: userId,
+          paymentmethod: 1,
+          orderId: Number(userId),
+          grandTotal:
+            Number(cart?.data?.qty) * Number(props?.item?.product?.total),
+          productIds: props?.item?.product?.id
+            ? props?.item?.product?.id
+            : props?.item?.id,
+          qty: cart?.data?.qty,
+          storeId: Number(props?.item?.supplierId),
+          customization: customization,
+        };
+        let response = await addOrder(tempCartValue);
+        if (response?.data?.success) {
+          MySwal.fire({
+            title: <p>Your order placed please vist your order page</p>,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to add order for item:", error);
+      }
+    } else {
+      MySwal.fire({
+        title: <p>Please select quantity</p>,
+      });
+    }
+  };
   return (
     <>
       <Modal
         size={"5xl"}
-        isOpen={props.isOpen}
-        onClose={props.onClose}
-        placement="bottom"
-        scrollBehavior="inside"
-        backdrop="opaque"
-        classNames={{
-          closeButton: "modalIconClose",
+        isOpen={props?.isOpen}
+        onClose={() => {
+          if (props?.isOpen && cart?.data?.qty && cart?.data?.qty !== 0) {
+            dispatch(
+              onUpdateProductDetailsModal({
+                isOpen: false,
+                item: null,
+              })
+            );
+          }
         }}
-        closeButton={<ModalCloseIcon />}
+        placement="center"
+        scrollBehavior="inside"
+        backdrop="blur"
+        hideCloseButton
       >
         <ModalContent>
           {(onClose) => (
             <>
+              <ModalCloseIcon
+                onClick={() => {
+                  dispatch(
+                    onUpdateProductDetailsModal({
+                      isOpen: false,
+                      item: null,
+                    })
+                  );
+                }}
+                className="modalIconClose"
+              />
               <ModalBody className="p-5">
                 <div className="grid xm:grid-cols-2 mm:grid-cols-2  sm:grid-cols-2 ml:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-3 gap-4">
                   <div className="">
@@ -153,7 +248,11 @@ export const ProductDetails = (props: VendorDetailsProps) => {
                       <CardBody className="overflow-visible p-0 relative">
                         <Image
                           alt="Card background"
-                          src={`${infoData.baseApi}/${props?.item?.product?.photo}`}
+                          src={`${infoData.baseApi}/${
+                            props?.item?.product?.photo
+                              ? props?.item?.product?.photo
+                              : props?.item?.photo
+                          }`}
                           width="100%"
                           radius="lg"
                           className="w-full object-cover md:h-[222px] xm:h-[150px] mm:h-[150px]  ml:h-[150px]"
@@ -164,65 +263,75 @@ export const ProductDetails = (props: VendorDetailsProps) => {
                   <div className="sm:px-2 xl:col-span-1 lg:col-span-1 md:order-3 xm:order-3 mm:order-3 ml:order-3 md:col-span-2 xm:col-span-2 mm:col-span-2 ml:col-span-2 ">
                     <div className="">
                       <h2 className="text-xl truncate font-bold">
-                        {props?.item?.product?.name}
+                        {props?.item?.product?.name
+                          ? props?.item?.product?.name
+                          : props?.item?.name}
                       </h2>
                       <p className="text-slate-300 text-lg line-through font-normal">
-                        Rs : {props?.item?.price}
+                        Rs : {props?.item?.product?.price}
                       </p>
                       <div className="flex justify-between items-center">
                         <p className="text-black text-lg font-normal">
-                          Rs: {props?.item?.price} ({props?.item?.unitSize})
+                          Rs: {props?.item?.product?.total}{" "}
+                          <span style={{ color: "black", fontSize: "10px" }}>
+                            ({props?.item?.product?.unitSize})
+                          </span>
                         </p>
                         <div className="text-sm">120 Stocks</div>
                       </div>
-                      <div className="flex items-center justify-between mt-2">
-                        <div className="">
-                          <div className="flex justify-between items-center rounded-xl bg-gray-100 lg:h-unit-xl">
+                      {(Number(props?.item?.product?.isEnableEcommerce) === 1 ||
+                        Number(props?.item?.isEnableEcommerce) === 1) && (
+                        <div className="flex items-center justify-between mt-2">
+                          <div className="">
+                            <div className="flex justify-between items-center rounded-xl bg-gray-100 lg:h-unit-xl">
+                              <Button
+                                className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
+                                radius="full"
+                                isIconOnly
+                                size="md"
+                                onClick={() => handleAddCart("remove")}
+                              >
+                                -
+                              </Button>
+                              <p className="bg-gray-100 text-sm font-semibold p-0 m-0">
+                                {cart?.data?.qty ? cart?.data?.qty : 0}
+                              </p>
+                              <Button
+                                className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
+                                radius="full"
+                                isIconOnly
+                                size={"md"}
+                                onClick={() => handleAddCart("add")}
+                              >
+                                +
+                              </Button>
+                            </div>
+                          </div>
+                          <div className="">
                             <Button
-                              className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
-                              radius="full"
-                              isIconOnly
-                              size="md"
-                              onClick={() => handleAddCart("remove")}
-                            >
-                              -
-                            </Button>
-                            <p className="bg-gray-100 text-sm font-semibold p-0 m-0">
-                              {cart?.data?.qty ? cart?.data?.qty : 0}
-                            </p>
-                            <Button
-                              className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
-                              radius="full"
-                              isIconOnly
+                              className="xm:h-unit-8 xm:px-4 lg:px-3 lg:h-unit-xl"
+                              color="primary"
+                              variant="ghost"
+                              radius="lg"
                               size={"md"}
-                              onClick={() => handleAddCart("add")}
+                              onClick={() => dispatch(onUpdateCartModal(true))}
                             >
-                              +
+                              View Cart
                             </Button>
                           </div>
                         </div>
-                        <div className="">
-                          <Button
-                            className="xm:h-unit-8 xm:px-4 lg:px-3 lg:h-unit-xl"
-                            color="primary"
-                            variant="ghost"
-                            radius="lg"
-                            size={"md"}
-                            onClick={() => onOpen()}
-                          >
-                            View Cart
-                          </Button>
-                        </div>
-                      </div>
+                      )}
                       <div className="grid grid-cols-12 justify-between items-center mt-4">
                         <div className="col-span-8">
                           <div className="flex items-center justify-between pb-2.5">
                             <p className="text-sm font-normal">Per Order</p>
                             <IconTick
                               fill={
-                                props?.item?.product?.paymentMode?.includes("1")
+                                props?.item?.product?.paymentMode?.includes(
+                                  "1"
+                                ) || props?.item?.paymentMode?.includes("1")
                                   ? "#49A84C"
-                                  : "#E6E6E6"
+                                  : "red"
                               }
                             />
                           </div>
@@ -232,9 +341,11 @@ export const ProductDetails = (props: VendorDetailsProps) => {
                             </p>
                             <IconTick
                               fill={
-                                props?.item?.product?.paymentMode?.includes("1")
+                                props?.item?.product?.paymentMode?.includes(
+                                  "2"
+                                ) || props?.item?.paymentMode?.includes("2")
                                   ? "#49A84C"
-                                  : "#E6E6E6"
+                                  : "red"
                               }
                             />
                           </div>
@@ -244,9 +355,11 @@ export const ProductDetails = (props: VendorDetailsProps) => {
                             </p>
                             <IconTick
                               fill={
-                                props?.item?.product?.paymentMode?.includes("1")
+                                props?.item?.product?.paymentMode?.includes(
+                                  "2"
+                                ) || props?.item?.paymentMode?.includes("2")
                                   ? "#49A84C"
-                                  : "#E6E6E6"
+                                  : "red"
                               }
                             />
                           </div>
@@ -313,49 +426,120 @@ export const ProductDetails = (props: VendorDetailsProps) => {
                         className="w-full object-cover md:h-[222px] xm:h-[150px] mm:h-[145px] ml:h-[145px]"
                         height={300}
                         alt="Here no Image"
-                        src="https://nextui-docs-v2.vercel.app/images/hero-card-complete.jpeg"
+                        src="https://nicknameinfotech.com/img/new-logo.png"
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="sm:px-2 mt-3 flex justify-between items-center ">
-                  <div className="font-semibold md:text-xl xm:text-md">
-                    Related Vendors
+                <div className="grid grid-cols-2">
+                  <div className="">
+                    <div className="description me-2">
+                      <div className="flex w-full flex-col">
+                        <Tabs
+                          aria-label="Options"
+                          color="default"
+                          variant="solid"
+                          // className="flex-col"
+                        >
+                          <Tab
+                            key="photos"
+                            title={
+                              <div className="flex items-center space-x-2 ">
+                                {/* <GalleryIcon /> */}
+                                <span>Description</span>
+                              </div>
+                            }
+                          >
+                            <Card className="min-h-[170px]">
+                              <CardBody>
+                                {props?.item?.product?.slug
+                                  ? props?.item?.product?.slug
+                                  : props?.item?.slug}
+                              </CardBody>
+                            </Card>
+                          </Tab>
+                          {/* <Tab
+                            key="music"
+                            title={
+                              <div className="flex items-center space-x-2">
+                                <span>Product Images</span>
+                              </div>
+                            }
+                          >
+                            <Card className="min-h-[170px]">
+                              <CardBody>
+                                {" "}
+                                <RowsPhotoAlbum
+                                  photos={slides}
+                                  targetRowHeight={150}
+                                  onClick={({ index: current }) =>
+                                    setIndex(current)
+                                  }
+                                />
+                              </CardBody>
+                            </Card>
+                          </Tab> */}
+                        </Tabs>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex flex  items-center">
-                    <Button
-                      className="bg-gray-200 me-5"
-                      size="md"
-                      isIconOnly
-                      aria-label="Like"
-                      variant="bordered"
-                    >
-                      <IconPrev fill="#000000" />
-                    </Button>
-                    <Button
-                      className=" bg-gray-200"
-                      size="md"
-                      isIconOnly
-                      aria-label="Like"
-                      variant="bordered"
-                    >
-                      <IconNext fill="#000000" />
-                    </Button>
+                  <div className="min-h-[170px]">
+                    <h2 className="font-bold my-2">
+                      {props?.item?.product?.isEnableCustomize === 1 ||
+                      props?.item?.isEnableCustomize === 1
+                        ? "Customize Product and order items *"
+                        : "Write your feedback"}
+                    </h2>
+                    <Textarea
+                      classNames={{
+                        base: "max-w-[100%]",
+                        input: "resize-y min-h-[120px]",
+                      }}
+                      placeholder="Enter your details"
+                      onChange={(e) => setCustomization(e.target.value)}
+                      errorMessage={
+                        !customization
+                          ? "Please enter your customization details"
+                          : null
+                      }
+                    />
+                    <div className="flex justify-end mt-2">
+                      {/* <StarRating maxRating={5} /> */}
+                      <Button
+                        variant="ghost"
+                        color={!customization ? "default" : "success"}
+                        disabled={!customization}
+                        className={!customization ? "cursor-not-allowed" : ""}
+                        onClick={() => {
+                          if (
+                            props?.item?.product?.isEnableCustomize === 1 ||
+                            props?.item?.isEnableCustomize === 1
+                          ) {
+                            handleAddOrder();
+                          }
+                        }}
+                      >
+                        {props?.item?.product?.isEnableCustomize === 1 ||
+                        props?.item?.isEnableCustomize === 1
+                          ? "Place Order"
+                          : "Submit FeedBack"}
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <div className="grid xm:grid-cols-1 mm:grid-cols-1 ml:grid-cols-1 sm:grid-cols-2  md:grid-cols-2  lg:grid-cols-2  xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-4 gap-2">
-                  {vendors?.data?.map((item, index) => {
-                    return <VendorCard item={item} key={index} />;
-                  })}
                 </div>
               </ModalBody>
-              <ModalFooter className="pt-0 p-3 flex justify-between"></ModalFooter>
+
+              <Lightbox
+                index={index}
+                slides={slides}
+                open={index >= 0}
+                close={() => setIndex(-1)}
+              />
             </>
           )}
         </ModalContent>
       </Modal>
-      <BuyCard isOpen={isOpen} onClose={onClose} />
     </>
   );
 };

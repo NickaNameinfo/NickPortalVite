@@ -48,6 +48,13 @@ export const VendorProductApi = createApi({
         body,
       }),
     }),
+    addOrder: builder.mutation({
+      query: (body) => ({
+        url: `/order/create`,
+        method: "POST",
+        body,
+      }),
+    }),
     updateCart: builder.mutation({
       query: (body) => ({
         url: `/cart/update/${body?.orderId}/${body?.productId}`,
@@ -70,6 +77,7 @@ export const {
   useGetVendorsByIdQuery,
   useGetVendorsProductByIdQuery,
   useAddCartMutation,
+  useAddOrderMutation,
   useGetCartByProductIdQuery,
   useUpdateCartMutation,
   useGetCartByOrderIdQuery,
