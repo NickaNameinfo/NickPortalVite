@@ -50,7 +50,6 @@ export const Register = () => {
   const [addStores] = useAddStoreMutation();
   const [updateUser] = useUpdateUserMutation();
   const [addVendors] = useAddVendorsMutation();
-
   const onSubmit = async () => {
     try {
       let tempApiValue = {
@@ -83,7 +82,7 @@ export const Register = () => {
             let userResult = await updateUser(tempAPIUserData);
             if (userResult?.data?.success) {
               dispatch(onOpenResigter(false));
-              dispatch(onOpenLogin(true));
+              navigate(`/Admin/`);
             }
           }
         } else if (result?.data?.user?.role === "2") {
@@ -103,14 +102,14 @@ export const Register = () => {
           const resultVendor = await addVendors(apiFormData);
           if (resultVendor?.data?.success) {
             let tempAPIUserData = {
-              id:  resultVendor?.data?.data?.[0]?.id,
+              id: resultVendor?.data?.data?.[0]?.id,
               email: formData?.email,
               vendorId: resultVendor?.data?.data?.[0]?.vendorId,
             };
             let userResult = await updateUser(tempAPIUserData);
             if (userResult?.data?.success) {
               dispatch(onOpenResigter(false));
-              dispatch(onOpenLogin(true));
+              navigate(`/Admin/`);
             }
           }
         } else {
