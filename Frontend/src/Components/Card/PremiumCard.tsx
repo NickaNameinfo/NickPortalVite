@@ -247,7 +247,7 @@ export const PremiumCard = ({
                       shape="circle"
                       color="danger"
                       onClick={() => {
-                        dispatch(onUpdateCartModal(true));
+                        dispatch(onUpdateCartModal(true)); 
                       }}
                     >
                       {/* <Button

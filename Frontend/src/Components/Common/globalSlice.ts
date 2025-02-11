@@ -12,7 +12,7 @@ export interface GlobalConfigState {
   onSearchOpenStore?: boolean;
   storeList?: any;
   isProductDetailsModalOpen?: any;
-  isOpenCartModal: any;
+  isOpenCartModal: any; 
   isOpenOrderModal: any;
   isSideBarExpand:boolean;
 }
@@ -111,3 +111,4 @@ export const {
   onUpdateSidebarExpand
 } = globalConfigSlice.actions;
 export default globalConfigSlice.reducer;
+ 

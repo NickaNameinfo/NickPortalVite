@@ -23,19 +23,20 @@ import {
   TableCell,
   getKeyValue,
 } from "@nextui-org/react";
-import { IconDelete } from "../Icons";
-import { useGetCartByOrderIdQuery } from "../../views/VendorProducts/Service.mjs";
-import {
-  useAddCartMutation,
-  useDeleteCartItemMutation,
-  useUpdateCartMutation,
-} from "../../views/VendorProducts/Service.mjs";
-import { getCookie } from "../../JsFiles/CommonFunction.mjs";
+import { IconDelete, ModalCloseIcon } from "../Icons";
+import { useNavigate, useParams } from "react-router-dom";
 import { infoData } from "../../configData";
-import { useAppDispatch, useAppSelector } from "../../Common/hooks";
-import { onRefreshCart } from "../../Common/globalSlice";
-import { useNavigate } from "react-router-dom";
-
+import { getCookie } from "../../JsFiles/CommonFunction.mjs";
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
+import { onRefreshCart, onUpdateCartModal } from "../../Common/globalSlice";
+import { useAppSelector, useAppDispatch } from "../../Common/hooks";
+import {
+  useGetCartByOrderIdQuery,
+  useUpdateCartMutation,
+  useDeleteCartItemMutation,
+  useAddOrderMutation,
+} from "../../views/VendorProducts/Service.mjs";
 const columns = [
   { name: "Sl.No", uid: "id" },
   { name: "Product", uid: "photo" },
@@ -46,28 +47,38 @@ const columns = [
 export const BuyCard = (props: any) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
-  const id = getCookie("id");
+
+  const isOpenCartModal = useAppSelector(
+    (state) => state.globalConfig.isOpenCartModal
+  );
+  const userId = getCookie("id");
+  const { id } = useParams();
   const {
     data: cart,
     error: cartError,
     refetch: cartRefetch,
-  } = useGetCartByOrderIdQuery(Number(id));
+  } = useGetCartByOrderIdQuery(Number(userId));
+
+  console.log(cart, "asdf7as90d87fas908", Number(userId));
+
   const [updateCart] = useUpdateCartMutation();
   const [deleteCartItem] = useDeleteCartItemMutation();
+  const [addOrder] = useAddOrderMutation();
   const [deletId, setDeleteId] = React.useState(null);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const MySwal = withReactContent(Swal);
 
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
     cartRefetch();
-  }, [id, onRefresh]);
+  }, [userId, onRefresh]);
 
   const handleAddCart = async (type, product) => {
     let tempCartValue = {
       productId: product?.productId,
       name: product?.name,
-      orderId: id,
+      orderId: userId,
       price: Number(product?.price),
       total: Number(product?.qty) * Number(product?.price),
       qty: product?.qty
@@ -87,10 +98,40 @@ export const BuyCard = (props: any) => {
     }
   };
 
-  const onDeleteCartItems = async () => {
+  const handleAddOrder = async () => {
+    if (cart?.data?.length > 0) {
+      const promises = cart.data.map(async (item) => {
+        try {
+          const tempCartValue = {
+            customerId: item?.orderId,
+            paymentmethod: 3,
+            orderId: Number(userId),
+            grandTotal: Number(item?.qty * item?.price),
+            productIds: item?.productId,
+            qty: item?.qty,
+            storeId: id,
+          };
+          return await addOrder(tempCartValue);
+        } catch (error) {
+          console.error("Failed to add order for item:", item, error);
+          return null; // Return null for failed orders
+        }
+      });
+      if (promises) {
+        cart.data.map(async (item) => {
+          onDeleteCartItems(item?.productId);
+        });
+        MySwal.fire({
+          title: <p>Your order placed please vist your order page</p>,
+        });
+      }
+    }
+  };
+
+  const onDeleteCartItems = async (productId?) => {
     let apiInfo = {
-      orderId: id,
-      productId: deletId,
+      orderId: userId,
+      productId: productId ? productId : deletId,
     };
     const result = await deleteCartItem(apiInfo);
     if (result) {
@@ -101,7 +142,6 @@ export const BuyCard = (props: any) => {
   };
 
   const renderCell = React.useCallback((data, columnKey) => {
-    console.log(data, "datacolumnKey", columnKey);
     switch (columnKey) {
       case "photo":
         return (
@@ -160,59 +200,83 @@ export const BuyCard = (props: any) => {
   return (
     <>
       <Modal
-        isOpen={props.isOpen}
-        onClose={props.onClose}
+        isOpen={isOpenCartModal}
+        onClose={() => {
+          if (isOpenCartModal) {
+            dispatch(onUpdateCartModal(false));
+          }
+        }}
         size={"5xl"}
         shadow="md"
         placement="center"
         backdrop="blur"
         scrollBehavior="inside"
+        hideCloseButton
       >
         <ModalContent className="pb-3">
           <>
-            <ModalHeader></ModalHeader>
-            <ModalBody className=" p-0 m-0 mt-1 ">
+            <ModalCloseIcon
+              onClick={() => {
+                dispatch(onUpdateCartModal(false));
+              }}
+              className="modalIconClose"
+            />
+            <ModalBody className="p-0 m-0 mt-1 pt-2">
               <div className="grid xm:grid-cols-1 mm:grid-cols-1  sm:grid-cols-1 ml:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 3xl:grid-cols-2 4xl:grid-cols-2">
                 <div className="">
-                  <Table
-                    isStriped
-                    classNames={{
-                      base: " xm:max-h-[250px] mm:max-h-[250px] ml:max-h-[250px] md:max-h-[340px] lg:max-h-[340px] xl:max-h-[340px] 2xl:max-h-[340px] 3xl:max-h-[340px] 3xl:max-h-[340px] overflow-scroll",
-                      table:
-                        "xm:min-h-[350px] ml:min-h-[350px] mm:min-h-[350px] lg:min-h-[340px] md:max-h-[340px] xl:max-h-[340px] 2xl:max-h-[340px] 3xl:max-h-[340px] 3xl:max-h-[340px] ",
-                    }}
-                  >
-                    <TableHeader columns={columns} className="">
-                      {(column) => (
-                        <TableColumn
-                          className="ps-0 m-0"
-                          key={column.uid}
-                          align={column.uid === "actions" ? "center" : "start"}
-                        >
-                          {column.name}
-                        </TableColumn>
-                      )}
-                    </TableHeader>
+                  {!cart || cart?.data?.length <= 0 ? (
+                    <p className="text-center my-3">No Item in Your Cart</p>
+                  ) : (
+                    <Table
+                      isHeaderSticky
+                      classNames={{
+                        base: "xm:max-h-[250px] mm:max-h-[250px] ml:max-h-[250px] md:max-h-[340px] lg:max-h-[340px] xl:max-h-[340px] 2xl:max-h-[340px] 3xl:max-h-[340px] overflow-hidden",
+                        table: "w-full",
+                      }}
+                    >
+                      <TableHeader
+                        columns={columns}
+                        className="sticky top-0 bg-white z-10"
+                      >
+                        {(column) => (
+                          <TableColumn
+                            className="ps-0 m-0"
+                            key={column.uid}
+                            align={
+                              column.uid === "actions" ? "center" : "start"
+                            }
+                          >
+                            {column.name}
+                          </TableColumn>
+                        )}
+                      </TableHeader>
 
-                    <TableBody items={cart?.data} className="m-0 p-0">
-                      {(item: any) => (
-                        <TableRow key={item?.["id"]} className="p-0 m-0">
-                          {(columnKey) => (
-                            <TableCell className="p-1 m-0">
-                              {renderCell(item, columnKey)}
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
+                      <TableBody
+                        items={cart?.data}
+                        className="max-h-[340px] overflow-y-auto p-0 m-0"
+                      >
+                        {(item: any) => (
+                          <TableRow key={item?.["id"]} className="p-0 m-0">
+                            {(columnKey) => (
+                              <TableCell className="p-1 m-0">
+                                {renderCell(item, columnKey)}
+                              </TableCell>
+                            )}
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  )}
                   <div className="items-center flex justify-center ">
                     <Button
                       size="sm"
                       color="primary"
                       variant="bordered"
-                      className="ms-3"
+                      className={`ms-3 ${
+                        cart?.data?.length <= 0 ? "cursor-not-allowed" : ""
+                      }`}
                       onClick={() => navigate(-1)}
+                      disabled={cart?.data?.length <= 0}
                     >
                       Buy More Items
                     </Button>
@@ -228,15 +292,18 @@ export const BuyCard = (props: any) => {
                         {" "}
                         Rs :{" "}
                         {cart?.data
-                          ?.reduce((sum, item) => sum + item.total, 0)
-                          .toString()
-                          .replace(/(\d+)(\d{3})$/, "$1,$2")}
+                          ?.reduce(
+                            (sum, item) => sum + item.price * item.qty,
+                            0
+                          ) // Multiply price with qty
+                          .toFixed(2) // Ensures two decimal places
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       </div>
                     </div>
-                    <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
+                    {/* <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
                       <div>Discount</div>
                       <div> 100%</div>
-                    </div>
+                    </div> */}
                     <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
                       <div>Delivery Charge</div>
                       <div> Free</div>
@@ -248,9 +315,12 @@ export const BuyCard = (props: any) => {
                         {" "}
                         Rs.{" "}
                         {cart?.data
-                          ?.reduce((sum, item) => sum + item.total, 0)
-                          .toString()
-                          .replace(/(\d+)(\d{3})$/, "$1,$2")}
+                          ?.reduce(
+                            (sum, item) => sum + item.price * item.qty,
+                            0
+                          ) // Multiply price with qty
+                          .toFixed(2) // Ensures two decimal places
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       </div>
                     </div>
                     <Divider orientation="horizontal" className="my-2" />
@@ -259,12 +329,13 @@ export const BuyCard = (props: any) => {
                         Payment Options
                       </div>
                       <RadioGroup className="w-full">
-                        <div className="flex  justify-between items-center mx-3 w-full">
-                          <div className="w-2/4 m-1 items-center">
+                        {/* <div className="flex  justify-between items-center mx-3 w-full"> */}
+                        {/* <div className="w-2/4 m-1 items-center">
                             <Radio
-                              value=" Google-Pay "
+                              value="Google-Pay"
                               size="sm"
                               className="items-center"
+                              disabled
                             >
                               Google Pay
                             </Radio>
@@ -274,6 +345,7 @@ export const BuyCard = (props: any) => {
                               value="Phone-Pay"
                               size="sm"
                               className="items-center"
+                              disabled
                             >
                               Phone Pay
                             </Radio>
@@ -285,6 +357,7 @@ export const BuyCard = (props: any) => {
                               value=" Debit-Card"
                               size="sm"
                               className="items-center"
+                              disabled
                             >
                               Debit Card
                             </Radio>
@@ -294,17 +367,19 @@ export const BuyCard = (props: any) => {
                               value="Credit-Card"
                               size="sm"
                               className="items-center"
+                              disabled
                             >
                               Credit Card
                             </Radio>
                           </div>
-                        </div>
+                        </div> */}
                         <div className="justify-between mx-3 flex w-full items-center">
                           <div className="w-2/4 m-1 items-center">
                             <Radio
-                              value="Cash-on-Delivery"
+                              value={"3"}
                               size="sm"
                               className="items-center"
+                              checked={true}
                             >
                               Cash on Delivery
                             </Radio>
@@ -312,7 +387,15 @@ export const BuyCard = (props: any) => {
                         </div>
                       </RadioGroup>
                       <div className="flex items-center justify-center mt-4 mb-1">
-                        <Button size="sm" color="primary" className="me-5">
+                        <Button
+                          size="sm"
+                          color="primary"
+                          className={`me-5 ${
+                            cart?.data?.length <= 0 ? "cursor-not-allowed" : ""
+                          }`}
+                          disabled={cart?.data?.length <= 0}
+                          onClick={() => handleAddOrder()}
+                        >
                           Book Order
                         </Button>
                         <Button

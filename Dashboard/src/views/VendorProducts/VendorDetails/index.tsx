@@ -39,6 +39,8 @@ const VendorDetails = () => {
     }
   }, [id, refetch]);
 
+  console.log(isOpenCartModal, "asdf7a0s97")
+
   return (
     <div>
       <VendorHeaderCard item={vendorDetails?.data?.[0]} />

@@ -177,7 +177,6 @@ export const ProductDetail = (props: ProductDetailProps) => {
 
   const handleAddOrder = async () => {
     if (cart?.data?.qty && cart?.data?.qty !== 0) {
-      console.log(cart?.data?.qty, "asdf7as9d078");
       try {
         const tempCartValue = {
           customerId: userId,

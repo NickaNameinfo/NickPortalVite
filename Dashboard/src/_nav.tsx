@@ -160,17 +160,17 @@ export const _nav = [
     link: "/",
     icons: <IconHome />,
     menuItems: [
-      ...(tempRole !== "3"
-        ? [
-            {
-              menuType: "single",
-              name: "Stores",
-              key: "Stores",
-              link: "/",
-              icons: <IconHome />,
-            },
-          ]
-        : []),
+      // ...(tempRole !== "3"
+      //   ? [
+      //       {
+      //         menuType: "single",
+      //         name: "Stores",
+      //         key: "Stores",
+      //         link: "/",
+      //         icons: <IconHome />,
+      //       },
+      //     ]
+      //   : []),
       {
         menuType: "single",
         name: "Orders",

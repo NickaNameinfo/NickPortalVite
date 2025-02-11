@@ -15,10 +15,16 @@ import { IconHome } from "./Icons";
 import { _nav } from "../_nav";
 import { Link, useNavigate } from "react-router-dom";
 import { eraseCookie } from "../JsFiles/CommonFunction.mjs";
+import { BuyCard } from "./Cards/BuyCard";
+import { useAppSelector } from "../Common/hooks";
 export const AppSidebar = () => {
   const [menuToggle, setMenuToggle] = React.useState(false);
   const [mobileExpand, setMobileExpand] = React.useState(false);
 
+  const isOpenCartModal = useAppSelector(
+    (state) => state.globalConfig.isOpenCartModal
+  );
+  
   const navigate = useNavigate();
 
   const itemClasses = {
@@ -202,6 +208,8 @@ export const AppSidebar = () => {
           </div>
         </aside>
       </div>
+      {/* {isOPenOrderModal && <OrderCard />} */}
+      {isOpenCartModal && <BuyCard />}
     </>
   );
 };

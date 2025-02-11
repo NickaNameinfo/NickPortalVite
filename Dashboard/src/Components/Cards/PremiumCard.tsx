@@ -25,69 +25,85 @@ import {
   useAddCartMutation,
   useGetCartByProductIdQuery,
   useUpdateCartMutation,
+  useDeleteCartItemMutation,
 } from "../../views/VendorProducts/Service.mjs";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import { useAppDispatch, useAppSelector } from "../../Common/hooks";
-import { onRefreshCart } from "../../Common/globalSlice";
+import {
+  onRefreshCart,
+  onUpdateCartModal,
+  onUpdateProductDetailsModal,
+} from "../../Common/globalSlice";
+import InputNextUI from "../Common/Input/input";
 
 export const PremiumCard = ({ item = null }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const {
-    isOpen: cartIsOpen,
-    onOpen: cartOpen,
-    onClose: cartClose,
-  } = useDisclosure();
-  const [cartPopup, setTrue, setFalse, toggle] = useBoolean(false);
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
   const id = getCookie("id");
   const [addCart] = useAddCartMutation();
   const [updateCart] = useUpdateCartMutation();
+  const [deleteCartItem] = useDeleteCartItemMutation();
   const dispatch = useAppDispatch();
   let productId = {
     id: id,
     productId: item?.product?.id,
   };
   const { data, error, refetch } = useGetCartByProductIdQuery(productId);
-
+  const [qty, setQty] = React.useState(0);
+  
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
     refetch();
   }, [onRefresh]);
 
-  const handleAddCart = async (type) => {
+  React.useEffect(() => {
+    handleAddCart(qty);
+  }, [qty]);
+
+  const handleAddCart = async (value) => {
     let tempCartValue = {
       productId: item?.product?.id,
       name: item?.product?.name,
       orderId: id,
       price: Number(item?.price),
       total: Number(data?.data?.qty) * Number(item?.price),
-      qty: data?.data?.qty
-        ? type === "add"
-          ? Number(data?.data?.qty) + 1
-          : Number(data?.data?.qty) - 1
-        : 1,
+      qty: !value || value === 0 ? 0 : value,
       photo: item?.product?.photo,
     };
-    if (data?.data) {
-      try {
-        const result = await updateCart(tempCartValue);
-        if (result) {
-          refetch();
-          dispatch(onRefreshCart(true));
-        }
-      } catch (error) {
-        console.log(error);
-      }
+    if (!value || value === 0) {
+      onDeleteCartItems(item?.product?.id);
     } else {
-      try {
-        const result = await addCart(tempCartValue);
-        if (result) {
-          refetch();
-          dispatch(onRefreshCart(true));
+      if (data?.data) {
+        try {
+          const result = await updateCart(tempCartValue);
+          if (result) {
+            refetch();
+            dispatch(onRefreshCart(true));
+          }
+        } catch (error) {
+          console.log(error);
         }
-      } catch (error) {
-        console.log(error);
+      } else {
+        try {
+          const result = await addCart(tempCartValue);
+          if (result) {
+            refetch();
+            dispatch(onRefreshCart(true));
+          }
+        } catch (error) {
+          console.log(error);
+        }
       }
+    }
+  };
+
+  const onDeleteCartItems = async (productId?) => {
+    let apiInfo = {
+      orderId: id,
+      productId: productId,
+    };
+    const result = await deleteCartItem(apiInfo);
+    if (result) {
+      dispatch(onRefreshCart(true));
     }
   };
 
@@ -174,7 +190,14 @@ export const PremiumCard = ({ item = null }) => {
                     radius="full"
                     isIconOnly
                     size="lg"
-                    onClick={() => onOpen()}
+                    onClick={() =>
+                      dispatch(
+                        onUpdateProductDetailsModal({
+                          isOpen: true,
+                          item: item,
+                        })
+                      )
+                    }
                   >
                     <IconsEye fill="#CFA007" className="m-3 cursor-pointer" />
                   </Button>
@@ -191,7 +214,7 @@ export const PremiumCard = ({ item = null }) => {
                       onClick={() => cartOpen()}
                     > */}
                     <IconShopBag
-                      onClick={() => cartOpen()}
+                      onClick={() => dispatch(onUpdateCartModal(true))}
                       fill="#4C86F9"
                       className="cursor-pointer"
                     />
@@ -218,27 +241,9 @@ export const PremiumCard = ({ item = null }) => {
                     </PopoverTrigger>
                     <PopoverContent className="addsub bg-white ">
                       <div className="flex justify-between items-center">
-                        <Button
-                          className="bgnone p-0 m-0 text-base font-semibold"
-                          radius="full"
-                          isIconOnly
-                          size="md"
-                          onClick={() => handleAddCart("remove")}
-                        >
-                          -
-                        </Button>
-                        <p className="bgnonetext-sm font-semibold px-2 ">
-                          {data?.data?.qty ? data?.data?.qty : 0}
-                        </p>
-                        <Button
-                          className="bgnone p-0 m-0 text-base font-semibold "
-                          radius="full"
-                          isIconOnly
-                          size="md"
-                          onClick={() => handleAddCart("add")}
-                        >
-                          +
-                        </Button>
+                        <InputNextUI
+                          onChange={(value) => setQty(value)}
+                        />
                       </div>
                     </PopoverContent>
                   </Popover>
