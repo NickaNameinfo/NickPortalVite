@@ -97,18 +97,18 @@ module.exports = {
         order: [["createdAt", "DESC"]],
         include: [{ model: db.addresses }],
       });
-  
+
       // Extract unique product IDs for all orders
       const productIds = orders.flatMap((order) =>
         Array.isArray(order.productIds) ? order.productIds : [order.productIds]
       );
       const uniqueProductIds = [...new Set(productIds)];
-  
+
       // Fetch all unique products
       const products = await db.product.findAll({
         where: { id: uniqueProductIds },
       });
-  
+
       // Attach only relevant products to each order
       const ordersWithProducts = orders.map((order) => {
         const orderProductIds = Array.isArray(order.productIds)
@@ -121,19 +121,22 @@ module.exports = {
           ),
         };
       });
-  
+
       res.status(200).json({ success: true, data: ordersWithProducts });
     } catch (err) {
       next(err);
     }
-  },  
+  },
 
   async getAllOrderListBySoreId(req, res, next) {
     try {
       const orders = await db.orders.findAll({
         where: { storeId: req.params.id },
         order: [["createdAt", "DESC"]],
-        include: [{ model: db.addresses }],
+        include: [
+          { model: db.addresses },
+          { model: db.users }, // Include user details
+        ],
       });
 
       const productIds = orders.flatMap((order) => order.productIds || []);

@@ -74,6 +74,8 @@ const CustomersOrderList = () => {
     refetch();
   }, [ids]);
 
+  console.log(data, "data9087")
+
   const columns = [
     { name: "S.No", id: "id", sortable: true },
     { name: "custId", id: "custId", sortable: true },
