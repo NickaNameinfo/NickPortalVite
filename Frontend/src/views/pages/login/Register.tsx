@@ -82,7 +82,7 @@ export const Register = () => {
             let userResult = await updateUser(tempAPIUserData);
             if (userResult?.data?.success) {
               dispatch(onOpenResigter(false));
-              navigate(`https://nicknameportal.shop/Admin/`);
+              window.open("https://nicknameportal.shop/Admin/", "_blank");
             }
           }
         } else if (result?.data?.user?.role === "2") {
@@ -109,7 +109,7 @@ export const Register = () => {
             let userResult = await updateUser(tempAPIUserData);
             if (userResult?.data?.success) {
               dispatch(onOpenResigter(false));
-              navigate(`https://nicknameportal.shop/Admin/`);
+              window.open("https://nicknameportal.shop/Admin/", "_blank");
             }
           }
         } else {

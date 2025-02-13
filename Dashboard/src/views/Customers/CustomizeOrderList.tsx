@@ -167,7 +167,7 @@ const CustomizeOrderList = () => {
           columns={columns}
           tableItems={
             currentRole === 0
-              ? data?.["data"]?.filter((item) => item?.customization)
+              ? data?.["data"]
               : storeOrder?.["data"]?.filter((item) => item?.customization)
           }
           isStatusFilter={false}
