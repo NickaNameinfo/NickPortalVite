@@ -159,7 +159,15 @@ export const PremiumCard = ({
                 >{`(${productItem?.unitSize})`}</span>
               </p>
               <p className="font-normal text-sm  TextMaincolor p-0">
-                120 Stocks
+                <small
+                  style={{
+                    color: "#999",
+                    paddingLeft: "10px",
+                  }}
+                >
+                  Coming soon
+                </small>{" "}
+                Stocks
               </p>
             </div>
             <div className="w-full flex justify-between mt-2">
@@ -247,7 +255,7 @@ export const PremiumCard = ({
                       shape="circle"
                       color="danger"
                       onClick={() => {
-                        dispatch(onUpdateCartModal(true)); 
+                        dispatch(onUpdateCartModal(true));
                       }}
                     >
                       {/* <Button

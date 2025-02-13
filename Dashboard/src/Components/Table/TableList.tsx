@@ -31,6 +31,7 @@ interface TableProps {
   defaultCloumns: any;
   renderCell: any;
   isStatusFilter: boolean;
+  refreshOrder?: boolean;
 }
 
 export const TableList = (props: TableProps) => {
@@ -57,7 +58,6 @@ export const TableList = (props: TableProps) => {
       Array.from(visibleColumns).includes(column.id)
     );
   }, [visibleColumns]);
-
   const filteredItems = React.useMemo(() => {
     let filteredUsers = props?.tableItems ? [...props?.tableItems] : [];
 
@@ -297,7 +297,7 @@ export const TableList = (props: TableProps) => {
     hasSearchFilter,
   ]);
 
-  return (
+  return !props.refreshOrder ? (
     <Table
       aria-label="Example table with custom cells, pagination and sorting"
       isHeaderSticky
@@ -340,5 +340,7 @@ export const TableList = (props: TableProps) => {
         )}
       </TableBody>
     </Table>
+  ) : (
+    <p>Loading...</p>
   );
 };

@@ -128,7 +128,10 @@ export const VendorCard = ({ item = null }) => {
             Products : {data?.data?.length ? data?.data?.length : 0}
           </div>
           <div className="font-normal text-sm  TextMaincolor w-6/12 justify-end flex">
-            Near By : 15 Km
+            Near By : <small style={{
+              color: "#999",
+              paddingLeft : "10px",
+            }}>Coming soon</small>
           </div>
         </div>
       </CardFooter>

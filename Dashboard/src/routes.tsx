@@ -30,6 +30,7 @@ const Subscriptions = React.lazy(
   () => import("../src/views/Subscriptions/index")
 );
 const Dashboard = React.lazy(() => import("../src/views/Dashboard/index"));
+const YourOrders = React.lazy(() => import("../src/views/Orders/index"));
 
 const routes = [
   { path: "/", exact: false, name: "Home" },
@@ -62,6 +63,7 @@ const routes = [
     element: VendorDetails,
   },
   { path: "/Subscriptions", name: "Subscriptions", element: Subscriptions },
+  { path: "/YourOrders", name: "YourOrders", element: YourOrders },
 ];
 
 export default routes;

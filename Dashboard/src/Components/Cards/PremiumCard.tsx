@@ -49,7 +49,7 @@ export const PremiumCard = ({ item = null }) => {
   };
   const { data, error, refetch } = useGetCartByProductIdQuery(productId);
   const [qty, setQty] = React.useState(0);
-  
+
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
     refetch();
@@ -135,7 +135,15 @@ export const PremiumCard = ({ item = null }) => {
                 Rs : {item?.price}
               </p>
               <p className="font-normal text-sm  TextMaincolor p-0">
-                120 Stocks
+                <small
+                  style={{
+                    color: "#999",
+                    paddingLeft: "10px",
+                  }}
+                >
+                  Coming soon
+                </small>{" "}
+                Stocks
               </p>
             </div>
             <div className="w-full flex justify-between mt-2">
@@ -241,9 +249,7 @@ export const PremiumCard = ({ item = null }) => {
                     </PopoverTrigger>
                     <PopoverContent className="addsub bg-white ">
                       <div className="flex justify-between items-center">
-                        <InputNextUI
-                          onChange={(value) => setQty(value)}
-                        />
+                        <InputNextUI onChange={(value) => setQty(value)} />
                       </div>
                     </PopoverContent>
                   </Popover>

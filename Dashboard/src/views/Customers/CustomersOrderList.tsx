@@ -52,6 +52,8 @@ const CustomersOrderList = () => {
   const [updateOrder] = useUpdatOrderMutation();
 
   const [selectedId, setSelectedId] = React.useState(null);
+  const [refreshOrder, setRefreshOrder] = React.useState(false);
+
   const [orderStatus, serteOrderStatus] = React.useState([
     "processing",
     "shipping",
@@ -73,8 +75,6 @@ const CustomersOrderList = () => {
     storeOrderRefetch();
     refetch();
   }, [ids]);
-
-  console.log(data, "data9087")
 
   const columns = [
     { name: "S.No", id: "id", sortable: true },
@@ -124,7 +124,6 @@ const CustomersOrderList = () => {
             className="border-l-indigo-500"
             onPress={onOpen}
             onClick={() => {
-              console.log(user, "asdfa70s98d7fa");
               setValue("status", user?.status);
               setValue(
                 "deliverydate",
@@ -142,6 +141,7 @@ const CustomersOrderList = () => {
   }, []);
 
   const onSubmit = async (data: any) => {
+    setRefreshOrder(true);
     const { year, month, day } = data.deliverydate;
     // Create a Date object (Note: JavaScript months are 0-indexed)
     const date = new Date(year, month - 1, day);
@@ -153,25 +153,30 @@ const CustomersOrderList = () => {
       id: selectedId,
     };
     const result = await updateOrder(tempApiParams).unwrap();
+    console.log(result, "asdfas790")
     if (result?.success) {
-      onClose();
+      storeOrderRefetch();
+      setRefreshOrder(false);
     }
   };
 
   return (
     <div className="mx-2">
-      {data && (
+      {!refreshOrder ? (
         <TableList
           defaultCloumns={defaultCloumns}
           renderCell={renderCell}
           columns={columns}
           tableItems={
             currentRole === 0
-              ? data?.["data"]?.filter((item) => !item?.customization)
+              ? data?.["data"]
               : storeOrder?.["data"]?.filter((item) => !item?.customization)
           }
           isStatusFilter={false}
+          refreshOrder={refreshOrder}
         />
+      ) : (
+        "Loading...232"
       )}
       <Modal
         isOpen={isOpen}

@@ -26,7 +26,7 @@ export const StoreCard = ({ item = null, key = null }) => {
     Number(item?.id)
   );
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <Card className="ps-1 Storecard p-0">
@@ -37,7 +37,10 @@ export const StoreCard = ({ item = null, key = null }) => {
       </CardHeader>
       <CardBody className="overflow-visible pt-2 pb-3.5 ps-2 pe-2  ">
         <div className="grid grid-cols-12">
-          <div className="col-span-5" onClick={() => navigate(`/Store/StoreDetails/${item?.id}`)}>
+          <div
+            className="col-span-5"
+            onClick={() => navigate(`/Store/StoreDetails/${item?.id}`)}
+          >
             <Image
               isZoomed
               shadow="md"
@@ -105,16 +108,16 @@ export const StoreCard = ({ item = null, key = null }) => {
 
               <div className="mt-0 basis-3/12 justify-end flex pe-0">
                 <div className="iconbox flex items-center justify-center cursor-pointer">
-                    <Button
-                      radius="full"
-                      isIconOnly
-                      size="sm"
-                      className="iconbox"
-                      type="button"
-                      onClick={() => navigate(`/Store/StoreDetails/${item?.id}`)}
-                    >
-                      <IconstoreCardNext fill="#6942CB" />
-                    </Button>
+                  <Button
+                    radius="full"
+                    isIconOnly
+                    size="sm"
+                    className="iconbox"
+                    type="button"
+                    onClick={() => navigate(`/Store/StoreDetails/${item?.id}`)}
+                  >
+                    <IconstoreCardNext fill="#6942CB" />
+                  </Button>
                 </div>
               </div>
             </div>
@@ -128,7 +131,15 @@ export const StoreCard = ({ item = null, key = null }) => {
             Products : {data?.data?.length ? data?.data?.length : 0}
           </div>
           <div className="font-normal text-sm  TextMaincolor w-6/12 justify-end flex">
-            Near By : 15 Km
+            Near By :{" "}
+            <small
+              style={{
+                color: "#999",
+                paddingLeft: "10px",
+              }}
+            >
+              Coming soon
+            </small>
           </div>
         </div>
       </CardFooter>

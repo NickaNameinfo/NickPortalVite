@@ -269,4 +269,15 @@ export const _nav = [
     key: "LogOut",
     icons: <IconHome />,
   },
+  ...(tempRole === "3"
+    ? [
+        {
+          menuType: "single",
+          name: "YourOrders",
+          key: "YourOrders",
+          link: "/YourOrders",
+          icons: <IconHome />,
+        },
+      ]
+    : []),
 ];
