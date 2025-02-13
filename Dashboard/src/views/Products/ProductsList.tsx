@@ -164,7 +164,7 @@ const ProductsList = () => {
           renderCell={renderCell}
           columns={currentRole !== "1" ? byuserCloumn : columns}
           tableItems={
-            currentRole === "1"
+            currentRole === "0"
               ? data?.["data"]
               : currentRole === "2"
               ? vendorProducts?.data
