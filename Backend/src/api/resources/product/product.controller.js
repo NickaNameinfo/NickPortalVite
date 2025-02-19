@@ -215,6 +215,7 @@ module.exports = {
                 brand: brand ? brand : product?.brand,
                 unitSize: unitSize ? unitSize : product.unitSize,
                 desc: desc ? desc : product.desc,
+                sortDesc: desc ? desc : product.sortDesc,
                 buyerPrice: buyerPrice ? buyerPrice : product.buyerPrice,
                 price: price ? price : product.price,
                 qty: qty ? qty : product.qty,
