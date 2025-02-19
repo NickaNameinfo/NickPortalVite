@@ -276,7 +276,17 @@ export const ProductDetail = (props: ProductDetailProps) => {
                             ({props?.item?.product?.unitSize})
                           </span>
                         </p>
-                        <div className="text-sm">120 Stocks</div>
+                        <div className="text-sm">
+                          <small
+                            style={{
+                              color: "#999",
+                              paddingLeft: "10px",
+                            }}
+                          >
+                            Coming soon
+                          </small>{" "}
+                          Stocks
+                        </div>
                       </div>
                       {(Number(props?.item?.product?.isEnableEcommerce) === 1 ||
                         Number(props?.item?.isEnableEcommerce) === 1) && (
@@ -452,9 +462,9 @@ export const ProductDetail = (props: ProductDetailProps) => {
                           >
                             <Card className="min-h-[170px]">
                               <CardBody>
-                                {props?.item?.product?.slug
-                                  ? props?.item?.product?.slug
-                                  : props?.item?.slug}
+                                {props?.item?.product?.sortDesc
+                                  ? props?.item?.product?.sortDesc
+                                  : props?.item?.sortDesc}
                               </CardBody>
                             </Card>
                           </Tab>

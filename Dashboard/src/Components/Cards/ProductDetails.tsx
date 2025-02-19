@@ -463,9 +463,9 @@ export const ProductDetail = (props: ProductDetailProps) => {
                           >
                             <Card className="min-h-[170px]">
                               <CardBody>
-                                {props?.item?.product?.slug
-                                  ? props?.item?.product?.slug
-                                  : props?.item?.slug}
+                                {props?.item?.product?.sortDesc
+                                  ? props?.item?.product?.sortDesc
+                                  : props?.item?.sortDesc}
                               </CardBody>
                             </Card>
                           </Tab>
