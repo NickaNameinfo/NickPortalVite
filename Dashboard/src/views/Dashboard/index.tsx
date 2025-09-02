@@ -5,63 +5,68 @@ const Dashboard = () => {
     {
       title: "Products",
       img: "https://nextui.org/images/fruit-1.jpeg",
-      price: "$5.50",
+      price: "6867",
     },
-    {
-      title: "Customers",
-      img: "https://nextui.org/images/fruit-2.jpeg",
-      price: "$3.00",
-    },
-    {
-      title: "Customer Requests",
-      img: "https://nextui.org/images/fruit-3.jpeg",
-      price: "$10.00",
-    },
+    // {
+    //   title: "Customers",
+    //   img: "https://nextui.org/images/fruit-2.jpeg",
+    //   price: "$3.00",
+    // },
+    // {
+    //   title: "Customer Requests",
+    //   img: "https://nextui.org/images/fruit-3.jpeg",
+    //   price: "$10.00",
+    // },
     {
       title: "Customer Orders",
       img: "https://nextui.org/images/fruit-4.jpeg",
-      price: "$5.30",
+      price: "876",
     },
     {
-      title: "Your Orders",
+      title: "Customize Orders",
       img: "https://nextui.org/images/fruit-5.jpeg",
-      price: "$15.70",
+      price: "76",
     },
     {
-      title: "Transactions",
-      img: "https://nextui.org/images/fruit-6.jpeg",
-      price: "$8.00",
+      title: "Store Orders",
+      img: "https://nextui.org/images/fruit-5.jpeg",
+      price: "876",
     },
-    {
-      title: "Over all Reports",
-      img: "https://nextui.org/images/fruit-7.jpeg",
-      price: "$7.50",
-    },
-    {
-      title: "Today Sale",
-      img: "https://nextui.org/images/fruit-8.jpeg",
-      price: "$12.20",
-    },
-    {
-      title: "Weekly Sale",
-      img: "https://nextui.org/images/fruit-8.jpeg",
-      price: "$12.20",
-    },
-    {
-      title: "Monthly Sale",
-      img: "https://nextui.org/images/fruit-8.jpeg",
-      price: "$12.20",
-    },
-    {
-      title: "Yearly Sale",
-      img: "https://nextui.org/images/fruit-8.jpeg",
-      price: "$12.20",
-    },
-    {
-      title: "Other Details",
-      img: "https://nextui.org/images/fruit-8.jpeg",
-      price: "$12.20",
-    },
+    // {
+    //   title: "Transactions",
+    //   img: "https://nextui.org/images/fruit-6.jpeg",
+    //   price: "$8.00",
+    // },
+    // {
+    //   title: "Over all Reports",
+    //   img: "https://nextui.org/images/fruit-7.jpeg",
+    //   price: "$7.50",
+    // },
+    // {
+    //   title: "Today Sale",
+    //   img: "https://nextui.org/images/fruit-8.jpeg",
+    //   price: "$12.20",
+    // },
+    // {
+    //   title: "Weekly Sale",
+    //   img: "https://nextui.org/images/fruit-8.jpeg",
+    //   price: "$12.20",
+    // },
+    // {
+    //   title: "Monthly Sale",
+    //   img: "https://nextui.org/images/fruit-8.jpeg",
+    //   price: "$12.20",
+    // },
+    // {
+    //   title: "Yearly Sale",
+    //   img: "https://nextui.org/images/fruit-8.jpeg",
+    //   price: "$12.20",
+    // },
+    // {
+    //   title: "Other Details",
+    //   img: "https://nextui.org/images/fruit-8.jpeg",
+    //   price: "$12.20",
+    // },
   ];
 
   return (

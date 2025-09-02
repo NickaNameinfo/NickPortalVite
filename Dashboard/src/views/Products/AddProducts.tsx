@@ -16,7 +16,7 @@ import {
   SelectItem,
   User,
 } from "@nextui-org/react";
-import React from "react";
+import React, { createContext } from "react";
 import {
   useAddProductMutation,
   useAddStoreProductMutation,
@@ -24,6 +24,7 @@ import {
   useGetProductsByIdQuery,
   useUpdateProductMutation,
 } from "./Service.mjs";
+import { useUploadFileMutation } from "../../Service.mjs"
 import { useGetCategoriesQuery } from "../Categories/Service.mjs";
 import { getCookie } from "../.././JsFiles//CommonFunction.mjs";
 import InputNextUI from "../../Components/Common/Input/input";
@@ -31,6 +32,7 @@ import { infoData } from "../../configData";
 import { useGetSubcriptionByCustomerIDQuery } from "../Subscriptions/Service.mjs";
 import { useGetVendorsProductByIdQuery } from "../VendorProducts/Service.mjs";
 import { useGetStoresProductByIDQuery } from "../Store/Service.mjs";
+import { SubscriptionExpiredModal } from "../../Components/SubscriptionExpiredModal";
 
 const AddProducts = () => {
   const {
@@ -44,10 +46,12 @@ const AddProducts = () => {
   const currentStoreUserId = getCookie("storeId");
   const currentVendorUserId = getCookie("vendorId");
   const navigate = useNavigate();
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = React.useState(false);
   const [addProducts] = useAddProductMutation();
   const [addStoreProducts] = useAddStoreProductMutation();
   const [addVendorProducts] = useAddVendorProductMutation();
   const [updateProducts] = useUpdateProductMutation();
+  const [uploadfile] = useUploadFileMutation();
   const { productId } = useParams();
   let tempFormData = watch();
   const {
@@ -55,9 +59,21 @@ const AddProducts = () => {
     error: categoryerror,
     refetch: categoryrefetch,
   } = useGetCategoriesQuery();
+
   let currentUserId = currentStoreUserId
     ? currentStoreUserId
     : currentVendorUserId;
+
+  let sellingProductValues = {
+    id: currentUserId,
+    subscriptionType: "Plan0",
+  };
+
+  const {
+    data: sellingProductValuesData,
+    error: sellingProductValuesError,
+    refetch: sellingProductValuesRefetch,
+  } = useGetSubcriptionByCustomerIDQuery(sellingProductValues, { skip: !currentUserId });
 
   let tempEcommereceValues = {
     id: currentUserId,
@@ -67,43 +83,61 @@ const AddProducts = () => {
     data: ecommereceSubcriptionData,
     error,
     refetch,
-  } = useGetSubcriptionByCustomerIDQuery(tempEcommereceValues);
+  } = useGetSubcriptionByCustomerIDQuery(tempEcommereceValues, { skip: !currentUserId });
 
   let temCustomizeValues = {
     id: currentUserId,
     subscriptionType: "Plan2",
   };
+
   const {
     data: customizeSubcriptionData,
     error: customizeError,
     refetch: customizeRefetch,
-  } = useGetSubcriptionByCustomerIDQuery(temCustomizeValues);
+  } = useGetSubcriptionByCustomerIDQuery(temCustomizeValues, { skip: !currentUserId });
 
   const {
     data: vendorProducts,
     error: vendorError,
     refetch: vendorRefetch,
-  } = useGetVendorsProductByIdQuery(Number(currentVendorUserId));
+  } = useGetVendorsProductByIdQuery(Number(currentVendorUserId), { skip: !currentVendorUserId });
 
   const {
     data: storeProducts,
     error: storeError,
     refetch: stroeRefetch,
-  } = useGetStoresProductByIDQuery(Number(currentStoreUserId));
+  } = useGetStoresProductByIDQuery(Number(currentStoreUserId), { skip: !currentStoreUserId });
 
   const {
     data: productData,
     error: productError,
     refetch: productRefetch,
-  } = useGetProductsByIdQuery(productId);
+  } = useGetProductsByIdQuery(productId, { skip: !productId });
 
   React.useEffect(() => {
     setValue("paymentMode", ["1", "2", "3"]);
-    productRefetch();
-    stroeRefetch();
-    vendorRefetch();
-    customizeRefetch();
   }, []);
+
+  React.useEffect(() => {
+    if (!productId) {
+      reset({
+        categoryId: "",
+        name: "",
+        description: "",
+        price: "",
+        discount: "",
+        qty: "",
+        total: "",
+        discountPer: "",
+        grand_total: "",
+        paymentMode: ["1", "2", "3"],
+        isEnableCustomize: false,
+        isEnableEcommerce: false,
+      });
+    }
+   
+  }, [productId, reset]);
+
 
   React.useEffect(() => {
     if (productData?.data) {
@@ -124,25 +158,50 @@ const AddProducts = () => {
     setValue("discountPer", Number(discountAmount));
   }, [tempFormData?.price, tempFormData?.discount, tempFormData?.qty]);
 
+  let productListValues =
+    vendorProducts?.data?.length > 0
+      ? vendorProducts?.data
+      : storeProducts?.data;
+
+  const filteredEcommereceData = productListValues?.filter(
+    (item) => item.product.isEnableEcommerce === "1"
+  );
+  const filteredCustomizeData = productListValues?.filter(
+    (item) => item.product.isEnableCustomize === 1
+  );
+  const productAddCount = sellingProductValuesData?.data?.subscriptionCount + sellingProductValuesData?.data?.freeCount
+
   const onSubmit = async (data: any) => {
-    let tempData = {
+    const formData = new FormData();
+    if ( productAddCount <= productListValues?.length && !productId) {
+      setIsSubscriptionModalOpen(true)
+      return;
+    }
+
+    // Only append file if it exists
+    if (data.photo) {
+      formData.append("file", data.photo);
+    }
+    if(!data.photo) {
+      alert("Please select image");
+      return;
+    }
+    let fileResult = await uploadfile(formData);
+    if (!fileResult?.data?.success && !productId) return;
+    let apiParams = {
       ...data,
       subCategoryId: 3,
       childCategoryId: 3,
-      slug: data?.name,
+      slug: `${new Date().getTime()}`,
       createdId: currentStoreUserId ? currentStoreUserId : currentVendorUserId,
       createdType: currentStoreUserId ? "Store" : "Vendor",
       paymentMode: String(tempFormData?.paymentMode || ""),
       isEnableCustomize: tempFormData?.isEnableCustomize ? "1" : "0",
       isEnableEcommerce: tempFormData?.isEnableEcommerce ? "1" : "0",
+      photo: fileResult?.data?.fileUrl,
     };
-    console.log(tempData, "tempData123452345");
-    const formData = new FormData();
-    for (const key in tempData) {
-      formData.append(key, tempData[key]);
-    }
-    if (!productData?.data) {
-      const result = await addProducts(formData).unwrap();
+    if (!productId) {
+      const result = await addProducts(apiParams).unwrap();
       if (result?.success) {
         const tempStoreValueAPI = {
           supplierId: currentStoreUserId
@@ -171,24 +230,12 @@ const AddProducts = () => {
       }
     } else {
       setValue("id", productData?.data?.id);
-      const result = await updateProducts(formData).unwrap();
+      const result = await updateProducts(apiParams).unwrap();
       if (result?.success) {
         navigate("/ProductsList");
       }
     }
   };
-
-  let productListValues =
-    vendorProducts?.data?.length > 0
-      ? vendorProducts?.data
-      : storeProducts?.data;
-
-  const filteredEcommereceData = productListValues?.filter(
-    (item) => item.product.isEnableEcommerce === "1"
-  );
-  const filteredCustomizeData = productListValues?.filter(
-    (item) => item.product.isEnableCustomize === 1
-  );
 
   return (
     <div className="mx-3">
@@ -219,26 +266,35 @@ const AddProducts = () => {
             color="default"
           >
             <p className="font-medium  text-black/70">
-              {" "}
               {productData?.data ? "Update Product" : "Add Protuct"}
             </p>
           </Chip>
-          <Chip variant="flat" color="primary">
-            Total Ecommerce Subscription{" "}
-            {ecommereceSubcriptionData?.data?.[0]?.subscriptionCount}
-          </Chip>
-          <Chip variant="flat" color="warning">
-            Total Customize Subscription{" "}
-            {customizeSubcriptionData?.data?.[0]?.subscriptionCount}
-          </Chip>
+          <div className="text-center">
+            <Chip variant="flat" color="primary">
+              Total Ecommerce Subscription
+            </Chip>
+            <p className="mt-2">Total : <Chip variant="flat" color="success" size="sm">{ecommereceSubcriptionData?.data?.subscriptionCount ?? 0}</Chip> Used : <Chip variant="flat" color="danger" size="sm">{filteredEcommereceData?.length ?? 0}</Chip></p>
+          </div>
+          <div className="text-center">
+            <Chip variant="flat" color="danger">
+              Total Customize Subscription
+            </Chip>
+            <p className="mt-2">Total : <Chip variant="flat" color="success" size="sm">{customizeSubcriptionData?.data?.subscriptionCount ?? 0}</Chip> Used : <Chip variant="flat" color="danger" size="sm">{filteredCustomizeData?.length ?? 0}</Chip></p>
+          </div>
+          <div className="text-center">
+            <Chip variant="flat" color="warning">
+              Total Selling Products Subscription
+            </Chip>
+            <p className="mt-2">Total : <Chip variant="flat" color="success" size="sm">{productAddCount ?? 0}</Chip> Used : <Chip variant="flat" color="danger" size="sm">{productListValues?.length ?? 0}</Chip></p>
+          </div>
           <div className="text-center">
             <Button
               color="primary"
               type="submit"
               size="md"
-              // className="w-[90px]"
+            // className="w-[90px]"
             >
-              {productData?.data ? "Update Product" : "Add New Product"}
+              {productId ? "Update Product" : "Add Product"}
             </Button>
           </div>
         </div>
@@ -365,9 +421,6 @@ const AddProducts = () => {
                 <InputNextUI
                   type="text"
                   label="Name"
-                  onChange={(value) => {
-                    console.log(value, "ownername");
-                  }}
                   {...field}
                   isRequired={true}
                   isInvalid={errors?.["name"] ? true : false}
@@ -383,9 +436,6 @@ const AddProducts = () => {
                 <InputNextUI
                   type="text"
                   label="Unit"
-                  onChange={(value) => {
-                    console.log(value, "ownername");
-                  }}
                   {...field}
                   isRequired={true}
                   isInvalid={errors?.["unitSize"] ? true : false}
@@ -416,9 +466,6 @@ const AddProducts = () => {
                 <InputNextUI
                   type="text"
                   label="Sort Description"
-                  onChange={(value) => {
-                    console.log(value, "ownername");
-                  }}
                   {...field}
                   isRequired={true}
                   isInvalid={errors?.["sortDesc"] ? true : false}
@@ -453,9 +500,6 @@ const AddProducts = () => {
                 <InputNextUI
                   type="text"
                   label="Quantity"
-                  onChange={(value) => {
-                    console.log(value, "ownername");
-                  }}
                   {...field}
                   isRequired={true}
                   isInvalid={errors?.["qty"] ? true : false}
@@ -471,9 +515,6 @@ const AddProducts = () => {
                 <InputNextUI
                   type="text"
                   label="Discoint(%)"
-                  onChange={(value) => {
-                    console.log(value, "ownername");
-                  }}
                   {...field}
                   isRequired={true}
                   isInvalid={errors?.["discount"] ? true : false}
@@ -489,9 +530,6 @@ const AddProducts = () => {
                 <InputNextUI
                   type="text"
                   label="Discount Price"
-                  onChange={(value) => {
-                    console.log(value, "ownername");
-                  }}
                   {...field}
                   isDisabled
                   isRequired={true}
@@ -523,9 +561,6 @@ const AddProducts = () => {
                 <InputNextUI
                   type="text"
                   label="Grant total"
-                  onChange={(value) => {
-                    console.log(value, "Grant total");
-                  }}
                   isDisabled
                   {...field}
                   errorMessage={errors?.["grand_total"]?.message}
@@ -549,7 +584,6 @@ const AddProducts = () => {
                         width: "100%",
                       }}
                       onChange={(e) => {
-                        console.log(e, "Selected file");
                         field.onChange(e.target.files[0]); // Update form state with selected file
                         document.getElementById("fileLabel").innerText = e
                           .target.files[0]
@@ -587,7 +621,7 @@ const AddProducts = () => {
               />
               {/* {productData?.data?.photo && ( */}
               <Image
-                src={`${infoData.baseApi}/${productData?.data?.photo}`}
+                src={`${productData?.data?.photo}`}
                 className="h-20 ml-2"
                 width={100}
               />
@@ -631,22 +665,22 @@ const AddProducts = () => {
                         field.onChange(e.target.checked ? "1" : "0")
                       } // Update value on change
                       isDisabled={
-                        !ecommereceSubcriptionData?.data?.[0]
+                        !ecommereceSubcriptionData?.data
                           ?.subscriptionCount ||
                         String(productData?.data?.isEnableEcommerce) === "1" ||
                         Number(
-                          ecommereceSubcriptionData?.data?.[0]
+                          ecommereceSubcriptionData?.data
                             ?.subscriptionCount
                         ) -
-                          filteredEcommereceData?.length <=
-                          0
+                        filteredEcommereceData?.length <=
+                        0
                       }
                     >
                       Enable Ecommerce
                       <span className="ml-2">
                         <Chip variant="flat" color="primary">
                           {Number(
-                            ecommereceSubcriptionData?.data?.[0]
+                            ecommereceSubcriptionData?.data
                               ?.subscriptionCount
                           ) - filteredEcommereceData?.length}
                         </Chip>
@@ -670,23 +704,23 @@ const AddProducts = () => {
                           field.onChange(e.target.checked ? "1" : "0")
                         } // Update value on change
                         isDisabled={
-                          !customizeSubcriptionData?.data?.[0]
+                          !customizeSubcriptionData?.data
                             ?.subscriptionCount ||
                           String(productData?.data?.isEnableCustomize) ===
-                            "1" ||
+                          "1" ||
                           Number(
-                            customizeSubcriptionData?.data?.[0]
+                            customizeSubcriptionData?.data
                               ?.subscriptionCount
                           ) -
-                            filteredCustomizeData?.length <=
-                            0
+                          filteredCustomizeData?.length <=
+                          0
                         }
                       >
                         Enable Customize{" "}
                         <span>
                           <Chip variant="flat" color="primary">
                             {Number(
-                              customizeSubcriptionData?.data?.[0]
+                              customizeSubcriptionData?.data
                                 ?.subscriptionCount
                             ) - filteredCustomizeData?.length}
                           </Chip>
@@ -700,6 +734,10 @@ const AddProducts = () => {
           </div>
         </div>
       </form>
+      <SubscriptionExpiredModal
+        isOpen={isSubscriptionModalOpen}
+        onClose={() => setIsSubscriptionModalOpen(false)}
+      />
     </div>
   );
 };

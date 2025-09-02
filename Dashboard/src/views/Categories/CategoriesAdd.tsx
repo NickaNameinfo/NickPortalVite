@@ -124,17 +124,6 @@ const CategoriesAdd = () => {
           >
             <p className="font-medium  text-black/70"> Add Categories</p>
           </Chip>
-
-          <div className="text-center">
-            <Button
-              color="primary"
-              type="submit"
-              size="md"
-              className="w-[90px]"
-            >
-              Submit
-            </Button>
-          </div>
         </div>
         <div>
           <div className="grid grid-cols-2 gap-4 mb-0.5">
@@ -154,6 +143,14 @@ const CategoriesAdd = () => {
                 />
               )}
             />
+            <Button
+              color="primary"
+              type="submit"
+              size="md"
+              className="w-[90px]"
+            >
+              Submit
+            </Button>
             {/* <Controller
               name="slug" // Changed to reflect a text input
               control={control}

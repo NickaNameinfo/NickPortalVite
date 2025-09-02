@@ -46,8 +46,6 @@ const PriceingCard = ({ item = null, subscription = null }) => {
     refetch();
   }, []);
 
-  console.log(currentloginDetails?.data?.firstName, "currentloginDetails70987");
-
   React.useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -56,7 +54,6 @@ const PriceingCard = ({ item = null, subscription = null }) => {
       setScriptLoaded(true);
     };
     document.body.appendChild(script);
-
     return () => {
       document.body.removeChild(script);
     };
@@ -125,25 +122,25 @@ const PriceingCard = ({ item = null, subscription = null }) => {
       subscriptionPlan: item.key,
       customerId: currentUserId,
       status: 1,
-      id: data?.data?.[0]?.id,
+      id: data?.data?.id,
+      freeCount : item?.freeCount
     };
 
-    if (data?.success) {
-      let result = await updatesubscription(tempApiValue);
-    } else {
-      let result = await addSubCription(tempApiValue);
-    }
+    // if (data?.success) {
+    //   let result = await updatesubscription(tempApiValue);
+    // } else {
+    let result = await addSubCription(tempApiValue);
+    // }
     refetch();
   };
 
   return (
     <div>
       <Card
-        className={`max-w-[400px] ${
-          data?.data?.[0]?.subscriptionPlan === item.key
+        className={`max-w-[400px] ${data?.data?.subscriptionPlan === item.key
             ? "bg-stripe-gradient"
             : ""
-        }`}
+          }`}
       >
         <CardHeader className="flex gap-3">
           <div className="flex justify-between w-[100%]">
@@ -152,13 +149,13 @@ const PriceingCard = ({ item = null, subscription = null }) => {
               <p className="text-small text-default-500">
                 Default Items : {item?.defaultValue}
               </p>
-              {data?.data?.[0]?.subscriptionPlan === item.key && (
-                <p className="text-small text-default-500">
-                  Current Plan Items : {data?.data?.[0]?.subscriptionCount}
+              {data?.data?.subscriptionPlan === item.key && (
+                <p className="text-small text-red-500">
+                  Current Plan Items : {data?.data?.subscriptionCount}
                 </p>
               )}
             </div>
-            {data?.data?.[0]?.subscriptionPlan === item.key && (
+            {data?.data?.subscriptionPlan === item.key && (
               <Chip color="warning" variant="dot">
                 Current Plan
               </Chip>
@@ -191,10 +188,8 @@ const PriceingCard = ({ item = null, subscription = null }) => {
           <Button
             onClick={() => handleSubmit()}
             isDisabled={
-              (subscription?.key !== "Plan1" &&
-                subscription?.key !== "Plan2" &&
-                subscription?.key !== "Plan3") ||
-              Number(item?.price * formData?.itemCount) <= 0
+              (subscription?.commingSoon) ||
+                Number(item?.price * formData?.itemCount) <= 0
                 ? true
                 : false
             }

@@ -103,17 +103,17 @@ export const _nav = [
     link: "/",
     icons: <IconHome />,
     menuItems: [
-      ...(tempRole !== "0"
-        ? [
-            {
-              menuType: "single",
-              name: "Add",
-              key: "Add",
-              link: "/AddProducts",
-              icons: <IconHome />,
-            },
-          ]
-        : []),
+      // ...(tempRole !== "0"
+      //   ? [
+      //       {
+      //         menuType: "single",
+      //         name: "Add",
+      //         key: "Add",
+      //         link: "/AddProducts",
+      //         icons: <IconHome />,
+      //       },
+      //     ]
+      //   : []),
       ...(tempRole === "2"
         ? [
             {
@@ -187,82 +187,82 @@ export const _nav = [
       },
     ],
   },
-  {
-    menuType: "multiple",
-    name: "Requests",
-    key: "Requests",
-    link: "/",
-    icons: <IconHome />,
-    menuItems: [
-      ...(tempRole !== "3"
-        ? [
-            {
-              menuType: "single",
-              name: "Stores",
-              key: "Stores",
-              link: "/",
-              icons: <IconHome />,
-            },
-          ]
-        : []),
-      ...(tempRole === "0"
-        ? [
-            {
-              menuType: "single",
-              name: "Vendors",
-              key: "Vendors",
-              link: "/",
-              icons: <IconHome />,
-            },
-          ]
-        : []),
-      {
-        menuType: "single",
-        name: "Customers",
-        key: "Customers",
-        link: "/",
-        icons: <IconHome />,
-      },
-    ],
-  },
-  {
-    menuType: "multiple",
-    name: "Transaction",
-    key: "Transaction",
-    link: "/",
-    icons: <IconHome />,
-    menuItems: [
-      ...(tempRole !== "3"
-        ? [
-            {
-              menuType: "single",
-              name: "Stores",
-              key: "Stores",
-              link: "/",
-              icons: <IconHome />,
-            },
-          ]
-        : []),
-      ...(tempRole === "0"
-        ? [
-            {
-              menuType: "single",
-              name: "Vendors",
-              key: "Vendors",
-              link: "/",
-              icons: <IconHome />,
-            },
-          ]
-        : []),
-      {
-        menuType: "single",
-        name: "Customers",
-        key: "Customers",
-        link: "/",
-        icons: <IconHome />,
-      },
-    ],
-  },
+  // {
+  //   menuType: "multiple",
+  //   name: "Requests",
+  //   key: "Requests",
+  //   link: "/",
+  //   icons: <IconHome />,
+  //   menuItems: [
+  //     ...(tempRole !== "3"
+  //       ? [
+  //           {
+  //             menuType: "single",
+  //             name: "Stores",
+  //             key: "Stores",
+  //             link: "/",
+  //             icons: <IconHome />,
+  //           },
+  //         ]
+  //       : []),
+  //     ...(tempRole === "0"
+  //       ? [
+  //           {
+  //             menuType: "single",
+  //             name: "Vendors",
+  //             key: "Vendors",
+  //             link: "/",
+  //             icons: <IconHome />,
+  //           },
+  //         ]
+  //       : []),
+  //     {
+  //       menuType: "single",
+  //       name: "Customers",
+  //       key: "Customers",
+  //       link: "/",
+  //       icons: <IconHome />,
+  //     },
+  //   ],
+  // },
+  // {
+  //   menuType: "multiple",
+  //   name: "Transaction",
+  //   key: "Transaction",
+  //   link: "/",
+  //   icons: <IconHome />,
+  //   menuItems: [
+  //     ...(tempRole !== "3"
+  //       ? [
+  //           {
+  //             menuType: "single",
+  //             name: "Stores",
+  //             key: "Stores",
+  //             link: "/",
+  //             icons: <IconHome />,
+  //           },
+  //         ]
+  //       : []),
+  //     ...(tempRole === "0"
+  //       ? [
+  //           {
+  //             menuType: "single",
+  //             name: "Vendors",
+  //             key: "Vendors",
+  //             link: "/",
+  //             icons: <IconHome />,
+  //           },
+  //         ]
+  //       : []),
+  //     {
+  //       menuType: "single",
+  //       name: "Customers",
+  //       key: "Customers",
+  //       link: "/",
+  //       icons: <IconHome />,
+  //     },
+  //   ],
+  // },
   {
     menuType: "single",
     name: "LogOut",

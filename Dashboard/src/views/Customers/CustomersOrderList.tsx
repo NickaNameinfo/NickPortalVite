@@ -153,7 +153,6 @@ const CustomersOrderList = () => {
       id: selectedId,
     };
     const result = await updateOrder(tempApiParams).unwrap();
-    console.log(result, "asdfas790")
     if (result?.success) {
       storeOrderRefetch();
       setRefreshOrder(false);

@@ -32,8 +32,15 @@ export const AuthApi = createApi({
         body
       }),
     }),
+    uploadFile: builder.mutation({
+      query: (body) => ({
+        url: `/auth/upload-file`,
+        method: "POST",
+        body
+      }),
+    }),
   }),
 });
 
-export const { useRegisterMutation, useLoginMutation, useUpdatUserMutation } = AuthApi;
+export const { useRegisterMutation, useLoginMutation, useUpdatUserMutation, useUploadFileMutation } = AuthApi;
 export const { endpoints } = AuthApi;

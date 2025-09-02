@@ -7,10 +7,6 @@ import { useAppDispatch } from "../../../Common/hooks";
 import { updateLoginDetails } from "../../../Common/globalSlice";
 import InputNextUI from "../../../Components/Common/Input/input";
 import { IconLoginSVG } from "../../../Components/Common/Icons/icon";
-import { useAddStoreMutation } from "../../Store/Service.mjs";
-import { useAddVendorsMutation } from "../../vendors/Service.mjs";
-import { getCookie } from "../../../JsFiles/CommonFunction.mjs";
-import { useUpdatUserMutation } from "../../../Service.mjs";
 const Login = () => {
   const authenticate = (user, next) => {
     const now = new Date();

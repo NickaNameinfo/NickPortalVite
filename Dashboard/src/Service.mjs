@@ -49,8 +49,15 @@ export const GlobalApi = createApi({
         body
       }),
     }),
+    uploadFile: builder.mutation({
+      query: (body) => ({
+        url: `/auth/upload-file`,
+        method: "POST",
+        body
+      }),
+    }),
   }),
 });
 
-export const { useGetUserQuery,useUpdatUserMutation, useGetAllUserQuery, useGetAllOrderListQuery, useGetAllOrderListByStoreQuery, useUpdatOrderMutation } = GlobalApi;
+export const { useGetUserQuery,useUpdatUserMutation, useGetAllUserQuery, useGetAllOrderListQuery, useGetAllOrderListByStoreQuery, useUpdatOrderMutation, useUploadFileMutation } = GlobalApi;
 export const { endpoints } = GlobalApi;

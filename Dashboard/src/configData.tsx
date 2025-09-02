@@ -1,6 +1,6 @@
 export const infoData = {
-  baseApi: "https://nicknameportal.shop/Backend/api",
-  // baseApi: "http://localhost:5000/api",
+  // baseApi: "https://nicknameinfo.net/api",
+  baseApi: "http://localhost:8000/api",
   regex: /[<>:"\/\|?*]/,
 };
  

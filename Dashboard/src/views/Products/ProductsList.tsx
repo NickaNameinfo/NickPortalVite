@@ -123,9 +123,7 @@ const ProductsList = () => {
           <div className="relative flex justify-center items-center gap-2">
             {
               <Image
-                src={`${infoData?.baseApi}/${
-                  data?.product?.photo ? data?.product?.photo : data?.photo
-                }`}
+                src={`${data?.product?.photo ? data?.product?.photo : data?.photo}`}
                 width={50}
                 height={50}
               />
@@ -158,6 +156,17 @@ const ProductsList = () => {
 
   return (
     <div className="mx-2">
+      <div className="flex justify-between items-center gap-2 my-3">
+        <h2 className="text-2xl font-bold">Products</h2>
+        <Button
+          color="primary"
+          onClick={() => nativegate("/AddProducts")}
+          size="md"
+          variant="flat"
+        >
+          Add Products
+        </Button>
+      </div>
       {data && (
         <TableList
           defaultCloumns={currentRole !== "1" ? byuserProduct : defaultCloumns}
@@ -167,8 +176,8 @@ const ProductsList = () => {
             currentRole === "0"
               ? data?.["data"]
               : currentRole === "2"
-              ? vendorProducts?.data
-              : storeProducts?.data
+                ? vendorProducts?.data
+                : storeProducts?.data
           }
           isStatusFilter={false}
         />

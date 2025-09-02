@@ -35,16 +35,17 @@ function App() {
     }
   }, [data]);
 
+
   return (
     <Suspense fallback={loading}>
-      <Router basename="/Admin">
+      <Router>
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/404" element={<Page404 />} />
           <Route path="/500" element={<Page500 />} />
-          {/* {getCookie("token") && ( */}
+          {getCookie("token") && (
             <Route path="*" index element={<DefaultLayout />} />
-          {/* )} */}
+          )}
         </Routes>
       </Router>
     </Suspense>

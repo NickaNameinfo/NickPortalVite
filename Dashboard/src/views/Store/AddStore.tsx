@@ -19,7 +19,7 @@ import InputNextUI from "../../Components/Common/Input/input";
 import TeaxtareaNextUI from "../../Components/Common/Input/Textarea";
 import { getCookie, setCookie } from "../../JsFiles/CommonFunction.mjs";
 import { useAppSelector } from "../../Common/hooks";
-import { useUpdatUserMutation } from "../../Service.mjs";
+import { useUpdatUserMutation, useUploadFileMutation } from "../../Service.mjs";
 import { infoData } from "../../configData";
 import { IconStep } from "../../icons";
 const AddStore = () => {
@@ -44,38 +44,77 @@ const AddStore = () => {
   );
   const [updateStores] = useUpdateStoreMutation();
   const [updateUser] = useUpdatUserMutation();
+  const [uploadfile] = useUploadFileMutation();
 
-  console.log(formData, "formData");
+  console.log(formData, "formData", errors);
 
   React.useEffect(() => {
-    setValue("storename", data?.data?.[0]?.storename);
-    setValue("email", data?.data?.[0]?.email);
-    setValue("phone", data?.data?.[0]?.phone);
-    setValue("status", String(data?.data?.[0]?.status));
-    setValue("areaId", 3);
     if (data?.data) {
-      reset(data?.data);
+      // Reset the form with the first item of the fetched data
+      reset(data.data);
+      // Set areaId explicitly if it's not part of the fetched data or needs to be fixed
+      setValue("areaId", 3);
     }
-  }, [data]);
+  }, [data, reset, setValue]);
 
   const onSubmit = async (data: any) => {
-    let tempAPIData = {
+    console.log(data, "data52452354234");
+
+    let storeImageUrl = data.storeImage; // Initialize with current value (could be File or string URL)
+    let verifyDocumentUrl = data.verifyDocument; // Initialize with current value (could be File or string URL)
+
+    // Handle storeImage upload if it's a new file
+    if (data.storeImage instanceof File) {
+      const storeImageFormData = new FormData();
+      storeImageFormData.append("file", data.storeImage);
+      const storeImageUploadResult = await uploadfile(storeImageFormData);
+      if (storeImageUploadResult?.data?.success) {
+        storeImageUrl = storeImageUploadResult.data.fileUrl;
+      } else {
+        alert("Failed to upload store image.");
+        return; // Stop submission if upload fails
+      }
+    } else if (!storeImageUrl) {
+      // If it's not a file and not an existing URL, it means it's missing
+      alert("Please upload store image.");
+      return;
+    }
+
+    // Handle verifyDocument upload if it's a new file
+    if (data.verifyDocument instanceof File) {
+      const verifyDocumentFormData = new FormData();
+      verifyDocumentFormData.append("file", data.verifyDocument);
+      const verifyDocumentUploadResult = await uploadfile(verifyDocumentFormData);
+      if (verifyDocumentUploadResult?.data?.success) {
+        verifyDocumentUrl = verifyDocumentUploadResult.data.fileUrl;
+      } else {
+        alert("Failed to upload verification document.");
+        return; // Stop submission if upload fails
+      }
+    } else if (!verifyDocumentUrl) {
+      // If it's not a file and not an existing URL, it means it's missing
+      alert("Please upload verification document.");
+      return;
+    }
+
+    let apiParams = {
       ...data,
+      storeImage: storeImageUrl, // Use the uploaded URL or existing URL
+      verifyDocument: verifyDocumentUrl, // Use the uploaded URL or existing URL
       areaId: 3,
     };
-    const apiFormData = new FormData();
-    for (const key in tempAPIData) {
-      apiFormData.append(key, tempAPIData[key]);
-    }
-    const result = await updateStores(apiFormData);
+
+    // Proceed with updating the store
+    const result = await updateStores(apiParams);
     if (result?.data?.success) {
       let tempAPIUserData = {
-        id: formData?.users?.[0]?.id,
+        id: apiParams?.users?.id,
         email: data?.["email"],
         password: data?.["password"],
-        verify: formData?.status,
+        verify: apiParams?.status,
       };
-      let userResult = updateUser(tempAPIUserData);
+      // Await the updateUser call to ensure it completes before proceeding
+      let userResult = await updateUser(tempAPIUserData);
       if (userResult) {
         refetch();
         navigate("/Dashboard");
@@ -221,8 +260,8 @@ const AddStore = () => {
                 label="location"
                 {...field}
                 isRequired={true}
-                isInvalid={errors?.["storeaddress"] ? true : false}
-                errorMessage={errors?.["storeaddress"]?.message}
+                isInvalid={errors?.["location"] ? true : false} // Corrected field name
+                errorMessage={errors?.["location"]?.message} // Corrected field name
               />
             )}
           />
@@ -232,12 +271,12 @@ const AddStore = () => {
             rules={{ required: "Please enter value" }}
             render={({ field }) => (
               <InputNextUI
-                type="test"
+                type="text" // Changed from "test" to "text"
                 label="Open Time"
                 {...field}
                 isRequired={true}
-                isInvalid={errors?.["storeaddress"] ? true : false}
-                errorMessage={errors?.["storeaddress"]?.message}
+                isInvalid={errors?.["openTime"] ? true : false} // Corrected field name
+                errorMessage={errors?.["openTime"]?.message} // Corrected field name
               />
             )}
           />
@@ -251,8 +290,8 @@ const AddStore = () => {
                 label="Close Time"
                 {...field}
                 isRequired={true}
-                isInvalid={errors?.["storeaddress"] ? true : false}
-                errorMessage={errors?.["storeaddress"]?.message}
+                isInvalid={errors?.["closeTime"] ? true : false} // Corrected field name
+                errorMessage={errors?.["closeTime"]?.message} // Corrected field name
               />
             )}
           />
@@ -309,9 +348,9 @@ const AddStore = () => {
                 </div>
               )}
             />
-            {data?.data?.[0]?.storeImage && (
+            {data?.data?.storeImage && (
               <Image
-                src={`${infoData.baseApi}/${data?.data?.[0]?.storeImage}`}
+                src={`${data?.data?.storeImage}`}
                 className="h-fit"
                 width={100}
               />
@@ -341,9 +380,6 @@ const AddStore = () => {
               <InputNextUI
                 type="text"
                 label="Owner Name"
-                onChange={(value) => {
-                  console.log(value, "ownername");
-                }}
                 {...field}
                 isRequired={true}
                 isInvalid={errors?.["ownername"] ? true : false}
@@ -359,9 +395,6 @@ const AddStore = () => {
               <InputNextUI
                 type="email"
                 label="Email"
-                onChange={(value) => {
-                  console.log(value, "ownername");
-                }}
                 {...field}
                 isRequired={true}
                 isInvalid={errors?.["email"] ? true : false}
@@ -380,9 +413,6 @@ const AddStore = () => {
               <InputNextUI
                 type="password"
                 label="Password"
-                onChange={(value) => {
-                  console.log(value, "ownername");
-                }}
                 {...field}
                 isRequired={true}
                 isInvalid={errors?.["password"] ? true : false}
@@ -423,6 +453,69 @@ const AddStore = () => {
               />
             )}
           />
+          <div className="flex">
+            <Controller
+              name="verifyDocument" // Changed to reflect a text input
+              control={control}
+              rules={{ required: "Please enter value" }}
+              render={({ field }) => (
+                <div style={{ position: "relative", width: "100%" }}>
+                  <input
+                    type="file"
+                    id="verifyDocument"
+                    style={{
+                      opacity: 0,
+                      position: "absolute",
+                      zIndex: -1,
+                      width: "100%",
+                    }}
+                    onChange={(e) => {
+                      field.onChange(e.target.files[0]); // Update form state with selected file
+                      document.getElementById("verifyDocumentLabel").innerText = e.target
+                        .files[0]
+                        ? e.target.files[0].name
+                        : "No file selected"; // Update label dynamically
+                    }}
+                  />
+                  <label
+                    htmlFor="verifyDocument"
+                    style={{
+                      border: "1px solid rgba(128, 128, 128, 0.3)",
+                      borderRadius: "7px",
+                      padding: "10px",
+                      width: "100%",
+                      display: "inline-block",
+                      textAlign: "center",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                    }}
+                  >
+                    Choose Government Document
+                  </label>
+                  <span
+                    id="verifyDocumentLabel"
+                    style={{
+                      marginLeft: "10px",
+                      textAlign: "start",
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    No file selected
+                  </span>
+                  {errors?.["verifyDocument"] ? <p className="text-red-500">Please upload verify document to verify your store</p> : null}
+                </div>
+              )}
+            />
+            {data?.data?.verifyDocument && (
+              <Image
+                src={`${data?.data?.verifyDocument}`}
+                className="h-fit"
+                width={100}
+              />
+            )}
+          </div>
+          
         </div>
         <div className="flex flex-col flex-wrap gap-4 border-b pb-3 mt-4 mb-4">
           <Chip
