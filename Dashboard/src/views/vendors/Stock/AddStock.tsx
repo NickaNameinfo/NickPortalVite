@@ -34,7 +34,7 @@ const AddStock = () => {
   const vendorId = getCookie("vendorId");
   const [DeleteData] = useDeleteStockMutation();
   const navigate = useNavigate();
-  const { data, error, refetch } = useGetStockQuery(vendorId);
+  const { data, error, refetch } = useGetStockQuery(vendorId, { skip:!vendorId});
   const {
     data: categoryData,
     error: categoryerror,

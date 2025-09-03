@@ -44,7 +44,7 @@ export const OrderCard = (props: any) => {
     data: orderList,
     error: orderListError,
     refetch: orderListRefetch,
-  } = useGetOrderByOrderIdQuery(Number(userId));
+  } = useGetOrderByOrderIdQuery(Number(userId), { skip: !userId});
 
   const isOPenOrderModal = useAppSelector(
     (state) => state.globalConfig.isOpenOrderModal
@@ -62,7 +62,7 @@ export const OrderCard = (props: any) => {
             className="p-0 m-0"
             avatarProps={{
               radius: "lg",
-              src: `${infoData.baseApi}/${data?.products?.[0]?.photo}`,
+              src: `${data?.products?.[0]?.photo}`,
             }}
             name={null}
           ></User>

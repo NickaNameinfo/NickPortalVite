@@ -71,7 +71,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
     data: storeDetails,
     error,
     refetch,
-  } = useGetStoresByIdQuery(Number(props?.item?.supplierId));
+  } = useGetStoresByIdQuery(Number(props?.item?.supplierId), { skip: !Number(props?.item?.supplierId) });
   let productId = {
     id: userId,
     productId: props?.item?.product?.id
@@ -83,7 +83,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
     data: cart,
     error: cartError,
     refetch: cartRefetch,
-  } = useGetCartByProductIdQuery(productId);
+  } = useGetCartByProductIdQuery(productId, { skip: !productId });
 
   const [addCart] = useAddCartMutation();
   const [addOrder] = useAddOrderMutation();
@@ -91,11 +91,11 @@ export const ProductDetail = (props: ProductDetailProps) => {
   const dispatch = useAppDispatch();
   const [index, setIndex] = React.useState(-1);
 
-  React.useEffect(() => {
-    onRefresh && dispatch(onRefreshCart(false));
-    refetch();
-    storesRefetch();
-  }, [onRefresh]);
+  // React.useEffect(() => {
+  //   onRefresh && dispatch(onRefreshCart(false));
+  //   refetch();
+  //   storesRefetch();
+  // }, [onRefresh]);
 
   const handleAddCart = async (type) => {
     let tempCartValue = {
@@ -247,11 +247,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                       <CardBody className="overflow-visible p-0 relative">
                         <Image
                           alt="Card background"
-                          src={`${infoData.baseApi}/${
-                            props?.item?.product?.photo
-                              ? props?.item?.product?.photo
-                              : props?.item?.photo
-                          }`}
+                          src={`${props?.item?.product?.photo ?? props?.item?.photo}`}
                           width="100%"
                           radius="lg"
                           className="w-full object-cover md:h-[222px] xm:h-[150px] mm:h-[150px]  ml:h-[150px]"
@@ -290,46 +286,46 @@ export const ProductDetail = (props: ProductDetailProps) => {
                       </div>
                       {(Number(props?.item?.product?.isEnableEcommerce) === 1 ||
                         Number(props?.item?.isEnableEcommerce) === 1) && (
-                        <div className="flex items-center justify-between mt-2">
-                          <div className="">
-                            <div className="flex justify-between items-center rounded-xl bg-gray-100 lg:h-unit-xl">
+                          <div className="flex items-center justify-between mt-2">
+                            <div className="">
+                              <div className="flex justify-between items-center rounded-xl bg-gray-100 lg:h-unit-xl">
+                                <Button
+                                  className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
+                                  radius="full"
+                                  isIconOnly
+                                  size="md"
+                                  onClick={() => handleAddCart("remove")}
+                                >
+                                  -
+                                </Button>
+                                <p className="bg-gray-100 text-sm font-semibold p-0 m-0">
+                                  {cart?.data?.qty ? cart?.data?.qty : 0}
+                                </p>
+                                <Button
+                                  className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
+                                  radius="full"
+                                  isIconOnly
+                                  size={"md"}
+                                  onClick={() => handleAddCart("add")}
+                                >
+                                  +
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="">
                               <Button
-                                className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
-                                radius="full"
-                                isIconOnly
-                                size="md"
-                                onClick={() => handleAddCart("remove")}
-                              >
-                                -
-                              </Button>
-                              <p className="bg-gray-100 text-sm font-semibold p-0 m-0">
-                                {cart?.data?.qty ? cart?.data?.qty : 0}
-                              </p>
-                              <Button
-                                className="bg-gray-100 p-0 m-0 text-base font-semibold xm:h-unit-8 xm:px-4 lg:px-3"
-                                radius="full"
-                                isIconOnly
+                                className="xm:h-unit-8 xm:px-4 lg:px-3 lg:h-unit-xl"
+                                color="primary"
+                                variant="ghost"
+                                radius="lg"
                                 size={"md"}
-                                onClick={() => handleAddCart("add")}
+                                onClick={() => dispatch(onUpdateCartModal(true))}
                               >
-                                +
+                                View Cart
                               </Button>
                             </div>
                           </div>
-                          <div className="">
-                            <Button
-                              className="xm:h-unit-8 xm:px-4 lg:px-3 lg:h-unit-xl"
-                              color="primary"
-                              variant="ghost"
-                              radius="lg"
-                              size={"md"}
-                              onClick={() => dispatch(onUpdateCartModal(true))}
-                            >
-                              View Cart
-                            </Button>
-                          </div>
-                        </div>
-                      )}
+                        )}
                       <div className="grid grid-cols-12 justify-between items-center mt-4">
                         <div className="col-span-8">
                           <div className="flex items-center justify-between pb-2.5">
@@ -449,7 +445,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                           aria-label="Options"
                           color="default"
                           variant="solid"
-                          // className="flex-col"
+                        // className="flex-col"
                         >
                           <Tab
                             key="photos"
@@ -496,7 +492,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                   <div className="min-h-[170px]">
                     <h2 className="font-bold my-2">
                       {props?.item?.product?.isEnableCustomize === 1 ||
-                      props?.item?.isEnableCustomize === 1
+                        props?.item?.isEnableCustomize === 1
                         ? "Customize Product and order items *"
                         : "Write your feedback"}
                     </h2>
@@ -530,7 +526,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                         }}
                       >
                         {props?.item?.product?.isEnableCustomize === 1 ||
-                        props?.item?.isEnableCustomize === 1
+                          props?.item?.isEnableCustomize === 1
                           ? "Place Order"
                           : "Submit FeedBack"}
                       </Button>

@@ -41,14 +41,13 @@ const Add = () => {
   const vendorId = getCookie("vendorId");
   const currentUserRole = getCookie("role");
   const { itemId } = useParams();
+  const getVendoreId = itemId || vendorId
   const { data, error, refetch } = useGetVendorsByIDQuery(
-    itemId ? itemId : vendorId ? vendorId : null
+    getVendoreId, { skip: !getVendoreId }
   );
 
-  console.log(data, "errors70987");
-
   React.useEffect(() => {
-    refetch();
+    // refetch();
     if (data?.data.length > 0) {
       reset(data?.data?.[0]);
       setValue("status", data?.data?.[0]?.status.toString());

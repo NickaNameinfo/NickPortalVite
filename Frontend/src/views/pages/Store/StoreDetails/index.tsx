@@ -12,7 +12,7 @@ import { BuyCard } from "../../../../Components/Card/BuyCard";
 
 const StoreDetails = () => {
   const { id } = useParams();
-  const { data, error, refetch } = useGetStoresProductByIDQuery(Number(id));
+  const { data, error, refetch } = useGetStoresProductByIDQuery(Number(id), {skip: !id});
 
   const isProductDetailsModalOpen = useAppSelector(
     (state) => state.globalConfig.isProductDetailsModalOpen
@@ -22,11 +22,11 @@ const StoreDetails = () => {
     (state) => state.globalConfig.isOpenCartModal
   );
 
-  React.useEffect(() => {
-    if (id) {
-      refetch();
-    }
-  }, [id, refetch]);
+  // React.useEffect(() => {
+  //   if (id) {
+  //     refetch();
+  //   }
+  // }, [id, refetch]);
   
   return (
     <div>

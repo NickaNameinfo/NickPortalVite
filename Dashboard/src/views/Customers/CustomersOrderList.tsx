@@ -47,7 +47,7 @@ const CustomersOrderList = () => {
     data: storeOrder,
     error: storeOrderError,
     refetch: storeOrderRefetch,
-  } = useGetAllOrderListByStoreQuery(ids);
+  } = useGetAllOrderListByStoreQuery(ids, { skip:!ids});
   const { data, error, refetch } = useGetAllOrderListQuery();
   const [updateOrder] = useUpdatOrderMutation();
 
@@ -72,7 +72,7 @@ const CustomersOrderList = () => {
   ];
 
   React.useEffect(() => {
-    storeOrderRefetch();
+    // storeOrderRefetch();
     refetch();
   }, [ids]);
 

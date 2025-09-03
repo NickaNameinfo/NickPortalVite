@@ -17,12 +17,12 @@ const VendorDetails = () => {
   const { id } = useParams();
   const currentPlan = getCookie("plan");
   const vendorId = getCookie("vendorId");
-  const { data, error, refetch } = useGetVendorsProductByIdQuery(Number(id));
+  const { data, error, refetch } = useGetVendorsProductByIdQuery(Number(id), {skip:!id});
   const {
     data: vendorDetails,
     error: vendorError,
     refetch: vendorRefetch,
-  } = useGetVendorsByIdQuery(id);
+  } = useGetVendorsByIdQuery(id, { skip:!id});
 
   const isProductDetailsModalOpen = useAppSelector(
     (state) => state.globalConfig.isProductDetailsModalOpen
@@ -33,13 +33,11 @@ const VendorDetails = () => {
   );
 
   // Refetch the data when the id changes
-  React.useEffect(() => {
-    if (id) {
-      refetch();
-    }
-  }, [id, refetch]);
-
-  console.log(isOpenCartModal, "asdf7a0s97")
+  // React.useEffect(() => {
+  //   if (id) {
+  //     refetch();
+  //   }
+  // }, [id, refetch]);
 
   return (
     <div>

@@ -39,8 +39,9 @@ const AddStore = () => {
   const storeId = getCookie("storeId");
   const currentUserRole = getCookie("role");
   const { itemId } = useParams();
+  const getStoreId  = itemId || storeId
   const { data, error, refetch } = useGetStoresByIDQuery(
-    itemId || storeId || null
+    getStoreId, { skip:!getStoreId}
   );
   const [updateStores] = useUpdateStoreMutation();
   const [updateUser] = useUpdatUserMutation();

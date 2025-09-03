@@ -49,14 +49,14 @@ export const ProductViewCard = ({ item = null }) => {
   const navigate = useNavigate();
 
   const { data, error, refetch } = useGetStoresByIdQuery(
-    Number(item?.createdId)
+    Number(item?.createdId), { skip: !item?.createdId }
   );
 
   const {
     data: storeProduct,
     error: storeProductError,
     refetch: storeProductRefetch,
-  } = useGetStoresProductByIDQuery(Number(data?.data?.id));
+  } = useGetStoresProductByIDQuery(Number(data?.data?.id), { skip:!data?.data?.id });
 
 
   React.useEffect(() => {
@@ -102,7 +102,7 @@ export const ProductViewCard = ({ item = null }) => {
               width={250}
               radius="lg"
               className="w-full object-cover min-h-[176px] max-h-[176px]"
-              src={`${infoData.baseApi}/${item?.photo}`}
+              src={`${item?.photo}`}
               height={250}
             />
           </CardBody>
@@ -137,7 +137,7 @@ export const ProductViewCard = ({ item = null }) => {
                       radius="lg"
                       className="w-full object-contain h-[112px]"
                       alt="Card background"
-                      src={`${infoData?.baseApi}/${data?.data?.storeImage}`}
+                      src={`${data?.data?.storeImage}`}
                     />
                   </div>
                   <div className="col-span-12 ps-3 mt-2">

@@ -47,12 +47,12 @@ export const PremiumCard = ({ item = null }) => {
     id: id,
     productId: item?.product?.id,
   };
-  const { data, error, refetch } = useGetCartByProductIdQuery(productId);
+  const { data, error, refetch } = useGetCartByProductIdQuery(productId, {skip: productId});
   const [qty, setQty] = React.useState(0);
 
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
-    refetch();
+    // refetch();
   }, [onRefresh]);
 
   React.useEffect(() => {

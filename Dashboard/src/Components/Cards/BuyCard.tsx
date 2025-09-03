@@ -57,9 +57,7 @@ export const BuyCard = (props: any) => {
     data: cart,
     error: cartError,
     refetch: cartRefetch,
-  } = useGetCartByOrderIdQuery(Number(userId));
-
-  console.log(cart, "asdf7as90d87fas908", Number(userId));
+  } = useGetCartByOrderIdQuery(Number(userId), { skip: !userId });
 
   const [updateCart] = useUpdateCartMutation();
   const [deleteCartItem] = useDeleteCartItemMutation();
@@ -71,7 +69,6 @@ export const BuyCard = (props: any) => {
 
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
-    cartRefetch();
   }, [userId, onRefresh]);
 
   const handleAddCart = async (type, product) => {

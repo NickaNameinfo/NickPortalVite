@@ -23,11 +23,11 @@ const loading = (
 function App() {
   const id = getCookie("id");
   const dispatch = useAppDispatch();
-  const { data, error, refetch } = useGetUserQuery(id);
+  const { data, error, refetch } = useGetUserQuery(id, { skip: !id });
 
-  React.useEffect(() => {
-    refetch();
-  }, [id]);
+  // React.useEffect(() => {
+  //   refetch();
+  // }, [id]);
 
   React.useEffect(() => {
     if (data?.data) {

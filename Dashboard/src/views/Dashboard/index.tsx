@@ -1,11 +1,51 @@
 import { Card, CardBody, CardFooter, Image } from "@nextui-org/react";
+import { useGetVendorsProductByIdQuery } from "../VendorProducts/Service.mjs";
+import { useGetStoresProductByIDQuery } from "../Store/Service.mjs";
+import { useGetProductsQuery } from "../Products/Service.mjs";
+import { getCookie } from "../../JsFiles/CommonFunction.mjs";
+import { useGetOrderByOrderIdQuery } from "../VendorProducts/Service.mjs";
+import { useNavigate } from "react-router-dom";
+import {
+  useGetAllOrderListQuery,
+  useGetAllOrderListByStoreQuery,
+} from "../../Service.mjs";
 
 const Dashboard = () => {
+  const userId = getCookie("id");
+  const vendorId = getCookie("vendorId");
+  const storeId = getCookie("storeId");
+  let ids = vendorId ? vendorId : storeId;
+  const nativegate = useNavigate();
+
+  const { data: allOrder, error: allOrderError } = useGetAllOrderListQuery(undefined, { skip: !!vendorId || !!storeId });
+  const { data, error, refetch } = useGetProductsQuery(undefined, { skip: !!vendorId || !!storeId });
+
+  const {
+    data: orderList,
+    error: orderListError,
+    refetch: orderListRefetch,
+  } = useGetOrderByOrderIdQuery(Number(userId), { skip: !userId });
+  const {
+    data: storeOrder,
+    error: storeOrderError,
+    refetch: storeOrderRefetch,
+  } = useGetAllOrderListByStoreQuery(ids, { skip: !vendorId || !!storeId });
+  const {
+    data: vendorProducts,
+    error: vendorError,
+    refetch: vendorRefetch,
+  } = useGetVendorsProductByIdQuery(Number(vendorId), { skip: !vendorId });
+  const {
+    data: storeProducts,
+    error: storeError,
+    refetch: stroeRefetch,
+  } = useGetStoresProductByIDQuery(Number(storeId), { skip: !storeId });
+
   const list = [
     {
       title: "Products",
       img: "https://nextui.org/images/fruit-1.jpeg",
-      price: "6867",
+      price: data?.count || vendorProducts?.count || storeProducts?.count || 0,
     },
     // {
     //   title: "Customers",
@@ -20,17 +60,17 @@ const Dashboard = () => {
     {
       title: "Customer Orders",
       img: "https://nextui.org/images/fruit-4.jpeg",
-      price: "876",
+      price: allOrder?.count || storeOrder?.count || 0,
     },
     {
       title: "Customize Orders",
       img: "https://nextui.org/images/fruit-5.jpeg",
-      price: "76",
+      price: storeOrder?.["data"]?.filter((item) => item?.customization)?.length || data?.["data"]?.filter((item) => item?.customization).length || 0,
     },
     {
       title: "Store Orders",
       img: "https://nextui.org/images/fruit-5.jpeg",
-      price: "876",
+      price: orderList?.count || 0,
     },
     // {
     //   title: "Transactions",

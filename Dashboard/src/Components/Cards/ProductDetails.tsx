@@ -71,7 +71,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
     data: storeDetails,
     error,
     refetch,
-  } = useGetVendorsByIdQuery(Number(props?.item?.supplierId));
+  } = useGetVendorsByIdQuery(Number(props?.item?.supplierId), { skip: !Number(props?.item?.supplierId) });
 
   let productId = {
     id: userId,
@@ -84,7 +84,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
     data: cart,
     error: cartError,
     refetch: cartRefetch,
-  } = useGetCartByProductIdQuery(productId);
+  } = useGetCartByProductIdQuery(productId, { skip:!productId});
 
   const [addCart] = useAddCartMutation();
   const [addOrder] = useAddOrderMutation();
@@ -94,7 +94,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
 
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
-    refetch();
+    // refetch();
     vendorRefetch();
   }, [onRefresh]);
 

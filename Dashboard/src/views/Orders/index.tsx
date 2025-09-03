@@ -37,11 +37,11 @@ const OrderCard = (props: any) => {
     data: orderList,
     error: orderListError,
     refetch: orderListRefetch,
-  } = useGetOrderByOrderIdQuery(Number(userId));
+  } = useGetOrderByOrderIdQuery(Number(userId), { skip: !userId });
 
-  React.useEffect(() => {
-    orderListRefetch();
-  }, []);
+  // React.useEffect(() => {
+  //   orderListRefetch();
+  // }, []);
 
   const renderCell = React.useCallback((data, columnKey) => {
     switch (columnKey) {

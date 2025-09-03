@@ -47,7 +47,7 @@ const CustomizeOrderList = () => {
     data: storeOrder,
     error: storeOrderError,
     refetch: storeOrderRefetch,
-  } = useGetAllOrderListByStoreQuery(ids);
+  } = useGetAllOrderListByStoreQuery(ids, { skip: !ids });
   const { data, error, refetch } = useGetAllOrderListQuery();
   const [updateOrder] = useUpdatOrderMutation();
 
@@ -71,7 +71,7 @@ const CustomizeOrderList = () => {
   ];
 
   React.useEffect(() => {
-    storeOrderRefetch();
+    // storeOrderRefetch();
     refetch();
   }, [ids]);
 
@@ -167,7 +167,7 @@ const CustomizeOrderList = () => {
           columns={columns}
           tableItems={
             currentRole === 0
-              ? data?.["data"]
+              ? data?.["data"]?.filter((item) => item?.customization)
               : storeOrder?.["data"]?.filter((item) => item?.customization)
           }
           isStatusFilter={false}

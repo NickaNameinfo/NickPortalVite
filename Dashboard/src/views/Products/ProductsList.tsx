@@ -18,22 +18,23 @@ import { useGetStoresProductByIDQuery } from "../Store/Service.mjs";
 import { infoData } from "../../configData";
 import { useNavigate } from "react-router-dom";
 const ProductsList = () => {
-  const { data, error, refetch } = useGetProductsQuery();
   const vendorId = getCookie("vendorId");
   const storeId = getCookie("storeId");
+  const { data, error, refetch } = useGetProductsQuery(undefined, { skip: !!vendorId || !!storeId });
   const nativegate = useNavigate();
   const {
     data: vendorProducts,
     error: vendorError,
     refetch: vendorRefetch,
-  } = useGetVendorsProductByIdQuery(Number(vendorId));
+  } = useGetVendorsProductByIdQuery(Number(vendorId), { skip: !vendorId });
   const {
     data: storeProducts,
     error: storeError,
     refetch: stroeRefetch,
-  } = useGetStoresProductByIDQuery(Number(storeId));
-
+  } = useGetStoresProductByIDQuery(Number(storeId), { skip:!storeId });
   const currentRole = getCookie("role");
+  console.log(storeProducts, "storeProducts7089523", currentRole)
+
   const defaultCloumns = [
     "id",
     "name",
@@ -71,18 +72,18 @@ const ProductsList = () => {
     ...(currentRole !== "1" ? [{ name: "Actions", id: "actions" }] : []),
   ];
 
-  React.useEffect(() => {
-    if (storeId || vendorId) {
-      refetch();
-      vendorRefetch();
-      stroeRefetch();
-    }
-  }, [vendorId, storeId]);
+  // React.useEffect(() => {
+  //   if (storeId || vendorId) {
+  //     refetch();
+  //     vendorRefetch();
+  //     stroeRefetch();
+  //   }
+  // }, [vendorId, storeId]);
 
   const renderCell = React.useCallback((data, columnKey) => {
     switch (columnKey) {
       case "product":
-        return <p>{data?.product?.name}</p>;
+        return <p>{data?.product?.name ? data?.product?.name :  data?.name}</p>;
       case "storename":
         return (
           <User
@@ -167,7 +168,7 @@ const ProductsList = () => {
           Add Products
         </Button>
       </div>
-      {data && (
+      {data || vendorProducts?.data || storeProducts?.data  ? (
         <TableList
           defaultCloumns={currentRole !== "1" ? byuserProduct : defaultCloumns}
           renderCell={renderCell}
@@ -181,7 +182,7 @@ const ProductsList = () => {
           }
           isStatusFilter={false}
         />
-      )}
+      ) : <p>No Products</p>}
     </div>
   );
 };

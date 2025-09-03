@@ -24,14 +24,9 @@ import { useAppSelector } from "../Common/hooks";
 export const StoreHeaderCard = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data, error, refetch } = useGetStoresByIdQuery(Number(id));
+  const { data, error, refetch } = useGetStoresByIdQuery(Number(id), { skip:!id });
   const storeList = useAppSelector((state) => state.globalConfig.storeList);
 
-  const {
-    data: productData,
-    error: productError,
-    refetch: productRefetch,
-  } = useGetStoresProductByIDQuery(Number(id));
   const notify = (value) => toast(value);
 
   const handleShare = () => {
@@ -55,7 +50,7 @@ export const StoreHeaderCard = () => {
           isZoomed
           alt="Here no Image"
           className="w-full object-cover max-h-[85px] p-1"
-          src={`${infoData.baseApi}/${data?.data?.storeImage}`}
+          src={`${data?.data?.storeImage}`}
         />
       </div>
       <div className="px-3">
@@ -79,7 +74,7 @@ export const StoreHeaderCard = () => {
         <div className="textColortimingColor lg:mt-0.5 text-sm font-normal flex items-center">
           <div> Products :</div>
           <div className="ms-1">
-            {productData?.data?.length ? productData?.data?.length : 0}
+            {data?.data?.totalProducts || 0}
           </div>
         </div>
       </div>

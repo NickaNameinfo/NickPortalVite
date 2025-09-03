@@ -125,13 +125,13 @@ export const AppHeader = () => {
     data: cart,
     error: cartError,
     refetch: cartRefetch,
-  } = useGetCartByOrderIdQuery(Number(id));
+  } = useGetCartByOrderIdQuery(Number(id), { skip: !id });
 
   const {
     data: orderList,
     error: orderListError,
     refetch: orderListRefetch,
-  } = useGetOrderByOrderIdQuery(Number(id));
+  } = useGetOrderByOrderIdQuery(Number(id), { skip:!id });
 
   const handleNext = () => {
     setStartIndex((prevIndex) =>

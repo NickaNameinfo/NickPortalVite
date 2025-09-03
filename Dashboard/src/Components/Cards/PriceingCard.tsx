@@ -34,7 +34,7 @@ const PriceingCard = ({ item = null, subscription = null }) => {
     subscriptionType: subscription.key ? subscription.key : null,
   };
   const { data, error, refetch } =
-    useGetSubcriptionByCustomerIDQuery(tempValues);
+    useGetSubcriptionByCustomerIDQuery(tempValues, { skip: !tempValues});
   const currentloginDetails = useAppSelector(
     (state) => state.globalConfig.currentloginDetails
   );
@@ -42,9 +42,9 @@ const PriceingCard = ({ item = null, subscription = null }) => {
   const [updatesubscription] = useUpdatesubscriptionMutation();
   const [scriptLoaded, setScriptLoaded] = React.useState(false);
 
-  React.useEffect(() => {
-    refetch();
-  }, []);
+  // React.useEffect(() => {
+  //   refetch();
+  // }, []);
 
   React.useEffect(() => {
     const script = document.createElement("script");

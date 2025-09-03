@@ -21,10 +21,11 @@ import { infoData } from "../../configData";
 import { useGetStoresProductByIDQuery } from "../../views/pages/Store/Service.mjs";
 import { useAppSelector } from "../Common/hooks";
 import { Link, useNavigate } from "react-router-dom";
+
 export const StoreCard = ({ item = null, key = null }) => {
-  const { data, error, refetch } = useGetStoresProductByIDQuery(
-    Number(item?.id)
-  );
+  // const { data, error, refetch } = useGetStoresProductByIDQuery(
+  //   Number(item?.id)
+  // );
 
   const navigate = useNavigate();
 
@@ -48,7 +49,7 @@ export const StoreCard = ({ item = null, key = null }) => {
               radius="lg"
               className="w-full object-cover h-[112px] cursor-pointer"
               alt="Card background"
-              src={`${infoData.baseApi}/${item?.storeImage}`}
+              src={`${item?.storeImage}`}
             />
           </div>
           <div className="col-span-7 ps-3">
@@ -128,7 +129,7 @@ export const StoreCard = ({ item = null, key = null }) => {
       <CardFooter className="p-0 m-0">
         <div className="w-full px-2.5  pb-3 flex">
           <div className="font-normal text-sm  TextMaincolor w-6/12">
-            Products : {data?.data?.length ? data?.data?.length : 0}
+            Products : {item?.totalProducts}
           </div>
           <div className="font-normal text-sm  TextMaincolor w-6/12 justify-end flex">
             Near By :{" "}

@@ -49,14 +49,12 @@ export const RelatedProducts = ({
               shadow="md"
               width="100%"
               radius="lg"
-              className={`w-full object-cover  ${
-                from !== "ProductView"
+              className={`w-full object-cover  ${from !== "ProductView"
                   ? "min-h-[176px] max-h-[176px]"
                   : "min-h-[50px] max-h-[100px]"
-              }`}
-              src={`${infoData.baseApi}/${
-                item?.product?.photo ? item?.product?.photo : item?.photo
-              }`}
+                }`}
+              src={`${item?.product?.photo ? item?.product?.photo : item?.photo
+                }`}
             />
           </CardBody>
         )}

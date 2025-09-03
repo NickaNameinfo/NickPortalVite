@@ -39,7 +39,7 @@ const Product = () => {
     data: storesByPayment,
     error: storesByPaymentError,
     refetch: storesByPaymentRefetch,
-  } = useGetProductsByPaymenTypeQuery(gloablSearchByPayment);
+  } = useGetProductsByPaymenTypeQuery(gloablSearchByPayment, { skip: !gloablSearchByPayment});
 
   const {
     data: storesByOpenStore,
@@ -52,12 +52,12 @@ const Product = () => {
     data: filterByCategory,
     error: filterCategoryError,
     refetch: filterByCategoryRefetch,
-  } = useGetProductsByCategoryQuery(globalCategorySearch);
+  } = useGetProductsByCategoryQuery(globalCategorySearch, { skip:!globalCategorySearch});
   const {
     data: filterBySearch,
     error: filterSearchError,
     refetch: filterBySearchRefetch,
-  } = useGetProductsBySearchQuery(globalSearch);
+  } = useGetProductsBySearchQuery(globalSearch, { skip:!globalSearch});
 
   const [productDataList, setProductDataList] = React.useState(null);
 
@@ -65,12 +65,12 @@ const Product = () => {
     refetch();
   }, []);
 
-  React.useEffect(() => {
-    filterByCategoryRefetch();
-    filterBySearchRefetch();
-    storesByPaymentRefetch();
-    storesByOpenStoreRefetch();
-  }, [globalCategorySearch, globalSearch, gloablSearchByPayment]);
+  // React.useEffect(() => {
+  //   filterByCategoryRefetch();
+  //   filterBySearchRefetch();
+  //   storesByPaymentRefetch();
+  //   storesByOpenStoreRefetch();
+  // }, [globalCategorySearch, globalSearch, gloablSearchByPayment]);
 
   React.useEffect(() => {
     if (filterBySearch?.data?.length > 0) {

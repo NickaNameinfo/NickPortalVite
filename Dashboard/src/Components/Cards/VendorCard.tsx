@@ -23,7 +23,7 @@ import { infoData } from "../../configData";
 import { useGetVendorsProductByIdQuery } from "../../views/VendorProducts/Service.mjs";
 export const VendorCard = ({ item = null }) => {
   const { data, error, refetch } = useGetVendorsProductByIdQuery(
-    Number(item?.id)
+    Number(item?.id), { skip: !item?.id}
   );
 
   return (

@@ -57,7 +57,7 @@ export const BuyCard = (props: any) => {
     data: cart,
     error: cartError,
     refetch: cartRefetch,
-  } = useGetCartByOrderIdQuery(Number(userId));
+  } = useGetCartByOrderIdQuery(Number(userId), { skip: !userId });
   const [updateCart] = useUpdateCartMutation();
   const [deleteCartItem] = useDeleteCartItemMutation();
   const [addOrder] = useAddOrderMutation();

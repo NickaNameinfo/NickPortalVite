@@ -22,7 +22,7 @@ import { toast } from "react-toastify";
 
 export const VendorHeaderCard = ({ item = null }) => {
   const { id } = useParams();
-  const { data, error, refetch } = useGetVendorsProductByIdQuery(Number(id));
+  const { data, error, refetch } = useGetVendorsProductByIdQuery(Number(id), {skip : !id});
   const {
     data: vendorList,
     error: vendorListError,

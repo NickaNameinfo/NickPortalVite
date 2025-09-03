@@ -79,13 +79,13 @@ export const AppSidebar = () => {
     data: cart,
     error: cartError,
     refetch: cartRefetch,
-  } = useGetCartByOrderIdQuery(Number(id));
+  } = useGetCartByOrderIdQuery(Number(id), {skip: !id});
 
   const {
     data: orderList,
     error: orderListError,
     refetch: orderListRefetch,
-  } = useGetOrderByOrderIdQuery(Number(id));
+  } = useGetOrderByOrderIdQuery(Number(id), {skip:!id});
 
   const itemClasses = {
     base: "py-0 w-full",
@@ -98,8 +98,8 @@ export const AppSidebar = () => {
 
   React.useEffect(() => {
     refetch();
-    cartRefetch();
-    orderListRefetch();
+    // cartRefetch();
+    // orderListRefetch();
   }, []);
 
   React.useEffect(() => {

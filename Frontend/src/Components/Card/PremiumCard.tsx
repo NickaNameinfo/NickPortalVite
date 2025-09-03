@@ -59,7 +59,7 @@ export const PremiumCard = ({
     id: userId,
     productId: productItem?.id,
   };
-  const { data, error, refetch } = useGetCartByProductIdQuery(productId);
+  const { data, error, refetch } = useGetCartByProductIdQuery(productId, { skip: !productId });
   const MySwal = withReactContent(Swal);
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
@@ -135,12 +135,11 @@ export const PremiumCard = ({
               shadow="md"
               width="100%"
               radius="lg"
-              className={`w-full object-cover cursor-pointer ${
-                from !== "ProductView"
+              className={`w-full object-cover cursor-pointer ${from !== "ProductView"
                   ? "min-h-[176px] max-h-[176px]"
                   : "min-h-[50px] max-h-[50px]"
-              }`}
-              src={`${infoData?.baseApi}/${productItem?.photo}`}
+                }`}
+              src={`${productItem?.photo}`}
             />
           </CardBody>
         )}

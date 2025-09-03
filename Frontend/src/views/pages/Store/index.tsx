@@ -38,19 +38,19 @@ const Store = () => {
     data: storesByCategory,
     error: storeByError,
     refetch: storeByCategoryRefetch,
-  } = useGetStoresByCategoryQuery(globalCategorySearch);
+  } = useGetStoresByCategoryQuery(globalCategorySearch, { skip: !globalCategorySearch });
 
   const {
     data: storesByFilter,
     error: storeByFilterError,
     refetch: storeByFilterRefetch,
-  } = useGetStoresByFiltersQuery(globalSearch);
+  } = useGetStoresByFiltersQuery(globalSearch, { skip:!globalSearch });
 
   const {
     data: storesByPayment,
     error: storesByPaymentError,
     refetch: storesByPaymentRefetch,
-  } = useGetStoresByPaymentTypeQuery(gloablSearchByPayment);
+  } = useGetStoresByPaymentTypeQuery(gloablSearchByPayment, { skip:!gloablSearchByPayment });
 
   const {
     data: storesByOpenStore,
@@ -71,12 +71,12 @@ const Store = () => {
     }
   }, [storeDataList]);
 
-  React.useEffect(() => {
-    storeByCategoryRefetch();
-    storeByFilterRefetch();
-    storesByPaymentRefetch();
-    // storesByOpenStoreRefetch();
-  }, [globalCategorySearch, globalSearch, gloablSearchByPayment]);
+  // React.useEffect(() => {
+  //   storeByCategoryRefetch();
+  //   storeByFilterRefetch();
+  //   storesByPaymentRefetch();
+  //   // storesByOpenStoreRefetch();
+  // }, [globalCategorySearch, globalSearch, gloablSearchByPayment]);
 
   React.useEffect(() => {
     if (storesByFilter?.data?.length > 0) {

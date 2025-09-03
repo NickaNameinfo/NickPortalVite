@@ -33,8 +33,7 @@ interface VendorDetailsProps {
 
 export const VendorDetails = (props: VendorDetailsProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data, error, refetch } = useGetVendorsByIdQuery(props.id);
-  console.log(data?.data, "propsdata");
+  const { data, error, refetch } = useGetVendorsByIdQuery(props.id, { skip: !props.id });
 
   React.useEffect(() => {
     refetch();
