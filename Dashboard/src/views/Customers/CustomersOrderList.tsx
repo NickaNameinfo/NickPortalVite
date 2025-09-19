@@ -47,8 +47,8 @@ const CustomersOrderList = () => {
     data: storeOrder,
     error: storeOrderError,
     refetch: storeOrderRefetch,
-  } = useGetAllOrderListByStoreQuery(ids, { skip:!ids});
-  const { data, error, refetch } = useGetAllOrderListQuery();
+  } = useGetAllOrderListByStoreQuery(ids, { skip: !ids });
+  const { data, error, refetch } = useGetAllOrderListQuery({ refetchOnMountOrArgChange: true, skip: ids });
   const [updateOrder] = useUpdatOrderMutation();
 
   const [selectedId, setSelectedId] = React.useState(null);
@@ -71,10 +71,6 @@ const CustomersOrderList = () => {
     "actions",
   ];
 
-  React.useEffect(() => {
-    // storeOrderRefetch();
-    refetch();
-  }, [ids]);
 
   const columns = [
     { name: "S.No", id: "id", sortable: true },
@@ -275,7 +271,7 @@ const CustomersOrderList = () => {
                   size="sm"
                   type="submit"
                   onPress={onClose}
-                  onClick={() => {}}
+                  onClick={() => { }}
                 >
                   Update
                 </Button>

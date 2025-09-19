@@ -16,7 +16,7 @@ const StoreList = () => {
   const navigate = useNavigate();
 
   const [DeleteData] = useDeleteStoreMutation();
-  const { data, error, refetch } = useGetStoreQuery();
+  const { data, error, refetch } = useGetStoreQuery(undefined, { refetchOnMountOrArgChange: true });
 
   const defaultCloumns = [
     "storename",
@@ -45,11 +45,8 @@ const StoreList = () => {
   };
 
   const onDelete = async (deleteID) => {
-    console.log(deleteID, "deleteID");
-
     if (deleteID) {
       const result = await DeleteData(deleteID);
-      console.log(result, "DeleteData");
       if (result?.data?.success) {
         refetch();
       }

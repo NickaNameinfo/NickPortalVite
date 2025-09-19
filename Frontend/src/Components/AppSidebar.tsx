@@ -19,12 +19,14 @@ import {
   Listbox,
   ListboxItem,
   useDisclosure,
+  Tooltip,
 } from "@nextui-org/react";
 import {
   Arrowleft,
   Arrowright,
   FormeIcon,
   IconHome,
+  IconInfo,
   IconMap,
   IconMapRound,
 } from "./Icons";
@@ -50,6 +52,7 @@ import {
 } from "../views/pages/Store/Service.mjs";
 import { OrderCard } from "./Card/OrderCard";
 import { BuyCard } from "./Card/BuyCard";
+import { IconForgotSVG } from "../Icons";
 
 export const AppSidebar = () => {
   const [selectedCategory, setSelectedCategory] = React.useState([]);
@@ -79,13 +82,13 @@ export const AppSidebar = () => {
     data: cart,
     error: cartError,
     refetch: cartRefetch,
-  } = useGetCartByOrderIdQuery(Number(id), {skip: !id});
+  } = useGetCartByOrderIdQuery(Number(id), {skip: !id, refetchOnMountOrArgChange: true});
 
   const {
     data: orderList,
     error: orderListError,
     refetch: orderListRefetch,
-  } = useGetOrderByOrderIdQuery(Number(id), {skip:!id});
+  } = useGetOrderByOrderIdQuery(Number(id), {skip:!id, refetchOnMountOrArgChange: true});
 
   const itemClasses = {
     base: "py-0 w-full",
@@ -95,12 +98,6 @@ export const AppSidebar = () => {
     indicator: "text-medium",
     content: "text-small px-2",
   };
-
-  React.useEffect(() => {
-    refetch();
-    // cartRefetch();
-    // orderListRefetch();
-  }, []);
 
   React.useEffect(() => {
     onSearchByCategory(
@@ -132,8 +129,6 @@ export const AppSidebar = () => {
   };
 
   const handleFilters = (result) => {
-    console.log(result, "asdf9a7s0df78sa");
-
     if (onSeletedItem === result.key) {
       dispatch(onGlobalPaymentSearch(null));
       dispatch(onUpdateOpenStore(false));
@@ -228,9 +223,12 @@ export const AppSidebar = () => {
                           className={
                             result?.isSoon || result?.key === onSeletedItem
                               ? "flex w-full justify-between"
-                              : ""
+                              : "flex"
                           }
                         >
+                          {result?.info && (
+                            <Tooltip content={result?.info} showArrow><span><IconInfo fill="#FF0000" width={15} className={"mr-2"}/></span></Tooltip>
+                          )}
                           <p className="text-black text-sm font-normal">
                             {result?.name}
                           </p>

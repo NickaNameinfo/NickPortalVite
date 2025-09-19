@@ -63,11 +63,6 @@ export const ProductDetail = (props: ProductDetailProps) => {
   const MySwal = withReactContent(Swal);
   const userId = getCookie("id");
   const {
-    data: stores,
-    error: storesError,
-    refetch: storesRefetch,
-  } = useGetStoresQuery();
-  const {
     data: storeDetails,
     error,
     refetch,
@@ -78,7 +73,6 @@ export const ProductDetail = (props: ProductDetailProps) => {
       ? props?.item?.product?.id
       : props?.item?.id,
   };
-
   const {
     data: cart,
     error: cartError,

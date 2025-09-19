@@ -26,9 +26,7 @@ export const StoreHeaderCard = () => {
   const navigate = useNavigate();
   const { data, error, refetch } = useGetStoresByIdQuery(Number(id), { skip:!id });
   const storeList = useAppSelector((state) => state.globalConfig.storeList);
-
   const notify = (value) => toast(value);
-
   const handleShare = () => {
     const url = window.location.href; // Get the current URL
     navigator.clipboard

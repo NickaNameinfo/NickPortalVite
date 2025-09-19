@@ -24,8 +24,31 @@ export const GlobalApi = createApi({
         body
       }),
     }),
+    updateAddress: builder.mutation({
+      query: (body) => ({
+        url: `/address/update`,
+        method: "POST",
+        body,
+      }),
+    }),
+    deleteAddress: builder.mutation({
+      query: (id) => ({
+        url: `/address/delete/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
-export const { useGetUserQuery, useUpdateUserMutation } = GlobalApi;
+export const {
+  useGetUserQuery,
+  useUpdateUserMutation,
+  useGetCartByOrderIdQuery,
+  useAddOrderMutation,
+  useUpdateCartMutation,
+  useDeleteCartItemMutation,
+  useUpdateAddressMutation,
+  useGetAddressesByCustIdQuery,
+  useDeleteAddressMutation,
+} = GlobalApi;
 export const { endpoints } = GlobalApi;

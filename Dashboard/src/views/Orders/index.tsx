@@ -62,6 +62,7 @@ const OrderCard = (props: any) => {
         return <p className="m-0 p-0">{data?.[columnKey]}</p>;
     }
   }, []);
+  
   return (
     <>
       <div className="grid">

@@ -59,7 +59,7 @@ export const Register = () => {
       const result = await register(tempApiValue);
       if (result?.data?.success) {
         if (result?.data?.user?.role === "3") {
-          let tempAPIData = {
+          let apiFormData = {
             storename: formData?.firstName,
             email: formData?.email,
             phone: formData?.phoneNo,
@@ -68,10 +68,6 @@ export const Register = () => {
             password: formData?.password,
             areaId: 3,
           };
-          const apiFormData = new FormData();
-          for (const key in tempAPIData) {
-            apiFormData.append(key, tempAPIData[key]);
-          }
           const resultStore = await addStores(apiFormData);
           if (resultStore?.data?.success) {
             let tempAPIUserData = {
@@ -82,11 +78,11 @@ export const Register = () => {
             let userResult = await updateUser(tempAPIUserData);
             if (userResult?.data?.success) {
               dispatch(onOpenResigter(false));
-              window.open("https://nicknameportal.shop/Admin/", "_blank");
+              // window.open("https://nicknameportal.shop/Admin/", "_blank");
             }
           }
         } else if (result?.data?.user?.role === "2") {
-          let tempAPIData = {
+          let apiFormData = {
             storename: formData?.firstName,
             email: formData?.email,
             phone: formData?.phoneNo,
@@ -95,10 +91,7 @@ export const Register = () => {
             password: formData?.password,
             areaId: 3,
           };
-          const apiFormData = new FormData();
-          for (const key in tempAPIData) {
-            apiFormData.append(key, tempAPIData[key]);
-          }
+          
           const resultVendor = await addVendors(apiFormData);
           if (resultVendor?.data?.success) {
             let tempAPIUserData = {

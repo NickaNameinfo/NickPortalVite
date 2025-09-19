@@ -48,7 +48,7 @@ const CustomizeOrderList = () => {
     error: storeOrderError,
     refetch: storeOrderRefetch,
   } = useGetAllOrderListByStoreQuery(ids, { skip: !ids });
-  const { data, error, refetch } = useGetAllOrderListQuery();
+  const { data, error, refetch } = useGetAllOrderListQuery({ refetchOnMountOrArgChange: true, skip: ids });
   const [updateOrder] = useUpdatOrderMutation();
 
   const [selectedId, setSelectedId] = React.useState(null);
@@ -69,11 +69,6 @@ const CustomizeOrderList = () => {
     "customization",
     "actions",
   ];
-
-  React.useEffect(() => {
-    // storeOrderRefetch();
-    refetch();
-  }, [ids]);
 
   const columns = [
     { name: "S.No", id: "id", sortable: true },

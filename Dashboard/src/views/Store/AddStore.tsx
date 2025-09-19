@@ -15,12 +15,11 @@ import {
   useGetStoresByIDQuery,
   useUpdateStoreMutation,
 } from "./Service.mjs";
+import { useAddSubcriptionMutation } from "../Subscriptions/Service.mjs"
 import InputNextUI from "../../Components/Common/Input/input";
 import TeaxtareaNextUI from "../../Components/Common/Input/Textarea";
 import { getCookie, setCookie } from "../../JsFiles/CommonFunction.mjs";
-import { useAppSelector } from "../../Common/hooks";
 import { useUpdatUserMutation, useUploadFileMutation } from "../../Service.mjs";
-import { infoData } from "../../configData";
 import { IconStep } from "../../icons";
 const AddStore = () => {
   const navigate = useNavigate();
@@ -39,15 +38,17 @@ const AddStore = () => {
   const storeId = getCookie("storeId");
   const currentUserRole = getCookie("role");
   const { itemId } = useParams();
-  const getStoreId  = itemId || storeId
+  const getStoreId = itemId || storeId
   const { data, error, refetch } = useGetStoresByIDQuery(
-    getStoreId, { skip:!getStoreId}
+    getStoreId, { skip: !getStoreId }
   );
   const [updateStores] = useUpdateStoreMutation();
   const [updateUser] = useUpdatUserMutation();
   const [uploadfile] = useUploadFileMutation();
+  const [addSubCription] = useAddSubcriptionMutation();
 
-  console.log(formData, "formData", errors);
+  const [loading, setLoading] = React.useState(false);
+
 
   React.useEffect(() => {
     if (data?.data) {
@@ -59,8 +60,7 @@ const AddStore = () => {
   }, [data, reset, setValue]);
 
   const onSubmit = async (data: any) => {
-    console.log(data, "data52452354234");
-
+    setLoading(true)
     let storeImageUrl = data.storeImage; // Initialize with current value (could be File or string URL)
     let verifyDocumentUrl = data.verifyDocument; // Initialize with current value (could be File or string URL)
 
@@ -118,9 +118,30 @@ const AddStore = () => {
       let userResult = await updateUser(tempAPIUserData);
       if (userResult) {
         refetch();
-        navigate("/Dashboard");
+        afterStoreUpdate()
+        setLoading(false)
+        navigate("/Stores/List");
       }
     }
+  };
+
+  const afterStoreUpdate = async () => {
+    let tempApiValue = {
+      subscriptionCount: 0,
+      subscriptionPrice: 0,
+      subscriptionType: "Plan0",
+      subscriptionPlan: "PL0_000",
+      customerId: getStoreId,
+      status: 1,
+      freeCount: 5
+    };
+
+    // if (data?.success) {
+    //   let result = await updatesubscription(tempApiValue);
+    // } else {
+    let result = await addSubCription(tempApiValue);
+    // }
+    refetch();
   };
 
   return (
@@ -149,7 +170,7 @@ const AddStore = () => {
               size="md"
               className="w-[90px]"
             >
-              {id ? "Update" : "Create"}
+              {loading ? "...Updating" : id ? "Update" : "Create"}
             </Button>
           </div>
         </div>
@@ -246,7 +267,7 @@ const AddStore = () => {
           <Controller
             name="website" // Changed to reflect a text input
             control={control}
-            rules={{ required: true }}
+            // rules={{ required: true }}
             render={({ field }) => (
               <InputNextUI type="text" label="website" {...field} />
             )}
@@ -406,16 +427,16 @@ const AddStore = () => {
           <Controller
             name="password" // Changed to reflect a text input
             control={control}
-            rules={{
-              required: "Please enter value in minimum 5 letter",
-              minLength: 5,
-            }}
+            // rules={{
+            //   required: "Please enter value in minimum 5 letter",
+            //   minLength: 5,
+            // }}
             render={({ field }) => (
               <InputNextUI
                 type="password"
                 label="Password"
                 {...field}
-                isRequired={true}
+                // isRequired={true}
                 isInvalid={errors?.["password"] ? true : false}
                 errorMessage={errors?.["password"]?.message}
               />
@@ -516,7 +537,7 @@ const AddStore = () => {
               />
             )}
           </div>
-          
+
         </div>
         <div className="flex flex-col flex-wrap gap-4 border-b pb-3 mt-4 mb-4">
           <Chip

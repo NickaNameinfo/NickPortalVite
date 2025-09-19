@@ -34,34 +34,34 @@ const Store = () => {
     (state) => state.globalConfig.onSearchOpenStore
   );
 
+
   const {
     data: storesByCategory,
     error: storeByError,
     refetch: storeByCategoryRefetch,
-  } = useGetStoresByCategoryQuery(globalCategorySearch, { skip: !globalCategorySearch });
+  } = useGetStoresByCategoryQuery(globalCategorySearch, { refetchOnMountOrArgChange: true });
 
   const {
     data: storesByFilter,
     error: storeByFilterError,
     refetch: storeByFilterRefetch,
-  } = useGetStoresByFiltersQuery(globalSearch, { skip:!globalSearch });
+  } = useGetStoresByFiltersQuery(globalSearch, { refetchOnMountOrArgChange: true });
 
   const {
     data: storesByPayment,
     error: storesByPaymentError,
     refetch: storesByPaymentRefetch,
-  } = useGetStoresByPaymentTypeQuery(gloablSearchByPayment, { skip:!gloablSearchByPayment });
+  } = useGetStoresByPaymentTypeQuery(gloablSearchByPayment, { refetchOnMountOrArgChange: true });
 
   const {
     data: storesByOpenStore,
     error: storesByOpenStoreError,
     refetch: storesByOpenStoreRefetch,
-  } = useGetStoresByOpenStoreQuery();
+  } = useGetStoresByOpenStoreQuery({ refetchOnMountOrArgChange: true });
 
   const [storeDataList, setStoreDataList] = React.useState(null);
 
   React.useEffect(() => {
-    refetch();
     dispatch(onResetModals());
   }, []);
 

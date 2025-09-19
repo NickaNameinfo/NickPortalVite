@@ -89,27 +89,9 @@ export const AppHeader = () => {
   const [sliderLabel, setSliderLabel] = React.useState([]);
   const [searchValues, setSearchValues] = React.useState(null);
   const [isPopOverOpen, setIsPopOverOpen] = React.useState(false);
-
-  const { data: category } = useGetCategoryQuery();
   const dispatch = useAppDispatch();
   const id = getCookie("id");
   const itemsPerPage = 12;
-
-  React.useEffect(() => {
-    if (category?.data) {
-      const labels = category.data.map((item) => item);
-      setSliderLabel(labels);
-    } else {
-      setSliderLabel([]);
-    }
-  }, [category?.data]);
-
-  React.useEffect(() => {
-    if (isProductDetailsModalOpen?.isOpen || isOpenCartModal || isOPenOrderModal) {
-      setIsPopOverOpen(false);
-    }
-  }, [isProductDetailsModalOpen, isOpenCartModal, isOPenOrderModal]);
-
   const displayedLabels =
     sliderLabel?.slice(startIndex, startIndex + itemsPerPage) || [];
 
@@ -121,17 +103,20 @@ export const AppHeader = () => {
     (state) => state.globalConfig.globalCategorySearch
   );
 
+  const { data: category } = useGetCategoryQuery({ refetchOnMountOrArgChange: true });
+
   const {
     data: cart,
     error: cartError,
     refetch: cartRefetch,
-  } = useGetCartByOrderIdQuery(Number(id), { skip: !id });
+  } = useGetCartByOrderIdQuery(Number(id), { skip: !id, refetchOnMountOrArgChange: true });
 
   const {
     data: orderList,
     error: orderListError,
     refetch: orderListRefetch,
-  } = useGetOrderByOrderIdQuery(Number(id), { skip:!id });
+  } = useGetOrderByOrderIdQuery(Number(id), { skip: !id, refetchOnMountOrArgChange: true });
+
 
   const handleNext = () => {
     setStartIndex((prevIndex) =>
@@ -160,6 +145,21 @@ export const AppHeader = () => {
     dispatch(updateLoginDetails(null));
     location.reload();
   };
+
+  React.useEffect(() => {
+    if (category?.data) {
+      const labels = category.data.map((item) => item);
+      setSliderLabel(labels);
+    } else {
+      setSliderLabel([]);
+    }
+  }, [category?.data]);
+
+  React.useEffect(() => {
+    if (isProductDetailsModalOpen?.isOpen || isOpenCartModal || isOPenOrderModal) {
+      setIsPopOverOpen(false);
+    }
+  }, [isProductDetailsModalOpen, isOpenCartModal, isOPenOrderModal]);
 
   return (
     <>
@@ -259,11 +259,10 @@ export const AppHeader = () => {
               <Button
                 key={index}
                 color="primary"
-                className={`mx-1 IconCalls transition  ${
-                  currLocation[1] === view.key
+                className={`mx-1 IconCalls transition  ${currLocation[1] === view.key
                     ? "bg-primary text-white"
                     : "text-slate-400 bg-white"
-                }`}
+                  }`}
                 onClick={() => navigate(`/${view.key}`)}
               >
                 <span className="hidden sm:block">{view.name}</span>
@@ -273,10 +272,10 @@ export const AppHeader = () => {
                       view.key === ""
                         ? storeImageIcon
                         : view.key === "ProductView"
-                        ? productImageIcon
-                        : view.key === "VendorView"
-                        ? vendorImageIcon
-                        : mapImageIcon
+                          ? productImageIcon
+                          : view.key === "VendorView"
+                            ? vendorImageIcon
+                            : mapImageIcon
                     }
                     width={28}
                   />
@@ -304,7 +303,7 @@ export const AppHeader = () => {
               isIconOnly
               color="warning"
               className="bg-yellow-500 hidden"
-              onPress={() => {}}
+              onPress={() => { }}
             >
               <IconInfo />
             </Button>
@@ -332,9 +331,9 @@ export const AppHeader = () => {
                           name={currentloginDetails?.data?.firstName}
                           description="Your Details"
                           className="transition-transform"
-                          // avatarProps={{
-                          //   src: "https://i.pravatar.cc/150?u=a04258114e29026702d",
-                          // }}
+                        // avatarProps={{
+                        //   src: "https://i.pravatar.cc/150?u=a04258114e29026702d",
+                        // }}
                         />
                       </PopoverTrigger>
                       <PopoverContent className="p-0">
@@ -401,13 +400,12 @@ export const AppHeader = () => {
       </div>
 
       {/* Slider Section */}
-      <div className="slider-wrapper w-full overflow-hidden">
+      <div className="slider-wrapper w-full overflow-hidden px-2">
         <div className="flex items-center justify-between px-4 my-2">
           <Button
             isIconOnly
-            className={`Iconwhatsup w-7 min-w-7 h-7 ${
-              startIndex === 0 ? "cursor-not-allowed" : "cursor-pointer"
-            }`}
+            className={`Iconwhatsup w-7 min-w-7 h-7 ${startIndex === 0 ? "cursor-not-allowed" : "cursor-pointer"
+              }`}
             style={{ backgroundColor: "#0000004a" }}
             onClick={handlePrev}
             disabled={startIndex === 0}
@@ -419,8 +417,10 @@ export const AppHeader = () => {
               <Button
                 key={index}
                 onClick={() => {
-                  if (globalCategorySearch) {
-                    dispatch(onGlobalCategorySearch(null));
+                  // If the clicked category is already selected, unselect it.
+                  // Otherwise, select the new category.
+                  if (globalCategorySearch === item?.id) {
+                    onSearchByCategory(null); // Assuming onSearchByCategory can handle null to unselect
                   } else {
                     onSearchByCategory(item?.id);
                   }
@@ -443,11 +443,10 @@ export const AppHeader = () => {
             style={{ backgroundColor: "#0000004a" }}
             onClick={handleNext}
             disabled={startIndex + itemsPerPage >= sliderLabel.length}
-            className={`Iconwhatsup w-7 min-w-7 h-7 ${
-              startIndex + itemsPerPage >= sliderLabel?.length
+            className={`Iconwhatsup w-7 min-w-7 h-7 ${startIndex + itemsPerPage >= sliderLabel?.length
                 ? "cursor-not-allowed"
                 : "cursor-pointer"
-            }`}
+              }`}
           >
             <IconNext fill="#ffffffcc" width="12px" height="12px" />
           </Button>

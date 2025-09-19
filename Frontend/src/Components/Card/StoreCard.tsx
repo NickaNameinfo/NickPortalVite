@@ -139,7 +139,7 @@ export const StoreCard = ({ item = null, key = null }) => {
                 paddingLeft: "10px",
               }}
             >
-              Coming soon
+              {item?.distance}
             </small>
           </div>
         </div>

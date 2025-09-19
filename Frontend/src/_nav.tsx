@@ -8,6 +8,7 @@ export const _nav = [
     link: "/",
     icons: <IconHome />,
     isSoon: true,
+    info: "Baed on your activity",
   },
   {
     menuType: "single",
@@ -16,6 +17,7 @@ export const _nav = [
     link: "/",
     icons: <IconHome />,
     isSoon: true,
+    info: "Not visited products",
   },
   {
     menuType: "single",
@@ -24,6 +26,7 @@ export const _nav = [
     link: "/",
     icons: <IconHome />,
     isSoon: true,
+    info: "Products within 5Km",
   },
   {
     menuType: "multiple",
@@ -54,6 +57,7 @@ export const _nav = [
     key: 1,
     link: "/",
     icons: <IconHome />,
+    info: "Only pre book products and stores",
   },
   {
     menuType: "single",
@@ -61,6 +65,7 @@ export const _nav = [
     key: 2,
     link: "/",
     icons: <IconHome />,
+    info: "Only online payment products and stores",
   },
   {
     menuType: "single",
@@ -68,6 +73,7 @@ export const _nav = [
     key: 3,
     link: "/",
     icons: <IconHome />,
+    info: "Only cash on delivery products and stores",
   },
   {
     menuType: "single",
@@ -75,6 +81,7 @@ export const _nav = [
     key: "Open Shop",
     link: "/",
     icons: <IconHome />,
+    info: "Only open shop products and stores",
   },
   {
     menuType: "single",
@@ -82,6 +89,7 @@ export const _nav = [
     key: "Hospitals",
     link: "/",
     icons: <IconHome />,
+    info: "Only hospital products and stores",
   },
   {
     menuType: "single",
@@ -89,5 +97,6 @@ export const _nav = [
     key: "Hotels",
     link: "/",
     icons: <IconHome />,
+    info: "Only hotel products and stores",
   },
 ];

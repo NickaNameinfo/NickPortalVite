@@ -20,18 +20,18 @@ import { useNavigate } from "react-router-dom";
 const ProductsList = () => {
   const vendorId = getCookie("vendorId");
   const storeId = getCookie("storeId");
-  const { data, error, refetch } = useGetProductsQuery(undefined, { skip: !!vendorId || !!storeId });
+  const { data, error, refetch } = useGetProductsQuery(undefined, { skip: !!vendorId || !!storeId, refetchOnMountOrArgChange: true });
   const nativegate = useNavigate();
   const {
     data: vendorProducts,
     error: vendorError,
     refetch: vendorRefetch,
-  } = useGetVendorsProductByIdQuery(Number(vendorId), { skip: !vendorId });
+  } = useGetVendorsProductByIdQuery(Number(vendorId), { skip: !vendorId, refetchOnMountOrArgChange: true });
   const {
     data: storeProducts,
     error: storeError,
     refetch: stroeRefetch,
-  } = useGetStoresProductByIDQuery(Number(storeId), { skip:!storeId });
+  } = useGetStoresProductByIDQuery(Number(storeId), { skip:!storeId, refetchOnMountOrArgChange: true });
   const currentRole = getCookie("role");
   console.log(storeProducts, "storeProducts7089523", currentRole)
 
@@ -81,6 +81,7 @@ const ProductsList = () => {
   // }, [vendorId, storeId]);
 
   const renderCell = React.useCallback((data, columnKey) => {
+    console.log(data, "asdfa7s09df7")
     switch (columnKey) {
       case "product":
         return <p>{data?.product?.name ? data?.product?.name :  data?.name}</p>;
@@ -105,12 +106,12 @@ const ProductsList = () => {
               </DropdownTrigger>
               <DropdownMenu>
                 <DropdownItem
-                  onClick={() => nativegate(`/AddProducts/${data.product?.id}`)}
+                  onClick={() => nativegate(`/AddProducts/${data.product?.id ? data.product?.id : data?.id}`)}
                 >
                   View
                 </DropdownItem>
                 <DropdownItem
-                  onClick={() => nativegate(`/AddProducts/${data.product?.id}`)}
+                  onClick={() => nativegate(`/AddProducts/${data.product?.id ? data.product?.id : data?.id}`)}
                 >
                   Edit
                 </DropdownItem>

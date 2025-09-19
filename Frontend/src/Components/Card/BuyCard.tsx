@@ -12,8 +12,9 @@ import {
   ScrollShadow,
   Radio,
   RadioGroup,
+  Input,
 } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableHeader,
@@ -23,17 +24,20 @@ import {
   TableCell,
   getKeyValue,
 } from "@nextui-org/react";
-import { IconDelete, ModalCloseIcon } from "../Icons";
+import { IconDelete, IconInfo, ModalCloseIcon } from "../Icons";
 import { useBoolean } from "../Common/CustomHooks";
 import { useAppDispatch, useAppSelector } from "../Common/hooks";
 import { useNavigate, useParams } from "react-router-dom";
-import { infoData } from "../../configData";
+import { toast } from "react-toastify";
 import { onRefreshCart, onUpdateCartModal } from "../Common/globalSlice";
 import {
   useGetCartByOrderIdQuery,
   useUpdateCartMutation,
   useDeleteCartItemMutation,
   useAddOrderMutation,
+  useUpdateAddressMutation,
+  useGetAddressesByCustIdQuery,
+  useAddAddressMutation
 } from "../../views/pages/Store/Service.mjs";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import withReactContent from "sweetalert2-react-content";
@@ -47,6 +51,9 @@ const columns = [
 
 export const BuyCard = (props: any) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState('1');
+  const [deliveryDate, setDeliveryDate] = React.useState('');
+  const [isSelectAddress, setIsSelectAddress] = useState(false);
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
   const isOpenCartModal = useAppSelector(
     (state) => state.globalConfig.isOpenCartModal
@@ -65,11 +72,71 @@ export const BuyCard = (props: any) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const MySwal = withReactContent(Swal);
+  const [updateAddress] = useUpdateAddressMutation();
+  const [addAddress] = useAddAddressMutation();
+  const { data: addresses, refetch: refetchAddresses } = useGetAddressesByCustIdQuery(userId, { skip: !userId });
+
+  const [addressDetails, setAddressDetails] = useState({
+    fullname: "",
+    phone: "",
+    orderId: "",
+    custId: "",
+    district: "",
+    city: "",
+    states: "",
+    area: "",
+    shipping: "",
+  });
+
+  const [selectedAddress, setSelectedAddress] = useState(null);
 
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
     cartRefetch();
   }, [userId, onRefresh]);
+
+  React.useEffect(() => {
+    if (userId) {
+      setAddressDetails((prevDetails) => ({
+        ...prevDetails,
+        custId: userId,
+      }));
+    }
+    if (cart?.data && cart.data.length > 0) {
+      setAddressDetails((prevDetails) => ({
+        ...prevDetails,
+        orderId: cart.data[0].orderId,
+      }));
+    }
+  }, [userId, cart]);
+
+  React.useEffect(() => {
+    if (addresses?.data?.length > 0) {
+      setSelectedAddress(addresses.data[0]);
+    }
+  }, [addresses]);
+
+  React.useEffect(() => {
+    if (selectedAddress) {
+      setAddressDetails({
+        fullname: selectedAddress.fullname || "",
+        phone: selectedAddress.phone || "",
+        orderId: selectedAddress.orderId || "",
+        custId: selectedAddress.custId || "",
+        district: selectedAddress.district || "",
+        city: selectedAddress.city || "",
+        states: selectedAddress.states || "",
+        area: selectedAddress.area || "",
+        shipping: selectedAddress.shipping || "",
+      });
+    }
+  }, [selectedAddress]);
+
+  React.useEffect(() => {
+    if (userId) {
+      refetchAddresses();
+    }
+  }, [userId]);
 
   const handleAddCart = async (type, product) => {
     let tempCartValue = {
@@ -101,12 +168,14 @@ export const BuyCard = (props: any) => {
         try {
           const tempCartValue = {
             customerId: item?.orderId,
-            paymentmethod: 3,
+            paymentmethod: selectedPaymentMethod,
             orderId: Number(userId),
             grandTotal: Number(item?.qty * item?.price),
             productIds: item?.productId,
             qty: item?.qty,
             storeId: id,
+            cutomerDeliveryDate: deliveryDate,
+            addressDetails: selectedAddress || addressDetails, // Include selected or entered address details
           };
           return await addOrder(tempCartValue);
         } catch (error) {
@@ -138,6 +207,50 @@ export const BuyCard = (props: any) => {
     }
   };
 
+  const handleAddressChange = (e) => {
+    setAddressDetails({
+      ...addressDetails,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleUpdateAddress = async () => {
+    try {
+      const apiInfo = {
+        ...addressDetails,
+        custId: userId,
+      };
+      const result = await updateAddress(apiInfo);
+      if (result?.data?.success) {
+        toast.success("Address updated successfully!");
+        refetchAddresses();
+      } else {
+        toast.error("Failed to update address.");
+      }
+    } catch (error) {
+      toast.error("Error updating address.");
+      console.error("Address update error:", error);
+    }
+  };
+  const handleAddAddress = async () => {
+    try {
+      const apiInfo = {
+        ...addressDetails,
+        custId: userId,
+      };
+      const result = await addAddress(apiInfo);
+      if (result?.data?.success) {
+        toast.success("Address added successfully!");
+        refetchAddresses();
+      } else {
+        toast.error("Failed to add address.");
+      }
+    } catch (error) {
+      toast.error("Error adding address.");
+      console.error("Address add error:", error);
+    }
+  };
+
   const renderCell = React.useCallback((data, columnKey) => {
     switch (columnKey) {
       case "photo":
@@ -146,7 +259,7 @@ export const BuyCard = (props: any) => {
             className="p-0 m-0"
             avatarProps={{
               radius: "lg",
-              src: `${infoData.baseApi}/${data.photo}`,
+              src: `${data.photo}`,
             }}
             name={null}
           ></User>
@@ -194,6 +307,22 @@ export const BuyCard = (props: any) => {
     }
   }, []);
 
+
+  useEffect(() => {
+    if (userId) {
+      setAddressDetails((prevDetails) => ({
+        ...prevDetails,
+        custId: userId,
+      }));
+    }
+    if (cart?.data && cart.data.length > 0) {
+      setAddressDetails((prevDetails) => ({
+        ...prevDetails,
+        orderId: cart.data[0].orderId,
+      }));
+    }
+  }, [userId, cart]);
+
   return (
     <>
       <Modal
@@ -220,7 +349,7 @@ export const BuyCard = (props: any) => {
             />
             <ModalBody className="p-0 m-0 mt-1 pt-2">
               <div className="grid xm:grid-cols-1 mm:grid-cols-1  sm:grid-cols-1 ml:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 3xl:grid-cols-2 4xl:grid-cols-2">
-                <div className="">
+                {!isSelectAddress ? <div className="">
                   <Table
                     isHeaderSticky
                     classNames={{
@@ -266,16 +395,102 @@ export const BuyCard = (props: any) => {
                       size="sm"
                       color="primary"
                       variant="bordered"
-                      className={`ms-3 ${
-                        cart?.data?.length <= 0 ? "cursor-not-allowed" : ""
-                      }`}
+                      className={`ms-3 ${cart?.data?.length <= 0 ? "cursor-not-allowed" : ""
+                        }`}
                       onClick={() => navigate(-1)}
                       disabled={cart?.data?.length <= 0}
                     >
                       Buy More Items
                     </Button>
                   </div>
-                </div>
+                </div> :
+                  <div className="BuycarBg mx-3">
+                    {/* Address Update Form */}
+                    <div className="p-4 border-t dark:border-gray-700">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Delivery Address</h3>
+                      {addresses?.data?.length > 0 && (
+                        <div className="space-y-3 mb-4">
+                          <RadioGroup
+                            value={selectedAddress?.id}
+                            onValueChange={(value) => {
+                              const address = addresses.data.find((addr) => addr.id === value);
+                              setSelectedAddress(address);
+                            }}
+                          >
+                            {addresses.data.map((address) => (
+                              <Radio key={address.id} value={address.id}>
+                                {`${address.fullname}, ${address.shipping}, ${address.area}, ${address.city}, ${address.district}, ${address.states}, ${address.phone}`}
+                              </Radio>
+                            ))}
+                          </RadioGroup>
+                        </div>
+                      )}
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          name="fullname"
+                          placeholder="Full Name"
+                          value={addressDetails.fullname}
+                          onChange={handleAddressChange}
+                          className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        />
+                        <input
+                          type="text"
+                          name="phone"
+                          placeholder="Phone"
+                          value={addressDetails.phone}
+                          onChange={handleAddressChange}
+                          className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        />
+                        <input
+                          type="text"
+                          name="district"
+                          placeholder="District"
+                          value={addressDetails.district}
+                          onChange={handleAddressChange}
+                          className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        />
+                        <input
+                          type="text"
+                          name="city"
+                          placeholder="City"
+                          value={addressDetails.city}
+                          onChange={handleAddressChange}
+                          className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        />
+                        <input
+                          type="text"
+                          name="states"
+                          placeholder="State"
+                          value={addressDetails.states}
+                          onChange={handleAddressChange}
+                          className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        />
+                        <input
+                          type="text"
+                          name="area"
+                          placeholder="Area"
+                          value={addressDetails.area}
+                          onChange={handleAddressChange}
+                          className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        />
+                        <input
+                          type="text"
+                          name="shipping"
+                          placeholder="Shipping Address"
+                          value={addressDetails.shipping}
+                          onChange={handleAddressChange}
+                          className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        />
+                        <button
+                          onClick={handleUpdateAddress}
+                          className="w-full rounded-md bg-blue-600 py-2 text-white hover:bg-blue-700"
+                        >
+                          {selectedAddress ? "Update Address" : "Add Address"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>}
                 <div>
                   <div className=" BuycarBg mx-3">
                     <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
@@ -294,10 +509,7 @@ export const BuyCard = (props: any) => {
                           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       </div>
                     </div>
-                    {/* <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
-                      <div>Discount</div>
-                      <div> 100%</div>
-                    </div> */}
+
                     <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
                       <div>Delivery Charge</div>
                       <div> Free</div>
@@ -310,7 +522,7 @@ export const BuyCard = (props: any) => {
                         Rs.{" "}
                         {cart?.data
                           ?.reduce(
-                            (sum, item) => sum + item.price * item.qty,
+                            (sum, item) => sum + parseFloat(item.price) * parseFloat(item.qty),
                             0
                           ) // Multiply price with qty
                           .toFixed(2) // Ensures two decimal places
@@ -322,75 +534,78 @@ export const BuyCard = (props: any) => {
                       <div className="font-medium paymetoption text-base mx-3 pb-2 pt-2">
                         Payment Options
                       </div>
-                      <RadioGroup className="w-full">
-                        {/* <div className="flex  justify-between items-center mx-3 w-full"> */}
-                        {/* <div className="w-2/4 m-1 items-center">
+                      <RadioGroup className="w-full" value={selectedPaymentMethod} onChange={(e) => setSelectedPaymentMethod(e.target.value)}>
+                        <div className="flex  justify-between items-center mx-3 w-full">
+                          <div className="w-2/4 m-1 items-center flex">
                             <Radio
-                              value="Google-Pay"
+                              value="1"
                               size="sm"
-                              className="items-center"
+                              className="items-center mr-1"
                               disabled
                             >
-                              Google Pay
+                              Online payment
                             </Radio>
+                            <Tooltip content={"We accept online payments using credit/debit cards, net banking, and mobile wallets."} showArrow className="w-80"><span><IconInfo fill="#FF0000" width={15} className={"mr-2"} /></span></Tooltip>
                           </div>
-                          <div className="w-2/4 m-1 items-center">
+                          <div className="w-2/4 m-1 items-center flex">
                             <Radio
-                              value="Phone-Pay"
+                              value="2"
                               size="sm"
-                              className="items-center"
+                              className="items-center mr-1"
                               disabled
                             >
-                              Phone Pay
+                              Pre Order
                             </Radio>
+                            <Tooltip content={"Pre Order means you can order the product before your going to shop directly and you have to pay the 15% of the total amount to place order."} showArrow className="w-80"><span><IconInfo fill="#FF0000" width={15} className={"mr-2"} /></span></Tooltip>
                           </div>
                         </div>
                         <div className="flex  justify-between items-center mx-3 w-full">
-                          <div className="w-2/4 m-1 items-center">
+                          <div className="w-2/4 m-1 items-center flex">
                             <Radio
-                              value=" Debit-Card"
+                              value="3"
                               size="sm"
-                              className="items-center"
+                              className="items-center mr-1"
                               disabled
-                            >
-                              Debit Card
-                            </Radio>
-                          </div>
-                          <div className="w-2/4 m-1 items-center">
-                            <Radio
-                              value="Credit-Card"
-                              size="sm"
-                              className="items-center"
-                              disabled
-                            >
-                              Credit Card
-                            </Radio>
-                          </div>
-                        </div> */}
-                        <div className="justify-between mx-3 flex w-full items-center">
-                          <div className="w-2/4 m-1 items-center">
-                            <Radio
-                              value={"3"}
-                              size="sm"
-                              className="items-center"
-                              checked={true}
                             >
                               Cash on Delivery
                             </Radio>
+                            <Tooltip content={"Cash on Delivery means you can pay the amount at the time of delivery."} showArrow className="w-80"><span><IconInfo fill="#FF0000" width={15} className={"mr-2"} /></span></Tooltip>
+                          </div>
+                          <div className="w-2/4 m-1 items-center flex">
+                            <Radio
+                              value="4"
+                              size="sm"
+                              className="items-center mr-1"
+                              disabled
+                            >
+                              Delivery in future
+                            </Radio>
+                            <Tooltip content={"Delivery in future means you can order the product and we will deliver it to you in selected date. and you have to pay the 30% of the total amount to place order."} showArrow className="w-80"><span><IconInfo fill="#FF0000" width={15} className={"mr-2"} /></span></Tooltip>
                           </div>
                         </div>
+                        {selectedPaymentMethod === '4' && (
+                          <div className="flex  justify-between items-center mx-3 w-full">
+                            <div className="w-4/6 m-1 items-center flex">
+                              <Input
+                                value={deliveryDate}
+                                onChange={(e) => setDeliveryDate(e.target.value)}
+                                type="date"
+                                className="w-2/4 m-1"
+                              />
+                            </div>
+                          </div>
+                        )}
                       </RadioGroup>
                       <div className="flex items-center justify-center mt-4 mb-1">
                         <Button
                           size="sm"
                           color="primary"
-                          className={`me-5 ${
-                            cart?.data?.length <= 0 ? "cursor-not-allowed" : ""
-                          }`}
+                          className={`me-5 ${cart?.data?.length <= 0 ? "cursor-not-allowed" : ""
+                            }`}
                           disabled={cart?.data?.length <= 0}
-                          onClick={() => handleAddOrder()}
+                          onClick={() => setIsSelectAddress(true)}
                         >
-                          Book Order
+                          Select delivery address
                         </Button>
                         <Button
                           size="sm"

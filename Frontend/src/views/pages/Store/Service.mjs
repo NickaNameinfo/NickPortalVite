@@ -13,13 +13,13 @@ export const StoreApi = createApi({
   endpoints: (builder) => ({
     getStoresProductByID: builder.query({
       query: (id) => ({
-        url: `/store/product/getAllProductById/${id}`, 
+        url: `/store/product/getAllProductById/${id}`,
         method: "GET",
       }),
     }),
     getStores: builder.query({
       query: (id) => ({
-        url: `/store/list`,
+        url: `/store/list?currentLocation=${localStorage.getItem('latitude') + ',' + localStorage.getItem('longitude')}`,
         method: "GET",
       }),
     }),
@@ -32,7 +32,7 @@ export const StoreApi = createApi({
     }),
     getStoresById: builder.query({
       query: (id) => ({
-        url: `/store/list/${id}`,
+        url: `/store/list/${id}?currentLocation=${localStorage.getItem('latitude') + ',' + localStorage.getItem('longitude')}`,
         method: "GET",
       }),
     }),
@@ -82,27 +82,53 @@ export const StoreApi = createApi({
         body,
       }),
     }),
-    getStoresByCategory:  builder.query({
+    getStoresByCategory: builder.query({
       query: (id) => ({
         url: `/store/filterByCategory?categoryIds=${id}`,
         method: "GET",
       }),
     }),
-    getStoresByFilters:  builder.query({
+    getStoresByFilters: builder.query({
       query: (query) => ({
         url: `/store/getAllStoresByFilters?search=${query}`,
         method: "GET",
       }),
     }),
-    getStoresByPaymentType:  builder.query({
+    getStoresByPaymentType: builder.query({
       query: (query) => ({
         url: `/store/getAllStoresByFilters?paymentModes=${query}`,
         method: "GET",
       }),
     }),
-    getStoresByOpenStore:  builder.query({
+    getStoresByOpenStore: builder.query({
       query: (query) => ({
         url: `/store/getOpenStores`,
+        method: "GET",
+      }),
+    }),
+    addAddress: builder.mutation({
+      query: (body) => ({
+        url: `/address/create`,
+        method: "POST",
+        body,
+      }),
+    }),
+    updateAddress: builder.mutation({
+      query: (body) => ({
+        url: `/address/update/${body?.id}`,
+        method: "POST",
+        body,
+      }),
+    }),
+    deleteAddress: builder.mutation({
+      query: (body) => ({
+        url: `/address/delete/${body?.id}`,
+        method: "DELETE",
+      }),
+    }),
+    getAddressesByCustId: builder.query({
+      query: (custId) => ({
+        url: `/address/list/${custId}`,
         method: "GET",
       }),
     }),
@@ -124,6 +150,9 @@ export const {
   useGetStoresByOpenStoreQuery,
   useAddOrderMutation,
   useAddStoreMutation,
-  useGetOrderByOrderIdQuery
+  useGetOrderByOrderIdQuery,
+  useUpdateAddressMutation,
+  useGetAddressesByCustIdQuery,
+  useAddAddressMutation
 } = StoreApi;
 export const { endpoints } = StoreApi;
