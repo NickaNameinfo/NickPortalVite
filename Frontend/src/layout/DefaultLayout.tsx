@@ -6,6 +6,10 @@ import { ToastContainer } from "react-toastify";
 const DefaultLayout = () => {
   return (
     <div>
+
+      <marquee className="bg-yellow-200 text-yellow-800 p-2">
+        📢 We are currently collaborating with stores and will enable ordering soon.
+      </marquee>
       <main className="mytheme text-foreground overflow-hidden pt-4 px-1">
         <div className="flex">
           <AppSidebar />

@@ -18,7 +18,7 @@ export const StoreApi = createApi({
   endpoints: (builder) => ({
     getStore: builder.query({
       query: (body) => ({
-        url: `/store/list`,
+        url: `/store/admin/list`,
         method: "GET",
       }),
     }),

@@ -41,6 +41,7 @@ import { infoData } from "../../configData";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { toast } from "react-toastify";
 
 export const PremiumCard = ({
   item = null,
@@ -109,7 +110,6 @@ export const PremiumCard = ({
       }
     }
   };
-
   return (
     <>
       <Card className="Storecard pt-3.5 px-3">
@@ -155,7 +155,7 @@ export const PremiumCard = ({
                 Rs : {productItem?.total}{" "}
                 <span
                   style={{ color: "black", fontSize: "10px" }}
-                >{`(${productItem?.unitSize})`}</span>
+                >{`(${productItem?.qty})`}</span>
               </p>
               <p className="font-normal text-sm  TextMaincolor p-0">
                 <small
@@ -164,7 +164,7 @@ export const PremiumCard = ({
                     paddingLeft: "10px",
                   }}
                 >
-                  Coming soon
+                  {productItem?.unitSize}
                 </small>{" "}
                 Stocks
               </p>
@@ -254,7 +254,11 @@ export const PremiumCard = ({
                       shape="circle"
                       color="danger"
                       onClick={() => {
-                        dispatch(onUpdateCartModal(true));
+                        if (userId) {
+                          dispatch(onUpdateCartModal(true));
+                        } else {
+                          toast.error("Please login to add to cart!");
+                        }
                       }}
                     >
                       {/* <Button
@@ -268,7 +272,11 @@ export const PremiumCard = ({
                         fill="#4C86F9"
                         className="cursor-pointer"
                         onClick={() => {
-                          dispatch(onUpdateCartModal(true));
+                          if (userId) {
+                            dispatch(onUpdateCartModal(true));
+                          } else {
+                            toast.error("Please login to add to cart!");
+                          }
                         }}
                       />
                       {/* </Button> */}

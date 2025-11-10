@@ -197,6 +197,7 @@ export const AppSidebar = () => {
               {_nav?.map((result) =>
                 result?.menuType === "single" ? (
                   <div
+                    key={result.key}
                     style={
                       !result?.isSoon
                         ? {
@@ -246,7 +247,7 @@ export const AppSidebar = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="rounded-lg mb-3">
+                  <div key={result.key} className="rounded-lg mb-3">
                     <Accordion
                       itemClasses={itemClasses}
                       className="text-foreground rounded-lg"
@@ -256,7 +257,7 @@ export const AppSidebar = () => {
                       }}
                     >
                       <AccordionItem
-                        key="1"
+                        key={result.key}
                         aria-label={result?.name}
                         title={result?.name}
                         className="p-0 m-0 text-white"
@@ -264,7 +265,7 @@ export const AppSidebar = () => {
                         <ul>
                           {data?.data?.map((data) => {
                             return (
-                              <li className="pb-2 m-0">
+                              <li key={data?.id} className="pb-2 m-0">
                                 <div className="flex items-center justify-between mb-0.5">
                                   <div className="flex items-center">
                                     <p

@@ -13,6 +13,7 @@ import {
   Tabs,
   Tab,
   Textarea,
+  Tooltip,
 } from "@nextui-org/react";
 import React from "react";
 import {
@@ -263,7 +264,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                         <p className="text-black text-lg font-normal">
                           Rs: {props?.item?.product?.total}{" "}
                           <span style={{ color: "black", fontSize: "10px" }}>
-                            ({props?.item?.product?.unitSize})
+                            ({props?.item?.product?.qty ? props?.item?.product?.qty : props?.item?.product?.unitSize})
                           </span>
                         </p>
                         <div className="text-sm">
@@ -273,7 +274,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               paddingLeft: "10px",
                             }}
                           >
-                            Coming soon
+                            {props?.item?.product?.unitSize ? props?.item?.product?.unitSize : props?.item?.product?.qty}
                           </small>{" "}
                           Stocks
                         </div>
@@ -313,7 +314,13 @@ export const ProductDetail = (props: ProductDetailProps) => {
                                 variant="ghost"
                                 radius="lg"
                                 size={"md"}
-                                onClick={() => dispatch(onUpdateCartModal(true))}
+                                onClick={() => {
+                                  if (userId) {
+                                    dispatch(onUpdateCartModal(true));
+                                  } else {
+                                    toast.error("Please login to add to cart!");
+                                  }
+                                }}
                               >
                                 View Cart
                               </Button>
@@ -484,47 +491,149 @@ export const ProductDetail = (props: ProductDetailProps) => {
                     </div>
                   </div>
                   <div className="min-h-[170px]">
-                    <h2 className="font-bold my-2">
-                      {props?.item?.product?.isEnableCustomize === 1 ||
-                        props?.item?.isEnableCustomize === 1
-                        ? "Customize Product and order items *"
-                        : "Write your feedback"}
-                    </h2>
-                    <Textarea
-                      classNames={{
-                        base: "max-w-[100%]",
-                        input: "resize-y min-h-[120px]",
-                      }}
-                      placeholder="Enter your details"
-                      onChange={(e) => setCustomization(e.target.value)}
-                      errorMessage={
-                        !customization
-                          ? "Please enter your customization details"
-                          : null
-                      }
-                    />
-                    <div className="flex justify-end mt-2">
-                      {/* <StarRating maxRating={5} /> */}
-                      <Button
-                        variant="ghost"
-                        color={!customization ? "default" : "success"}
-                        disabled={!customization}
-                        className={!customization ? "cursor-not-allowed" : ""}
-                        onClick={() => {
-                          if (
-                            props?.item?.product?.isEnableCustomize === 1 ||
-                            props?.item?.isEnableCustomize === 1
-                          ) {
-                            handleAddOrder();
-                          }
-                        }}
+                    <Tabs
+                      aria-label="Options"
+                      color="default"
+                      variant="solid"
+                    // className="flex-col"
+                    >
+                      <Tab
+                        key="photos"
+                        title={
+                          <div className="flex items-center space-x-2">
+                            {/* <GalleryIcon /> */}
+                            <span>Normal Order</span>
+                          </div>
+                        }
                       >
-                        {props?.item?.product?.isEnableCustomize === 1 ||
-                          props?.item?.isEnableCustomize === 1
-                          ? "Place Order"
-                          : "Submit FeedBack"}
-                      </Button>
-                    </div>
+                        <Card className="min-h-[170px]">
+                          <CardBody>
+                            <h2 className="font-bold my-2">Give delivery details</h2>
+                            <Textarea
+                              classNames={{
+                                base: "max-w-[100%]",
+                                input: "resize-y min-h-[120px]",
+                              }}
+                              placeholder="Enter your details"
+                              onChange={(e) => setCustomization(e.target.value)}
+                              errorMessage={
+                                !customization
+                                  ? "Please enter your customization details"
+                                  : null
+                              }
+                            />
+                            <div className="flex justify-end mt-2">
+                              <Tooltip content="we are collaboration with stores soon will enable this feature">
+                                <Button
+                                  variant="ghost"
+                                  color={!cart?.data?.qty ? "default" : "success"}
+                                  disabled={true}
+                                  className={!cart?.data?.qty ? "cursor-not-allowed mr-3" : "mr-3"}
+                                  onClick={() => {
+                                    if (userId) {
+                                      handleAddOrder();
+                                    } else {
+                                      toast.error("Please login to place order!");
+                                    }
+                                  }}
+                                >Place Order</Button>
+                              </Tooltip>
+                            </div>
+                          </CardBody>
+                        </Card>
+                      </Tab>
+                       <Tab
+                        key="Customize"
+                        title={
+                          <div className="flex items-center space-x-2">
+                            {/* <GalleryIcon /> */}
+                            <span>Customize Order</span>
+                          </div>
+                        }
+                      >
+                        <Card className="min-h-[170px]">
+                          <CardBody>
+                            <h2 className="font-bold my-2">Please enter your customization details</h2>
+                            <Textarea
+                              classNames={{
+                                base: "max-w-[100%]",
+                                input: "resize-y min-h-[120px]",
+                              }}
+                              placeholder="Enter your details"
+                              onChange={(e) => setCustomization(e.target.value)}
+                              errorMessage={
+                                !customization
+                                  ? "Please enter your customization details"
+                                  : null
+                              }
+                            />
+                            <div className="flex justify-end mt-2">
+                             <Tooltip content="we are collaboration with stores soon will enable this feature">
+                                <Button
+                                  variant="ghost"
+                                  color={!cart?.data?.qty ? "default" : "success"}
+                                  disabled={true}
+                                  className={!cart?.data?.qty ? "cursor-not-allowed mr-3" : "mr-3"}
+                                  onClick={() => {
+                                    if (userId) {
+                                      handleAddOrder();
+                                    } else {
+                                      toast.error("Please login to place order!");
+                                    }
+                                  }}
+                                >Place Order</Button>
+                              </Tooltip>
+                            </div>
+                          </CardBody>
+                        </Card>
+                      </Tab>
+                       <Tab
+                        key="Feedback"
+                        title={
+                          <div className="flex items-center space-x-2">
+                            {/* <GalleryIcon /> */}
+                            <span>Feedback</span>
+                          </div>
+                        }
+                      >
+                        <Card className="min-h-[170px]">
+                          <CardBody>
+                            <h2 className="font-bold my-2">Write your feedback</h2>
+                            <Textarea
+                              classNames={{
+                                base: "max-w-[100%]",
+                                input: "resize-y min-h-[120px]",
+                              }}
+                              placeholder="Enter your details"
+                              onChange={(e) => setCustomization(e.target.value)}
+                              errorMessage={
+                                !customization
+                                  ? "Please enter your feedback"
+                                  : null
+                              }
+                            />
+                            <div className="flex justify-end mt-2">
+                              <Tooltip content="We are collaboration with stores soon will enable this feature">
+                                <Button
+                                  variant="ghost"
+                                  color={!cart?.data?.qty ? "default" : "success"}
+                                  disabled={!cart?.data?.qty}
+                                  className={!cart?.data?.qty ? "cursor-not-allowed mr-3" : "mr-3"}
+                                  onClick={() => {
+                                    if (userId) {
+                                      handleAddOrder();
+                                    } else {
+                                      toast.error("Please login to place order!");
+                                    }
+                                  }}
+                                >Submit Feedback</Button>
+                              </Tooltip>
+                            </div>
+                          </CardBody>
+                        </Card>
+                      </Tab>
+                    </Tabs>
+
                   </div>
                 </div>
               </ModalBody>

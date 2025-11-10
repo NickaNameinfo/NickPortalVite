@@ -56,17 +56,17 @@ export const ProductViewCard = ({ item = null }) => {
     data: storeProduct,
     error: storeProductError,
     refetch: storeProductRefetch,
-  } = useGetStoresProductByIDQuery(Number(data?.data?.id), { skip:!data?.data?.id });
+  } = useGetStoresProductByIDQuery(Number(data?.data?.id), { skip: !data?.data?.id });
 
 
   React.useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768); // 768px is typically md breakpoint
     };
-    
+
     // Initial check
     handleResize();
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -117,15 +117,18 @@ export const ProductViewCard = ({ item = null }) => {
             Store Details : {data?.data?.storename}
           </div>
           <div className="px-1 md:flex">
-            {Number(item?.isEnableEcommerce) === 1 ? (
-              <PremiumCard item={item} isHideImage={false} from="ProductView" />
-            ) : (
-              <RelatedProducts
-                item={item}
-                isHideImage={false}
-                from="ProductView"
-              />
-            )}
+            <div className="w-[50%]">
+              {Number(item?.isEnableEcommerce) === 1 ? (
+                <PremiumCard item={item} isHideImage={false} from="ProductView" />
+              ) : (
+                <RelatedProducts
+                  item={item}
+                  isHideImage={false}
+                  from="ProductView"
+                  lineHeight={2}
+                />
+              )}
+            </div>
             <Card className="ps-1 Storecard p-0 outline-none shadow-none max-w-[380px] ml-2">
               <CardBody className="overflow-visible pt-2 pb-3.5 ps-2 pe-2">
                 <div className="grid grid-cols-12">

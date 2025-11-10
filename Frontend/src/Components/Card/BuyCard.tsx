@@ -86,13 +86,14 @@ export const BuyCard = (props: any) => {
     states: "",
     area: "",
     shipping: "",
+    id: "",
   });
 
   const [selectedAddress, setSelectedAddress] = useState(null);
 
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
-    cartRefetch();
+    userId && cartRefetch();
   }, [userId, onRefresh]);
 
   React.useEffect(() => {
@@ -128,6 +129,7 @@ export const BuyCard = (props: any) => {
         states: selectedAddress.states || "",
         area: selectedAddress.area || "",
         shipping: selectedAddress.shipping || "",
+        id: selectedAddress.id || "",
       });
     }
   }, [selectedAddress]);
@@ -350,7 +352,7 @@ export const BuyCard = (props: any) => {
             <ModalBody className="p-0 m-0 mt-1 pt-2">
               <div className="grid xm:grid-cols-1 mm:grid-cols-1  sm:grid-cols-1 ml:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 3xl:grid-cols-2 4xl:grid-cols-2">
                 {!isSelectAddress ? <div className="">
-                  <Table
+                  {cart?.data?.length > 0 && <Table
                     isHeaderSticky
                     classNames={{
                       base: "xm:max-h-[250px] mm:max-h-[250px] ml:max-h-[250px] md:max-h-[340px] lg:max-h-[340px] xl:max-h-[340px] 2xl:max-h-[340px] 3xl:max-h-[340px] overflow-hidden",
@@ -386,7 +388,7 @@ export const BuyCard = (props: any) => {
                         </TableRow>
                       )}
                     </TableBody>
-                  </Table>
+                  </Table>}
                   {cart?.data?.length <= 0 && (
                     <p className="text-center my-3">No Item in Your Cart</p>
                   )}
@@ -482,12 +484,25 @@ export const BuyCard = (props: any) => {
                           onChange={handleAddressChange}
                           className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                         />
-                        <button
-                          onClick={handleUpdateAddress}
-                          className="w-full rounded-md bg-blue-600 py-2 text-white hover:bg-blue-700"
-                        >
-                          {selectedAddress ? "Update Address" : "Add Address"}
-                        </button>
+                        <div className="flex justify-between">
+                          <Tooltip content="we are collaboration with stores soon will enable this feature">
+                            <Button
+                              onClick={handleAddAddress}
+                              isDisabled
+                              className="px-5 rounded-md bg-blue-600 py-2 text-white hover:bg-blue-700"
+                            > 
+                            {"Add Address"}
+                          </Button>
+                          </Tooltip>
+                          {selectedAddress && <Button
+                            onClick={handleUpdateAddress}
+                            isDisabled
+                            variant="ghost"
+                            className="px-5 rounded-md bg-blue-600 py-2 text-white hover:bg-blue-700"
+                          >
+                            {"Update Address"}
+                          </Button>}
+                        </div>
                       </div>
                     </div>
                   </div>}
@@ -597,16 +612,19 @@ export const BuyCard = (props: any) => {
                         )}
                       </RadioGroup>
                       <div className="flex items-center justify-center mt-4 mb-1">
-                        <Button
-                          size="sm"
-                          color="primary"
-                          className={`me-5 ${cart?.data?.length <= 0 ? "cursor-not-allowed" : ""
-                            }`}
-                          disabled={cart?.data?.length <= 0}
-                          onClick={() => setIsSelectAddress(true)}
-                        >
-                          Select delivery address
-                        </Button>
+                        <Tooltip content="We are collaboration with stores soon will enable this feature">
+                          <Button
+                            size="sm"
+                            color="primary"
+                            isDisabled
+                            className={`me-5 ${cart?.data?.length <= 0 ? "cursor-not-allowed" : ""
+                              }`}
+                            disabled={cart?.data?.length <= 0}
+                            onClick={() => setIsSelectAddress(true)}
+                          >
+                            {isSelectAddress ? "Confirm Order" : "Select delivery address"}
+                          </Button>
+                        </Tooltip>
                         <Button
                           size="sm"
                           color="primary"

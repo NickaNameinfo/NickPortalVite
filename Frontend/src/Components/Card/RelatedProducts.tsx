@@ -18,8 +18,11 @@ export const RelatedProducts = ({
   isHideImage = false,
   from = null,
   popOverOnClose = null,
+  lineHeight = 8,
 }) => {
   const dispatch = useAppDispatch();
+
+  console.log(item, "item42")
 
   return (
     <>
@@ -50,8 +53,8 @@ export const RelatedProducts = ({
               width="100%"
               radius="lg"
               className={`w-full object-cover  ${from !== "ProductView"
-                  ? "min-h-[176px] max-h-[176px]"
-                  : "min-h-[50px] max-h-[100px]"
+                ? "min-h-[176px] max-h-[176px]"
+                : "min-h-[50px] max-h-[100px]"
                 }`}
               src={`${item?.product?.photo ? item?.product?.photo : item?.photo
                 }`}
@@ -61,16 +64,21 @@ export const RelatedProducts = ({
         <CardFooter className="p-0">
           <div className="grid grid-cols-1 w-full">
             <div className="font-semibold mt-3 text-sm  TextMaincolor justify-start flex">
-              <p className="truncate">
+              <p>
                 {item?.product?.name ? item?.product?.name : item?.name}
               </p>
             </div>
-            <div className="font-normal text-sm mt-2  TextMaincolor justify-start flex">
-              4 pcs (Approx. 550 - 640 g)
+            <div className="font-normal text-sm Pricecolor overflow-hidden text-ellipsis"
+              style={{
+                display: '-webkit-box',
+                WebkitLineClamp: lineHeight,
+                WebkitBoxOrient: 'vertical',
+              }}>
+              {item?.product?.sortDesc ? item?.product?.sortDesc : item?.sortDesc}
             </div>
             <div className="w-full flex justify-between mt-3 mb-3">
               <p className="font-normal text-sm  Pricecolor">
-                {item?.unitSize} Stocks
+                {item?.quantity ? item?.quantity : item?.unitSize}
               </p>
               <p className="font-normal text-sm  TextMaincolor">
                 Rs : {item?.price}

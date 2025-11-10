@@ -28,6 +28,7 @@ const StoreDetails = () => {
   //   }
   // }, [id, refetch]);
   
+
   return (
     <div>
       <StoreHeaderCard />

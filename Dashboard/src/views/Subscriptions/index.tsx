@@ -4,36 +4,36 @@ import PriceingCard from "../../Components/Cards/PriceingCard";
 
 const Subscriptions = () => {
   const [subscriptionList, setSubscriptionList] = React.useState([
-    {
-      key: "Plan0",
-      name: "Select Product to Sell",
-      commingSoon: false,
-      plans: [
-        {
-          name: "Monthly",
-          key: "PL0_001",
-          discription:
-            "Make beautiful websites regardless of your design experience.",
-          label: "Enter number of item",
-          price: 25,
-          defaultValue: 1,
-          freeCount : 5
-        },
-        {
-          name: "Yearly",
-          key: "PL0_002",
-          discription:
-            "Make beautiful websites regardless of your design experience.",
-          label: "Enter number of item",
-          price: 289,
-          defaultValue: 1,
-        },
-      ],
-    },
+    // {
+    //   key: "Plan0",
+    //   name: "Select Product to Sell",
+    //   commingSoon: false,
+    //   plans: [
+    //     {
+    //       name: "Monthly",
+    //       key: "PL0_001",
+    //       discription:
+    //         "Make beautiful websites regardless of your design experience.",
+    //       label: "Enter number of item",
+    //       price: 25,
+    //       defaultValue: 1,
+    //       freeCount : 5
+    //     },
+    //     {
+    //       name: "Yearly",
+    //       key: "PL0_002",
+    //       discription:
+    //         "Make beautiful websites regardless of your design experience.",
+    //       label: "Enter number of item",
+    //       price: 289,
+    //       defaultValue: 1,
+    //     },
+    //   ],
+    // },
     {
       key: "Plan1",
       name: "Convert to E-Commerce",
-      commingSoon: false,
+      commingSoon: true,
       plans: [
         {
           name: "Weekly",
@@ -67,7 +67,7 @@ const Subscriptions = () => {
     {
       key: "Plan2",
       name: "Product Customization",
-      commingSoon: false,
+      commingSoon: true,
       plans: [
         {
           name: "Weekly",
@@ -101,7 +101,7 @@ const Subscriptions = () => {
     {
       key: "Plan3",
       name: "Add's (Advertisements)",
-      commingSoon: false,
+      commingSoon: true,
       plans: [
         {
           name: "Weekly",

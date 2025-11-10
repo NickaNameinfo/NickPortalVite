@@ -22,7 +22,7 @@ import { useGetStoresProductByIDQuery } from "../../views/pages/Store/Service.mj
 import { useAppSelector } from "../Common/hooks";
 import { Link, useNavigate } from "react-router-dom";
 
-export const StoreCard = ({ item = null, key = null }) => {
+export const StoreCard = ({ item = null }) => {
   // const { data, error, refetch } = useGetStoresProductByIDQuery(
   //   Number(item?.id)
   // );

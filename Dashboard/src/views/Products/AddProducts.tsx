@@ -173,10 +173,10 @@ const AddProducts = () => {
 
   const onSubmit = async (data: any) => {
     const formData = new FormData();
-    if ( productAddCount <= productListValues?.length && !productId) {
-      setIsSubscriptionModalOpen(true)
-      return;
-    }
+    // if ( productAddCount <= productListValues?.length && !productId) {
+    //   setIsSubscriptionModalOpen(true)
+    //   return;
+    // }
 
     // Only append file if it exists
     if (data.photo) {
@@ -196,8 +196,8 @@ const AddProducts = () => {
       createdId: currentStoreUserId ? currentStoreUserId : currentVendorUserId,
       createdType: currentStoreUserId ? "Store" : "Vendor",
       paymentMode: String(tempFormData?.paymentMode || ""),
-      isEnableCustomize: tempFormData?.isEnableCustomize ? "1" : "0",
-      isEnableEcommerce: tempFormData?.isEnableEcommerce ? "1" : "0",
+      isEnableCustomize: Number(tempFormData?.isEnableCustomize) ? "1" : "0",
+      isEnableEcommerce: Number(tempFormData?.isEnableEcommerce) ? "1" : "0",
       photo: fileResult?.data?.fileUrl,
     };
     if (!productId) {
@@ -281,12 +281,12 @@ const AddProducts = () => {
             </Chip>
             <p className="mt-2">Total : <Chip variant="flat" color="success" size="sm">{customizeSubcriptionData?.data?.subscriptionCount ?? 0}</Chip> Used : <Chip variant="flat" color="danger" size="sm">{filteredCustomizeData?.length ?? 0}</Chip></p>
           </div>
-          <div className="text-center">
+          {/* <div className="text-center">
             <Chip variant="flat" color="warning">
               Total Selling Products Subscription
             </Chip>
             <p className="mt-2">Total : <Chip variant="flat" color="success" size="sm">{productAddCount ?? 0}</Chip> Used : <Chip variant="flat" color="danger" size="sm">{productListValues?.length ?? 0}</Chip></p>
-          </div>
+          </div> */}
           <div className="text-center">
             <Button
               color="primary"
@@ -584,11 +584,17 @@ const AddProducts = () => {
                         width: "100%",
                       }}
                       onChange={(e) => {
-                        field.onChange(e.target.files[0]); // Update form state with selected file
-                        document.getElementById("fileLabel").innerText = e
-                          .target.files[0]
-                          ? e.target.files[0].name
-                          : "No file selected"; // Update label dynamically
+                        const file = e.target.files[0];
+                        if (file && file.size > 500 * 1024) { // 500KB limit
+                          alert("File size exceeds 500KB. Please select a smaller file.");
+                          e.target.value = ''; // Clear the input
+                          document.getElementById("fileLabel").innerText = "No file selected";
+                        } else {
+                          field.onChange(file); // Update form state with selected file
+                          document.getElementById("fileLabel").innerText = file
+                            ? file.name
+                            : "No file selected"; // Update label dynamically
+                        }
                       }}
                     />
                     <label
@@ -622,7 +628,7 @@ const AddProducts = () => {
               {/* {productData?.data?.photo && ( */}
               <Image
                 src={`${productData?.data?.photo}`}
-                className="h-20 ml-2"
+                className="h-20 ml-2" 
                 width={100}
               />
               {/* )} */}
