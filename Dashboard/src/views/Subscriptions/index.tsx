@@ -33,33 +33,162 @@ const Subscriptions = () => {
     {
       key: "Plan1",
       name: "Convert to E-Commerce",
-      commingSoon: true,
+      commingSoon: false,
       plans: [
         {
-          name: "Weekly",
+          name: "Starter",
           key: "PL1_001",
-          discription:
-            "Make beautiful websites regardless of your design experience.",
+          discription: (
+            <div>
+              <p className="text-md font-semibold mb-2">Key Features:</p>
+              <ul className="space-y-2 text-small">
+                {/* Based on the image, the features are: */}
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Offline Products</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>No Commission</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Delivery Partner</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Order Support</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Store Branding</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Orders</span>
+                </li>
+              </ul>
+            </div>
+          ),
           label: "Enter number of item",
-          price: 80,
+          price: 38,
           defaultValue: 1,
         },
         {
-          name: "Monthly",
+          name: "Standard",
           key: "PL1_002",
-          discription:
-            "Make beautiful websites regardless of your design experience.",
-          label: "Enter number of item",
-          price: 280,
-          defaultValue: 1,
+          discription: (
+            <div>
+              <p className="text-md font-semibold mb-2">Key Features:</p>
+              <ul className="space-y-2 text-small">
+                {/* Based on the image, the features are: */}
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Offline Products</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>No Commission</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Delivery Partner</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Order Support</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Store Branding</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Orders</span>
+                </li>
+              </ul>
+            </div>
+          ),
+          price: 2799,
+          defaultValue: "1 - 100",
         },
         {
-          name: "Yearly",
+          name: "Premium",
           key: "PL1_003",
-          discription:
-            "Make beautiful websites regardless of your design experience.",
+          discription: (
+            <div>
+              <p className="text-md font-semibold mb-2">Key Features:</p>
+              <ul className="space-y-2 text-small">
+                {/* Based on the image, the features are: */}
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Offline Products</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>No Commission</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Delivery Partner</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Order Support</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Store Branding</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Orders</span>
+                </li>
+              </ul>
+            </div>
+          ),
           label: "Enter number of item",
-          price: 2800,
+          price: 3799,
+          defaultValue: "100 - 200",
+        },
+        {
+          name: "Customized",
+          key: "PL1_004",
+          discription: (
+            <div>
+              <p className="text-md font-semibold mb-2">Key Features:</p>
+              <ul className="space-y-2 text-small">
+                {/* Based on the image, the features are: */}
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Offline Products</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>No Commission</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Delivery Partner</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Order Support</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Store Branding</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Orders</span>
+                </li>
+              </ul>
+            </div>
+          ),
+          label: "Enter number of item",
+          price: 17,
+          basePrice: 3799,
           defaultValue: 1,
         },
       ],
@@ -67,35 +196,47 @@ const Subscriptions = () => {
     {
       key: "Plan2",
       name: "Product Customization",
-      commingSoon: true,
+      commingSoon: false,
       plans: [
         {
-          name: "Weekly",
-          key: "PL1_001",
-          discription:
-            "Make beautiful websites regardless of your design experience.",
+          name: "Starter",
+          key: "PL2_001",
+          discription: (
+            <div>
+              <p className="text-md font-semibold mb-2">Key Features:</p>
+              <ul className="space-y-2 text-small">
+                {/* Based on the image, the features are: */}
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Offline Products</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>No Commission</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Delivery Partner</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Order Support</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Store Branding</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Orders</span>
+                </li>
+              </ul>
+            </div>
+          ),
           label: "Enter number of item",
-          price: 27,
+          price: 9,
           defaultValue: 1,
-        },
-        {
-          name: "Monthly",
-          key: "PL1_002",
-          discription:
-            "Make beautiful websites regardless of your design experience.",
-          label: "Enter number of item",
-          price: 110,
-          defaultValue: 1,
-        },
-        {
-          name: "Yearly",
-          key: "PL1_003",
-          discription:
-            "Make beautiful websites regardless of your design experience.",
-          label: "Enter number of item",
-          price: 1370,
-          defaultValue: 1,
-        },
+        }
       ],
     },
     {
@@ -129,44 +270,6 @@ const Subscriptions = () => {
           label: "Enter number of item",
           price: 1780,
           defaultValue: 1,
-        },
-      ],
-    },
-    {
-      key: "four",
-      name: "Map View",
-      commingSoon: true,
-      plans: [
-        {
-          name: "3 Month",
-          price: 0,
-        },
-        {
-          name: "6 Month",
-          price: 0,
-        },
-        {
-          name: "12 Month",
-          price: 0,
-        },
-      ],
-    },
-    {
-      key: "four",
-      name: "Sales Reports",
-      commingSoon: true,
-      plans: [
-        {
-          name: "3 Month",
-          price: 0,
-        },
-        {
-          name: "6 Month",
-          price: 0,
-        },
-        {
-          name: "12 Month",
-          price: 0,
         },
       ],
     },
@@ -244,11 +347,6 @@ const Subscriptions = () => {
       name: "Delivery Partner Customizations",
       commingSoon: true,
     },
-    {
-      key: "twelve",
-      name: "Feedback and Ratings Details",
-      commingSoon: true,
-    },
   ]);
 
   return (
@@ -261,7 +359,7 @@ const Subscriptions = () => {
               aria-label={`Accordion ${index}`}
               title={subscription?.name}
               startContent={subscription?.commingSoon && <Chip color="danger" size="sm">Comming soon</Chip>}
-              // isDisabled={ subscription?.key !== "Plan1" && subscription?.key !== "Plan2" && subscription?.key !== "Plan3" ? true : false}
+            // isDisabled={ subscription?.key !== "Plan1" && subscription?.key !== "Plan2" && subscription?.key !== "Plan3" ? true : false}
             >
               <div className="grid xm:grid-cols-1 mm:grid-cols-1 ml:grid-cols-1 sm:grid-cols-2  md:grid-cols-2  lg:grid-cols-2  xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-4 gap-2">
                 {subscription?.plans?.map((item) => {
