@@ -397,7 +397,12 @@ export const AppSidebar = () => {
                                 endContent={cart?.data?.length}
                                 startContent={<IconHome />}
                                 onClick={() =>
-                                  dispatch(onUpdateCartModal(true))
+                                  dispatch(onUpdateCartModal({
+                                    isOpen: true,
+                                    item: null,
+                                    qty: 0,
+                                    type: "Product",
+                                  }))
                                 }
                               >
                                 Cart

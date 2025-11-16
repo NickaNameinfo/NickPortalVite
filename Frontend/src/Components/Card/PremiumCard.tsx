@@ -255,7 +255,12 @@ export const PremiumCard = ({
                       color="danger"
                       onClick={() => {
                         if (userId) {
-                          dispatch(onUpdateCartModal(true));
+                          dispatch(onUpdateCartModal({
+                            isOpen: true,
+                            item: item,
+                            qty: data?.data?.qty ? data?.data?.qty : 0,
+                            type: "Product",
+                          }));
                         } else {
                           toast.error("Please login to add to cart!");
                         }
@@ -273,7 +278,12 @@ export const PremiumCard = ({
                         className="cursor-pointer"
                         onClick={() => {
                           if (userId) {
-                            dispatch(onUpdateCartModal(true));
+                            dispatch(onUpdateCartModal({
+                              isOpen: true,
+                              item: item,
+                              qty: data?.data?.qty ? data?.data?.qty : 0,
+                              type: "Product",
+                            }));
                           } else {
                             toast.error("Please login to add to cart!");
                           }

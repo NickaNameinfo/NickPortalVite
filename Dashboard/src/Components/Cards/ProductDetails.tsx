@@ -324,7 +324,12 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               variant="ghost"
                               radius="lg"
                               size={"md"}
-                              onClick={() => dispatch(onUpdateCartModal(true))}
+                              onClick={() => dispatch(onUpdateCartModal({
+                                isOpen: true,
+                                item: props?.item,
+                                qty: cart?.data?.qty,
+                                type: "Product",
+                              }))}
                             >
                               View Cart
                             </Button>

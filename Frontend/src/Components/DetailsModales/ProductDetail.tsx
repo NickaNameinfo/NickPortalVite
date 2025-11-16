@@ -14,6 +14,7 @@ import {
   Tab,
   Textarea,
   Tooltip,
+  CardFooter,
 } from "@nextui-org/react";
 import React from "react";
 import {
@@ -50,6 +51,7 @@ import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import StarRating from "../Input/Ratings";
+import { BuyCard } from "../Card/BuyCard";
 
 interface ProductDetailProps {
   isOpen: any;
@@ -80,8 +82,11 @@ export const ProductDetail = (props: ProductDetailProps) => {
     refetch: cartRefetch,
   } = useGetCartByProductIdQuery(productId, { skip: !productId });
 
+  const isOpenCartModal = useAppSelector(
+    (state) => state.globalConfig.isOpenCartModal
+  );
+
   const [addCart] = useAddCartMutation();
-  const [addOrder] = useAddOrderMutation();
   const [updateCart] = useUpdateCartMutation();
   const dispatch = useAppDispatch();
   const [index, setIndex] = React.useState(-1);
@@ -170,31 +175,13 @@ export const ProductDetail = (props: ProductDetailProps) => {
   ];
 
   const handleAddOrder = async () => {
-    if (cart?.data?.qty && cart?.data?.qty !== 0) {
-      console.log(cart?.data?.qty, "asdf7as9d078");
-      try {
-        const tempCartValue = {
-          customerId: userId,
-          paymentmethod: 1,
-          orderId: Number(userId),
-          grandTotal:
-            Number(cart?.data?.qty) * Number(props?.item?.product?.total),
-          productIds: props?.item?.product?.id
-            ? props?.item?.product?.id
-            : props?.item?.id,
-          qty: cart?.data?.qty,
-          storeId: Number(props?.item?.supplierId),
-          customization: customization,
-        };
-        let response = await addOrder(tempCartValue);
-        if (response?.data?.success) {
-          MySwal.fire({
-            title: <p>Your order placed please vist your order page</p>,
-          });
-        }
-      } catch (error) {
-        console.error("Failed to add order for item:", error);
-      }
+    if (cart?.data?.qty || Number(props?.item?.product?.isBooking)) {
+      dispatch(onUpdateCartModal({
+        isOpen: true,
+        item: props?.item,
+        qty: cart?.data?.qty,
+        type: Number(props?.item?.product?.isBooking) ? "Service" : "Product",
+      }))
     } else {
       MySwal.fire({
         title: <p>Please select quantity</p>,
@@ -316,7 +303,12 @@ export const ProductDetail = (props: ProductDetailProps) => {
                                 size={"md"}
                                 onClick={() => {
                                   if (userId) {
-                                    dispatch(onUpdateCartModal(true));
+                                    dispatch(onUpdateCartModal({
+                                      isOpen: true,
+                                      item: props?.item,
+                                      qty: cart?.data?.qty ? cart?.data?.qty : 0,
+                                      type: "Product",
+                                    }));
                                   } else {
                                     toast.error("Please login to add to cart!");
                                   }
@@ -463,7 +455,24 @@ export const ProductDetail = (props: ProductDetailProps) => {
                                   ? props?.item?.product?.sortDesc
                                   : props?.item?.sortDesc}
                               </CardBody>
+
                             </Card>
+                            {Number(props?.item?.product?.isBooking) ?
+                              <div className="flex justify-end mt-2">
+                                <Button
+                                  variant="ghost"
+                                  color={"success"}
+                                  className={"mr-3"}
+                                  onClick={() => {
+                                    if (userId) {
+                                      handleAddOrder()
+                                    } else {
+                                      toast.error("Please login to place order!");
+                                    }
+                                  }}
+                                >Book Service</Button>
+                              </div> : null
+                            }
                           </Tab>
                           {/* <Tab
                             key="music"
@@ -497,8 +506,9 @@ export const ProductDetail = (props: ProductDetailProps) => {
                       variant="solid"
                     // className="flex-col"
                     >
-                      <Tab
-                        key="photos"
+
+                      {Number(props?.item?.product?.isEnableEcommerce) && <Tab
+                        key="normalOrder"
                         title={
                           <div className="flex items-center space-x-2">
                             {/* <GalleryIcon /> */}
@@ -523,26 +533,26 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               }
                             />
                             <div className="flex justify-end mt-2">
-                              <Tooltip content="we are collaboration with stores soon will enable this feature">
-                                <Button
-                                  variant="ghost"
-                                  color={!cart?.data?.qty ? "default" : "success"}
-                                  disabled={true}
-                                  className={!cart?.data?.qty ? "cursor-not-allowed mr-3" : "mr-3"}
-                                  onClick={() => {
-                                    if (userId) {
-                                      handleAddOrder();
-                                    } else {
-                                      toast.error("Please login to place order!");
-                                    }
-                                  }}
-                                >Place Order</Button>
-                              </Tooltip>
+                              <Button
+                                variant="ghost"
+                                color={!cart?.data?.qty ? "default" : "success"}
+                                disabled={!cart?.data?.qty}
+                                className={!cart?.data?.qty ? "cursor-not-allowed mr-3" : "mr-3"}
+                                onClick={() => {
+                                  if (userId) {
+                                    handleAddOrder()
+                                  } else {
+                                    toast.error("Please login to place order!");
+                                  }
+                                }}
+                              >Place Order</Button>
                             </div>
                           </CardBody>
                         </Card>
                       </Tab>
-                       <Tab
+                      }
+
+                      {Number(props?.item?.product?.isEnableCustomize) && <Tab
                         key="Customize"
                         title={
                           <div className="flex items-center space-x-2">
@@ -568,26 +578,25 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               }
                             />
                             <div className="flex justify-end mt-2">
-                             <Tooltip content="we are collaboration with stores soon will enable this feature">
-                                <Button
-                                  variant="ghost"
-                                  color={!cart?.data?.qty ? "default" : "success"}
-                                  disabled={true}
-                                  className={!cart?.data?.qty ? "cursor-not-allowed mr-3" : "mr-3"}
-                                  onClick={() => {
-                                    if (userId) {
-                                      handleAddOrder();
-                                    } else {
-                                      toast.error("Please login to place order!");
-                                    }
-                                  }}
-                                >Place Order</Button>
-                              </Tooltip>
+                              <Button
+                                variant="ghost"
+                                color={!cart?.data?.qty ? "default" : "success"}
+                                disabled={true}
+                                className={!cart?.data?.qty ? "cursor-not-allowed mr-3" : "mr-3"}
+                                onClick={() => {
+                                  if (userId) {
+                                    handleAddOrder();
+                                  } else {
+                                    toast.error("Please login to place order!");
+                                  }
+                                }}
+                              >Place Order</Button>
                             </div>
                           </CardBody>
                         </Card>
-                      </Tab>
-                       <Tab
+                      </Tab>}
+
+                      <Tab
                         key="Feedback"
                         title={
                           <div className="flex items-center space-x-2">
@@ -613,21 +622,19 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               }
                             />
                             <div className="flex justify-end mt-2">
-                              <Tooltip content="We are collaboration with stores soon will enable this feature">
-                                <Button
-                                  variant="ghost"
-                                  color={!cart?.data?.qty ? "default" : "success"}
-                                  disabled={!cart?.data?.qty}
-                                  className={!cart?.data?.qty ? "cursor-not-allowed mr-3" : "mr-3"}
-                                  onClick={() => {
-                                    if (userId) {
-                                      handleAddOrder();
-                                    } else {
-                                      toast.error("Please login to place order!");
-                                    }
-                                  }}
-                                >Submit Feedback</Button>
-                              </Tooltip>
+                              <Button
+                                variant="ghost"
+                                color={!cart?.data?.qty ? "default" : "success"}
+                                disabled={!cart?.data?.qty}
+                                className={!cart?.data?.qty ? "cursor-not-allowed mr-3" : "mr-3"}
+                                onClick={() => {
+                                  if (userId) {
+                                    handleAddOrder();
+                                  } else {
+                                    toast.error("Please login to place order!");
+                                  }
+                                }}
+                              >Submit Feedback</Button>
                             </div>
                           </CardBody>
                         </Card>
@@ -648,6 +655,8 @@ export const ProductDetail = (props: ProductDetailProps) => {
           )}
         </ModalContent>
       </Modal>
+
+      {/* {isOpenCartModal && <BuyCard />} */}
     </>
   );
 };

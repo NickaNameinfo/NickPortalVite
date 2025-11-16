@@ -68,6 +68,7 @@ const AddStore = () => {
     if (data.storeImage instanceof File) {
       const storeImageFormData = new FormData();
       storeImageFormData.append("file", data.storeImage);
+      storeImageFormData.append("storeName", data?.id || data?.storeName);
       const storeImageUploadResult = await uploadfile(storeImageFormData);
       if (storeImageUploadResult?.data?.success) {
         storeImageUrl = storeImageUploadResult.data.fileUrl;
@@ -85,6 +86,7 @@ const AddStore = () => {
     if (data.verifyDocument instanceof File) {
       const verifyDocumentFormData = new FormData();
       verifyDocumentFormData.append("file", data.verifyDocument);
+      verifyDocumentFormData.append("storeName", data?.id || data?.storeName);
       const verifyDocumentUploadResult = await uploadfile(verifyDocumentFormData);
       if (verifyDocumentUploadResult?.data?.success) {
         verifyDocumentUrl = verifyDocumentUploadResult.data.fileUrl;

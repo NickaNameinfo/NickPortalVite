@@ -241,6 +241,44 @@ const Subscriptions = () => {
     },
     {
       key: "Plan3",
+      name: "Book Service",
+      commingSoon: false,
+      plans: [
+        {
+          name: "Starter",
+          key: "PL3_001",
+          discription: (
+            <div>
+              <p className="text-md font-semibold mb-2">Key Features:</p>
+              <ul className="space-y-2 text-small">
+                {/* Based on the image, the features are: */}
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Service Booking</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>No Commission</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Booking Support</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Store Branding</span>
+                </li>
+              </ul>
+            </div>
+          ),
+          label: "Enter number of item",
+          price: 1999,
+          defaultValue: 1,
+        }
+      ],
+    },
+    {
+      key: "Plan4",
       name: "Add's (Advertisements)",
       commingSoon: true,
       plans: [
@@ -351,7 +389,7 @@ const Subscriptions = () => {
 
   return (
     <div className="my-2">
-      <Accordion variant="splitted" defaultExpandedKeys={["0"]}>
+      <Accordion variant="splitted">
         {subscriptionList?.map((subscription, index) => {
           return (
             <AccordionItem

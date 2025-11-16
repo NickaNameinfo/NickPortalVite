@@ -68,6 +68,20 @@ export const StoreApi = createApi({
         body,
       }),
     }),
+    addOrderlist: builder.mutation({
+      query: (body) => ({
+        url: `/payment/orderlist`,
+        method: "POST",
+        body,
+      }),
+    }),
+    addPyament: builder.mutation({
+      query: (body) => ({
+        url: `/payment/orders`,
+        method: "POST",
+        body,
+      }),
+    }),
     updateCart: builder.mutation({
       query: (body) => ({
         url: `/cart/update/${body?.orderId}/${body?.productId}`,
@@ -153,6 +167,8 @@ export const {
   useGetOrderByOrderIdQuery,
   useUpdateAddressMutation,
   useGetAddressesByCustIdQuery,
-  useAddAddressMutation
+  useAddAddressMutation,
+  useAddOrderlistMutation,
+  useAddPyamentMutation,
 } = StoreApi;
 export const { endpoints } = StoreApi;

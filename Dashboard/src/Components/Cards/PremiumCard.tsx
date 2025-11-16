@@ -47,7 +47,7 @@ export const PremiumCard = ({ item = null }) => {
     id: id,
     productId: item?.product?.id,
   };
-  const { data, error, refetch } = useGetCartByProductIdQuery(productId, {skip: productId});
+  const { data, error, refetch } = useGetCartByProductIdQuery(productId, { skip: productId });
   const [qty, setQty] = React.useState(0);
 
   React.useEffect(() => {
@@ -222,7 +222,12 @@ export const PremiumCard = ({ item = null }) => {
                       onClick={() => cartOpen()}
                     > */}
                     <IconShopBag
-                      onClick={() => dispatch(onUpdateCartModal(true))}
+                      onClick={() => dispatch(onUpdateCartModal({
+                        isOpen: true,
+                        item: item,
+                        qty: data?.data?.qty ? data?.data?.qty : 0,
+                        type: "Product",
+                      }))}
                       fill="#4C86F9"
                       className="cursor-pointer"
                     />

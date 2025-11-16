@@ -97,3 +97,21 @@ body {
     --background-end-rgb: 0, 0, 0;
   }
 }
+
+ /* Ensure the Razorpay payment window is on top of every element */
+.razorpay-checkout-frame {
+    z-index: 999999 !important; /* Extremely high value */
+    position: fixed !important; 
+    top: 0 !important; 
+    left: 0 !important;
+}
+
+/* Ensure the NextUI backdrop is significantly lower */
+.nextui-modal-backdrop {
+    z-index: 9999 !important; /* Must be less than 999999 */
+}
+
+/* Also target the NextUI modal container itself */
+.nextui-modal-wrapper {
+    z-index: 10000 !important; /* Must be less than 999999 */
+}

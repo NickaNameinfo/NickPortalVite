@@ -200,7 +200,12 @@ export const BuyCard = (props: any) => {
         isOpen={isOpenCartModal}
         onClose={() => {
           if (isOpenCartModal) {
-            dispatch(onUpdateCartModal(false));
+            dispatch(onUpdateCartModal({
+              isOpen: false,
+              item: null,
+              qty: 0,
+              type: null,
+            }));
           }
         }}
         size={"5xl"}
@@ -214,7 +219,12 @@ export const BuyCard = (props: any) => {
           <>
             <ModalCloseIcon
               onClick={() => {
-                dispatch(onUpdateCartModal(false));
+                dispatch(onUpdateCartModal({
+                  isOpen: false,
+                  item: null,
+                  qty: 0,
+                  type: null,
+                }));
               }}
               className="modalIconClose"
             />

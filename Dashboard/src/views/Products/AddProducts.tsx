@@ -1,6 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import {
+  Autocomplete,
+  AutocompleteItem,
   Badge,
   Button,
   Checkbox,
@@ -12,6 +14,7 @@ import {
   DropdownTrigger,
   Image,
   Input,
+  RadioGroup,
   Select,
   SelectItem,
   User,
@@ -33,6 +36,7 @@ import { useGetSubcriptionByCustomerIDQuery } from "../Subscriptions/Service.mjs
 import { useGetVendorsProductByIdQuery } from "../VendorProducts/Service.mjs";
 import { useGetStoresProductByIDQuery } from "../Store/Service.mjs";
 import { SubscriptionExpiredModal } from "../../Components/SubscriptionExpiredModal";
+import { CustomRadio } from "../../Components/CustomRadio";
 
 const AddProducts = () => {
   const {
@@ -85,6 +89,17 @@ const AddProducts = () => {
     refetch,
   } = useGetSubcriptionByCustomerIDQuery(tempEcommereceValues, { skip: !currentUserId });
 
+  let isBookingValues = {
+    id: currentUserId,
+    subscriptionType: "Plan3",
+  };
+
+  const {
+    data: isBooking,
+    error: isBookingError,
+    refetch: isBookingRefetch,
+  } = useGetSubcriptionByCustomerIDQuery(isBookingValues, { skip: !currentUserId });
+
   let temCustomizeValues = {
     id: currentUserId,
     subscriptionType: "Plan2",
@@ -118,6 +133,9 @@ const AddProducts = () => {
     setValue("paymentMode", ["1", "2", "3"]);
   }, []);
 
+
+  console.log(tempFormData, "tempFormData34")
+
   React.useEffect(() => {
     if (!productId) {
       reset({
@@ -133,9 +151,10 @@ const AddProducts = () => {
         paymentMode: ["1", "2", "3"],
         isEnableCustomize: false,
         isEnableEcommerce: false,
+        serviceType: "Product",
       });
     }
-   
+
   }, [productId, reset]);
 
 
@@ -146,17 +165,23 @@ const AddProducts = () => {
       setValue("paymentMode", productData?.data?.paymentMode?.split(","));
       setValue("isEnableCustomize", productData?.data?.isEnableCustomize);
       setValue("isEnableEcommerce", productData?.data?.isEnableEcommerce);
+      setValue("serviceType", productData?.data?.serviceType);
+      setValue("categoryId", productData?.data?.categoryId);
     }
   }, [productData]);
 
   React.useEffect(() => {
     const discountAmount = (tempFormData?.price * tempFormData?.discount) / 100;
     const discountedPrice = tempFormData?.price - discountAmount;
-
-    setValue("grand_total", Number(discountedPrice * tempFormData?.qty));
-    setValue("total", Number(discountedPrice * tempFormData?.qty));
+    if (tempFormData.serviceType === "Product") {
+      setValue("grand_total", Number(discountedPrice * tempFormData?.qty));
+      setValue("total", Number(discountedPrice * tempFormData?.qty));
+    } else {
+      setValue("grand_total", Number(discountedPrice * 1));
+      setValue("total", Number(discountedPrice * 1));
+    }
     setValue("discountPer", Number(discountAmount));
-  }, [tempFormData?.price, tempFormData?.discount, tempFormData?.qty]);
+  }, [tempFormData?.price, tempFormData?.discount, tempFormData?.qty, tempFormData?.serviceType]);
 
   let productListValues =
     vendorProducts?.data?.length > 0
@@ -182,7 +207,8 @@ const AddProducts = () => {
     if (data.photo) {
       formData.append("file", data.photo);
     }
-    if(!data.photo) {
+    formData.append("storeName", currentStoreUserId ? currentStoreUserId : currentVendorUserId);
+    if (!data.photo) {
       alert("Please select image");
       return;
     }
@@ -198,7 +224,9 @@ const AddProducts = () => {
       paymentMode: String(tempFormData?.paymentMode || ""),
       isEnableCustomize: Number(tempFormData?.isEnableCustomize) ? "1" : "0",
       isEnableEcommerce: Number(tempFormData?.isEnableEcommerce) ? "1" : "0",
+      isBooking: Number(isBooking?.data?.isBooking) ? "1" : "0",
       photo: fileResult?.data?.fileUrl,
+      serviceType: tempFormData?.serviceType || "Product",
     };
     if (!productId) {
       const result = await addProducts(apiParams).unwrap();
@@ -222,7 +250,6 @@ const AddProducts = () => {
           const vendorResult = await addVendorProducts(
             tempStoreValueAPI
           ).unwrap();
-          console.log(currentStoreUserId, vendorResult, "currentUserId");
           if (vendorResult) {
             navigate("/ProductsList");
           }
@@ -231,7 +258,15 @@ const AddProducts = () => {
     } else {
       setValue("id", productData?.data?.id);
       const result = await updateProducts(apiParams).unwrap();
-      if (result?.success) {
+      const storeResult = await addStoreProducts({
+        supplierId: currentStoreUserId
+          ? currentStoreUserId
+          : currentVendorUserId,
+        productId: apiParams?.id,
+        unitSize: apiParams?.qty,
+        buyerPrice: apiParams?.total,
+      }).unwrap();
+      if (storeResult) {
         navigate("/ProductsList");
       }
     }
@@ -299,445 +334,786 @@ const AddProducts = () => {
           </div>
         </div>
         <div>
-          <div className="grid grid-cols-2 gap-4 mb-2">
+          <div className="mb-4">
             <Controller
-              name="categoryId" // Changed to reflect a text input
+              name="serviceType" // Changed to reflect a text input
               control={control}
               rules={{ required: "Please select value" }}
               render={({ field }) => (
-                <Select
-                  isRequired={true}
-                  isInvalid={errors?.["categoryId"] ? true : false}
-                  errorMessage={errors?.["categoryId"]?.message}
-                  classNames={{
-                    label: "group-data-[filled=true]:-translate-y-3",
-                    trigger: [
-                      "bg-transparent",
-                      "border-1",
-                      "text-default-500",
-                      "transition-opacity",
-                      "data-[hover=true]:bg-transparent",
-                      "data-[hover=true]:bg-transparent",
-                      "dark:data-[hover=true]:bg-transparent",
-                      "data-[selectable=true]:focus:bg-transparent",
-                    ],
-                  }}
-                  listboxProps={{
-                    itemClasses: {
-                      base: [
-                        "rounded-md",
-                        "text-default-500",
-                        "transition-opacity",
-                        "data-[hover=true]:text-foreground",
-                        "data-[hover=true]:bg-default-100",
-                        "dark:data-[hover=true]:bg-default-50",
-                        "data-[selectable=true]:focus:bg-default-50",
-                        "data-[pressed=true]:opacity-90",
-                        "data-[focus-visible=true]:ring-default-500",
-                        "shadow-none",
-                        // "border-1",
-                      ],
-                    },
-                  }}
-                  label="Select Category"
-                  variant="faded"
-                  size="sm"
-                  {...field}
-                  selectedKeys={[String(tempFormData?.categoryId)]}
-                >
-                  {categoryData?.data?.map((item) => (
-                    <SelectItem key={String(item.id)} value={String(item.id)}>
-                      {item.name}
-                    </SelectItem>
-                  ))}
-                </Select>
-
-                // <Select label="Select an Category" {...field}>
-                //   {categoryData?.data?.map((item) => (
-                //     <SelectItem key={item.id}>{item.name}</SelectItem>
-                //   ))}
-                // </Select>
+                <RadioGroup label="Type of Product or Service" {...field} orientation="horizontal" className="w-full">
+                  <CustomRadio description="Sell physical or digital products directly through your online platform" value="Product">
+                    Online selling product
+                  </CustomRadio>
+                  <CustomRadio description="Offer a range of services, such as consulting, training, or support" value="Service">
+                    Providing service
+                  </CustomRadio>
+                </RadioGroup>
               )}
             />
-            <Controller
-              name="status" // Changed to reflect a text input
-              control={control}
-              rules={{ required: "Please select value" }}
-              render={({ field }) => (
-                <Select
-                  classNames={{
-                    label: "group-data-[filled=true]:-translate-y-3",
-                    trigger: [
-                      "bg-transparent",
-                      "border-1",
-                      "text-default-500",
-                      "transition-opacity",
-                      "data-[hover=true]:bg-transparent",
-                      "data-[hover=true]:bg-transparent",
-                      "dark:data-[hover=true]:bg-transparent",
-                      "data-[selectable=true]:focus:bg-transparent",
-                    ],
-                  }}
-                  listboxProps={{
-                    itemClasses: {
-                      base: [
-                        "rounded-md",
-                        "text-default-500",
-                        "transition-opacity",
-                        "data-[hover=true]:text-foreground",
-                        "data-[hover=true]:bg-default-100",
-                        "dark:data-[hover=true]:bg-default-50",
-                        "data-[selectable=true]:focus:bg-default-50",
-                        "data-[pressed=true]:opacity-90",
-                        "data-[focus-visible=true]:ring-default-500",
-                        "shadow-none",
-                        // "border-1",
-                      ],
-                    },
-                  }}
-                  label="Status"
-                  variant="bordered"
-                  size="sm"
-                  selectedKeys={String(tempFormData?.status)}
-                  {...field}
-                  isRequired={true}
-                  isInvalid={errors?.["status"] ? true : false}
-                  errorMessage={errors?.["status"]?.message}
-                >
-                  <SelectItem key={1} value={"1"}>
-                    {"Active"}
-                  </SelectItem>
-                  <SelectItem key={0} value={"0"}>
-                    {"InActive"}
-                  </SelectItem>
-                </Select>
-              )}
-            />
-            <Controller
-              name="name" // Changed to reflect a text input
-              control={control}
-              rules={{ required: "Please enter value" }}
-              render={({ field }) => (
-                <InputNextUI
-                  type="text"
-                  label="Name"
-                  {...field}
-                  isRequired={true}
-                  isInvalid={errors?.["name"] ? true : false}
-                  errorMessage={errors?.["name"]?.message}
-                />
-              )}
-            />
-            <Controller
-              name="unitSize" // Changed to reflect a text input
-              control={control}
-              rules={{ required: "Please enter value" }}
-              render={({ field }) => (
-                <InputNextUI
-                  type="text"
-                  label="Unit"
-                  {...field}
-                  isRequired={true}
-                  isInvalid={errors?.["unitSize"] ? true : false}
-                  errorMessage={errors?.["unitSize"]?.message}
-                />
-              )}
-            />
-            {/* <Controller
-              name="content" // Changed to reflect a text input
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <InputNextUI
-                  type="text"
-                  label="Content"
-                  onChange={(value) => {
-                    console.log(value, "ownername");
-                  }}
-                  {...field}
-                />
-              )}
-            /> */}
-            <Controller
-              name="sortDesc" // Changed to reflect a text input
-              control={control}
-              rules={{ required: "Please enter value" }}
-              render={({ field }) => (
-                <InputNextUI
-                  type="text"
-                  label="Sort Description"
-                  {...field}
-                  isRequired={true}
-                  isInvalid={errors?.["sortDesc"] ? true : false}
-                  errorMessage={errors?.["sortDesc"]?.message}
-                />
-              )}
-            />
-
-            <Controller
-              name="price" // Changed to reflect a text input
-              control={control}
-              rules={{ required: "Please enter value" }}
-              render={({ field }) => (
-                <InputNextUI
-                  type="text"
-                  label="Price"
-                  onChange={(value) => {
-                    setValue("grand_total", value);
-                  }}
-                  {...field}
-                  isRequired={true}
-                  isInvalid={errors?.["price"] ? true : false}
-                  errorMessage={errors?.["price"]?.message}
-                />
-              )}
-            />
-            <Controller
-              name="qty" // Changed to reflect a text input
-              control={control}
-              rules={{ required: "Please enter value" }}
-              render={({ field }) => (
-                <InputNextUI
-                  type="text"
-                  label="Quantity"
-                  {...field}
-                  isRequired={true}
-                  isInvalid={errors?.["qty"] ? true : false}
-                  errorMessage={errors?.["qty"]?.message}
-                />
-              )}
-            />
-            <Controller
-              name="discount" // Changed to reflect a text input
-              control={control}
-              rules={{ required: "Please enter value" }}
-              render={({ field }) => (
-                <InputNextUI
-                  type="text"
-                  label="Discoint(%)"
-                  {...field}
-                  isRequired={true}
-                  isInvalid={errors?.["discount"] ? true : false}
-                  errorMessage={errors?.["discount"]?.message}
-                />
-              )}
-            />
-            <Controller
-              name="discountPer" // Changed to reflect a text input
-              control={control}
-              rules={{ required: "Please enter value" }}
-              render={({ field }) => (
-                <InputNextUI
-                  type="text"
-                  label="Discount Price"
-                  {...field}
-                  isDisabled
-                  isRequired={true}
-                  isInvalid={errors?.["discountPer"] ? true : false}
-                  errorMessage={errors?.["discountPer"]?.message}
-                />
-              )}
-            />
-            <Controller
-              name="total" // Changed to reflect a text input
-              control={control}
-              render={({ field }) => (
-                <InputNextUI
-                  type="text"
-                  label="Total"
-                  onChange={(value) => {
-                    console.log(value, "ownername");
-                  }}
-                  isDisabled
-                  {...field}
-                />
-              )}
-            />
-            <Controller
-              name="grand_total" // Changed to reflect a text input
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <InputNextUI
-                  type="text"
-                  label="Grant total"
-                  isDisabled
-                  {...field}
-                  errorMessage={errors?.["grand_total"]?.message}
-                />
-              )}
-            />
-
-            <div className="flex">
-              <Controller
-                name="photo" // Changed to reflect a text input
-                control={control}
-                render={({ field }) => (
-                  <div style={{ position: "relative", width: "100%" }}>
-                    <input
-                      type="file"
-                      id="file"
-                      style={{
-                        opacity: 0,
-                        position: "absolute",
-                        zIndex: -1,
-                        width: "100%",
-                      }}
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        if (file && file.size > 500 * 1024) { // 500KB limit
-                          alert("File size exceeds 500KB. Please select a smaller file.");
-                          e.target.value = ''; // Clear the input
-                          document.getElementById("fileLabel").innerText = "No file selected";
-                        } else {
-                          field.onChange(file); // Update form state with selected file
-                          document.getElementById("fileLabel").innerText = file
-                            ? file.name
-                            : "No file selected"; // Update label dynamically
-                        }
-                      }}
-                    />
-                    <label
-                      htmlFor="file"
-                      style={{
-                        border: "1px solid rgba(128, 128, 128, 0.3)",
-                        borderRadius: "7px",
-                        padding: "10px",
-                        width: "100%",
-                        display: "inline-block",
-                        textAlign: "center",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                      }}
-                    >
-                      Choose File
-                    </label>
-                    <span
-                      id="fileLabel"
-                      style={{
-                        marginLeft: "10px",
-                        textAlign: "start",
-                        fontSize: "12px",
-                      }}
-                    >
-                      No file selected
-                    </span>
-                  </div>
-                )}
-              />
-              {/* {productData?.data?.photo && ( */}
-              <Image
-                src={`${productData?.data?.photo}`}
-                className="h-20 ml-2" 
-                width={100}
-              />
-              {/* )} */}
-            </div>
           </div>
-          <div className="grid grid-cols-2 gap-4 mb-2">
-            <Controller
-              name="paymentMode" // Changed to reflect a text input
-              control={control}
-              rules={{ required: "Please enter value" }}
-              render={({ field }) => (
-                <CheckboxGroup
-                  label="Select Payment Type"
-                  orientation="horizontal"
-                  color="secondary"
-                  {...field}
-                  defaultValue={["1", "2", "3"]}
-                >
-                  <Checkbox value="1">Per Order</Checkbox>
-                  <Checkbox value="2">Online Payment</Checkbox>
-                  <Checkbox value="3">Cash on Delivery</Checkbox>
-                </CheckboxGroup>
-              )}
-            />
-            <div className="w-100">
-              <h3 className="mb-1">Subcriptions</h3>
-              <div className="mb-3 flex">
+          {
+            tempFormData?.serviceType === "Service" ?
+              <div className="grid grid-cols-2 gap-4 mb-2">
                 <Controller
-                  name="isEnableEcommerce"
+                  name="categoryId" // Changed to reflect a text input
                   control={control}
+                  rules={{ required: "Please select value" }}
                   render={({ field }) => (
-                    <Checkbox
-                      isSelected={
-                        String(tempFormData?.isEnableEcommerce) === "1"
-                          ? true
-                          : false
-                      }
-                      checked={field.value === "1"} // Set checked based on the field's value
-                      onChange={(e) =>
-                        field.onChange(e.target.checked ? "1" : "0")
-                      } // Update value on change
-                      isDisabled={
-                        !ecommereceSubcriptionData?.data
-                          ?.subscriptionCount ||
-                        String(productData?.data?.isEnableEcommerce) === "1" ||
-                        Number(
-                          ecommereceSubcriptionData?.data
-                            ?.subscriptionCount
-                        ) -
-                        filteredEcommereceData?.length <=
-                        0
-                      }
+                    <Autocomplete
+                      isInvalid={errors?.["categoryId"] ? true : false}
+                      color={errors?.["categoryId"] ? "danger" : "default"}
+                      listboxProps={{
+                        itemClasses: {
+                          base: [
+                            "rounded-md",
+                            "text-default-500",
+                            "transition-opacity",
+                            "data-[hover=true]:text-foreground",
+                            "data-[hover=true]:bg-default-100",
+                            "dark:data-[hover=true]:bg-default-50",
+                            "data-[selectable=true]:focus:bg-default-50",
+                            "data-[pressed=true]:opacity-90",
+                            "data-[focus-visible=true]:ring-default-500",
+                            "shadow-none",
+                            // "border-1",
+                          ],
+                        },
+                      }}
+                      label="Select Category"
+                      variant="faded"
+                      size="sm"
+                      onSelectionChange={(selectedKey) => {
+                        const valueToSave = selectedKey === null ? null : Number(selectedKey);
+                        field.onChange(valueToSave); // Updates the form state
+                      }}
+                      selectedKey={String(tempFormData?.categoryId)}
                     >
-                      Enable Ecommerce
-                      <span className="ml-2">
-                        <Chip variant="flat" color="primary">
-                          {Number(
-                            ecommereceSubcriptionData?.data
-                              ?.subscriptionCount
-                          ) - filteredEcommereceData?.length}
-                        </Chip>
-                      </span>
-                    </Checkbox>
+                      {categoryData?.data?.map((item) => (
+                        <AutocompleteItem key={String(item.id)} value={String(item.id)}>
+                          {item.name}
+                        </AutocompleteItem>
+                      ))}
+                    </Autocomplete>
                   )}
                 />
-                <span className="ml-3">
+                <Controller
+                  name="status" // Changed to reflect a text input
+                  control={control}
+                  rules={{ required: "Please select value" }}
+                  render={({ field }) => (
+                    <Select
+                      classNames={{
+                        label: "group-data-[filled=true]:-translate-y-3",
+                        trigger: [
+                          "bg-transparent",
+                          "border-1",
+                          "text-default-500",
+                          "transition-opacity",
+                          "data-[hover=true]:bg-transparent",
+                          "data-[hover=true]:bg-transparent",
+                          "dark:data-[hover=true]:bg-transparent",
+                          "data-[selectable=true]:focus:bg-transparent",
+                        ],
+                      }}
+                      listboxProps={{
+                        itemClasses: {
+                          base: [
+                            "rounded-md",
+                            "text-default-500",
+                            "transition-opacity",
+                            "data-[hover=true]:text-foreground",
+                            "data-[hover=true]:bg-default-100",
+                            "dark:data-[hover=true]:bg-default-50",
+                            "data-[selectable=true]:focus:bg-default-50",
+                            "data-[pressed=true]:opacity-90",
+                            "data-[focus-visible=true]:ring-default-500",
+                            "shadow-none",
+                            // "border-1",
+                          ],
+                        },
+                      }}
+                      label="Status"
+                      variant="bordered"
+                      size="sm"
+                      selectedKeys={String(tempFormData?.status)}
+                      {...field}
+                      isRequired={true}
+                      isInvalid={errors?.["status"] ? true : false}
+                      errorMessage={errors?.["status"]?.message}
+                    >
+                      <SelectItem key={1} value={"1"}>
+                        {"Active"}
+                      </SelectItem>
+                      <SelectItem key={0} value={"0"}>
+                        {"InActive"}
+                      </SelectItem>
+                    </Select>
+                  )}
+                />
+                <Controller
+                  name="name" // Changed to reflect a text input
+                  control={control}
+                  rules={{ required: "Please enter value" }}
+                  render={({ field }) => (
+                    <InputNextUI
+                      type="text"
+                      label="Service Name"
+                      {...field}
+                      isRequired={true}
+                      isInvalid={errors?.["ServiceName"] ? true : false}
+                      errorMessage={errors?.["ServiceName"]?.message}
+                    />
+                  )}
+                />
+                <Controller
+                  name="sortDesc" // Changed to reflect a text input
+                  control={control}
+                  rules={{ required: "Please enter value" }}
+                  render={({ field }) => (
+                    <InputNextUI
+                      type="text"
+                      label="Sort Description"
+                      {...field}
+                      isRequired={true}
+                      isInvalid={errors?.["sortDesc"] ? true : false}
+                      errorMessage={errors?.["sortDesc"]?.message}
+                    />
+                  )}
+                />
+                <Controller
+                  name="price" // Changed to reflect a text input
+                  control={control}
+                  rules={{ required: "Please enter value" }}
+                  render={({ field }) => (
+                    <InputNextUI
+                      type="text"
+                      label="Price"
+                      onChange={(value) => {
+                        setValue("grand_total", value);
+                      }}
+                      {...field}
+                      isRequired={true}
+                      isInvalid={errors?.["price"] ? true : false}
+                      errorMessage={errors?.["price"]?.message}
+                    />
+                  )}
+                />
+                <Controller
+                  name="discount" // Changed to reflect a text input
+                  control={control}
+                  rules={{ required: "Please enter value" }}
+                  render={({ field }) => (
+                    <InputNextUI
+                      type="text"
+                      label="Discoint(%)"
+                      {...field}
+                      isRequired={true}
+                      isInvalid={errors?.["discount"] ? true : false}
+                      errorMessage={errors?.["discount"]?.message}
+                    />
+                  )}
+                />
+                <Controller
+                  name="discountPer" // Changed to reflect a text input
+                  control={control}
+                  rules={{ required: "Please enter value" }}
+                  render={({ field }) => (
+                    <InputNextUI
+                      type="text"
+                      label="Discount Price"
+                      {...field}
+                      isDisabled
+                      isRequired={true}
+                      isInvalid={errors?.["discountPer"] ? true : false}
+                      errorMessage={errors?.["discountPer"]?.message}
+                    />
+                  )}
+                />
+                <Controller
+                  name="total" // Changed to reflect a text input
+                  control={control}
+                  render={({ field }) => (
+                    <InputNextUI
+                      type="text"
+                      label="Total"
+                      onChange={(value) => {
+                        console.log(value, "ownername");
+                      }}
+                      isDisabled
+                      {...field}
+                    />
+                  )}
+                />
+                <Controller
+                  name="grand_total" // Changed to reflect a text input
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <InputNextUI
+                      type="text"
+                      label="Grant total"
+                      isDisabled
+                      {...field}
+                      errorMessage={errors?.["grand_total"]?.message}
+                    />
+                  )}
+                />
+
+                <div className="flex">
                   <Controller
-                    name="isEnableCustomize"
+                    name="photo" // Changed to reflect a text input
                     control={control}
                     render={({ field }) => (
-                      <Checkbox
-                        isSelected={
-                          String(tempFormData?.isEnableCustomize) === "1"
-                            ? true
-                            : false
-                        }
-                        checked={field.value === "1"} // Set checked based on the field's value
-                        onChange={(e) =>
-                          field.onChange(e.target.checked ? "1" : "0")
-                        } // Update value on change
-                        isDisabled={
-                          !customizeSubcriptionData?.data
-                            ?.subscriptionCount ||
-                          String(productData?.data?.isEnableCustomize) ===
-                          "1" ||
-                          Number(
-                            customizeSubcriptionData?.data
-                              ?.subscriptionCount
-                          ) -
-                          filteredCustomizeData?.length <=
-                          0
-                        }
-                      >
-                        Enable Customize{" "}
-                        <span>
-                          <Chip variant="flat" color="primary">
-                            {Number(
-                              customizeSubcriptionData?.data
-                                ?.subscriptionCount
-                            ) - filteredCustomizeData?.length}
-                          </Chip>
+                      <div style={{ position: "relative", width: "100%" }}>
+                        <input
+                          type="file"
+                          id="file"
+                          style={{
+                            opacity: 0,
+                            position: "absolute",
+                            zIndex: -1,
+                            width: "100%",
+                          }}
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file && file.size > 500 * 1024) { // 500KB limit
+                              alert("File size exceeds 500KB. Please select a smaller file.");
+                              e.target.value = ''; // Clear the input
+                              document.getElementById("fileLabel").innerText = "No file selected";
+                            } else {
+                              field.onChange(file); // Update form state with selected file
+                              document.getElementById("fileLabel").innerText = file
+                                ? file.name
+                                : "No file selected"; // Update label dynamically
+                            }
+                          }}
+                        />
+                        <label
+                          htmlFor="file"
+                          style={{
+                            border: "1px solid rgba(128, 128, 128, 0.3)",
+                            borderRadius: "7px",
+                            padding: "10px",
+                            width: "100%",
+                            display: "inline-block",
+                            textAlign: "center",
+                            cursor: "pointer",
+                            fontSize: "14px",
+                          }}
+                        >
+                          Choose File
+                        </label>
+                        <span
+                          id="fileLabel"
+                          style={{
+                            marginLeft: "10px",
+                            textAlign: "start",
+                            fontSize: "12px",
+                          }}
+                        >
+                          No file selected
                         </span>
-                      </Checkbox>
+                      </div>
                     )}
                   />
-                </span>
+                  {/* {productData?.data?.photo && ( */}
+                  <Image
+                    src={`${productData?.data?.photo}`}
+                    className="h-20 ml-2"
+                    width={100}
+                  />
+                  {/* )} */}
+                </div>
+                <div className="grid grid-cols-2 gap-4 mb-2">
+                  <Controller
+                    name="paymentMode" // Changed to reflect a text input
+                    control={control}
+                    rules={{ required: "Please enter value" }}
+                    render={({ field }) => (
+                      <CheckboxGroup
+                        label="Select Payment Type"
+                        orientation="horizontal"
+                        color="secondary"
+                        {...field}
+                        defaultValue={["1", "2", "3"]}
+                      >
+                        <Checkbox value="1">Per Order</Checkbox>
+                        <Checkbox value="2">Online Payment</Checkbox>
+                        <Checkbox value="3">Cash on Delivery</Checkbox>
+                      </CheckboxGroup>
+                    )}
+                  />
+                </div>
+                <div className="w-100">
+                  <h3 className="mb-1">Subcriptions</h3>
+                  <div className="mb-3 flex">
+                    <Controller
+                      name="isBooking"
+                      control={control}
+                      render={({ field }) => (
+                        <Checkbox
+                          isSelected={
+                            String(tempFormData?.isEnableEcommerce) === "1"
+                              ? true
+                              : false
+                          }
+                          checked={field.value === "1"} // Set checked based on the field's value
+                          onChange={(e) =>
+                            field.onChange(e.target.checked ? "1" : "0")
+                          } // Update value on change
+                          isDisabled={
+                            !isBooking?.data
+                              ?.subscriptionCount ||
+                            String(productData?.data?.serviceType) === "Service" ||
+                            Number(
+                              isBooking?.data
+                                ?.subscriptionCount
+                            ) -
+                            isBooking?.length <=
+                            0
+                          }
+                        >
+                          Enable booking
+                          <span className="ml-2">
+                            <Chip variant="flat" color="primary">
+                              {Number(
+                                isBooking?.data
+                                  ?.subscriptionCount
+                              ) - isBooking?.length}
+                            </Chip>
+                          </span>
+                        </Checkbox>
+                      )}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+              : <>
+                <div className="grid grid-cols-2 gap-4 mb-2">
+                  <Controller
+                    name="categoryId" // Changed to reflect a text input
+                    control={control}
+                    rules={{ required: "Please select value" }}
+                    render={({ field }) => (
+                      <Autocomplete
+                        isRequired={true}
+                        isInvalid={errors?.["categoryId"] ? true : false}
+                        color={errors?.["categoryId"] ? "danger" : "default"}
+                        listboxProps={{
+                          itemClasses: {
+                            base: [
+                              "rounded-md",
+                              "text-default-500",
+                              "transition-opacity",
+                              "data-[hover=true]:text-foreground",
+                              "data-[hover=true]:bg-default-100",
+                              "dark:data-[hover=true]:bg-default-50",
+                              "data-[selectable=true]:focus:bg-default-50",
+                              "data-[pressed=true]:opacity-90",
+                              "data-[focus-visible=true]:ring-default-500",
+                              "shadow-none",
+                              // "border-1",
+                            ],
+                          },
+                        }}
+                        label="Select Category"
+                        variant="faded"
+                        size="sm"
+                        onSelectionChange={(selectedKey) => {
+                          const valueToSave = selectedKey === null ? null : Number(selectedKey);
+                          field.onChange(valueToSave); // Updates the form state
+                        }}
+                        selectedKey={String(tempFormData?.categoryId)}
+                      >
+                        {categoryData?.data?.map((item) => (
+                          <AutocompleteItem key={String(item.id)} value={String(item.id)}>
+                            {item.name}
+                          </AutocompleteItem>
+                        ))}
+                      </Autocomplete>
+                    )}
+                  />
+                  <Controller
+                    name="status" // Changed to reflect a text input
+                    control={control}
+                    rules={{ required: "Please select value" }}
+                    render={({ field }) => (
+                      <Select
+                        classNames={{
+                          label: "group-data-[filled=true]:-translate-y-3",
+                          trigger: [
+                            "bg-transparent",
+                            "border-1",
+                            "text-default-500",
+                            "transition-opacity",
+                            "data-[hover=true]:bg-transparent",
+                            "data-[hover=true]:bg-transparent",
+                            "dark:data-[hover=true]:bg-transparent",
+                            "data-[selectable=true]:focus:bg-transparent",
+                          ],
+                        }}
+                        listboxProps={{
+                          itemClasses: {
+                            base: [
+                              "rounded-md",
+                              "text-default-500",
+                              "transition-opacity",
+                              "data-[hover=true]:text-foreground",
+                              "data-[hover=true]:bg-default-100",
+                              "dark:data-[hover=true]:bg-default-50",
+                              "data-[selectable=true]:focus:bg-default-50",
+                              "data-[pressed=true]:opacity-90",
+                              "data-[focus-visible=true]:ring-default-500",
+                              "shadow-none",
+                              // "border-1",
+                            ],
+                          },
+                        }}
+                        label="Status"
+                        variant="bordered"
+                        size="sm"
+                        selectedKeys={String(tempFormData?.status)}
+                        {...field}
+                        isRequired={true}
+                        isInvalid={errors?.["status"] ? true : false}
+                        errorMessage={errors?.["status"]?.message}
+                      >
+                        <SelectItem key={1} value={"1"}>
+                          {"Active"}
+                        </SelectItem>
+                        <SelectItem key={0} value={"0"}>
+                          {"InActive"}
+                        </SelectItem>
+                      </Select>
+                    )}
+                  />
+                  <Controller
+                    name="name" // Changed to reflect a text input
+                    control={control}
+                    rules={{ required: "Please enter value" }}
+                    render={({ field }) => (
+                      <InputNextUI
+                        type="text"
+                        label="Name"
+                        {...field}
+                        isRequired={true}
+                        isInvalid={errors?.["name"] ? true : false}
+                        errorMessage={errors?.["name"]?.message}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="unitSize" // Changed to reflect a text input
+                    control={control}
+                    rules={{ required: "Please enter value" }}
+                    render={({ field }) => (
+                      <InputNextUI
+                        type="text"
+                        label="Unit"
+                        {...field}
+                        isRequired={true}
+                        isInvalid={errors?.["unitSize"] ? true : false}
+                        errorMessage={errors?.["unitSize"]?.message}
+                      />
+                    )}
+                  />
+                  {/* <Controller
+                    name="content" // Changed to reflect a text input
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <InputNextUI
+                        type="text"
+                        label="Content"
+                        onChange={(value) => {
+                          console.log(value, "ownername");
+                        }}
+                        {...field}
+                      />
+                    )}
+                  /> */}
+                  <Controller
+                    name="sortDesc" // Changed to reflect a text input
+                    control={control}
+                    rules={{ required: "Please enter value" }}
+                    render={({ field }) => (
+                      <InputNextUI
+                        type="text"
+                        label="Sort Description"
+                        {...field}
+                        isRequired={true}
+                        isInvalid={errors?.["sortDesc"] ? true : false}
+                        errorMessage={errors?.["sortDesc"]?.message}
+                      />
+                    )}
+                  />
+
+                  <Controller
+                    name="price" // Changed to reflect a text input
+                    control={control}
+                    rules={{ required: "Please enter value" }}
+                    render={({ field }) => (
+                      <InputNextUI
+                        type="text"
+                        label="Price"
+                        onChange={(value) => {
+                          setValue("grand_total", value);
+                        }}
+                        {...field}
+                        isRequired={true}
+                        isInvalid={errors?.["price"] ? true : false}
+                        errorMessage={errors?.["price"]?.message}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="qty" // Changed to reflect a text input
+                    control={control}
+                    rules={{ required: "Please enter value" }}
+                    render={({ field }) => (
+                      <InputNextUI
+                        type="text"
+                        label="Quantity"
+                        {...field}
+                        isRequired={true}
+                        isInvalid={errors?.["qty"] ? true : false}
+                        errorMessage={errors?.["qty"]?.message}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="discount" // Changed to reflect a text input
+                    control={control}
+                    rules={{ required: "Please enter value" }}
+                    render={({ field }) => (
+                      <InputNextUI
+                        type="text"
+                        label="Discoint(%)"
+                        {...field}
+                        isRequired={true}
+                        isInvalid={errors?.["discount"] ? true : false}
+                        errorMessage={errors?.["discount"]?.message}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="discountPer" // Changed to reflect a text input
+                    control={control}
+                    rules={{ required: "Please enter value" }}
+                    render={({ field }) => (
+                      <InputNextUI
+                        type="text"
+                        label="Discount Price"
+                        {...field}
+                        isDisabled
+                        isRequired={true}
+                        isInvalid={errors?.["discountPer"] ? true : false}
+                        errorMessage={errors?.["discountPer"]?.message}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="total" // Changed to reflect a text input
+                    control={control}
+                    render={({ field }) => (
+                      <InputNextUI
+                        type="text"
+                        label="Total"
+                        onChange={(value) => {
+                          console.log(value, "ownername");
+                        }}
+                        isDisabled
+                        {...field}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="grand_total" // Changed to reflect a text input
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <InputNextUI
+                        type="text"
+                        label="Grant total"
+                        isDisabled
+                        {...field}
+                        errorMessage={errors?.["grand_total"]?.message}
+                      />
+                    )}
+                  />
+
+                  <div className="flex">
+                    <Controller
+                      name="photo" // Changed to reflect a text input
+                      control={control}
+                      render={({ field }) => (
+                        <div style={{ position: "relative", width: "100%" }}>
+                          <input
+                            type="file"
+                            id="file"
+                            style={{
+                              opacity: 0,
+                              position: "absolute",
+                              zIndex: -1,
+                              width: "100%",
+                            }}
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+                              if (file && file.size > 500 * 1024) { // 500KB limit
+                                alert("File size exceeds 500KB. Please select a smaller file.");
+                                e.target.value = ''; // Clear the input
+                                document.getElementById("fileLabel").innerText = "No file selected";
+                              } else {
+                                field.onChange(file); // Update form state with selected file
+                                document.getElementById("fileLabel").innerText = file
+                                  ? file.name
+                                  : "No file selected"; // Update label dynamically
+                              }
+                            }}
+                          />
+                          <label
+                            htmlFor="file"
+                            style={{
+                              border: "1px solid rgba(128, 128, 128, 0.3)",
+                              borderRadius: "7px",
+                              padding: "10px",
+                              width: "100%",
+                              display: "inline-block",
+                              textAlign: "center",
+                              cursor: "pointer",
+                              fontSize: "14px",
+                            }}
+                          >
+                            Choose File
+                          </label>
+                          <span
+                            id="fileLabel"
+                            style={{
+                              marginLeft: "10px",
+                              textAlign: "start",
+                              fontSize: "12px",
+                            }}
+                          >
+                            No file selected
+                          </span>
+                        </div>
+                      )}
+                    />
+                    {/* {productData?.data?.photo && ( */}
+                    <Image
+                      src={`${productData?.data?.photo}`}
+                      className="h-20 ml-2"
+                      width={100}
+                    />
+                    {/* )} */}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mb-2">
+                  <Controller
+                    name="paymentMode" // Changed to reflect a text input
+                    control={control}
+                    rules={{ required: "Please enter value" }}
+                    render={({ field }) => (
+                      <CheckboxGroup
+                        label="Select Payment Type"
+                        orientation="horizontal"
+                        color="secondary"
+                        {...field}
+                        defaultValue={["1", "2", "3"]}
+                      >
+                        <Checkbox value="1">Per Order</Checkbox>
+                        <Checkbox value="2">Online Payment</Checkbox>
+                        <Checkbox value="3">Cash on Delivery</Checkbox>
+                      </CheckboxGroup>
+                    )}
+                  />
+                  <div className="w-100">
+                    <h3 className="mb-1">Subcriptions</h3>
+                    <div className="mb-3 flex">
+                      <Controller
+                        name="isEnableEcommerce"
+                        control={control}
+                        render={({ field }) => (
+                          <Checkbox
+                            isSelected={
+                              String(tempFormData?.isEnableEcommerce) === "1"
+                                ? true
+                                : false
+                            }
+                            checked={field.value === "1"} // Set checked based on the field's value
+                            onChange={(e) =>
+                              field.onChange(e.target.checked ? "1" : "0")
+                            } // Update value on change
+                            isDisabled={
+                              !ecommereceSubcriptionData?.data
+                                ?.subscriptionCount ||
+                              String(productData?.data?.isEnableEcommerce) === "1" ||
+                              Number(
+                                ecommereceSubcriptionData?.data
+                                  ?.subscriptionCount
+                              ) -
+                              filteredEcommereceData?.length <=
+                              0
+                            }
+                          >
+                            Enable Ecommerce
+                            <span className="ml-2">
+                              <Chip variant="flat" color="primary">
+                                {Number(
+                                  ecommereceSubcriptionData?.data
+                                    ?.subscriptionCount
+                                ) - filteredEcommereceData?.length}
+                              </Chip>
+                            </span>
+                          </Checkbox>
+                        )}
+                      />
+                      <span className="ml-3">
+                        <Controller
+                          name="isEnableCustomize"
+                          control={control}
+                          render={({ field }) => (
+                            <Checkbox
+                              isSelected={
+                                String(tempFormData?.isEnableCustomize) === "1"
+                                  ? true
+                                  : false
+                              }
+                              checked={field.value === "1"} // Set checked based on the field's value
+                              onChange={(e) =>
+                                field.onChange(e.target.checked ? "1" : "0")
+                              } // Update value on change
+                              isDisabled={
+                                !customizeSubcriptionData?.data
+                                  ?.subscriptionCount ||
+                                String(productData?.data?.isEnableCustomize) ===
+                                "1" ||
+                                Number(
+                                  customizeSubcriptionData?.data
+                                    ?.subscriptionCount
+                                ) -
+                                filteredCustomizeData?.length <=
+                                0
+                              }
+                            >
+                              Enable Customize{" "}
+                              <span>
+                                <Chip variant="flat" color="primary">
+                                  {Number(
+                                    customizeSubcriptionData?.data
+                                      ?.subscriptionCount
+                                  ) - filteredCustomizeData?.length}
+                                </Chip>
+                              </span>
+                            </Checkbox>
+                          )}
+                        />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </>
+          }
         </div>
       </form>
       <SubscriptionExpiredModal

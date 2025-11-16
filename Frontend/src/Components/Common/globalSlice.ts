@@ -12,7 +12,12 @@ export interface GlobalConfigState {
   onSearchOpenStore?: boolean;
   storeList?: any;
   isProductDetailsModalOpen?: any;
-  isOpenCartModal: any; 
+  isOpenCartModal: {
+    isOpen: false,
+    item: null,
+    qty: 0,
+    type: "Product",
+  }; 
   isOpenOrderModal: any;
   isSideBarExpand:boolean;
 }
@@ -31,7 +36,12 @@ const initialState: GlobalConfigState = {
     isOpen: false,
     item: null,
   },
-  isOpenCartModal: false,
+  isOpenCartModal: {
+    isOpen: false,
+    item: null,
+    qty: 0,
+    type: "Product",
+  },
   isOpenOrderModal: false,
   isSideBarExpand : false
 };
@@ -87,7 +97,12 @@ const globalConfigSlice = createSlice({
         isOpen: false,
         item: null,
       };
-      state.isOpenCartModal = false;
+      state.isOpenCartModal = {
+        isOpen: false,
+        item: null,
+        qty: 0,
+        type: "Product",
+      };
       state.isOpenOrderModal = false;
     },
   },

@@ -29,7 +29,7 @@ import { useBoolean } from "../Common/CustomHooks";
 import { useAppDispatch, useAppSelector } from "../Common/hooks";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { onRefreshCart, onUpdateCartModal } from "../Common/globalSlice";
+import { onRefreshCart, onUpdateCartModal, onUpdateProductDetailsModal } from "../Common/globalSlice";
 import {
   useGetCartByOrderIdQuery,
   useUpdateCartMutation,
@@ -37,7 +37,9 @@ import {
   useAddOrderMutation,
   useUpdateAddressMutation,
   useGetAddressesByCustIdQuery,
-  useAddAddressMutation
+  useAddAddressMutation,
+  useAddPyamentMutation,
+  useAddOrderlistMutation
 } from "../../views/pages/Store/Service.mjs";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import withReactContent from "sweetalert2-react-content";
@@ -64,10 +66,12 @@ export const BuyCard = (props: any) => {
     data: cart,
     error: cartError,
     refetch: cartRefetch,
-  } = useGetCartByOrderIdQuery(Number(userId), { skip: !userId });
+  } = useGetCartByOrderIdQuery(Number(userId));
   const [updateCart] = useUpdateCartMutation();
   const [deleteCartItem] = useDeleteCartItemMutation();
   const [addOrder] = useAddOrderMutation();
+  const [addPayment] = useAddPyamentMutation();
+  const [addOrderlist] = useAddOrderlistMutation();
   const [deletId, setDeleteId] = React.useState(null);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -75,7 +79,6 @@ export const BuyCard = (props: any) => {
   const [updateAddress] = useUpdateAddressMutation();
   const [addAddress] = useAddAddressMutation();
   const { data: addresses, refetch: refetchAddresses } = useGetAddressesByCustIdQuery(userId, { skip: !userId });
-
   const [addressDetails, setAddressDetails] = useState({
     fullname: "",
     phone: "",
@@ -90,11 +93,27 @@ export const BuyCard = (props: any) => {
   });
 
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [scriptLoaded, setScriptLoaded] = React.useState(false);
+  // Razorpay script loading logic (kept as is)
+  React.useEffect(() => {
+    
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => {
+      setScriptLoaded(true);
+    };
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+
+  }, []);
 
   React.useEffect(() => {
+    cartRefetch()
     onRefresh && dispatch(onRefreshCart(false));
-    userId && cartRefetch();
-  }, [userId, onRefresh]);
+  }, [userId, onRefresh, isOpenCartModal]);
 
   React.useEffect(() => {
     if (userId) {
@@ -164,34 +183,211 @@ export const BuyCard = (props: any) => {
     }
   };
 
-  const handleAddOrder = async () => {
-    if (cart?.data?.length > 0) {
-      const promises = cart.data.map(async (item) => {
-        try {
-          const tempCartValue = {
-            customerId: item?.orderId,
-            paymentmethod: selectedPaymentMethod,
-            orderId: Number(userId),
-            grandTotal: Number(item?.qty * item?.price),
-            productIds: item?.productId,
-            qty: item?.qty,
-            storeId: id,
-            cutomerDeliveryDate: deliveryDate,
-            addressDetails: selectedAddress || addressDetails, // Include selected or entered address details
+
+  const razorpayHandleSubmit = async (amountInRupees, apiParams, paymentResult) => {
+    try {
+      const options = {
+        key: "rzp_live_RgPc8rKEOZbHgf",
+        amount: paymentResult?.data?.amount,
+        currency: paymentResult?.data?.currency,
+        order_id: paymentResult?.data?.id,
+        name: "Nickname Infotech",
+        description: "For Subscriptions",
+        handler: function (response: any) {
+          const paymentId = response.razorpay_payment_id;
+          if (paymentId) {
+            afterPaymentSuccess(apiParams, paymentId, paymentResult);
+          } else {
+            afterPaymentSuccess(apiParams, "TEMP_PAYMENT_ID_DEV", paymentResult);
+          }
+        },
+        theme: {
+          color: "#49a84c",
+        },
+      };
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const afterPaymentSuccess = async (apiParams, paymentId, paymentResult) => {
+    const razorpayPaymentUpdate = await addOrderlist({
+      orderCreationId: apiParams?.orderId,
+      razorpayPaymentId: paymentId,
+      razorpayOrderId: paymentResult?.data?.id,
+    });
+    if (razorpayPaymentUpdate?.data?.success) {
+      if (isOpenCartModal.type !== "Service") {
+        // 2. Iterate through the cart and create separate orders for each item
+        const orderPromises = cart.data.map(async (item) => {
+          const itemApiParams = {
+            ...apiParams, // Copy base parameters (including payment method)
+            grandTotal: Number(item?.qty * item?.price), // Individual item total
+            productIds: item?.productId, // Individual item ID
+            qty: item?.qty, // Individual item quantity
           };
-          return await addOrder(tempCartValue);
-        } catch (error) {
-          console.error("Failed to add order for item:", item, error);
-          return null; // Return null for failed orders
-        }
-      });
-      if (promises) {
-        cart.data.map(async (item) => {
-          onDeleteCartItems(item?.productId);
+          // Create the individual order record
+          await addOrder(itemApiParams);
+
+          // Delete the item from the cart upon successful order creation
+          await onDeleteCartItems(item?.productId);
         });
+        // Wait for all individual orders to be created and cart items deleted
+        await Promise.all(orderPromises);
+        setIsSelectAddress(false);
+        setSelectedAddress(null);
         MySwal.fire({
           title: <p>Your order placed please vist your order page</p>,
         });
+      } else {
+        const result = await addOrder(apiParams);
+        if (result?.data?.success) {
+          setIsSelectAddress(false);
+          setSelectedAddress(null);
+          MySwal.fire({
+            title: <p>Your order placed please vist your order page</p>,
+          });
+        }
+      }
+    } else {
+      setIsSelectAddress(false);
+      return { error: razorpayPaymentUpdate?.data?.message || "Failed to add order" };
+    }
+  }
+
+  const handleAddOrder = async () => {
+    dispatch(onUpdateCartModal({
+      isOpen: false,
+      item: null,
+      qty: 0,
+      type: null,
+    }));
+    dispatch(
+      onUpdateProductDetailsModal({
+        isOpen: false,
+        item: null,
+      })
+    );
+    if (!scriptLoaded) {
+      console.error("Razorpay script not loaded");
+      return;
+    }
+    if (isOpenCartModal.type !== "Service") {
+      // 1. Calculate the Grand Total for the entire cart
+      const grandTotal = cart?.data?.reduce(
+        (sum, item) => sum + Number(item.price) * Number(item.qty),
+        0
+      ) || 0;
+
+      // Create a base set of parameters needed for the order records
+      const baseApiParams = {
+        custId: userId,
+        paymentmethod: selectedPaymentMethod,
+        orderId: Number(userId),
+        grandTotal: grandTotal, // Total amount for payment initiation
+        storeId: id,
+        cutomerDeliveryDate: deliveryDate,
+        deliveryAddress: selectedAddress || addressDetails,
+        orderType: "Product",
+      };
+
+      // --- PAYMENT FLOW (Method 1, 2, 4) ---
+      if (String(selectedPaymentMethod) === "1" || String(selectedPaymentMethod) === "2" || String(selectedPaymentMethod) === "4") {
+        try {
+          // 2. Initiate Payment ONCE for the Grand Total
+          const paymentResult = await addPayment({
+            "amount": grandTotal, // Pass the combined Grand Total
+            "currency": "INR",
+            // NOTE: Use a unique receipt ID instead of userId for security
+            "order_id": userId, // This should ideally be a unique Order ID from your server
+            "payment_capture": 1
+          });
+
+          if (paymentResult?.data?.success) {
+            // 3. Open Razorpay ONCE
+            // Pass the baseApiParams (which includes all delivery details)
+            await razorpayHandleSubmit(grandTotal, baseApiParams, paymentResult?.data);
+          } else {
+            toast.error(paymentResult?.data?.message || "Failed to create payment order.");
+            return;
+          }
+        } catch (error) {
+          console.error("Razorpay initiation error:", error);
+          toast.error("Failed to start payment process.");
+          return;
+        }
+      }
+      // --- NON-PAYMENT FLOW (Method 3, COD/Pre-Order) ---
+      else {
+        // If it's a non-online payment method (e.g., COD), execute orders directly
+        const orderPromises = cart.data.map(async (item) => {
+          const itemApiParams = {
+            ...baseApiParams, // Copy base parameters
+            grandTotal: Number(item?.qty * item?.price), // Individual item total
+            productIds: item?.productId, // Individual item ID
+            qty: item?.qty, // Individual item quantity
+            paymentmethod: selectedPaymentMethod, // Ensure payment method is set correctly
+          };
+          await addOrder(itemApiParams);
+          await onDeleteCartItems(item?.productId);
+        });
+
+        await Promise.all(orderPromises);
+
+        // Final success message and cleanup (outside the map loop)
+        setIsSelectAddress(false);
+        setSelectedAddress(null);
+        MySwal.fire({
+          title: <p>Your order placed please vist your order page</p>,
+        });
+      }
+    } else {
+      try {
+        const apiParams = {
+          custId: userId,
+          paymentmethod: selectedPaymentMethod,
+          orderId: Number(userId),
+          grandTotal: isOpenCartModal.item?.product?.total || 0,
+          productIds: isOpenCartModal.item?.product?.id || "",
+          qty: isOpenCartModal.item?.product?.qty || 0,
+          storeId: id,
+          cutomerDeliveryDate: deliveryDate,
+          deliveryAddress: selectedAddress || addressDetails, // Include selected or entered address details
+          orderType: "Service",
+        };
+        if (String(selectedPaymentMethod) === "1" || String(selectedPaymentMethod) === "2" || String(selectedPaymentMethod) === "4") {
+          try {
+            const paymentResult = await addPayment({
+              "amount": apiParams.grandTotal,
+              "currency": "INR",
+              "order_id": userId,
+              "payment_capture": 1
+            });
+            if (paymentResult?.data?.success) {
+              await razorpayHandleSubmit(apiParams.grandTotal, apiParams, paymentResult?.data);
+            } else {
+              return { error: paymentResult?.data?.message || "Failed to add payment" };
+            }
+          } catch (error) {
+            console.log(error, "afdsadf");
+          }
+        } else {
+          const result = await addOrder(apiParams);
+          if (result?.data?.success) {
+            setIsSelectAddress(false);
+            setSelectedAddress(null);
+            MySwal.fire({
+              title: <p>Your order placed please vist your order page</p>,
+            });
+          } else {
+            return { error: result?.data?.message || "Failed to add order" };
+          }
+        }
+      } catch (error) {
+        console.error("Failed to add order for item:", error);
+        return { error: "Failed to add order" }; // Return null for failed orders
       }
     }
   };
@@ -309,7 +505,6 @@ export const BuyCard = (props: any) => {
     }
   }, []);
 
-
   useEffect(() => {
     if (userId) {
       setAddressDetails((prevDetails) => ({
@@ -328,10 +523,15 @@ export const BuyCard = (props: any) => {
   return (
     <>
       <Modal
-        isOpen={isOpenCartModal}
+        isOpen={isOpenCartModal.isOpen}
         onClose={() => {
-          if (isOpenCartModal) {
-            dispatch(onUpdateCartModal(false));
+          if (isOpenCartModal.isOpen) {
+            dispatch(onUpdateCartModal({
+              isOpen: false,
+              item: null,
+              qty: 0,
+              type: null,
+            }));
           }
         }}
         size={"5xl"}
@@ -345,13 +545,18 @@ export const BuyCard = (props: any) => {
           <>
             <ModalCloseIcon
               onClick={() => {
-                dispatch(onUpdateCartModal(false));
+                dispatch(onUpdateCartModal({
+                  isOpen: false,
+                  item: null,
+                  qty: 0,
+                  type: null,
+                }));
               }}
               className="modalIconClose"
             />
             <ModalBody className="p-0 m-0 mt-1 pt-2">
               <div className="grid xm:grid-cols-1 mm:grid-cols-1  sm:grid-cols-1 ml:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 3xl:grid-cols-2 4xl:grid-cols-2">
-                {!isSelectAddress ? <div className="">
+                {!isSelectAddress && isOpenCartModal.type === "Product" ? <div className="">
                   {cart?.data?.length > 0 && <Table
                     isHeaderSticky
                     classNames={{
@@ -485,18 +690,14 @@ export const BuyCard = (props: any) => {
                           className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                         />
                         <div className="flex justify-between">
-                          <Tooltip content="we are collaboration with stores soon will enable this feature">
-                            <Button
-                              onClick={handleAddAddress}
-                              isDisabled
-                              className="px-5 rounded-md bg-blue-600 py-2 text-white hover:bg-blue-700"
-                            > 
+                          <Button
+                            onClick={handleAddAddress}
+                            className="px-5 rounded-md bg-blue-600 py-2 text-white hover:bg-blue-700"
+                          >
                             {"Add Address"}
                           </Button>
-                          </Tooltip>
                           {selectedAddress && <Button
                             onClick={handleUpdateAddress}
-                            isDisabled
                             variant="ghost"
                             className="px-5 rounded-md bg-blue-600 py-2 text-white hover:bg-blue-700"
                           >
@@ -508,133 +709,155 @@ export const BuyCard = (props: any) => {
                   </div>}
                 <div>
                   <div className=" BuycarBg mx-3">
-                    <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
-                      <div>
-                        Total Products (<b>{cart?.data?.length}</b> Items )
-                      </div>
-                      <div>
-                        {" "}
-                        Rs :{" "}
-                        {cart?.data
-                          ?.reduce(
-                            (sum, item) => sum + item.price * item.qty,
-                            0
-                          ) // Multiply price with qty
-                          .toFixed(2) // Ensures two decimal places
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                      </div>
-                    </div>
+                    {isOpenCartModal.type === "Product" ? (
+                      <>
+                        <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
+                          <div>
+                            Total Products (<b>{cart?.data?.length}</b> Items )
+                          </div>
+                          <div>
+                            {" "}
+                            Rs :{" "}
+                            {cart?.data
+                              ?.reduce(
+                                (sum, item) => sum + item.price * item.qty,
+                                0
+                              ) // Multiply price with qty
+                              .toFixed(2) // Ensures two decimal places
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                          </div>
+                        </div>
 
-                    <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
-                      <div>Delivery Charge</div>
-                      <div> Free</div>
-                    </div>
-                    <Divider orientation="horizontal" className="my-3.5" />
-                    <div className="flex justify-between py-1 mx-3 text-base font-medium  m-1">
-                      <div>Total Amount</div>
-                      <div>
-                        {" "}
-                        Rs.{" "}
-                        {cart?.data
-                          ?.reduce(
-                            (sum, item) => sum + parseFloat(item.price) * parseFloat(item.qty),
-                            0
-                          ) // Multiply price with qty
-                          .toFixed(2) // Ensures two decimal places
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                      </div>
-                    </div>
-                    <Divider orientation="horizontal" className="my-2" />
-                    <div className="paymetoptionBg mx-3 mt-2 rounded-lg">
-                      <div className="font-medium paymetoption text-base mx-3 pb-2 pt-2">
-                        Payment Options
-                      </div>
-                      <RadioGroup className="w-full" value={selectedPaymentMethod} onChange={(e) => setSelectedPaymentMethod(e.target.value)}>
-                        <div className="flex  justify-between items-center mx-3 w-full">
-                          <div className="w-2/4 m-1 items-center flex">
-                            <Radio
-                              value="1"
-                              size="sm"
-                              className="items-center mr-1"
-                              disabled
-                            >
-                              Online payment
-                            </Radio>
-                            <Tooltip content={"We accept online payments using credit/debit cards, net banking, and mobile wallets."} showArrow className="w-80"><span><IconInfo fill="#FF0000" width={15} className={"mr-2"} /></span></Tooltip>
-                          </div>
-                          <div className="w-2/4 m-1 items-center flex">
-                            <Radio
-                              value="2"
-                              size="sm"
-                              className="items-center mr-1"
-                              disabled
-                            >
-                              Pre Order
-                            </Radio>
-                            <Tooltip content={"Pre Order means you can order the product before your going to shop directly and you have to pay the 15% of the total amount to place order."} showArrow className="w-80"><span><IconInfo fill="#FF0000" width={15} className={"mr-2"} /></span></Tooltip>
+                        <div className="flex justify-between py-1 mx-3 font-medium text-sm m-1">
+                          <div>Delivery Charge</div>
+                          <div> Free</div>
+                        </div>
+                        <Divider orientation="horizontal" className="my-3.5" />
+                        <div className="flex justify-between py-1 mx-3 text-base font-medium  m-1">
+                          <div>Total Amount</div>
+                          <div>
+                            {" "}
+                            Rs.{" "}
+                            {cart?.data
+                              ?.reduce(
+                                (sum, item) => sum + parseFloat(item.price) * parseFloat(item.qty),
+                                0
+                              ) // Multiply price with qty
+                              .toFixed(2) // Ensures two decimal places
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </div>
                         </div>
-                        <div className="flex  justify-between items-center mx-3 w-full">
-                          <div className="w-2/4 m-1 items-center flex">
-                            <Radio
-                              value="3"
-                              size="sm"
-                              className="items-center mr-1"
-                              disabled
-                            >
-                              Cash on Delivery
-                            </Radio>
-                            <Tooltip content={"Cash on Delivery means you can pay the amount at the time of delivery."} showArrow className="w-80"><span><IconInfo fill="#FF0000" width={15} className={"mr-2"} /></span></Tooltip>
-                          </div>
-                          <div className="w-2/4 m-1 items-center flex">
-                            <Radio
-                              value="4"
-                              size="sm"
-                              className="items-center mr-1"
-                              disabled
-                            >
-                              Delivery in future
-                            </Radio>
-                            <Tooltip content={"Delivery in future means you can order the product and we will deliver it to you in selected date. and you have to pay the 30% of the total amount to place order."} showArrow className="w-80"><span><IconInfo fill="#FF0000" width={15} className={"mr-2"} /></span></Tooltip>
-                          </div>
+                      </>) : <>
+                      <p className="text-sm text-default-500 p-3">To move forward with your request, please book your service. This will help us begin the next steps smoothly.</p>
+                    </>}
+                    <>
+                      <Divider orientation="horizontal" className="my-2" />
+                      <div className="paymetoptionBg mx-3 mt-2 rounded-lg">
+                        <div className="font-medium paymetoption text-base mx-3 pb-2 pt-2">
+                          Payment Options
                         </div>
-                        {selectedPaymentMethod === '4' && (
+                        <RadioGroup className="w-full" value={selectedPaymentMethod} onChange={(e) => setSelectedPaymentMethod(e.target.value)}>
                           <div className="flex  justify-between items-center mx-3 w-full">
-                            <div className="w-4/6 m-1 items-center flex">
-                              <Input
-                                value={deliveryDate}
-                                onChange={(e) => setDeliveryDate(e.target.value)}
-                                type="date"
-                                className="w-2/4 m-1"
-                              />
+                            <div className="w-2/4 m-1 items-center flex">
+                              <Radio
+                                value="1"
+                                size="sm"
+                                className="items-center mr-1"
+                                disabled
+                              >
+                                Online payment
+                              </Radio>
+                              <Tooltip content={"We accept online payments using credit/debit cards, net banking, and mobile wallets."} showArrow className="w-80"><span><IconInfo fill="#FF0000" width={15} className={"mr-2"} /></span></Tooltip>
+                            </div>
+                            <div className="w-2/4 m-1 items-center flex">
+                              <Radio
+                                value="2"
+                                size="sm"
+                                className="items-center mr-1"
+                                disabled
+                              >
+                                Pre Order
+                              </Radio>
+                              <Tooltip content={"Pre Order means you can order the product before your going to shop directly and you have to pay the 15% of the total amount to place order."} showArrow className="w-80"><span><IconInfo fill="#FF0000" width={15} className={"mr-2"} /></span></Tooltip>
                             </div>
                           </div>
-                        )}
-                      </RadioGroup>
-                      <div className="flex items-center justify-center mt-4 mb-1">
-                        <Tooltip content="We are collaboration with stores soon will enable this feature">
+                          <div className="flex  justify-between items-center mx-3 w-full">
+                            <div className="w-2/4 m-1 items-center flex">
+                              <Radio
+                                value="3"
+                                size="sm"
+                                className="items-center mr-1"
+                                disabled
+                              >
+                                Cash on Delivery
+                              </Radio>
+                              <Tooltip content={"Cash on Delivery means you can pay the amount at the time of delivery."} showArrow className="w-80"><span><IconInfo fill="#FF0000" width={15} className={"mr-2"} /></span></Tooltip>
+                            </div>
+                            <div className="w-2/4 m-1 items-center flex">
+                              <Radio
+                                value="4"
+                                size="sm"
+                                className="items-center mr-1"
+                                disabled
+                              >
+                                Delivery in future
+                              </Radio>
+                              <Tooltip content={"Delivery in future means you can order the product and we will deliver it to you in selected date. and you have to pay the 30% of the total amount to place order."} showArrow className="w-80"><span><IconInfo fill="#FF0000" width={15} className={"mr-2"} /></span></Tooltip>
+                            </div>
+                          </div>
+                          {selectedPaymentMethod === '4' && (
+                            <div className="flex  justify-between items-center mx-3 w-full">
+                              <div className="w-4/6 m-1 items-center flex">
+                                <Input
+                                  value={deliveryDate}
+                                  onChange={(e) => setDeliveryDate(e.target.value)}
+                                  type="date"
+                                  className="w-2/4 m-1"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </RadioGroup>
+                        <div className="flex items-center justify-center mt-4 mb-1">
+                          {isOpenCartModal.type === "Product" ?
+                            <Button
+                              size="sm"
+                              color="primary"
+                              className={`me-5 ${cart?.data?.length > 0 ? "" : "cursor-not-allowed"
+                                }`}
+                              disabled={cart?.data?.length > 0 ? false : true}
+                              onClick={() => {
+                                if (selectedAddress && isSelectAddress) {
+                                  handleAddOrder()
+                                } else {
+                                  setIsSelectAddress(true)
+                                }
+                              }}
+                            >
+                              {isSelectAddress ? "Confirm Order" : "Select delivery address"}
+                            </Button> :
+                            <Button
+                              size="sm"
+                              color="primary"
+                              className={`me-5 ${!selectedAddress ? "cursor-not-allowed" : ""
+                                }`}
+                              disabled={!selectedAddress}
+                              onClick={() => handleAddOrder()}
+                            >
+                              {"Book Service"}
+                            </Button>}
                           <Button
                             size="sm"
                             color="primary"
-                            isDisabled
-                            className={`me-5 ${cart?.data?.length <= 0 ? "cursor-not-allowed" : ""
-                              }`}
-                            disabled={cart?.data?.length <= 0}
-                            onClick={() => setIsSelectAddress(true)}
+                            variant="bordered"
+                            onClick={() => navigate(-1)}
                           >
-                            {isSelectAddress ? "Confirm Order" : "Select delivery address"}
+                            Back To Shop
                           </Button>
-                        </Tooltip>
-                        <Button
-                          size="sm"
-                          color="primary"
-                          variant="bordered"
-                          onClick={() => navigate(-1)}
-                        >
-                          Back To Shop
-                        </Button>
+                        </div>
                       </div>
-                    </div>
+                    </>
+
                   </div>
                 </div>
               </div>

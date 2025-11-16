@@ -98,11 +98,12 @@ function PriceingCard({ item = null, subscription = null }) {
       const amountInPaisa = Math.round(amountInRupees * 100);
 
       const options = {
-        key: "rzp_live_efRIa318ph9lot",
+        key: "rzp_live_RgPc8rKEOZbHgf",
         amount: amountInPaisa,
         currency: "INR",
         name: "Nickname Infotech",
         description: "For Subscriptions",
+        payment_capture: 1,
         capture: true,
         handler: function (response: any) {
           const paymentId = response.razorpay_payment_id;
@@ -147,7 +148,7 @@ function PriceingCard({ item = null, subscription = null }) {
 
   // Helper functions for price calculation and plan styling
   const isItemBased = item?.key === "PL1_004";
-  const isFixedPlan = item.key === "PL1_002" || item.key === "PL1_003";
+  const isFixedPlan = item.key === "PL1_002" || item.key === "PL1_003" || item.key === "PL3_001";
   const basePrice = Number(item?.basePrice || 0);
   const perItemPrice = Number(item?.price || 0);
   const itemCount = Number(formData?.itemCount || 1);

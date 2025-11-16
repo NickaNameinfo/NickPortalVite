@@ -39,26 +39,29 @@ export const RelatedProducts = ({
         className="Storecard pt-3.5 px-3 cursor-pointer"
       >
         {!isHideImage && (
-          <CardBody className="overflow-visible p-0 relative">
-            <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
-              Available
-            </span>
-            <span className="bg-danger bottom-0 z-50 right-0 absolute text-white text-xs font-medium px-2.5 py-1 rounded-se-xl rounded-es-xl dark:bg-gray-700 dark:text-gray-300">
-              Online Order Not Available
-            </span>
-            <Image
-              isZoomed
-              alt="Here no Image"
-              shadow="md"
-              width="100%"
-              radius="lg"
-              className={`w-full object-cover  ${from !== "ProductView"
-                ? "min-h-[176px] max-h-[176px]"
-                : "min-h-[50px] max-h-[100px]"
-                }`}
-              src={`${item?.product?.photo ? item?.product?.photo : item?.photo
-                }`}
-            />
+          <CardBody className="overflow-visible p-0">
+            <div className="relative">
+              <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
+                Available
+              </span>
+              <Image
+                isZoomed
+                alt="Here no Image"
+                shadow="md"
+                width="100%"
+                radius="lg"
+                className={`w-full object-cover  ${from !== "ProductView"
+                  ? "min-h-[176px] max-h-[176px]"
+                  : "min-h-[50px] max-h-[100px]"
+                  }`}
+                src={`${item?.product?.photo ? item?.product?.photo : item?.photo
+                  }`}
+              />
+              <span className="bg-danger bottom-0 z-50 right-0 absolute text-white text-xs font-medium px-2.5 py-1 rounded-se-xl rounded-es-xl dark:bg-gray-700 dark:text-gray-300">
+                Online Order Not Available
+              </span>
+            </div>
+
           </CardBody>
         )}
         <CardFooter className="p-0">
