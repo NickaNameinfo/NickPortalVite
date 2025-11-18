@@ -73,7 +73,7 @@ function PriceingCard({ item = null, subscription = null }) {
         return;
       }
 
-      const isItemBased = item?.key === "PL1_004";
+      const isItemBased = item?.key === "PL1_004" || item?.key === "PL1_005";
       const isFixedPlan = item.key === "PL1_002" || item.key === "PL1_003";
 
       const basePrice = Number(item?.basePrice || 0);
@@ -147,7 +147,7 @@ function PriceingCard({ item = null, subscription = null }) {
   };
 
   // Helper functions for price calculation and plan styling
-  const isItemBased = item?.key === "PL1_004";
+  const isItemBased = item?.key === "PL1_004" || item?.key === "PL1_005";
   const isFixedPlan = item.key === "PL1_002" || item.key === "PL1_003" || item.key === "PL3_001";
   const basePrice = Number(item?.basePrice || 0);
   const perItemPrice = Number(item?.price || 0);
@@ -204,7 +204,7 @@ function PriceingCard({ item = null, subscription = null }) {
                   {item.saveLabel}
                 </Chip>
               )}
-              <p className="text-xl font-bold">{item.name} {(item.key === "PL1_002" ? <span className="text-red-500 text-base">( 1 - 100 Products)</span> : item.key === "PL1_003" ? <span className="text-red-500 text-base">( 1 - 200 Products)</span> : item.key === "PL1_004" ? <span className="text-red-500 text-base"> ( Above 200 Products) </span> : "")}<span className="text-red-500 text-base"></span></p>
+              <p className="text-xl font-bold">{item.name} {(item.key === "PL1_002" ? <span className="text-red-500 text-base">( 1 - 100 Products)</span> : item.key === "PL1_003" ? <span className="text-red-500 text-base">( 1 - 200 Products)</span> : item.key === "PL1_004" || item.key === "PL1_005" ? <span className="text-red-500 text-base"> ( Above 200 Products) </span> : "")}<span className="text-red-500 text-base"></span></p>
               <p className="text-small text-default-500">Billed Annually <span className="text-red-500 text-base">(Yearly)</span></p>
               {data?.data?.subscriptionPlan === item.key && (
                 <p className="text-small text-red-500 mt-1">

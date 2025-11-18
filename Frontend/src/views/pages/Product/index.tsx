@@ -39,38 +39,31 @@ const Product = () => {
     data: storesByPayment,
     error: storesByPaymentError,
     refetch: storesByPaymentRefetch,
-  } = useGetProductsByPaymenTypeQuery(gloablSearchByPayment, { skip: !gloablSearchByPayment});
+  } = useGetProductsByPaymenTypeQuery(gloablSearchByPayment, { refetchOnMountOrArgChange: true });
 
   const {
     data: storesByOpenStore,
     error: storesByOpenStoreError,
     refetch: storesByOpenStoreRefetch,
-  } = useGetProductsByOpenShopQuery();
+  } = useGetProductsByOpenShopQuery({ refetchOnMountOrArgChange: true });
 
-  const { data, error, refetch } = useGetProductsQuery();
+  const { data, error, refetch } = useGetProductsQuery({ refetchOnMountOrArgChange: true });
   const {
     data: filterByCategory,
     error: filterCategoryError,
     refetch: filterByCategoryRefetch,
-  } = useGetProductsByCategoryQuery(globalCategorySearch, { skip:!globalCategorySearch});
+  } = useGetProductsByCategoryQuery(globalCategorySearch, { refetchOnMountOrArgChange: true });
   const {
     data: filterBySearch,
     error: filterSearchError,
     refetch: filterBySearchRefetch,
-  } = useGetProductsBySearchQuery(globalSearch, { skip:!globalSearch});
+  } = useGetProductsBySearchQuery(globalSearch, { refetchOnMountOrArgChange: true });
 
   const [productDataList, setProductDataList] = React.useState(null);
 
   React.useEffect(() => {
     refetch();
-  }, []);
-
-  // React.useEffect(() => {
-  //   filterByCategoryRefetch();
-  //   filterBySearchRefetch();
-  //   storesByPaymentRefetch();
-  //   storesByOpenStoreRefetch();
-  // }, [globalCategorySearch, globalSearch, gloablSearchByPayment]);
+  }, [refetch]);
 
   React.useEffect(() => {
     if (filterBySearch?.data?.length > 0) {
@@ -83,6 +76,8 @@ const Product = () => {
       setProductDataList(storesByOpenStore?.data);
     } else if (data?.data?.length > 0) {
       setProductDataList(data?.data);
+    } else {
+      setProductDataList(null);
     }
   }, [
     filterByCategory,
@@ -97,9 +92,9 @@ const Product = () => {
     <>
       <div className="grid  mm:grid-cols-2 ml:grid-cols-2 sm:grid-cols-4  md:grid-cols-4  lg:grid-cols-5  xl:grid-cols-5 2xl:grid-cols-5 3xl:grid-cols-5 gap-2 mt-1">
         {productDataList?.length > 0
-          ? productDataList?.map((item) => {
+          ? productDataList?.map((item, index) => {
               return item?.createdType === "Store" ? (
-                <ProductViewCard item={item} />
+                <ProductViewCard key={item?.id || index} item={item} />
               ) : null;
             })
           : null}

@@ -3,7 +3,7 @@ import { getCookie } from "../src/JsFiles/CommonFunction.mjs";
 // Assuming getCookie is imported correctly
 const tempRole = getCookie("role");
 export const _nav = [
-  ...(tempRole === "3"
+  ...(tempRole === "0"
     ? [
         {
           menuType: "single",
@@ -276,6 +276,17 @@ export const _nav = [
           name: "YourOrders",
           key: "YourOrders",
           link: "/YourOrders",
+          icons: <IconHome />,
+        },
+      ]
+    : []),
+  ...(tempRole === "0" || tempRole === "3"
+    ? [
+        {
+          menuType: "single",
+          name: "Billing",
+          key: "Billing",
+          link: "/Billing/List",
           icons: <IconHome />,
         },
       ]

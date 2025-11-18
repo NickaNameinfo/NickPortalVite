@@ -152,7 +152,7 @@ const AddStore = () => {
       className="w-full flex justify-center"
     >
       <div className="w-5/6">
-        <div className="flex items-center justify-between border-b pb-3 mt-2  mb-4">
+        {String(currentUserRole) === "0" ? <div className="flex items-center justify-between border-b pb-3 mt-2  mb-4">
           <Chip
             size="lg"
             classNames={{
@@ -175,7 +175,7 @@ const AddStore = () => {
               {loading ? "...Updating" : id ? "Update" : "Create"}
             </Button>
           </div>
-        </div>
+        </div> : null}
         <div className="grid grid-cols-2 gap-4 mb-2">
           <Controller
             name="storename" // Changed to reflect a text input
@@ -192,7 +192,7 @@ const AddStore = () => {
               />
             )}
           />
-          {currentUserRole === "0" && (
+          {String(currentUserRole) === "0" && (
             <Controller
               name="status" // Changed to reflect a text input
               control={control}

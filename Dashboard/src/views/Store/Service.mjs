@@ -49,7 +49,7 @@ export const StoreApi = createApi({
     }),
     getStoresProductByID: builder.query({
       query: (id) => ({
-        url: `/store/product/getAllProductById/${id}`,
+        url: `/store/product/admin/getAllProductById/${id}`,
         method: "GET",
       }),
     }),

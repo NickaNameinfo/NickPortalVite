@@ -19,7 +19,10 @@ export const StoreApi = createApi({
     }),
     getStores: builder.query({
       query: (id) => ({
-        url: `/store/list?currentLocation=${localStorage.getItem('latitude') + ',' + localStorage.getItem('longitude')}`,
+        url: `/store/list`,
+        params: {
+          currentLocation: localStorage.getItem('latitude') + ',' + localStorage.getItem('longitude')
+        },
         method: "GET",
       }),
     }),
@@ -32,7 +35,10 @@ export const StoreApi = createApi({
     }),
     getStoresById: builder.query({
       query: (id) => ({
-        url: `/store/list/${id}?currentLocation=${localStorage.getItem('latitude') + ',' + localStorage.getItem('longitude')}`,
+        url: `/store/list/${id}`,
+        params: {
+          currentLocation: localStorage.getItem('latitude') + ',' + localStorage.getItem('longitude')
+        },
         method: "GET",
       }),
     }),
@@ -98,25 +104,40 @@ export const StoreApi = createApi({
     }),
     getStoresByCategory: builder.query({
       query: (id) => ({
-        url: `/store/filterByCategory?categoryIds=${id}`,
+        url: `/store/filterByCategory`,
+        params: {
+          categoryIds: id,
+          currentLocation: localStorage.getItem('latitude') + ',' + localStorage.getItem('longitude')
+        },
         method: "GET",
       }),
     }),
     getStoresByFilters: builder.query({
       query: (query) => ({
-        url: `/store/getAllStoresByFilters?search=${query}`,
+        url: `/store/getAllStoresByFilters`,
+        params: {
+          search: query,
+          currentLocation: localStorage.getItem('latitude') + ',' + localStorage.getItem('longitude')
+        },
         method: "GET",
       }),
     }),
     getStoresByPaymentType: builder.query({
       query: (query) => ({
-        url: `/store/getAllStoresByFilters?paymentModes=${query}`,
+        url: `/store/getAllStoresByFilters`,
+        params: {
+          paymentModes: query,
+          currentLocation: localStorage.getItem('latitude') + ',' + localStorage.getItem('longitude')
+        },
         method: "GET",
       }),
     }),
     getStoresByOpenStore: builder.query({
       query: (query) => ({
         url: `/store/getOpenStores`,
+        params: {
+          currentLocation: localStorage.getItem('latitude') + ',' + localStorage.getItem('longitude')
+        },
         method: "GET",
       }),
     }),

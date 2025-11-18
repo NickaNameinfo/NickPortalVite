@@ -31,6 +31,9 @@ const Subscriptions = React.lazy(
 );
 const Dashboard = React.lazy(() => import("../src/views/Dashboard/index"));
 const YourOrders = React.lazy(() => import("../src/views/Orders/index"));
+const AddBill = React.lazy(() => import("../src/views/Billing/AddBill"));
+const BillsList = React.lazy(() => import("../src/views/Billing/BillsList"));
+const ViewBill = React.lazy(() => import("../src/views/Billing/ViewBill"));
 
 const routes = [
   { path: "/", exact: false, name: "Home" },
@@ -64,6 +67,9 @@ const routes = [
   },
   { path: "/Subscriptions", name: "Subscriptions", element: Subscriptions },
   { path: "/YourOrders", name: "YourOrders", element: YourOrders },
+  { path: "/Billing/Add", name: "AddBill", element: AddBill },
+  { path: "/Billing/List", name: "BillsList", element: BillsList },
+  { path: "/Billing/View/:id", name: "ViewBill", element: ViewBill },
 ];
 
 export default routes;

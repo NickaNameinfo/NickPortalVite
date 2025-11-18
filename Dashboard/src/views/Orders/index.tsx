@@ -20,7 +20,6 @@ import {
 import { infoData } from "../../configData";
 import { useGetOrderByOrderIdQuery } from "../VendorProducts/Service.mjs";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
-import { useAppDispatch, useAppSelector } from "../../Common/hooks";
 
 const columns = [
   { name: "Product", uid: "productImage" },
@@ -38,10 +37,6 @@ const OrderCard = (props: any) => {
     error: orderListError,
     refetch: orderListRefetch,
   } = useGetOrderByOrderIdQuery(Number(userId), { skip: !userId });
-
-  // React.useEffect(() => {
-  //   orderListRefetch();
-  // }, []);
 
   const renderCell = React.useCallback((data, columnKey) => {
     switch (columnKey) {

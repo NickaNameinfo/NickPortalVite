@@ -191,6 +191,54 @@ const Subscriptions = () => {
           basePrice: 3799,
           defaultValue: 1,
         },
+        {
+          name: "Premium with Billing",
+          key: "PL1_005",
+          discription: (
+            <div>
+              <p className="text-md font-semibold mb-2">Key Features:</p>
+              <ul className="space-y-2 text-small">
+                {/* Based on the image, the features are: */}
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Offline Products</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>No Commission</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Delivery Partner</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Order Support</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Store Branding</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Orders</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Billing</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Barcode</span>
+                </li>
+              </ul>
+            </div>
+          ),
+          label: "Enter number of item",
+          price: 17,
+          basePrice: 9999,
+          defaultValue: 1,
+        },
       ],
     },
     {

@@ -32,11 +32,18 @@ interface TableProps {
   renderCell: any;
   isStatusFilter: boolean;
   refreshOrder?: boolean;
+  selectionMode?: "single" | "multiple" | "none";
+  selectedKeys?: any;
+  onSelectionChange?: (keys: any) => void;
 }
 
 export const TableList = (props: TableProps) => {
   const [filterValue, setFilterValue] = React.useState("");
-  const [selectedKeys, setSelectedKeys] = React.useState<any>(new Set([]));
+  const [internalSelectedKeys, setInternalSelectedKeys] = React.useState<any>(new Set([]));
+  
+  const selectedKeys = props.selectedKeys || internalSelectedKeys;
+  const setSelectedKeys = props.onSelectionChange || setInternalSelectedKeys;
+
   const [visibleColumns, setVisibleColumns] = React.useState<any>(
     new Set(props.defaultCloumns)
   );
@@ -308,7 +315,7 @@ export const TableList = (props: TableProps) => {
         wrapper: "min-h-[382px] min-w-full min-w-unit-6",
       }}
       selectedKeys={selectedKeys}
-      // selectionMode="multiple"
+      selectionMode={props.selectionMode}
       sortDescriptor={sortDescriptor}
       topContent={topContent}
       topContentPlacement="outside"

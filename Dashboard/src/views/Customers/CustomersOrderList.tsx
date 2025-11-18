@@ -38,6 +38,7 @@ const CustomersOrderList = () => {
     formState: { errors },
   } = useForm();
   let tempFormData = watch();
+  const nativegate = useNavigate();
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const vendorId = getCookie("vendorId");
   const storeId = getCookie("storeId");
@@ -62,8 +63,10 @@ const CustomersOrderList = () => {
   ]);
   const defaultCloumns = [
     "custId",
+    "storeId",
     "paymentmethod",
     "deliverydate",
+    "deliveryAddress",
     "grandtotal",
     "status",
     "productIds",
@@ -72,11 +75,20 @@ const CustomersOrderList = () => {
   ];
 
 
+  const paymentOption = {
+    1: "Online payment",
+    2: "Pre Order",
+    3: "Cash on Delivery",
+    4: "Delivery in future"
+  }
+
   const columns = [
     { name: "S.No", id: "id", sortable: true },
-    { name: "custId", id: "custId", sortable: true },
+    ...(Number(currentRole) === 0 ? [{ name: "custId", id: "custId", sortable: true },
+    { name: "storeId", id: "storeId" }] : []),
     { name: "paymentmethod", id: "paymentmethod", sortable: true },
     { name: "deliverydate", id: "deliverydate" },
+    { name: "deliveryAddress", id: "deliveryAddress" },
     { name: "grandtotal", id: "grandtotal" },
     { name: "status", id: "status" },
     { name: "productIds", id: "productIds" },
@@ -102,6 +114,63 @@ const CustomersOrderList = () => {
           >
             {user.email}
           </User>
+        );
+      case "paymentmethod":
+        return (
+          <p>{paymentOption[user.paymentmethod]}</p>
+        );
+      case "deliveryAddress":
+        // Get the deliveryAddress string
+        const fullAddressString = user.deliveryAddress;
+        // Split the string by comma and trim whitespace from each part
+        const parts = fullAddressString.split(',').map(part => part.trim());
+        const addressParts = [
+          parts[0],       // e.g., '26'
+          parts[1],       // e.g., 'Arul'
+          parts[6],       // e.g., 'chennai'
+          parts[7],       // e.g., 'chennai'
+        ];
+
+        // Join the selected address parts into a clean address string
+        const address = addressParts.filter(Boolean).join(', ');
+
+        // The date is the 11th element (index 10): 2025-11-06T14:40:03.000Z
+        const dateString = parts[10];
+
+        // Format the date to a more readable, date-only format
+        let deliveryDate = '';
+        if (dateString) {
+          try {
+            // Create a Date object
+            const dateObject = new Date(dateString);
+            // Format it as YYYY-MM-DD (or use 'en-US' for MM/DD/YYYY if preferred)
+            deliveryDate = dateObject.toLocaleDateString('en-CA');
+            // Alternative: deliveryDate = dateObject.toDateString(); // e.g., "Wed Nov 06 2025"
+          } catch (e) {
+            console.error("Error formatting date:", e);
+            deliveryDate = 'Invalid Date';
+          }
+        }
+
+        return (
+          <p>
+            <span className="text-primary">Address: </span>{address}
+            <br />
+            <span className="text-danger">Date:</span> {deliveryDate}
+          </p>
+        );
+      case "productIds":
+        return (
+          <Chip
+            key={user.productIds}
+            size="sm"
+            color="primary"
+            variant="flat"
+            className="cursor-pointer"
+            onClick={() => nativegate(`/AddProducts/${user.productIds}`)}
+          >
+            {user.productIds}
+          </Chip>
         );
       case "status":
         return (
@@ -163,7 +232,7 @@ const CustomersOrderList = () => {
           renderCell={renderCell}
           columns={columns}
           tableItems={
-            currentRole === 0
+            Number(currentRole) === 0
               ? data?.["data"]
               : storeOrder?.["data"]?.filter((item) => !item?.customization)
           }
@@ -171,7 +240,7 @@ const CustomersOrderList = () => {
           refreshOrder={refreshOrder}
         />
       ) : (
-        "Loading...232"
+        "Loading..."
       )}
       <Modal
         isOpen={isOpen}
