@@ -32,8 +32,8 @@ export const BillingApi = createApi({
       }),
     }),
     getBills: builder.query({
-      query: () => ({
-        url: `/billing/getAll`,
+      query: (id) => ({
+        url: `/billing/getByStoreId/${id}`,
         method: "GET",
       }),
     }),

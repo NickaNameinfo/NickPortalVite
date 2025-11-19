@@ -83,6 +83,7 @@ export const BuyCard = (props: any) => {
           ? Number(product?.qty) + 1
           : Number(product?.qty) - 1
         : 1,
+      newUnitSize: product?.newUnitSize,
       photo: props?.item?.product?.photo,
     };
     try {

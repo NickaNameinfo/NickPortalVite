@@ -68,6 +68,7 @@ export const PremiumCard = ({ item = null }) => {
       total: Number(data?.data?.qty) * Number(item?.price),
       qty: !value || value === 0 ? 0 : value,
       photo: item?.product?.photo,
+      unitSize: item?.product?.unitSize,
     };
     if (!value || value === 0) {
       onDeleteCartItems(item?.product?.id);

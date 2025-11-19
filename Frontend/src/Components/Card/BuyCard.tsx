@@ -39,7 +39,8 @@ import {
   useGetAddressesByCustIdQuery,
   useAddAddressMutation,
   useAddPyamentMutation,
-  useAddOrderlistMutation
+  useAddOrderlistMutation,
+  useUpdateProductMutation
 } from "../../views/pages/Store/Service.mjs";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import withReactContent from "sweetalert2-react-content";
@@ -72,6 +73,7 @@ export const BuyCard = (props: any) => {
   const [addOrder] = useAddOrderMutation();
   const [addPayment] = useAddPyamentMutation();
   const [addOrderlist] = useAddOrderlistMutation();
+  const [updateProduct] = useUpdateProductMutation();
   const [deletId, setDeleteId] = React.useState(null);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -228,6 +230,10 @@ export const BuyCard = (props: any) => {
             productIds: item?.productId, // Individual item ID
             qty: item?.qty, // Individual item quantity
           };
+          updateProduct({
+            id: item?.productId,
+            unitSize: String(Number(item?.unitSize) - Number(item?.qty)),
+          }).unwrap();
           // Create the individual order record
           await addOrder(itemApiParams);
 

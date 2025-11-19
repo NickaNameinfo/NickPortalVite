@@ -21,9 +21,6 @@ export const RelatedProducts = ({
   lineHeight = 8,
 }) => {
   const dispatch = useAppDispatch();
-
-  console.log(item, "item42")
-
   return (
     <>
       <Card

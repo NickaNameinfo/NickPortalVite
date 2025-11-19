@@ -20,6 +20,7 @@ import {
 import React from "react";
 import { useAddBillMutation } from "./Service.mjs";
 import { useGetStoresProductByIDQuery } from "../Store/Service.mjs";
+import { useUpdateProductMutation } from "../Products/Service.mjs";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import InputNextUI from "../../Components/Common/Input/input";
 import TeaxtareaNextUI from "../../Components/Common/Input/Textarea";
@@ -49,6 +50,7 @@ const AddBill = () => {
 
   const navigate = useNavigate();
   const [addBill, { isLoading: isSubmitting }] = useAddBillMutation();
+  const [updateProduct] = useUpdateProductMutation();
   const [selectedProducts, setSelectedProducts] = React.useState<
     SelectedProduct[]
   >([]);
@@ -59,7 +61,7 @@ const AddBill = () => {
   const {
     data: productsData,
     refetch: refetchProducts,
-  } = useGetStoresProductByIDQuery(Number(storeId), { skip: !storeId , refetchOnMountOrArgChange: true});
+  } = useGetStoresProductByIDQuery(Number(storeId), { skip: !storeId, refetchOnMountOrArgChange: true });
 
   const products = productsData?.data || [];
 
@@ -161,7 +163,50 @@ const AddBill = () => {
 
     try {
       const result = await addBill(billData).unwrap();
-      alert("Bill created successfully!");
+
+      // Update product unitSize (stock) for each product in the bill
+      const updatePromises = selectedProducts.map(async (selectedProduct) => {
+        try {
+          // Find the original product data
+          const storeProduct = products.find((p: any) => p.id === selectedProduct.id);
+          if (!storeProduct || !storeProduct.product) {
+            console.warn(`Product ${selectedProduct.id} not found in products list`);
+            return;
+          }
+          const product = storeProduct.product;
+          // Get current unitSize from storeProduct (store-specific stock) or product (global stock)
+          const currentUnitSize = Number(product.unitSize) || 0;
+          const quantityUsed = selectedProduct.quantity;
+
+          const newUnitSize = (Number(currentUnitSize) - Number(quantityUsed));
+          // Update the product with new unitSize
+          const updateData = {
+            id: product.id, 
+            unitSize: String(newUnitSize),
+          };
+
+          await updateProduct(updateData).unwrap();
+        } catch (updateError: any) {
+          throw updateError; // Re-throw to handle in Promise.allSettled
+        }
+      });
+
+      // Wait for all updates to complete (even if some fail)
+      const updateResults = await Promise.allSettled(updatePromises);
+      const failedUpdates = updateResults.filter(result => result.status === 'rejected').length;
+
+      if (failedUpdates > 0) {
+        console.warn(`${failedUpdates} product(s) failed to update stock`);
+      }
+
+      // Refetch products to reflect updated stock
+      refetchProducts();
+
+      alert(
+        failedUpdates === 0
+          ? "Bill created successfully and product stock updated!"
+          : `Bill created successfully! ${selectedProducts.length - failedUpdates} product(s) stock updated. ${failedUpdates} product(s) failed to update.`
+      );
       reset();
       setSelectedProducts([]);
       navigate("/Billing/List");
@@ -210,9 +255,9 @@ const AddBill = () => {
                       {products.map((storeProduct: any) => {
                         const product = storeProduct.product;
                         if (!product) return null;
-                        
+
                         const displayPrice = storeProduct.price || product.total || product.price || 0;
-                        
+
                         return (
                           <AutocompleteItem
                             key={storeProduct.id}

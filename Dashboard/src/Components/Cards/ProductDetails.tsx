@@ -114,6 +114,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
           ? Number(cart?.data?.qty) + 1
           : Number(cart?.data?.qty) - 1
         : 1,
+      unitSize: props?.item?.product?.unitSize,
       photo: props?.item?.product?.photo
         ? props?.item?.product?.photo
         : props?.item?.photo,

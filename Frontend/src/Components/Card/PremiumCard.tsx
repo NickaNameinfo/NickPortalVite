@@ -79,6 +79,7 @@ export const PremiumCard = ({
           ? Number(data?.data?.qty) + 1
           : Number(data?.data?.qty) - 1
         : 1,
+      unitSize: productItem?.unitSize,
       photo: productItem?.photo ? productItem?.photo : item?.photo,
       storeId: id,
     };

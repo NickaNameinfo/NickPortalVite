@@ -10,10 +10,11 @@ import React from "react";
 import { TableList } from "../../Components/Table/TableList";
 import { useGetBillsQuery } from "./Service.mjs";
 import { useNavigate } from "react-router-dom";
+import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 
 const BillsList = () => {
   const navigate = useNavigate();
-  const { data, error, refetch } = useGetBillsQuery(undefined, {
+  const { data, error, refetch } = useGetBillsQuery(Number(getCookie("storeId")), {
     refetchOnMountOrArgChange: true,
   });
 
