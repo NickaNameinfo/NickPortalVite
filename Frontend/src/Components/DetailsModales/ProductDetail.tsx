@@ -15,6 +15,9 @@ import {
   Textarea,
   Tooltip,
   CardFooter,
+  Select,
+  SelectItem,
+  Input,
 } from "@nextui-org/react";
 import React from "react";
 import {
@@ -61,6 +64,10 @@ interface ProductDetailProps {
 export const ProductDetail = (props: ProductDetailProps) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [customization, setCustomization] = React.useState(null);
+  const [selectedSize, setSelectedSize] = React.useState<string>("");
+  const [selectedWeight, setSelectedWeight] = React.useState<string>("");
+  const [currentPrice, setCurrentPrice] = React.useState<number>(0);
+  const [sizeUnitSizeMap, setSizeUnitSizeMap] = React.useState<Record<string, { unitSize: string; qty: string; price: string; discount: string; discountPer: string; total: string; grandTotal: string }> | null>(null);
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
   const notify = (value) => toast(value);
   const MySwal = withReactContent(Swal);
@@ -91,6 +98,69 @@ export const ProductDetail = (props: ProductDetailProps) => {
   const dispatch = useAppDispatch();
   const [index, setIndex] = React.useState(-1);
 
+  // Parse sizeUnitSizeMap and set initial price
+  React.useEffect(() => {
+    const product = props?.item?.product || props?.item;
+    if (product?.sizeUnitSizeMap) {
+      try {
+        const parsed = typeof product.sizeUnitSizeMap === 'string' 
+          ? JSON.parse(product.sizeUnitSizeMap) 
+          : product.sizeUnitSizeMap;
+        setSizeUnitSizeMap(parsed);
+        
+        // Check if product is already in cart and has a size
+        const cartSize = cart?.data?.size;
+        let sizeToSelect = cartSize;
+        
+        // If no size in cart, use first size as default
+        if (!sizeToSelect || !parsed[sizeToSelect]) {
+          sizeToSelect = Object.keys(parsed)[0];
+        }
+        
+        if (sizeToSelect && parsed[sizeToSelect]) {
+          setSelectedSize(sizeToSelect);
+          const sizeData = parsed[sizeToSelect];
+          const sizePrice = Number(sizeData.price) || Number(sizeData.total) || Number(sizeData.grandTotal) || 0;
+          if (sizePrice > 0) {
+            setCurrentPrice(sizePrice);
+          } else {
+            const initialPrice = props?.item?.price || product?.total || product?.price || 0;
+            setCurrentPrice(Number(initialPrice));
+          }
+        } else {
+          // Set initial price if no sizes available
+          const initialPrice = props?.item?.price || product?.total || product?.price || 0;
+          setCurrentPrice(Number(initialPrice));
+        }
+      } catch (e) {
+        console.warn('Failed to parse sizeUnitSizeMap:', e);
+        setSizeUnitSizeMap(null);
+        const initialPrice = props?.item?.price || product?.total || product?.price || 0;
+        setCurrentPrice(Number(initialPrice));
+      }
+    } else {
+      // Set initial price if no sizeUnitSizeMap
+      const initialPrice = props?.item?.price || product?.total || product?.price || 0;
+      setCurrentPrice(Number(initialPrice));
+    }
+  }, [props?.item, cart?.data?.size]);
+
+  // Update price when size changes
+  React.useEffect(() => {
+    if (selectedSize && sizeUnitSizeMap && sizeUnitSizeMap[selectedSize]) {
+      const sizeData = sizeUnitSizeMap[selectedSize];
+      const sizePrice = Number(sizeData.price) || Number(sizeData.total) || Number(sizeData.grandTotal) || 0;
+      if (sizePrice > 0) {
+        setCurrentPrice(sizePrice);
+      }
+    } else if (!selectedSize) {
+      // Reset to original price when size is cleared
+      const product = props?.item?.product || props?.item;
+      const originalPrice = props?.item?.price || product?.total || product?.price || 0;
+      setCurrentPrice(Number(originalPrice));
+    }
+  }, [selectedSize, sizeUnitSizeMap, props?.item]);
+
   // React.useEffect(() => {
   //   onRefresh && dispatch(onRefreshCart(false));
   //   refetch();
@@ -98,6 +168,9 @@ export const ProductDetail = (props: ProductDetailProps) => {
   // }, [onRefresh]);
 
   const handleAddCart = async (type) => {
+    // Use current price (which may be updated based on size selection)
+    const priceToUse = currentPrice > 0 ? currentPrice : (Number(props?.item?.price) || Number(props?.item?.product?.total) || Number(props?.item?.product?.price) || 0);
+    
     let tempCartValue = {
       productId: props?.item?.product?.id
         ? props?.item?.product?.id
@@ -106,8 +179,8 @@ export const ProductDetail = (props: ProductDetailProps) => {
         ? props?.item?.product?.name
         : props?.item?.name,
       orderId: userId,
-      price: Number(props?.item?.price),
-      total: Number(cart?.data?.qty) * Number(props?.item?.price),
+      price: priceToUse,
+      total: Number(cart?.data?.qty || 1) * priceToUse,
       qty: cart?.data?.qty
         ? type === "add"
           ? Number(cart?.data?.qty) + 1
@@ -117,6 +190,8 @@ export const ProductDetail = (props: ProductDetailProps) => {
       photo: props?.item?.product?.photo
         ? props?.item?.product?.photo
         : props?.item?.photo,
+      size: selectedSize || "",
+      weight: selectedWeight || "",
     };
     if (cart?.data) {
       try {
@@ -250,7 +325,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                       </p>
                       <div className="flex justify-between items-center">
                         <p className="text-black text-lg font-normal">
-                          Rs: {props?.item?.product?.total}{" "}
+                          Rs: {currentPrice > 0 ? currentPrice : (props?.item?.product?.total || props?.item?.price || 0)}{" "}
                           <span style={{ color: "black", fontSize: "10px" }}>
                             ({props?.item?.product?.qty ? props?.item?.product?.qty : props?.item?.product?.unitSize})
                           </span>
@@ -262,11 +337,48 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               paddingLeft: "10px",
                             }}
                           >
-                            {props?.item?.product?.unitSize ? props?.item?.product?.unitSize : props?.item?.product?.qty}
+                            {selectedSize && sizeUnitSizeMap && sizeUnitSizeMap[selectedSize] 
+                              ? sizeUnitSizeMap[selectedSize].unitSize 
+                              : (props?.item?.product?.unitSize ? props?.item?.product?.unitSize : props?.item?.product?.qty)}
                           </small>{" "}
                           Stocks
                         </div>
                       </div>
+                      {/* Size Selection - Box Style */}
+                      {sizeUnitSizeMap && Object.keys(sizeUnitSizeMap).length > 0 && (
+                        <div className="mt-3">
+                          <div className="mb-2">
+                            <span className="text-gray-600 text-sm">Size: </span>
+                            <span className="font-semibold text-black text-sm">
+                              {selectedSize ? selectedSize.toUpperCase() : "Select"}
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {Object.keys(sizeUnitSizeMap).map((size) => {
+                              const sizeData = sizeUnitSizeMap[size];
+                              const isSelected = selectedSize === size;
+                              const unitSize = sizeData.unitSize || "";
+                              
+                              return (
+                                <button
+                                  key={size}
+                                  onClick={() => setSelectedSize(size)}
+                                  className={`
+                                    px-4 py-2 rounded border-2 transition-all text-sm
+                                    ${isSelected 
+                                      ? 'border-blue-600 bg-blue-50 text-black font-medium' 
+                                      : 'border-dashed border-gray-300 bg-white text-black hover:border-gray-400'
+                                    }
+                                    min-w-[80px] text-center
+                                  `}
+                                >
+                                  {unitSize ? `${size.toUpperCase()}: ${unitSize}` : size.toUpperCase()}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                       {(Number(props?.item?.product?.isEnableEcommerce) === 1 ||
                         Number(props?.item?.isEnableEcommerce) === 1) && (
                           <div className="flex items-center justify-between mt-2">

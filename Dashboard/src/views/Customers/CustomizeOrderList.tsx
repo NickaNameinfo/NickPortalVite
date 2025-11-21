@@ -47,8 +47,8 @@ const CustomizeOrderList = () => {
     data: storeOrder,
     error: storeOrderError,
     refetch: storeOrderRefetch,
-  } = useGetAllOrderListByStoreQuery(ids, { skip: !ids });
-  const { data, error, refetch } = useGetAllOrderListQuery({ refetchOnMountOrArgChange: true, skip: ids });
+  } = useGetAllOrderListByStoreQuery(ids, { skip: !ids, refetchOnMountOrArgChange: false });
+  const { data, error, refetch } = useGetAllOrderListQuery({ skip: ids, refetchOnMountOrArgChange: false });
   const [updateOrder] = useUpdatOrderMutation();
 
   const [selectedId, setSelectedId] = React.useState(null);
@@ -66,6 +66,7 @@ const CustomizeOrderList = () => {
     "status",
     "productIds",
     "qty",
+    "size",
     "customization",
     "actions",
   ];
@@ -79,6 +80,7 @@ const CustomizeOrderList = () => {
     { name: "status", id: "status" },
     { name: "productIds", id: "productIds" },
     { name: "qty", id: "qty" },
+    { name: "size", id: "size" },
     { name: "customization", id: "customization" },
     { name: "Actions", id: "actions" },
   ];
@@ -150,21 +152,29 @@ const CustomizeOrderList = () => {
     const result = await updateOrder(tempApiParams).unwrap();
     if (result?.success) {
       onClose();
+      reset();
+      // Refetch only the relevant query based on role
+      if (currentRole === 0) {
+        refetch();
+      } else {
+        storeOrderRefetch();
+      }
     }
   };
 
+  // Determine which data to use based on role
+  const orderData = currentRole === 0 
+    ? data?.["data"]?.filter((item) => item?.customization)
+    : storeOrder?.["data"]?.filter((item) => item?.customization);
+
   return (
     <div className="mx-2">
-      {data && (
+      {orderData && (
         <TableList
           defaultCloumns={defaultCloumns}
           renderCell={renderCell}
           columns={columns}
-          tableItems={
-            currentRole === 0
-              ? data?.["data"]?.filter((item) => item?.customization)
-              : storeOrder?.["data"]?.filter((item) => item?.customization)
-          }
+          tableItems={orderData}
           isStatusFilter={false}
         />
       )}

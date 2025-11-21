@@ -58,16 +58,12 @@ export const RelatedProducts = ({
                 Online Order Not Available
               </span>
             </div>
-
-          </CardBody>
-        )}
-        <CardFooter className="p-0">
-          <div className="grid grid-cols-1 w-full">
             <div className="font-semibold mt-3 text-sm  TextMaincolor justify-start flex">
               <p>
                 {item?.product?.name ? item?.product?.name : item?.name}
               </p>
             </div>
+
             <div className="font-normal text-sm Pricecolor overflow-hidden text-ellipsis"
               style={{
                 display: '-webkit-box',
@@ -76,6 +72,11 @@ export const RelatedProducts = ({
               }}>
               {item?.product?.sortDesc ? item?.product?.sortDesc : item?.sortDesc}
             </div>
+          </CardBody>
+        )}
+        <CardFooter className="p-0">
+          <div className="grid grid-cols-1 w-full">
+            
             <div className="w-full flex justify-between mt-3 mb-3">
               <p className="font-normal text-sm  Pricecolor">
                 {item?.quantity ? item?.quantity : item?.unitSize}

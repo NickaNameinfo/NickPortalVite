@@ -17,6 +17,12 @@ import {
   RadioGroup,
   Select,
   SelectItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
   User,
 } from "@nextui-org/react";
 import React, { createContext } from "react";
@@ -51,13 +57,22 @@ const AddProducts = () => {
   const currentVendorUserId = getCookie("vendorId");
   const navigate = useNavigate();
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = React.useState(false);
+  const [enableSizeManagement, setEnableSizeManagement] = React.useState<boolean>(false);
+  const [sizeUnitSizeMap, setSizeUnitSizeMap] = React.useState<Record<string, { unitSize: string; qty: string; price: string; discount: string; discountPer: string; total: string; grandTotal: string }>>({});
+  const [sizeEntries, setSizeEntries] = React.useState<Array<{ size: string; unitSize: string; qty: string; price: string; discount: string; discountPer: string; total: string; grandTotal: string; id: string }>>([]);
+  const [newSize, setNewSize] = React.useState<string>("");
+  const [newUnitSize, setNewUnitSize] = React.useState<string>("");
+  const [newPrice, setNewPrice] = React.useState<string>("");
+  const [newDiscount, setNewDiscount] = React.useState<string>("");
   const [addProducts] = useAddProductMutation();
   const [addStoreProducts] = useAddStoreProductMutation();
   const [addVendorProducts] = useAddVendorProductMutation();
   const [updateProducts] = useUpdateProductMutation();
   const [uploadfile] = useUploadFileMutation();
   const { productId } = useParams();
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   let tempFormData = watch();
+
   const {
     data: categoryData,
     error: categoryerror,
@@ -68,16 +83,16 @@ const AddProducts = () => {
     ? currentStoreUserId
     : currentVendorUserId;
 
-  let sellingProductValues = {
-    id: currentUserId,
-    subscriptionType: "Plan0",
-  };
+  // let sellingProductValues = {
+  //   id: currentUserId,
+  //   subscriptionType: "Plan0",
+  // };
 
-  const {
-    data: sellingProductValuesData,
-    error: sellingProductValuesError,
-    refetch: sellingProductValuesRefetch,
-  } = useGetSubcriptionByCustomerIDQuery(sellingProductValues, { skip: !currentUserId });
+  // const {
+  //   data: sellingProductValuesData,
+  //   error: sellingProductValuesError,
+  //   refetch: sellingProductValuesRefetch,
+  // } = useGetSubcriptionByCustomerIDQuery(sellingProductValues, { skip: !currentUserId });
 
   let tempEcommereceValues = {
     id: currentUserId,
@@ -87,7 +102,7 @@ const AddProducts = () => {
     data: ecommereceSubcriptionData,
     error,
     refetch,
-  } = useGetSubcriptionByCustomerIDQuery(tempEcommereceValues, { skip: !currentUserId });
+  } = useGetSubcriptionByCustomerIDQuery(tempEcommereceValues, { skip: !currentUserId, refetchOnMountOrArgChange: true });
 
   let isBookingValues = {
     id: currentUserId,
@@ -98,7 +113,7 @@ const AddProducts = () => {
     data: isBooking,
     error: isBookingError,
     refetch: isBookingRefetch,
-  } = useGetSubcriptionByCustomerIDQuery(isBookingValues, { skip: !currentUserId });
+  } = useGetSubcriptionByCustomerIDQuery(isBookingValues, { skip: !currentUserId, refetchOnMountOrArgChange: true });
 
   let temCustomizeValues = {
     id: currentUserId,
@@ -109,25 +124,25 @@ const AddProducts = () => {
     data: customizeSubcriptionData,
     error: customizeError,
     refetch: customizeRefetch,
-  } = useGetSubcriptionByCustomerIDQuery(temCustomizeValues, { skip: !currentUserId });
+  } = useGetSubcriptionByCustomerIDQuery(temCustomizeValues, { skip: !currentUserId, refetchOnMountOrArgChange: true });
 
   const {
     data: vendorProducts,
     error: vendorError,
     refetch: vendorRefetch,
-  } = useGetVendorsProductByIdQuery(Number(currentVendorUserId), { skip: !currentVendorUserId });
+  } = useGetVendorsProductByIdQuery(Number(currentVendorUserId), { skip: !currentVendorUserId, refetchOnMountOrArgChange: true });
 
   const {
     data: storeProducts,
     error: storeError,
     refetch: stroeRefetch,
-  } = useGetStoresProductByIDQuery(Number(currentStoreUserId), { skip: !currentStoreUserId });
+  } = useGetStoresProductByIDQuery(Number(currentStoreUserId), { skip: !currentStoreUserId, refetchOnMountOrArgChange: true });
 
   const {
     data: productData,
     error: productError,
     refetch: productRefetch,
-  } = useGetProductsByIdQuery(productId, { skip: !productId });
+  } = useGetProductsByIdQuery(productId, { skip: !productId, refetchOnMountOrArgChange: true });
 
   React.useEffect(() => {
     setValue("paymentMode", ["1", "2", "3"]);
@@ -152,7 +167,16 @@ const AddProducts = () => {
         isEnableCustomize: false,
         isEnableEcommerce: false,
         serviceType: "Product",
+        size: "",
+        weight: "",
+        unitSize: "",
       });
+      // Reset size entries when creating new product
+      setSizeEntries([]);
+      setSizeUnitSizeMap({});
+      setNewSize("");
+      setNewUnitSize("");
+      setNewPrice("");
     }
 
   }, [productId, reset]);
@@ -167,21 +191,74 @@ const AddProducts = () => {
       setValue("isEnableEcommerce", productData?.data?.isEnableEcommerce);
       setValue("serviceType", productData?.data?.serviceType);
       setValue("categoryId", productData?.data?.categoryId);
+      setValue("size", productData?.data?.size || "");
+      setValue("weight", productData?.data?.weight || "");
+      setValue("unitSize", productData?.data?.unitSize || "");
+      // Check if size management is enabled (has sizeUnitSizeMap with multiple entries)
+      if (productData?.data?.sizeUnitSizeMap) {
+        try {
+          const parsed = typeof productData.data.sizeUnitSizeMap === 'string'
+            ? JSON.parse(productData.data.sizeUnitSizeMap)
+            : productData.data.sizeUnitSizeMap;
+          const entriesCount = Object.keys(parsed || {}).length;
+          setEnableSizeManagement(entriesCount > 0);
+          setSizeUnitSizeMap(parsed || {});
+          // Convert map to array of entries
+          const entries = Object.entries(parsed || {}).map(([size, data], index) => {
+            let entryData: { unitSize?: string; qty?: string; price?: string; discount?: string; discountPer?: string; total?: string; grandTotal?: string };
+            if (typeof data === 'object' && data !== null && 'unitSize' in data) {
+              entryData = data as { unitSize: string; qty?: string; price: string; discount?: string; discountPer?: string; total?: string; grandTotal?: string };
+            } else {
+              entryData = { unitSize: String(data || ''), qty: String(data || ''), price: '', discount: '', discountPer: '', total: '', grandTotal: '' };
+            }
+            // Calculate values if not present
+            const price = Number(entryData.price || 0);
+            const discount = Number(entryData.discount || 0);
+            const discountAmount = (price * discount) / 100;
+            const discountedPrice = price - discountAmount;
+            const qty = Number(entryData.qty || entryData.unitSize || 0);
+            const total = discountedPrice * qty;
+
+            return {
+              size,
+              unitSize: String(entryData.unitSize || ''),
+              qty: String(entryData.qty || entryData.unitSize || ''),
+              price: String(entryData.price || ''),
+              discount: String(entryData.discount || '0'),
+              discountPer: String(entryData.discountPer || discountAmount.toFixed(2)),
+              total: String(entryData.total || total.toFixed(2)),
+              grandTotal: String(entryData.grandTotal || total.toFixed(2)),
+              id: `size-${index}-${Date.now()}`
+            };
+          });
+          setSizeEntries(entries);
+        } catch (e) {
+          setSizeUnitSizeMap({});
+          setSizeEntries([]);
+          setEnableSizeManagement(false);
+        }
+      } else {
+        setEnableSizeManagement(false);
+        setSizeEntries([]);
+      }
     }
   }, [productData]);
 
   React.useEffect(() => {
-    const discountAmount = (tempFormData?.price * tempFormData?.discount) / 100;
-    const discountedPrice = tempFormData?.price - discountAmount;
-    if (tempFormData.serviceType === "Product") {
-      setValue("grand_total", Number(discountedPrice * tempFormData?.qty));
-      setValue("total", Number(discountedPrice * tempFormData?.qty));
-    } else {
-      setValue("grand_total", Number(discountedPrice * 1));
-      setValue("total", Number(discountedPrice * 1));
+    // Only calculate if size management is NOT enabled
+    if (!enableSizeManagement) {
+      const discountAmount = (tempFormData?.price * tempFormData?.discount) / 100;
+      const discountedPrice = tempFormData?.price - discountAmount;
+      if (tempFormData.serviceType === "Product") {
+        setValue("grand_total", Number(discountedPrice * tempFormData?.qty));
+        setValue("total", Number(discountedPrice * tempFormData?.qty));
+      } else {
+        setValue("grand_total", Number(discountedPrice * 1));
+        setValue("total", Number(discountedPrice * 1));
+      }
+      setValue("discountPer", Number(discountAmount));
     }
-    setValue("discountPer", Number(discountAmount));
-  }, [tempFormData?.price, tempFormData?.discount, tempFormData?.qty, tempFormData?.serviceType]);
+  }, [tempFormData?.price, tempFormData?.discount, tempFormData?.qty, tempFormData?.serviceType, enableSizeManagement, setValue]);
 
   let productListValues =
     vendorProducts?.data?.length > 0
@@ -194,9 +271,10 @@ const AddProducts = () => {
   const filteredCustomizeData = productListValues?.filter(
     (item) => item.product.isEnableCustomize === 1
   );
-  const productAddCount = sellingProductValuesData?.data?.subscriptionCount + sellingProductValuesData?.data?.freeCount
+  // const productAddCount = sellingProductValuesData?.data?.subscriptionCount + sellingProductValuesData?.data?.freeCount
 
   const onSubmit = async (data: any) => {
+    setIsLoading(true);
     const formData = new FormData();
     // if ( productAddCount <= productListValues?.length && !productId) {
     //   setIsSubscriptionModalOpen(true)
@@ -214,6 +292,22 @@ const AddProducts = () => {
     }
     let fileResult = await uploadfile(formData);
     if (!fileResult?.data?.success && !productId) return;
+    // Calculate total unitSize from all size entries if size management is enabled, or use default unitSize
+    let unitSizeForSize: string;
+    let defaultPrice: string;
+
+    if (enableSizeManagement && sizeEntries.length > 0) {
+      const totalUnitSize = sizeEntries.reduce((sum, entry) => {
+        return sum + (Number(entry.unitSize) || 0);
+      }, 0);
+      unitSizeForSize = totalUnitSize > 0 ? String(totalUnitSize) : (tempFormData?.unitSize || "");
+      defaultPrice = sizeEntries[0].price || (tempFormData?.price || "");
+    } else {
+      // Use existing single fields
+      unitSizeForSize = tempFormData?.unitSize || "";
+      defaultPrice = tempFormData?.price || "";
+    }
+
     let apiParams = {
       ...data,
       subCategoryId: 3,
@@ -227,16 +321,23 @@ const AddProducts = () => {
       isBooking: Number(isBooking?.data?.isBooking) ? "1" : "0",
       photo: fileResult?.data?.fileUrl,
       serviceType: tempFormData?.serviceType || "Product",
+      unitSize: unitSizeForSize,
+      qty : tempFormData?.qty || "0",
+      total : tempFormData?.total || "0",
+      price: defaultPrice || tempFormData?.price || "",
+      sizeUnitSizeMap: enableSizeManagement ? JSON.stringify(sizeUnitSizeMap) : "", // Store the size-unitSize-price mapping only if enabled
     };
     if (!productId) {
       const result = await addProducts(apiParams).unwrap();
       if (result?.success) {
+        // Use unitSize from the selected size, or fallback to qty
+        const storeUnitSize = unitSizeForSize || result.data?.qty;
         const tempStoreValueAPI = {
           supplierId: currentStoreUserId
             ? currentStoreUserId
             : currentVendorUserId,
           productId: result.data?.id,
-          unitSize: result.data?.qty,
+          unitSize: storeUnitSize,
           buyerPrice: result.data?.total,
         };
         if (currentStoreUserId) {
@@ -258,18 +359,21 @@ const AddProducts = () => {
     } else {
       setValue("id", productData?.data?.id);
       const result = await updateProducts(apiParams).unwrap();
+      // Use unitSize from the selected size, or fallback to qty
+      const storeUnitSize = unitSizeForSize || apiParams?.qty;
       const storeResult = await addStoreProducts({
         supplierId: currentStoreUserId
           ? currentStoreUserId
           : currentVendorUserId,
         productId: apiParams?.id,
-        unitSize: apiParams?.qty,
+        unitSize: storeUnitSize,
         buyerPrice: apiParams?.total,
       }).unwrap();
       if (storeResult) {
         navigate("/ProductsList");
       }
     }
+    setIsLoading(false);
   };
 
   return (
@@ -327,9 +431,11 @@ const AddProducts = () => {
               color="primary"
               type="submit"
               size="md"
+              isLoading={isLoading}
+              isDisabled={isLoading}
             // className="w-[90px]"
             >
-              {productId ? "Update Product" : "Add Product"}
+              {isLoading ? "...Updating" : productId ? "Update Product" : "Add Product"}
             </Button>
           </div>
         </div>
@@ -802,36 +908,345 @@ const AddProducts = () => {
                       />
                     )}
                   />
+                  <div className="col-span-2">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Checkbox
+                        isSelected={enableSizeManagement}
+                        onValueChange={(checked) => {
+                          setEnableSizeManagement(checked);
+                          if (!checked) {
+                            // Clear size entries when disabled
+                            setSizeEntries([]);
+                            setSizeUnitSizeMap({});
+                            setNewSize("");
+                            setNewUnitSize("");
+                            setNewPrice("");
+                            setNewDiscount("");
+                          }
+                        }}
+                      >
+                        Enable Multiple Size Management
+                      </Checkbox>
+                    </div>
+
+                    {enableSizeManagement ? (
+                      <div className="mb-4">
+                        <h4 className="text-sm font-semibold mb-2">Size, Unit Size & Price Management</h4>
+
+                        <div className="flex gap-2 mb-3">
+                          <Select
+                            label="Select Size"
+                            variant="bordered"
+                            size="sm"
+                            selectedKeys={newSize ? [newSize] : []}
+                            onSelectionChange={(keys) => {
+                              const selectedSize = Array.from(keys)[0] as string;
+                              setNewSize(selectedSize || "");
+                            }}
+                            placeholder="Select Size"
+                            className="flex-1"
+                          >
+                            <SelectItem key="xs" value="xs">XS</SelectItem>
+                            <SelectItem key="s" value="s">S</SelectItem>
+                            <SelectItem key="m" value="m">M</SelectItem>
+                            <SelectItem key="l" value="l">L</SelectItem>
+                            <SelectItem key="xl" value="xl">XL</SelectItem>
+                            <SelectItem key="xxl" value="xxl">XXL</SelectItem>
+                            <SelectItem key="xxxl" value="xxxl">XXXL</SelectItem>
+                            <SelectItem key="xxxxl" value="xxxxl">XXXXL</SelectItem>
+                          </Select>
+                          <Input
+                            type="text"
+                            label="Unit Size"
+                            value={newUnitSize}
+                            onChange={(e) => setNewUnitSize(e.target.value)}
+                            placeholder="Enter unit size"
+                            size="sm"
+                            className="flex-1"
+                          />
+                          <Input
+                            type="number"
+                            label="Price"
+                            value={newPrice}
+                            onChange={(e) => setNewPrice(e.target.value)}
+                            placeholder="Enter price"
+                            size="sm"
+                            className="flex-1"
+                            startContent={
+                              <div className="pointer-events-none flex items-center">
+                                <span className="text-default-400 text-small">₹</span>
+                              </div>
+                            }
+                          />
+                          <Button
+                            color="primary"
+                            size="lg"
+                            onClick={() => {
+                              if (newSize && newUnitSize && newPrice) {
+                                // Calculate discount values
+                                const price = Number(newPrice) || 0;
+                                const discount = Number(newDiscount) || 0;
+                                const discountAmount = (price * discount) / 100;
+                                const discountedPrice = price - discountAmount;
+                                const qty = Number(newUnitSize) || 0;
+                                const total = discountedPrice * qty;
+
+                                // Check if size already exists
+                                const existingIndex = sizeEntries.findIndex(entry => entry.size === newSize);
+                                if (existingIndex >= 0) {
+                                  // Update existing entry
+                                  const updated = [...sizeEntries];
+                                  updated[existingIndex] = {
+                                    ...updated[existingIndex],
+                                    unitSize: newUnitSize,
+                                    qty: newUnitSize, // Update quantity when unitSize changes
+                                    price: newPrice,
+                                    discount: String(discount),
+                                    discountPer: String(discountAmount.toFixed(2)),
+                                    total: String(total.toFixed(2)),
+                                    grandTotal: String(total.toFixed(2))
+                                  };
+                                  setSizeEntries(updated);
+                                } else {
+                                  // Add new entry
+                                  const newEntry = {
+                                    size: newSize,
+                                    unitSize: newUnitSize,
+                                    qty: newUnitSize, // Quantity same as unitSize initially
+                                    price: newPrice,
+                                    discount: String(discount),
+                                    discountPer: String(discountAmount.toFixed(2)),
+                                    total: String(total.toFixed(2)),
+                                    grandTotal: String(total.toFixed(2)),
+                                    id: `size-${Date.now()}-${Math.random()}`
+                                  };
+                                  setSizeEntries([...sizeEntries, newEntry]);
+                                }
+                                // Update the map
+                                setSizeUnitSizeMap(prev => ({
+                                  ...prev,
+                                  [newSize]: {
+                                    unitSize: newUnitSize,
+                                    qty: newUnitSize,
+                                    price: newPrice,
+                                    discount: String(discount),
+                                    discountPer: String(discountAmount.toFixed(2)),
+                                    total: String(total.toFixed(2)),
+                                    grandTotal: String(total.toFixed(2))
+                                  }
+                                }));
+                                // Reset inputs
+                                setNewSize("");
+                                setNewUnitSize("");
+                                setNewPrice("");
+                                setNewDiscount("");
+                              }
+                            }}
+                            isDisabled={!newSize || !newUnitSize || !newPrice}
+                          >
+                            Add
+                          </Button>
+                        </div>
+
+                        {sizeEntries.length > 0 && (
+                          <div className="mt-4 overflow-x-auto">
+                            <Table aria-label="Size entries table" removeWrapper>
+                              <TableHeader>
+                                <TableColumn>SIZE</TableColumn>
+                                <TableColumn>UNIT SIZE</TableColumn>
+                                <TableColumn>QUANTITY</TableColumn>
+                                <TableColumn>PRICE</TableColumn>
+                                <TableColumn>DISCOUNT (%)</TableColumn>
+                                <TableColumn>DISCOUNT PRICE</TableColumn>
+                                <TableColumn>TOTAL</TableColumn>
+                                <TableColumn>GRAND TOTAL</TableColumn>
+                                <TableColumn>ACTION</TableColumn>
+                              </TableHeader>
+                              <TableBody>
+                                {sizeEntries.map((entry) => {
+                                  // Recalculate on render to ensure accuracy
+                                  const price = Number(entry.price) || 0;
+                                  const discount = Number(entry.discount) || 0;
+                                  const discountAmount = (price * discount) / 100;
+                                  const discountedPrice = price - discountAmount;
+                                  const qty = Number(entry.qty || entry.unitSize) || 0;
+                                  const total = discountedPrice * qty;
+
+                                  return (
+                                    <TableRow key={entry.id}>
+                                      <TableCell>
+                                        <Chip variant="flat" color="primary">
+                                          {entry.size.toUpperCase()}
+                                        </Chip>
+                                      </TableCell>
+                                      <TableCell>
+                                        <Input
+                                          type="number"
+                                          value={entry.unitSize}
+                                          onChange={(e) => {
+                                            const newUnitSize = e.target.value;
+                                            const updated = sizeEntries.map(e =>
+                                              e.id === entry.id
+                                                ? { ...e, unitSize: newUnitSize, total: String((discountedPrice * Number(entry.qty || newUnitSize)).toFixed(2)), grandTotal: String((discountedPrice * Number(entry.qty || newUnitSize)).toFixed(2)) }
+                                                : e
+                                            );
+                                            setSizeEntries(updated);
+                                            setSizeUnitSizeMap(prev => ({
+                                              ...prev,
+                                              [entry.size]: {
+                                                ...prev[entry.size],
+                                                unitSize: newUnitSize,
+                                                total: String((discountedPrice * Number(entry.qty || newUnitSize)).toFixed(2)),
+                                                grandTotal: String((discountedPrice * Number(entry.qty || newUnitSize)).toFixed(2))
+                                              }
+                                            }));
+                                          }}
+                                          size="sm"
+                                          className="w-20"
+                                        />
+                                      </TableCell>
+                                      <TableCell>
+                                        <Input
+                                          type="number"
+                                          value={entry.qty || entry.unitSize}
+                                          onChange={(e) => {
+                                            const newQty = e.target.value;
+                                            const updated = sizeEntries.map(e =>
+                                              e.id === entry.id
+                                                ? { ...e, qty: newQty, total: String((discountedPrice * Number(newQty)).toFixed(2)), grandTotal: String((discountedPrice * Number(newQty)).toFixed(2)) }
+                                                : e
+                                            );
+                                            setSizeEntries(updated);
+                                            setSizeUnitSizeMap(prev => ({
+                                              ...prev,
+                                              [entry.size]: {
+                                                ...prev[entry.size],
+                                                qty: newQty,
+                                                total: String((discountedPrice * Number(newQty)).toFixed(2)),
+                                                grandTotal: String((discountedPrice * Number(newQty)).toFixed(2))
+                                              }
+                                            }));
+                                          }}
+                                          size="sm"
+                                          className="w-20"
+                                          placeholder="Qty"
+                                        />
+                                      </TableCell>
+                                      <TableCell>
+                                        <Input
+                                          type="number"
+                                          value={entry.price}
+                                          onChange={(e) => {
+                                            const newPrice = Number(e.target.value) || 0;
+                                            const discount = Number(entry.discount) || 0;
+                                            const discountAmount = (newPrice * discount) / 100;
+                                            const discountedPrice = newPrice - discountAmount;
+                                            const qty = Number(entry.unitSize) || 0;
+                                            const total = discountedPrice * qty;
+
+                                            const updated = sizeEntries.map(e =>
+                                              e.id === entry.id
+                                                ? { ...e, price: String(newPrice), discountPer: String(discountAmount.toFixed(2)), total: String(total.toFixed(2)), grandTotal: String(total.toFixed(2)) }
+                                                : e
+                                            );
+                                            setSizeEntries(updated);
+                                            setSizeUnitSizeMap(prev => ({
+                                              ...prev,
+                                              [entry.size]: {
+                                                ...prev[entry.size],
+                                                price: String(newPrice),
+                                                discountPer: String(discountAmount.toFixed(2)),
+                                                total: String(total.toFixed(2)),
+                                                grandTotal: String(total.toFixed(2))
+                                              }
+                                            }));
+                                          }}
+                                          size="sm"
+                                          className="w-24"
+                                          startContent={<span className="text-default-400 text-small">₹</span>}
+                                        />
+                                      </TableCell>
+                                      <TableCell>
+                                        <Input
+                                          type="number"
+                                          value={entry.discount}
+                                          onChange={(e) => {
+                                            const newDiscount = Number(e.target.value) || 0;
+                                            const price = Number(entry.price) || 0;
+                                            const discountAmount = (price * newDiscount) / 100;
+                                            const discountedPrice = price - discountAmount;
+                                            const qty = Number(entry.qty || entry.unitSize) || 0;
+                                            const total = discountedPrice * qty;
+
+                                            const updated = sizeEntries.map(e =>
+                                              e.id === entry.id
+                                                ? { ...e, discount: String(newDiscount), discountPer: String(discountAmount.toFixed(2)), total: String(total.toFixed(2)), grandTotal: String(total.toFixed(2)) }
+                                                : e
+                                            );
+                                            setSizeEntries(updated);
+                                            setSizeUnitSizeMap(prev => ({
+                                              ...prev,
+                                              [entry.size]: {
+                                                ...prev[entry.size],
+                                                discount: String(newDiscount),
+                                                discountPer: String(discountAmount.toFixed(2)),
+                                                total: String(total.toFixed(2)),
+                                                grandTotal: String(total.toFixed(2))
+                                              }
+                                            }));
+                                          }}
+                                          size="sm"
+                                          className="w-20"
+                                        />
+                                      </TableCell>
+                                      <TableCell>
+                                        <span className="font-medium">₹{discountAmount.toFixed(2)}</span>
+                                      </TableCell>
+                                      <TableCell>
+                                        <span className="font-medium">₹{total.toFixed(2)}</span>
+                                      </TableCell>
+                                      <TableCell>
+                                        <span className="font-medium">₹{total.toFixed(2)}</span>
+                                      </TableCell>
+                                      <TableCell>
+                                        <Button
+                                          color="danger"
+                                          size="sm"
+                                          variant="light"
+                                          onClick={() => {
+                                            const updated = sizeEntries.filter(e => e.id !== entry.id);
+                                            setSizeEntries(updated);
+                                            // Update map
+                                            const updatedMap = { ...sizeUnitSizeMap };
+                                            delete updatedMap[entry.size];
+                                            setSizeUnitSizeMap(updatedMap);
+                                          }}
+                                        >
+                                          Remove
+                                        </Button>
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                })}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        )}
+                      </div>
+                    ) : null}
+                  </div>
                   <Controller
-                    name="unitSize" // Changed to reflect a text input
+                    name="weight"
                     control={control}
-                    rules={{ required: "Please enter value" }}
                     render={({ field }) => (
                       <InputNextUI
                         type="text"
-                        label="Unit"
+                        label="Weight"
                         {...field}
-                        isRequired={true}
-                        isInvalid={errors?.["unitSize"] ? true : false}
-                        errorMessage={errors?.["unitSize"]?.message}
+                        placeholder="Enter weight"
                       />
                     )}
                   />
-                  {/* <Controller
-                    name="content" // Changed to reflect a text input
-                    control={control}
-                    rules={{ required: true }}
-                    render={({ field }) => (
-                      <InputNextUI
-                        type="text"
-                        label="Content"
-                        onChange={(value) => {
-                          console.log(value, "ownername");
-                        }}
-                        {...field}
-                      />
-                    )}
-                  /> */}
                   <Controller
                     name="sortDesc" // Changed to reflect a text input
                     control={control}
@@ -848,99 +1263,115 @@ const AddProducts = () => {
                     )}
                   />
 
-                  <Controller
-                    name="price" // Changed to reflect a text input
-                    control={control}
-                    rules={{ required: "Please enter value" }}
-                    render={({ field }) => (
-                      <InputNextUI
-                        type="text"
-                        label="Price"
-                        onChange={(value) => {
-                          setValue("grand_total", value);
-                        }}
-                        {...field}
-                        isRequired={true}
-                        isInvalid={errors?.["price"] ? true : false}
-                        errorMessage={errors?.["price"]?.message}
+                  {!enableSizeManagement && (
+                    <>
+                      <Controller
+                        name="unitSize" // Changed to reflect a text input
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field }) => (
+                          <InputNextUI
+                            type="text"
+                            label="Unit Size"
+                            {...field}
+                          />
+                        )}
                       />
-                    )}
-                  />
-                  <Controller
-                    name="qty" // Changed to reflect a text input
-                    control={control}
-                    rules={{ required: "Please enter value" }}
-                    render={({ field }) => (
-                      <InputNextUI
-                        type="text"
-                        label="Quantity"
-                        {...field}
-                        isRequired={true}
-                        isInvalid={errors?.["qty"] ? true : false}
-                        errorMessage={errors?.["qty"]?.message}
+                      <Controller
+                        name="price" // Changed to reflect a text input
+                        control={control}
+                        rules={{ required: "Please enter value" }}
+                        render={({ field }) => (
+                          <InputNextUI
+                            type="text"
+                            label="Price"
+                            onChange={(value) => {
+                              setValue("grand_total", value);
+                            }}
+                            {...field}
+                            isRequired={true}
+                            isInvalid={errors?.["price"] ? true : false}
+                            errorMessage={errors?.["price"]?.message}
+                          />
+                        )}
                       />
-                    )}
-                  />
-                  <Controller
-                    name="discount" // Changed to reflect a text input
-                    control={control}
-                    rules={{ required: "Please enter value" }}
-                    render={({ field }) => (
-                      <InputNextUI
-                        type="text"
-                        label="Discoint(%)"
-                        {...field}
-                        isRequired={true}
-                        isInvalid={errors?.["discount"] ? true : false}
-                        errorMessage={errors?.["discount"]?.message}
+                      <Controller
+                        name="qty" // Changed to reflect a text input
+                        control={control}
+                        rules={{ required: "Please enter value" }}
+                        render={({ field }) => (
+                          <InputNextUI
+                            type="text"
+                            label="Quantity"
+                            {...field}
+                            isRequired={true}
+                            isInvalid={errors?.["qty"] ? true : false}
+                            errorMessage={errors?.["qty"]?.message}
+                          />
+                        )}
                       />
-                    )}
-                  />
-                  <Controller
-                    name="discountPer" // Changed to reflect a text input
-                    control={control}
-                    rules={{ required: "Please enter value" }}
-                    render={({ field }) => (
-                      <InputNextUI
-                        type="text"
-                        label="Discount Price"
-                        {...field}
-                        isDisabled
-                        isRequired={true}
-                        isInvalid={errors?.["discountPer"] ? true : false}
-                        errorMessage={errors?.["discountPer"]?.message}
+                      <Controller
+                        name="discount" // Changed to reflect a text input
+                        control={control}
+                        rules={{ required: "Please enter value" }}
+                        render={({ field }) => (
+                          <InputNextUI
+                            type="text"
+                            label="Discoint(%)"
+                            {...field}
+                            isRequired={true}
+                            isInvalid={errors?.["discount"] ? true : false}
+                            errorMessage={errors?.["discount"]?.message}
+                          />
+                        )}
                       />
-                    )}
-                  />
-                  <Controller
-                    name="total" // Changed to reflect a text input
-                    control={control}
-                    render={({ field }) => (
-                      <InputNextUI
-                        type="text"
-                        label="Total"
-                        onChange={(value) => {
-                          console.log(value, "ownername");
-                        }}
-                        isDisabled
-                        {...field}
+                      <Controller
+                        name="discountPer" // Changed to reflect a text input
+                        control={control}
+                        rules={{ required: "Please enter value" }}
+                        render={({ field }) => (
+                          <InputNextUI
+                            type="text"
+                            label="Discount Price"
+                            {...field}
+                            isDisabled
+                            isRequired={true}
+                            isInvalid={errors?.["discountPer"] ? true : false}
+                            errorMessage={errors?.["discountPer"]?.message}
+                          />
+                        )}
                       />
-                    )}
-                  />
-                  <Controller
-                    name="grand_total" // Changed to reflect a text input
-                    control={control}
-                    rules={{ required: true }}
-                    render={({ field }) => (
-                      <InputNextUI
-                        type="text"
-                        label="Grant total"
-                        isDisabled
-                        {...field}
-                        errorMessage={errors?.["grand_total"]?.message}
+                      <Controller
+                        name="total" // Changed to reflect a text input
+                        control={control}
+                        render={({ field }) => (
+                          <InputNextUI
+                            type="text"
+                            label="Total"
+                            onChange={(value) => {
+                              console.log(value, "ownername");
+                            }}
+                            isDisabled
+                            {...field}
+                          />
+                        )}
                       />
-                    )}
-                  />
+                      <Controller
+                        name="grand_total" // Changed to reflect a text input
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field }) => (
+                          <InputNextUI
+                            type="text"
+                            label="Grant total"
+                            isDisabled
+                            {...field}
+                            errorMessage={errors?.["grand_total"]?.message}
+                          />
+                        )}
+                      />
+                    </>
+                  )}
 
                   <div className="flex">
                     <Controller

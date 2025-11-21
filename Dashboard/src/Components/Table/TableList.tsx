@@ -47,7 +47,7 @@ export const TableList = (props: TableProps) => {
   const [visibleColumns, setVisibleColumns] = React.useState<any>(
     new Set(props.defaultCloumns)
   );
-  const [statusFilter, setStatusFilter] = React.useState<any>("all");
+  const [statusFilter, setStatusFilter] = React.useState<any>(new Set(["all"]));
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [sortDescriptor, setSortDescriptor] = React.useState<any>({
     column: "age",
@@ -57,7 +57,57 @@ export const TableList = (props: TableProps) => {
 
   const hasSearchFilter = Boolean(filterValue);
 
-  const statusOptions = [{ name: "Active", id: "active" }];
+  const statusOptions = React.useMemo(() => {
+    // Get unique status values from table items
+    const uniqueStatuses = new Set<string>();
+    if (props?.tableItems && Array.isArray(props.tableItems)) {
+      props.tableItems.forEach((item: any) => {
+        const status = item?.status || item?.product?.status;
+        if (status !== undefined && status !== null) {
+          // Handle numeric status
+          if (status === "1" || status === 1) {
+            uniqueStatuses.add("active");
+          } else if (status === "0" || status === 0) {
+            uniqueStatuses.add("inactive");
+          } else {
+            // Handle string status (processing, shipping, delivered, cancelled, etc.)
+            uniqueStatuses.add(String(status).toLowerCase());
+          }
+        }
+      });
+    }
+    
+    // Build options array
+    const options = [{ name: "All", id: "all" }];
+    
+    // Add common statuses if they exist in data
+    const commonStatuses = [
+      { name: "Active", id: "active" },
+      { name: "Inactive", id: "inactive" },
+      { name: "Processing", id: "processing" },
+      { name: "Shipping", id: "shipping" },
+      { name: "Delivered", id: "delivered" },
+      { name: "Cancelled", id: "cancelled" },
+    ];
+    
+    commonStatuses.forEach(status => {
+      if (uniqueStatuses.has(status.id)) {
+        options.push(status);
+      }
+    });
+    
+    // Add any other unique statuses found
+    uniqueStatuses.forEach(status => {
+      if (!["all", "active", "inactive", "processing", "shipping", "delivered", "cancelled"].includes(status)) {
+        options.push({ 
+          name: status.charAt(0).toUpperCase() + status.slice(1), 
+          id: status 
+        });
+      }
+    });
+    
+    return options;
+  }, [props?.tableItems]);
 
   const headerColumns = React.useMemo(() => {
     // if (visibleColumns === "all") return columns;
@@ -69,17 +119,61 @@ export const TableList = (props: TableProps) => {
     let filteredUsers = props?.tableItems ? [...props?.tableItems] : [];
 
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((user: any) =>
-        user?.["name"]?.toLowerCase().includes(filterValue.toLowerCase())
-      );
+      filteredUsers = filteredUsers.filter((user: any) => {
+        // Search across multiple fields
+        const searchLower = filterValue.toLowerCase();
+        const searchableFields = [
+          user?.["name"],
+          user?.["customerName"],
+          user?.["id"]?.toString(),
+          user?.["product"]?.["name"],
+          user?.["productName"],
+          user?.["products"]?.[0]?.name,
+          user?.["sortDesc"],
+          user?.["status"],
+          user?.["createdType"],
+          user?.["qty"]?.toString(),
+          user?.["grandtotal"]?.toString(),
+          user?.["deliverydate"],
+          user?.["custId"]?.toString(),
+          user?.["storeId"]?.toString(),
+          user?.["productIds"]?.toString(),
+          user?.["paymentmethod"]?.toString(),
+          user?.["deliveryAddress"],
+          user?.["size"],
+        ].filter(Boolean).map((field) => String(field).toLowerCase());
+        
+        return searchableFields.some((field) => field.includes(searchLower));
+      });
     }
+    const statusFilterArray = Array.from(statusFilter);
     if (
-      statusFilter !== "all" &&
-      Array.from(statusFilter).length !== statusOptions.length
+      !statusFilterArray.includes("all") &&
+      statusFilterArray.length > 0
     ) {
-      filteredUsers = filteredUsers.filter((user: any) =>
-        Array.from(statusFilter).includes(user.status)
-      );
+      filteredUsers = filteredUsers.filter((user: any) => {
+        const userStatus = user?.status || user?.product?.status;
+        
+        // Handle numeric status (1 = active, 0 = inactive)
+        if (userStatus === "1" || userStatus === 1) {
+          return statusFilterArray.includes("active");
+        }
+        if (userStatus === "0" || userStatus === 0) {
+          return statusFilterArray.includes("inactive");
+        }
+        
+        // Handle string status (processing, shipping, delivered, cancelled, etc.)
+        if (userStatus) {
+          const statusValue = String(userStatus).toLowerCase();
+          // Check if the status matches any selected filter
+          return statusFilterArray.some((filterStatus) => {
+            const filterLower = String(filterStatus).toLowerCase();
+            return statusValue === filterLower || statusValue.includes(filterLower);
+          });
+        }
+        
+        return false;
+      });
     }
 
     return filteredUsers;
@@ -248,7 +342,7 @@ export const TableList = (props: TableProps) => {
                 // autoFocus
                 // color="default"
                 variant="flat"
-                placeholder="Search by name..."
+                placeholder="Search..."
                 classNames={{
                   label: " bg-[#ffffff3b] text-black/90 dark:text-black/90",
                   input: [

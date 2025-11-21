@@ -49,6 +49,12 @@ export const PremiumCard = ({
   from = null,
   popOverOnClose = null,
 }) => {
+
+  const [selectedSize, setSelectedSize] = React.useState<string>("");
+  const [selectedWeight, setSelectedWeight] = React.useState<string>("");
+  const [currentPrice, setCurrentPrice] = React.useState<number>(0);
+  const [sizeUnitSizeMap, setSizeUnitSizeMap] = React.useState<Record<string, { unitSize: string; qty: string; price: string; discount: string; discountPer: string; total: string; grandTotal: string }> | null>(null);
+
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
   const productItem = item.product ? item.product : item;
   const userId = getCookie("id");
@@ -62,26 +68,95 @@ export const PremiumCard = ({
   };
   const { data, error, refetch } = useGetCartByProductIdQuery(productId, { skip: !productId });
   const MySwal = withReactContent(Swal);
+
+  // Parse sizeUnitSizeMap and set initial price
+  React.useEffect(() => {
+    if (productItem?.sizeUnitSizeMap) {
+      try {
+        const parsed = typeof productItem.sizeUnitSizeMap === 'string' 
+          ? JSON.parse(productItem.sizeUnitSizeMap) 
+          : productItem.sizeUnitSizeMap;
+        setSizeUnitSizeMap(parsed);
+        
+        // Check if product is already in cart and has a size
+        const cartSize = data?.data?.size;
+        let sizeToSelect = cartSize;
+        
+        // If no size in cart, use first size as default
+        if (!sizeToSelect || !parsed[sizeToSelect]) {
+          sizeToSelect = Object.keys(parsed)[0];
+        }
+        
+        if (sizeToSelect && parsed[sizeToSelect]) {
+          setSelectedSize(sizeToSelect);
+          const sizeData = parsed[sizeToSelect];
+          const sizePrice = Number(sizeData.price) || Number(sizeData.total) || Number(sizeData.grandTotal) || 0;
+          if (sizePrice > 0) {
+            setCurrentPrice(sizePrice);
+          } else {
+            const initialPrice = item?.price || productItem?.total || productItem?.price || 0;
+            setCurrentPrice(Number(initialPrice));
+          }
+        } else {
+          // Set initial price if no sizes available
+          const initialPrice = item?.price || productItem?.total || productItem?.price || 0;
+          setCurrentPrice(Number(initialPrice));
+        }
+      } catch (e) {
+        console.warn('Failed to parse sizeUnitSizeMap:', e);
+        setSizeUnitSizeMap(null);
+        const initialPrice = item?.price || productItem?.total || productItem?.price || 0;
+        setCurrentPrice(Number(initialPrice));
+      }
+    } else {
+      // Set initial price if no sizeUnitSizeMap
+      const initialPrice = item?.price || productItem?.total || productItem?.price || 0;
+      setCurrentPrice(Number(initialPrice));
+    }
+  }, [item, productItem, data?.data?.size]);
+
+  // Update price when size changes
+  React.useEffect(() => {
+    if (selectedSize && sizeUnitSizeMap && sizeUnitSizeMap[selectedSize]) {
+      const sizeData = sizeUnitSizeMap[selectedSize];
+      const sizePrice = Number(sizeData.price) || Number(sizeData.total) || Number(sizeData.grandTotal) || 0;
+      if (sizePrice > 0) {
+        setCurrentPrice(sizePrice);
+      }
+    } else if (!selectedSize) {
+      // Reset to original price when size is cleared
+      const originalPrice = item?.price || productItem?.total || productItem?.price || 0;
+      setCurrentPrice(Number(originalPrice));
+    }
+  }, [selectedSize, sizeUnitSizeMap, item, productItem]);
+
   React.useEffect(() => {
     onRefresh && dispatch(onRefreshCart(false));
     refetch();
   }, [onRefresh]);
 
   const handleAddCart = async (type) => {
+    // Use current price (which may be updated based on size selection)
+    const priceToUse = currentPrice > 0 ? currentPrice : (Number(item?.price) || Number(productItem?.total) || Number(productItem?.price) || 0);
+    
     let tempCartValue = {
       productId: productItem?.id,
       name: productItem?.name,
       orderId: userId,
-      price: Number(productItem?.total),
-      total: Number(data?.data?.qty) * Number(productItem?.total),
+      price: priceToUse,
+      total: Number(data?.data?.qty || 1) * priceToUse,
       qty: data?.data?.qty
         ? type === "add"
           ? Number(data?.data?.qty) + 1
           : Number(data?.data?.qty) - 1
         : 1,
-      unitSize: productItem?.unitSize,
+      unitSize: selectedSize && sizeUnitSizeMap && sizeUnitSizeMap[selectedSize] 
+        ? sizeUnitSizeMap[selectedSize].unitSize 
+        : productItem?.unitSize,
       photo: productItem?.photo ? productItem?.photo : item?.photo,
       storeId: id,
+      size: selectedSize || "",
+      weight: selectedWeight || "",
     };
     if (data?.data) {
       try {
@@ -142,18 +217,12 @@ export const PremiumCard = ({
                 }`}
               src={`${productItem?.photo}`}
             />
-          </CardBody>
-        )}
-
-        <CardFooter className="p-0">
-          <div className="grid grid-cols-1 w-full">
             <div className="font-semibold text-base mt-2 TextMaincolor">
               <p className="truncate">{productItem?.name}</p>
             </div>
-
             <div className="w-full flex justify-between mt-2">
               <p className="font-semibold text-base Pricecolor p-0">
-                Rs : {productItem?.total}{" "}
+                Rs : {currentPrice > 0 ? currentPrice : (productItem?.total || item?.price || 0)}{" "}
                 <span
                   style={{ color: "black", fontSize: "10px" }}
                 >{`(${productItem?.qty})`}</span>
@@ -165,11 +234,48 @@ export const PremiumCard = ({
                     paddingLeft: "10px",
                   }}
                 >
-                  {productItem?.unitSize}
+                  {selectedSize && sizeUnitSizeMap && sizeUnitSizeMap[selectedSize] 
+                    ? sizeUnitSizeMap[selectedSize].unitSize 
+                    : productItem?.unitSize}
                 </small>{" "}
                 Stocks
               </p>
             </div>
+            {/* Size Selection - Box Style */}
+            {sizeUnitSizeMap && Object.keys(sizeUnitSizeMap).length > 0 && (
+              <div className="mt-2">
+                <div className="mb-2">
+                  <span className="text-gray-600 text-xs">Size: </span>
+                  <span className="font-semibold text-black text-xs">
+                    {selectedSize ? selectedSize.toUpperCase() : "Select"}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {Object.keys(sizeUnitSizeMap).map((size) => {
+                    const sizeData = sizeUnitSizeMap[size];
+                    const isSelected = selectedSize === size;
+                    const unitSize = sizeData.unitSize || "";
+                    
+                    return (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={`
+                          px-3 py-1.5 rounded border-2 transition-all text-xs
+                          ${isSelected 
+                            ? 'border-blue-600 bg-blue-50 text-black font-medium' 
+                            : 'border-dashed border-gray-300 bg-white text-black hover:border-gray-400'
+                          }
+                          min-w-[20px] text-center
+                        `}
+                      >
+                        {unitSize ? `${size.toUpperCase()}: ${unitSize}` : size.toUpperCase()}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             <div className="w-full flex justify-between mt-2">
               <p className="font-normal text-sm  Pricecolor TextMaincolor p-0">
                 Per order
@@ -200,6 +306,12 @@ export const PremiumCard = ({
                 }
               />
             </div>
+          </CardBody>
+        )}
+
+        <CardFooter className="p-0">
+          <div className="grid grid-cols-1 w-full">
+            
             <div className="w-full flex justify-around pb-3">
               <div className="PrimiumCardFooterBg rounded-lg flex w-full justify-around items-center">
                 <div className="PrimiumCardFooterBg rounded-lg flex w-full justify-around items-center">

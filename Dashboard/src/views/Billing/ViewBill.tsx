@@ -232,6 +232,7 @@ const ViewBill = () => {
             >
               <TableHeader>
                 <TableColumn>ITEM</TableColumn>
+                <TableColumn className="text-center">SIZE</TableColumn>
                 <TableColumn className="text-center">QUANTITY</TableColumn>
                 <TableColumn className="text-right">UNIT PRICE</TableColumn>
                 <TableColumn className="text-right">TOTAL</TableColumn>
@@ -260,8 +261,22 @@ const ViewBill = () => {
                                 SKU: {product.productId}
                               </p>
                             )}
+                            {product.weight && (
+                              <p className="text-xs text-default-500">
+                                Weight: {product.weight}
+                              </p>
+                            )}
                           </div>
                         </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {product.size ? (
+                          <span className="px-2 py-1 bg-default-100 rounded text-xs font-medium">
+                            {product.size.toUpperCase()}
+                          </span>
+                        ) : (
+                          <span className="text-default-400 text-xs">-</span>
+                        )}
                       </TableCell>
                       <TableCell className="text-center">
                         {product.quantity || 0}
@@ -276,7 +291,7 @@ const ViewBill = () => {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center">
+                    <TableCell colSpan={5} className="text-center">
                       No products found
                     </TableCell>
                   </TableRow>

@@ -10,6 +10,8 @@ import {
   Divider,
   Image,
   Input,
+  Select,
+  SelectItem,
   Table,
   TableBody,
   TableCell,
@@ -33,6 +35,10 @@ interface SelectedProduct {
   price: number;
   quantity: number;
   total: number;
+  size?: string;
+  weight?: string;
+  productId?: number; // Store product ID to access product details
+  sizeUnitSizeMap?: Record<string, { unitSize: string; qty: string; price: string; discount: string; discountPer: string; total: string; grandTotal: string }>; // Store size pricing map
 }
 
 const AddBill = () => {
@@ -73,26 +79,43 @@ const AddBill = () => {
 
     const product = storeProduct.product;
 
-    // Check if product already added
-    if (selectedProducts.some((p) => p.id === selectedProductId)) {
-      alert("Product already added to the bill");
-      return;
+    // Parse sizeUnitSizeMap if it exists
+    let sizeUnitSizeMap: Record<string, { unitSize: string; qty: string; price: string; discount: string; discountPer: string; total: string; grandTotal: string }> | undefined;
+    if (product.sizeUnitSizeMap) {
+      try {
+        sizeUnitSizeMap = typeof product.sizeUnitSizeMap === 'string' 
+          ? JSON.parse(product.sizeUnitSizeMap) 
+          : product.sizeUnitSizeMap;
+      } catch (e) {
+        console.warn('Failed to parse sizeUnitSizeMap:', e);
+        sizeUnitSizeMap = undefined;
+      }
     }
 
     // Use store product price if available, otherwise use product total
     const productPrice = storeProduct.price || product.total || product.price || 0;
 
+    // Generate a unique ID for this product entry (allows same product with different sizes)
+    const uniqueId = selectedProducts.length > 0 
+      ? Math.max(...selectedProducts.map(p => p.id)) + 1 
+      : storeProduct.id;
+
     const newProduct: SelectedProduct = {
-      id: storeProduct.id,
+      id: uniqueId,
       name: product.name,
       photo: product.photo,
       price: productPrice,
       quantity: 1,
       total: productPrice,
+      size: "",
+      weight: "",
+      productId: product.id,
+      sizeUnitSizeMap: sizeUnitSizeMap,
     };
 
     setSelectedProducts([...selectedProducts, newProduct]);
-    setSelectedProductId(null);
+    // Don't clear selectedProductId to allow adding same product multiple times with different sizes
+    // setSelectedProductId(null);
   };
 
   const handleRemoveProduct = (productId: number) => {
@@ -131,6 +154,67 @@ const AddBill = () => {
     setSelectedProducts(updatedProducts);
   };
 
+  const handleSizeChange = (productId: number, size: string) => {
+    const updatedProducts = selectedProducts.map((p) => {
+      if (p.id === productId) {
+        let newPrice = p.price;
+        let actualSizeKey = size.trim(); // Store the actual key from sizeUnitSizeMap
+        
+        // If size is selected and product has sizeUnitSizeMap, update price based on size
+        if (size && size.trim() !== '' && p.sizeUnitSizeMap) {
+          // Find the matching key (case-insensitive)
+          const matchingKey = Object.keys(p.sizeUnitSizeMap).find(
+            key => key.toLowerCase() === size.toLowerCase().trim()
+          );
+          
+          if (matchingKey) {
+            actualSizeKey = matchingKey; // Use the actual key from the map
+            const sizeData = p.sizeUnitSizeMap[matchingKey];
+            
+            if (sizeData) {
+              // Use the price from size data, or fallback to total/grandTotal if price not available
+              const sizePrice = Number(sizeData.price) || Number(sizeData.total) || Number(sizeData.grandTotal) || 0;
+              if (sizePrice > 0) {
+                newPrice = sizePrice;
+              }
+            }
+          }
+        } else if (!size || size.trim() === '') {
+          // If size is cleared, reset to original product price
+          const storeProduct = products.find((sp: any) => sp.product?.id === p.productId);
+          if (storeProduct && storeProduct.product) {
+            newPrice = storeProduct.price || storeProduct.product.total || storeProduct.product.price || 0;
+          }
+          actualSizeKey = ""; // Clear the size
+        }
+        
+        return {
+          ...p,
+          size: actualSizeKey, // Store the actual key (preserving case from sizeUnitSizeMap)
+          price: newPrice,
+          total: newPrice * p.quantity, // Recalculate total with new price
+        };
+      }
+      return p;
+    });
+    setSelectedProducts(updatedProducts);
+  };
+
+  const handleWeightChange = (productId: number, weight: string) => {
+    const updatedProducts = selectedProducts.map((p) => {
+      if (p.id === productId) {
+        return {
+          ...p,
+          weight: weight,
+        };
+      }
+      return p;
+    });
+    setSelectedProducts(updatedProducts);
+  };
+
+  const sizeOptions = ["xs", "s", "m", "l", "xl", "xxl", "xxxl", "xxxxl"];
+
   const calculateSubtotal = () => {
     return selectedProducts.reduce((sum, product) => sum + product.total, 0);
   };
@@ -140,6 +224,160 @@ const AddBill = () => {
     const discount = watch("discount") || 0;
     const tax = watch("tax") || 0;
     return subtotal - discount + tax;
+  };
+
+  // Helper function to update product unitSize (size-specific or default)
+  const updateProductUnitSize = async (productId: number, quantity: number, size?: string) => {
+    try {
+      // Fetch current product data
+      const productResponse = await fetch(
+        `${infoData.baseApi}/product/getProductById/${productId}`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+
+      if (!productResponse.ok) {
+        console.warn(`Failed to fetch product ${productId}. Status: ${productResponse.status}`);
+        return;
+      }
+
+      const productResult = await productResponse.json();
+      const product = productResult?.data;
+
+      if (!product) {
+        console.warn(`Product ${productId} not found`);
+        return;
+      }
+
+      // Check if product has sizeUnitSizeMap and size is provided
+      if (size && size.trim() !== '' && product.sizeUnitSizeMap) {
+        try {
+          // Parse sizeUnitSizeMap (handle both string and object formats)
+          let sizeUnitSizeMap: Record<string, any>;
+          if (typeof product.sizeUnitSizeMap === 'string') {
+            try {
+              sizeUnitSizeMap = JSON.parse(product.sizeUnitSizeMap);
+            } catch (parseError) {
+              console.warn(`Error parsing sizeUnitSizeMap string for product ${productId}:`, parseError);
+              // Fall through to default flow
+              sizeUnitSizeMap = {};
+            }
+          } else if (typeof product.sizeUnitSizeMap === 'object' && product.sizeUnitSizeMap !== null) {
+            sizeUnitSizeMap = product.sizeUnitSizeMap;
+          } else {
+            console.warn(`Invalid sizeUnitSizeMap format for product ${productId}`);
+            // Fall through to default flow
+            sizeUnitSizeMap = {};
+          }
+
+          // Find matching size key (case-insensitive)
+          let matchingSizeKey: string | null = null;
+          const normalizedSize = size.trim().toLowerCase();
+          
+          for (const key in sizeUnitSizeMap) {
+            if (key.toLowerCase() === normalizedSize) {
+              matchingSizeKey = key;
+              break;
+            }
+          }
+
+          if (matchingSizeKey && sizeUnitSizeMap[matchingSizeKey]) {
+            const sizeData = sizeUnitSizeMap[matchingSizeKey];
+            let currentSizeUnitSize = 0;
+
+            // Extract current unitSize from sizeData
+            if (typeof sizeData === 'object' && sizeData !== null) {
+              // Handle object format: { unitSize: "10", price: "100", ... }
+              currentSizeUnitSize = Number(sizeData.unitSize) || 0;
+            } else if (typeof sizeData === 'string') {
+              // Handle string format (legacy)
+              currentSizeUnitSize = Number(sizeData) || 0;
+            } else if (typeof sizeData === 'number') {
+              // Handle number format
+              currentSizeUnitSize = sizeData;
+            }
+
+            // Validate stock availability
+            if (currentSizeUnitSize <= 0) {
+              console.warn(`Size ${size} (${matchingSizeKey}) has no stock available for product ${productId}`);
+              return;
+            }
+
+            if (currentSizeUnitSize < quantity) {
+              console.warn(`Insufficient stock for size ${size} (${matchingSizeKey}). Available: ${currentSizeUnitSize}, Requested: ${quantity}`);
+              return;
+            }
+
+            const newSizeUnitSize = currentSizeUnitSize - quantity;
+
+            // Update the size-specific unitSize in the map while preserving all other fields
+            if (typeof sizeData === 'object' && sizeData !== null) {
+              // Preserve all existing fields and update only unitSize
+              const updatedSizeData = {
+                ...sizeData,
+                unitSize: newSizeUnitSize.toString(),
+              };
+              sizeUnitSizeMap[matchingSizeKey] = updatedSizeData;
+            } else {
+              // If sizeData is not an object, create a new object structure
+              sizeUnitSizeMap[matchingSizeKey] = {
+                unitSize: newSizeUnitSize.toString(),
+                price: '',
+                qty: '',
+                discount: '',
+                discountPer: '',
+                total: '',
+                grandTotal: '',
+                name: product.name || "",
+                photo: product.photo || "",
+              };
+            }
+
+            // Update the product with modified sizeUnitSizeMap
+            await updateProduct({
+              id: productId,
+              sizeUnitSizeMap: JSON.stringify(sizeUnitSizeMap),
+            }).unwrap();
+
+            console.log(`✅ Successfully updated product ${productId} size "${matchingSizeKey}" unitSize from ${currentSizeUnitSize} to ${newSizeUnitSize}`);
+            return; // Exit early since we updated size-specific stock
+          } else {
+            console.warn(`Size "${size}" not found in sizeUnitSizeMap for product ${productId}. Available sizes: ${Object.keys(sizeUnitSizeMap).join(', ')}`);
+            // Fall through to default flow
+          }
+        } catch (e) {
+          console.warn(`Error processing sizeUnitSizeMap for product ${productId}:`, e);
+          // Fall through to default flow
+        }
+      }
+
+      // Default flow: Update main product unitSize (if no size or sizeUnitSizeMap doesn't exist)
+      const currentUnitSize = Number(product.unitSize) || 0;
+
+      if (currentUnitSize <= 0) {
+        console.warn(`Product ${productId} has no stock available (unitSize: ${currentUnitSize})`);
+        return;
+      }
+
+      if (currentUnitSize < quantity) {
+        console.warn(`Insufficient stock for product ${productId}. Available: ${currentUnitSize}, Requested: ${quantity}`);
+        return;
+      }
+
+      const newUnitSize = currentUnitSize - quantity;
+
+      await updateProduct({
+        id: productId,
+        unitSize: newUnitSize.toString(),
+      }).unwrap();
+
+      console.log(`✅ Successfully updated product ${productId} unitSize from ${currentUnitSize} to ${newUnitSize}`);
+    } catch (e) {
+      console.error(`❌ Error updating product ${productId} unitSize:`, e);
+      // Don't throw error as order was successful, but log for debugging
+    }
   };
 
   const onSubmit = async (data: any) => {
@@ -153,7 +391,15 @@ const AddBill = () => {
       customerName: data.customerName || "",
       customerEmail: data.customerEmail || "",
       customerPhone: data.customerPhone || "",
-      products: selectedProducts,
+      products: selectedProducts.map((p) => ({
+        quantity: p.quantity,
+        price: p.price,
+        total: p.total,
+        size: p.size || "",
+        weight: p.weight || "",
+        name: p.name || "",
+        photo: p.photo || "",
+      })),
       subtotal: calculateSubtotal().toFixed(2),
       discount: (data.discount || 0).toFixed(2),
       tax: (data.tax || 0).toFixed(2),
@@ -167,26 +413,18 @@ const AddBill = () => {
       // Update product unitSize (stock) for each product in the bill
       const updatePromises = selectedProducts.map(async (selectedProduct) => {
         try {
-          // Find the original product data
-          const storeProduct = products.find((p: any) => p.id === selectedProduct.id);
+          // Find the original product data using productId (not the unique id)
+          const storeProduct = products.find((p: any) => p.product?.id === selectedProduct.productId);
           if (!storeProduct || !storeProduct.product) {
-            console.warn(`Product ${selectedProduct.id} not found in products list`);
+            console.warn(`Product with productId ${selectedProduct.productId} not found in products list`);
             return;
           }
           const product = storeProduct.product;
-          // Get current unitSize from storeProduct (store-specific stock) or product (global stock)
-          const currentUnitSize = Number(product.unitSize) || 0;
-          const quantityUsed = selectedProduct.quantity;
-
-          const newUnitSize = (Number(currentUnitSize) - Number(quantityUsed));
-          // Update the product with new unitSize
-          const updateData = {
-            id: product.id, 
-            unitSize: String(newUnitSize),
-          };
-
-          await updateProduct(updateData).unwrap();
+          
+          // Use the helper function to update stock (size-specific or default)
+          await updateProductUnitSize(product.id, selectedProduct.quantity, selectedProduct.size);
         } catch (updateError: any) {
+          console.error(`Error updating product ${selectedProduct.productId}:`, updateError);
           throw updateError; // Re-throw to handle in Promise.allSettled
         }
       });
@@ -294,6 +532,16 @@ const AddBill = () => {
                   >
                     Add Product
                   </Button>
+                  {selectedProductId && (
+                    <Button
+                      color="default"
+                      variant="light"
+                      onClick={() => setSelectedProductId(null)}
+                      size="lg"
+                    >
+                      Clear
+                    </Button>
+                  )}
                 </div>
 
                 {/* Selected Products Table */}
@@ -305,6 +553,8 @@ const AddBill = () => {
                     <Table aria-label="Selected products table" removeWrapper>
                       <TableHeader>
                         <TableColumn>PRODUCT</TableColumn>
+                        <TableColumn>SIZE</TableColumn>
+                        <TableColumn>WEIGHT</TableColumn>
                         <TableColumn>PRICE</TableColumn>
                         <TableColumn>QTY</TableColumn>
                         <TableColumn>TOTAL</TableColumn>
@@ -330,6 +580,83 @@ const AddBill = () => {
                               </div>
                             </TableCell>
                             <TableCell>
+                              {(() => {
+                                // Determine available sizes
+                                const availableSizes = product.sizeUnitSizeMap && Object.keys(product.sizeUnitSizeMap).length > 0
+                                  ? Object.keys(product.sizeUnitSizeMap)
+                                  : ['No sizes available'];
+                                
+                                // Find the selected size (case-insensitive)
+                                const selectedSize = product.size && product.size.trim() !== ''
+                                  ? availableSizes.find(
+                                      key => key.toLowerCase() === product.size!.toLowerCase().trim()
+                                    ) || null
+                                  : null;
+                                
+                                return (
+                                  <div className="flex flex-wrap gap-2 min-w-[200px]">
+                                    {availableSizes.map((size) => {
+                                      const isSelected = selectedSize?.toLowerCase() === size.toLowerCase();
+                                      let sizeLabel = size.toUpperCase();
+                                      let sizePrice = "";
+                                      
+                                      // Get size data if available
+                                      if (product.sizeUnitSizeMap && product.sizeUnitSizeMap[size]) {
+                                        const sizeData = product.sizeUnitSizeMap[size];
+                                        const unitSize = sizeData.unitSize || "";
+                                        const price = Number(sizeData.price) || Number(sizeData.total) || Number(sizeData.grandTotal) || 0;
+                                        
+                                        if (unitSize) {
+                                          sizeLabel = `${size.toUpperCase()}: ${unitSize}`;
+                                        }
+                                        if (price > 0) {
+                                          sizePrice = `₹${price}`;
+                                        }
+                                      }
+                                      
+                                      return (
+                                        <button
+                                          key={size}
+                                          type="button"
+                                          onClick={() => handleSizeChange(product.id, size)}
+                                          className={`
+                                            px-3 py-1.5 rounded border-2 transition-all text-xs font-medium
+                                            ${isSelected 
+                                              ? 'border-blue-600 bg-blue-50 text-blue-700' 
+                                              : 'border-dashed border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50'
+                                            }
+                                            min-w-[60px] text-center
+                                          `}
+                                        >
+                                          <div className="flex flex-col items-center">
+                                            <span>{sizeLabel}</span>
+                                            {sizePrice && (
+                                              <span className="text-[10px] mt-0.5">{sizePrice}</span>
+                                            )}
+                                          </div>
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                );
+                              })()}
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="text"
+                                value={product.weight || ""}
+                                onChange={(e) =>
+                                  handleWeightChange(
+                                    product.id,
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Weight"
+                                size="sm"
+                                className="w-24"
+                              />
+                            </TableCell>
+                            <TableCell>
                               <Input
                                 type="number"
                                 value={String(product.price)}
@@ -343,6 +670,7 @@ const AddBill = () => {
                                 min="0"
                                 step="0.01"
                                 className="w-24"
+                                key={`price-${product.id}-${product.price}`} // Force re-render when price changes
                               />
                             </TableCell>
                             <TableCell>

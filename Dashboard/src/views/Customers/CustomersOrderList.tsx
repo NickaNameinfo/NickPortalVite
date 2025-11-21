@@ -72,6 +72,7 @@ const CustomersOrderList = () => {
     "productIds",
     "qty",
     "actions",
+    "size",
   ];
 
 
@@ -93,6 +94,7 @@ const CustomersOrderList = () => {
     { name: "status", id: "status" },
     { name: "productIds", id: "productIds" },
     { name: "qty", id: "qty" },
+    { name: "size", id: "size" },
     { name: "Actions", id: "actions" },
   ];
 
@@ -236,7 +238,7 @@ const CustomersOrderList = () => {
               ? data?.["data"]
               : storeOrder?.["data"]?.filter((item) => !item?.customization)
           }
-          isStatusFilter={false}
+          isStatusFilter={true}
           refreshOrder={refreshOrder}
         />
       ) : (

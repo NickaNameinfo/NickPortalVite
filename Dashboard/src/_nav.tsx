@@ -269,24 +269,24 @@ export const _nav = [
     key: "LogOut",
     icons: <IconHome />,
   },
-  ...(tempRole === "3"
-    ? [
-        {
-          menuType: "single",
-          name: "YourOrders",
-          key: "YourOrders",
-          link: "/YourOrders",
-          icons: <IconHome />,
-        },
-      ]
-    : []),
+  // ...(tempRole === "3"
+  //   ? [
+  //       {
+  //         menuType: "single",
+  //         name: "YourOrders",
+  //         key: "YourOrders",
+  //         link: "/YourOrders",
+  //         icons: <IconHome />,
+  //       },
+  //     ]
+  //   : []),
   ...(tempRole === "0" || tempRole === "3"
     ? [
         {
           menuType: "single",
-          name: "Billing",
+          name: "Billing (Only for subscribed stores)",
           key: "Billing",
-          link: "/Billing/List",
+          // link: "/Billing/List",
           icons: <IconHome />,
         },
       ]

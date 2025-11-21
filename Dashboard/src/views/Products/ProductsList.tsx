@@ -425,7 +425,7 @@ const ProductsList = () => {
                 ? vendorProducts?.data
                 : storeProducts?.data
           }
-          isStatusFilter={false}
+          isStatusFilter={true}
           selectionMode="multiple"
           selectedKeys={selectedKeys}
           onSelectionChange={setSelectedKeys}

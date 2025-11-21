@@ -43,6 +43,7 @@ import {
   useUpdateProductMutation
 } from "../../views/pages/Store/Service.mjs";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
+import { infoData } from "../../configData";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 const columns = [
@@ -50,6 +51,7 @@ const columns = [
   { name: "Product", uid: "photo" },
   { name: "Quantity", uid: "actions" },
   { name: "Price", uid: "price" },
+  { name: "Size", uid: "size" },
 ];
 
 export const BuyCard = (props: any) => {
@@ -92,6 +94,16 @@ export const BuyCard = (props: any) => {
     area: "",
     shipping: "",
     id: "",
+  });
+
+  const [addressErrors, setAddressErrors] = useState({
+    fullname: "",
+    phone: "",
+    district: "",
+    city: "",
+    states: "",
+    area: "",
+    shipping: "",
   });
 
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -162,29 +174,189 @@ export const BuyCard = (props: any) => {
   }, [userId]);
 
   const handleAddCart = async (type, product) => {
+    // Validation: Check stock availability
+    const newQty = product?.qty
+      ? type === "add"
+        ? Number(product?.qty) + 1
+        : Number(product?.qty) - 1
+      : 1;
+
+    // Get available stock (check if product has size-specific stock)
+    let availableStock = Number(product?.unitSize) || 0;
+    
+    // If product has size, check size-specific stock
+    if (product?.size && product?.sizeUnitSizeMap) {
+      try {
+        const sizeMap = typeof product.sizeUnitSizeMap === 'string' 
+          ? JSON.parse(product.sizeUnitSizeMap) 
+          : product.sizeUnitSizeMap;
+        if (sizeMap[product.size]) {
+          availableStock = Number(sizeMap[product.size].unitSize) || 0;
+        }
+      } catch (e) {
+        console.warn('Failed to parse sizeUnitSizeMap for stock check:', e);
+      }
+    }
+
+    // Validate stock availability when adding quantity
+    if (type === "add" && newQty > availableStock) {
+      toast.error(`Only ${availableStock} items available in stock!`);
+      return;
+    }
+
+    // Validate minimum quantity
+    if (newQty < 1) {
+      toast.error("Quantity cannot be less than 1!");
+      return;
+    }
+
     let tempCartValue = {
       productId: product?.productId,
       name: product?.name,
       orderId: userId,
       price: Number(product?.price),
-      total: Number(product?.qty) * Number(product?.price),
-      qty: product?.qty
-        ? type === "add"
-          ? Number(product?.qty) + 1
-          : Number(product?.qty) - 1
-        : 1,
+      total: newQty * Number(product?.price),
+      qty: newQty,
       photo: props?.item?.product?.photo,
+      size: product?.size || "",
+      weight: product?.weight || "",
+      unitSize: product?.unitSize || "",
     };
     try {
       const result = await updateCart(tempCartValue);
       if (result) {
         cartRefetch();
+        if (type === "add") {
+          toast.success("Quantity increased!");
+        } else {
+          toast.success("Quantity decreased!");
+        }
       }
     } catch (error) {
       console.log(error);
+      toast.error("Failed to update cart!");
     }
   };
 
+
+  // Helper function to update product unitSize (size-specific or default)
+  const updateProductUnitSize = async (productId: number, quantity: number, size?: string) => {
+    try {
+      const productResponse = await fetch(
+        `${infoData.baseApi}/product/getProductById/${productId}`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+
+      if (!productResponse.ok) {
+        console.warn(`Failed to fetch product ${productId}. Status: ${productResponse.status}`);
+        return;
+      }
+
+      const productResult = await productResponse.json();
+      const product = productResult?.data;
+
+      if (!product) {
+        console.warn(`Product ${productId} not found`);
+        return;
+      }
+
+      // Check if product has sizeUnitSizeMap and size is provided
+      if (size && size.trim() !== '' && product.sizeUnitSizeMap) {
+        try {
+          let sizeUnitSizeMap: Record<string, any>;
+          if (typeof product.sizeUnitSizeMap === 'string') {
+            sizeUnitSizeMap = JSON.parse(product.sizeUnitSizeMap);
+          } else {
+            sizeUnitSizeMap = product.sizeUnitSizeMap;
+          }
+
+          // Find matching size key (case-insensitive)
+          let matchingSizeKey: string | null = null;
+          for (const key in sizeUnitSizeMap) {
+            if (key.toLowerCase() === size.toLowerCase()) {
+              matchingSizeKey = key;
+              break;
+            }
+          }
+
+          if (matchingSizeKey) {
+            const sizeData = sizeUnitSizeMap[matchingSizeKey];
+            let currentSizeUnitSize = 0;
+
+            if (typeof sizeData === 'object' && sizeData !== null) {
+              currentSizeUnitSize = Number(sizeData.unitSize) || 0;
+            } else if (typeof sizeData === 'string') {
+              currentSizeUnitSize = Number(sizeData) || 0;
+            }
+
+            if (currentSizeUnitSize > 0) {
+              const newSizeUnitSize = currentSizeUnitSize - quantity;
+
+              if (newSizeUnitSize < 0) {
+                console.warn(`Size ${size} stock would be negative, skipping update`);
+                return;
+              }
+
+              // Update the size-specific unitSize in the map
+              if (typeof sizeData === 'object' && sizeData !== null) {
+                const updatedSizeData = { ...sizeData };
+                updatedSizeData.unitSize = newSizeUnitSize.toString();
+                sizeUnitSizeMap[matchingSizeKey] = updatedSizeData;
+              } else {
+                sizeUnitSizeMap[matchingSizeKey] = {
+                  unitSize: newSizeUnitSize.toString(),
+                  price: '',
+                  qty: '',
+                  discount: '',
+                  discountPer: '',
+                  total: '',
+                  grandTotal: '',
+                };
+              }
+
+              // Update the product with modified sizeUnitSizeMap
+              await updateProduct({
+                id: productId,
+                sizeUnitSizeMap: JSON.stringify(sizeUnitSizeMap),
+              }).unwrap();
+
+              console.log(`✅ Successfully updated product ${productId} size ${size} unitSize to ${newSizeUnitSize}`);
+              return; // Exit early since we updated size-specific stock
+            }
+          }
+        } catch (e) {
+          console.warn(`Error parsing sizeUnitSizeMap for product ${productId}:`, e);
+          // Fall through to default flow
+        }
+      }
+
+      // Default flow: Update main product unitSize (if no size or sizeUnitSizeMap doesn't exist)
+      const currentUnitSize = Number(product.unitSize) || 0;
+
+      if (currentUnitSize <= 0) {
+        return;
+      }
+
+      const newUnitSize = currentUnitSize - quantity;
+
+      if (newUnitSize < 0) {
+        return;
+      }
+
+      await updateProduct({
+        id: productId,
+        unitSize: newUnitSize.toString(),
+      }).unwrap();
+
+      console.log(`✅ Successfully updated product ${productId} unit size to ${newUnitSize}`);
+    } catch (e) {
+      console.error(`❌ Error updating product unitSize:`, e);
+      // Don't throw error as order was successful
+    }
+  };
 
   const razorpayHandleSubmit = async (amountInRupees, apiParams, paymentResult) => {
     try {
@@ -220,8 +392,8 @@ export const BuyCard = (props: any) => {
       razorpayPaymentId: paymentId,
       razorpayOrderId: paymentResult?.data?.id,
     });
-    if (razorpayPaymentUpdate?.data?.success) {
-      if (isOpenCartModal.type !== "Service") {
+      if (razorpayPaymentUpdate?.data?.success) {
+      if (isOpenCartModal?.type === "Product") {
         // 2. Iterate through the cart and create separate orders for each item
         const orderPromises = cart.data.map(async (item) => {
           const itemApiParams = {
@@ -229,11 +401,13 @@ export const BuyCard = (props: any) => {
             grandTotal: Number(item?.qty * item?.price), // Individual item total
             productIds: item?.productId, // Individual item ID
             qty: item?.qty, // Individual item quantity
+            size: item?.size || "",
+            weight: item?.weight || "",
           };
-          updateProduct({
-            id: item?.productId,
-            unitSize: String(Number(item?.unitSize) - Number(item?.qty)),
-          }).unwrap();
+          
+          // Update product stock (size-specific or default)
+          await updateProductUnitSize(item?.productId, Number(item?.qty), item?.size);
+          
           // Create the individual order record
           await addOrder(itemApiParams);
 
@@ -264,6 +438,67 @@ export const BuyCard = (props: any) => {
   }
 
   const handleAddOrder = async () => {
+    // Validation: Check if cart is empty
+    if (isOpenCartModal.type === "Product" && (!cart?.data || cart.data.length === 0)) {
+      toast.error("Your cart is empty!");
+      return;
+    }
+
+    // Validation: Check address for Product orders
+    if (isOpenCartModal.type === "Product") {
+      const hasAddress = selectedAddress || (
+        addressDetails.fullname &&
+        addressDetails.phone &&
+        addressDetails.shipping &&
+        addressDetails.city &&
+        addressDetails.district &&
+        addressDetails.states
+      );
+
+      if (!hasAddress) {
+        toast.error("Please add a delivery address before placing order!");
+        setIsSelectAddress(true);
+        return;
+      }
+    }
+
+    // Validation: Check payment method
+    if (!selectedPaymentMethod) {
+      toast.error("Please select a payment method!");
+      return;
+    }
+
+    // Validation: Check stock availability for all cart items
+    if (isOpenCartModal.type === "Product") {
+      for (const item of cart.data) {
+        let availableStock = Number(item?.unitSize) || 0;
+        
+        // Check size-specific stock if applicable
+        if (item?.size && item?.sizeUnitSizeMap) {
+          try {
+            const sizeMap = typeof item.sizeUnitSizeMap === 'string' 
+              ? JSON.parse(item.sizeUnitSizeMap) 
+              : item.sizeUnitSizeMap;
+            if (sizeMap[item.size]) {
+              availableStock = Number(sizeMap[item.size].unitSize) || 0;
+            }
+          } catch (e) {
+            console.warn('Failed to parse sizeUnitSizeMap for stock check:', e);
+          }
+        }
+
+        if (Number(item.qty) > availableStock) {
+          toast.error(`Insufficient stock for ${item.name}! Only ${availableStock} items available.`);
+          return;
+        }
+
+        if (availableStock <= 0) {
+          toast.error(`${item.name} is out of stock!`);
+          return;
+        }
+      }
+    }
+
     dispatch(onUpdateCartModal({
       isOpen: false,
       item: null,
@@ -276,11 +511,12 @@ export const BuyCard = (props: any) => {
         item: null,
       })
     );
-    if (!scriptLoaded) {
+    if (!scriptLoaded && (String(selectedPaymentMethod) === "1" || String(selectedPaymentMethod) === "2" || String(selectedPaymentMethod) === "4")) {
       console.error("Razorpay script not loaded");
+      toast.error("Payment system is not ready. Please try again.");
       return;
     }
-    if (isOpenCartModal.type !== "Service") {
+    if (isOpenCartModal?.type === "Product") {
       // 1. Calculate the Grand Total for the entire cart
       const grandTotal = cart?.data?.reduce(
         (sum, item) => sum + Number(item.price) * Number(item.qty),
@@ -297,6 +533,7 @@ export const BuyCard = (props: any) => {
         cutomerDeliveryDate: deliveryDate,
         deliveryAddress: selectedAddress || addressDetails,
         orderType: "Product",
+        size: cart?.data?.size || "",
       };
 
       // --- PAYMENT FLOW (Method 1, 2, 4) ---
@@ -335,7 +572,13 @@ export const BuyCard = (props: any) => {
             productIds: item?.productId, // Individual item ID
             qty: item?.qty, // Individual item quantity
             paymentmethod: selectedPaymentMethod, // Ensure payment method is set correctly
+            size: item?.size || "",
+            weight: item?.weight || "",
           };
+          
+          // Update product stock (size-specific or default)
+          await updateProductUnitSize(item?.productId, Number(item?.qty), item?.size);
+          
           await addOrder(itemApiParams);
           await onDeleteCartItems(item?.productId);
         });
@@ -349,15 +592,20 @@ export const BuyCard = (props: any) => {
           title: <p>Your order placed please vist your order page</p>,
         });
       }
-    } else {
+    } else if (isOpenCartModal?.type === "Service") {
       try {
+        const serviceItem: any = isOpenCartModal?.item;
+        if (!serviceItem) {
+          toast.error("Service item not found!");
+          return;
+        }
         const apiParams = {
           custId: userId,
           paymentmethod: selectedPaymentMethod,
           orderId: Number(userId),
-          grandTotal: isOpenCartModal.item?.product?.total || 0,
-          productIds: isOpenCartModal.item?.product?.id || "",
-          qty: isOpenCartModal.item?.product?.qty || 0,
+          grandTotal: serviceItem?.product?.total || serviceItem?.total || 0,
+          productIds: serviceItem?.product?.id || serviceItem?.id || "",
+          qty: serviceItem?.product?.qty || serviceItem?.qty || 0,
           storeId: id,
           cutomerDeliveryDate: deliveryDate,
           deliveryAddress: selectedAddress || addressDetails, // Include selected or entered address details
@@ -411,23 +659,131 @@ export const BuyCard = (props: any) => {
     }
   };
 
+  const validateAddressField = (name: string, value: string): string => {
+    switch (name) {
+      case "fullname":
+        if (!value.trim()) {
+          return "Full name is required";
+        }
+        if (value.trim().length < 2) {
+          return "Full name must be at least 2 characters";
+        }
+        if (!/^[a-zA-Z\s]+$/.test(value.trim())) {
+          return "Full name should only contain letters and spaces";
+        }
+        return "";
+      case "phone":
+        if (!value.trim()) {
+          return "Phone number is required";
+        }
+        if (!/^[0-9]{10}$/.test(value.trim())) {
+          return "Phone number must be 10 digits";
+        }
+        return "";
+      case "district":
+        if (!value.trim()) {
+          return "District is required";
+        }
+        if (value.trim().length < 2) {
+          return "District must be at least 2 characters";
+        }
+        return "";
+      case "city":
+        if (!value.trim()) {
+          return "City is required";
+        }
+        if (value.trim().length < 2) {
+          return "City must be at least 2 characters";
+        }
+        return "";
+      case "states":
+        if (!value.trim()) {
+          return "State is required";
+        }
+        if (value.trim().length < 2) {
+          return "State must be at least 2 characters";
+        }
+        return "";
+      case "area":
+        if (!value.trim()) {
+          return "Area is required";
+        }
+        if (value.trim().length < 2) {
+          return "Area must be at least 2 characters";
+        }
+        return "";
+      case "shipping":
+        if (!value.trim()) {
+          return "Shipping address is required";
+        }
+        if (value.trim().length < 5) {
+          return "Shipping address must be at least 5 characters";
+        }
+        return "";
+      default:
+        return "";
+    }
+  };
+
   const handleAddressChange = (e) => {
+    const { name, value } = e.target;
     setAddressDetails({
       ...addressDetails,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+    // Clear error when user starts typing
+    if (addressErrors[name]) {
+      setAddressErrors({
+        ...addressErrors,
+        [name]: "",
+      });
+    }
+  };
+
+  const validateAllAddressFields = (): boolean => {
+    const errors = {
+      fullname: validateAddressField("fullname", addressDetails.fullname),
+      phone: validateAddressField("phone", addressDetails.phone),
+      district: validateAddressField("district", addressDetails.district),
+      city: validateAddressField("city", addressDetails.city),
+      states: validateAddressField("states", addressDetails.states),
+      area: validateAddressField("area", addressDetails.area),
+      shipping: validateAddressField("shipping", addressDetails.shipping),
+    };
+    setAddressErrors(errors);
+    return !Object.values(errors).some((error) => error !== "");
   };
 
   const handleUpdateAddress = async () => {
+    if (!validateAllAddressFields()) {
+      toast.error("Please fix the errors in the address form");
+      return;
+    }
+
+    if (!selectedAddress || !selectedAddress.id) {
+      toast.error("Please select an address to update");
+      return;
+    }
+
     try {
       const apiInfo = {
         ...addressDetails,
         custId: userId,
+        id: selectedAddress.id,
       };
       const result = await updateAddress(apiInfo);
       if (result?.data?.success) {
         toast.success("Address updated successfully!");
         refetchAddresses();
+        setAddressErrors({
+          fullname: "",
+          phone: "",
+          district: "",
+          city: "",
+          states: "",
+          area: "",
+          shipping: "",
+        });
       } else {
         toast.error("Failed to update address.");
       }
@@ -437,6 +793,11 @@ export const BuyCard = (props: any) => {
     }
   };
   const handleAddAddress = async () => {
+    if (!validateAllAddressFields()) {
+      toast.error("Please fix the errors in the address form");
+      return;
+    }
+
     try {
       const apiInfo = {
         ...addressDetails,
@@ -446,6 +807,28 @@ export const BuyCard = (props: any) => {
       if (result?.data?.success) {
         toast.success("Address added successfully!");
         refetchAddresses();
+        // Reset form
+        setAddressDetails({
+          fullname: "",
+          phone: "",
+          orderId: addressDetails.orderId,
+          custId: userId,
+          district: "",
+          city: "",
+          states: "",
+          area: "",
+          shipping: "",
+          id: "",
+        });
+        setAddressErrors({
+          fullname: "",
+          phone: "",
+          district: "",
+          city: "",
+          states: "",
+          area: "",
+          shipping: "",
+        });
       } else {
         toast.error("Failed to add address.");
       }
@@ -639,62 +1022,154 @@ export const BuyCard = (props: any) => {
                         </div>
                       )}
                       <div className="space-y-3">
-                        <input
-                          type="text"
-                          name="fullname"
-                          placeholder="Full Name"
-                          value={addressDetails.fullname}
-                          onChange={handleAddressChange}
-                          className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        />
-                        <input
-                          type="text"
-                          name="phone"
-                          placeholder="Phone"
-                          value={addressDetails.phone}
-                          onChange={handleAddressChange}
-                          className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        />
-                        <input
-                          type="text"
-                          name="district"
-                          placeholder="District"
-                          value={addressDetails.district}
-                          onChange={handleAddressChange}
-                          className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        />
-                        <input
-                          type="text"
-                          name="city"
-                          placeholder="City"
-                          value={addressDetails.city}
-                          onChange={handleAddressChange}
-                          className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        />
-                        <input
-                          type="text"
-                          name="states"
-                          placeholder="State"
-                          value={addressDetails.states}
-                          onChange={handleAddressChange}
-                          className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        />
-                        <input
-                          type="text"
-                          name="area"
-                          placeholder="Area"
-                          value={addressDetails.area}
-                          onChange={handleAddressChange}
-                          className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        />
-                        <input
-                          type="text"
-                          name="shipping"
-                          placeholder="Shipping Address"
-                          value={addressDetails.shipping}
-                          onChange={handleAddressChange}
-                          className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        />
+                        <div>
+                          <input
+                            type="text"
+                            name="fullname"
+                            placeholder="Full Name *"
+                            value={addressDetails.fullname}
+                            onChange={handleAddressChange}
+                            onBlur={(e) => {
+                              const error = validateAddressField("fullname", e.target.value);
+                              setAddressErrors({ ...addressErrors, fullname: error });
+                            }}
+                            className={`w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white ${
+                              addressErrors.fullname
+                                ? "border-red-500 dark:border-red-500"
+                                : "border-gray-300 dark:border-gray-600"
+                            }`}
+                          />
+                          {addressErrors.fullname && (
+                            <p className="text-red-500 text-xs mt-1">{addressErrors.fullname}</p>
+                          )}
+                        </div>
+                        <div>
+                          <input
+                            type="tel"
+                            name="phone"
+                            placeholder="Phone *"
+                            value={addressDetails.phone}
+                            onChange={handleAddressChange}
+                            onBlur={(e) => {
+                              const error = validateAddressField("phone", e.target.value);
+                              setAddressErrors({ ...addressErrors, phone: error });
+                            }}
+                            maxLength={10}
+                            className={`w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white ${
+                              addressErrors.phone
+                                ? "border-red-500 dark:border-red-500"
+                                : "border-gray-300 dark:border-gray-600"
+                            }`}
+                          />
+                          {addressErrors.phone && (
+                            <p className="text-red-500 text-xs mt-1">{addressErrors.phone}</p>
+                          )}
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            name="district"
+                            placeholder="District *"
+                            value={addressDetails.district}
+                            onChange={handleAddressChange}
+                            onBlur={(e) => {
+                              const error = validateAddressField("district", e.target.value);
+                              setAddressErrors({ ...addressErrors, district: error });
+                            }}
+                            className={`w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white ${
+                              addressErrors.district
+                                ? "border-red-500 dark:border-red-500"
+                                : "border-gray-300 dark:border-gray-600"
+                            }`}
+                          />
+                          {addressErrors.district && (
+                            <p className="text-red-500 text-xs mt-1">{addressErrors.district}</p>
+                          )}
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            name="city"
+                            placeholder="City *"
+                            value={addressDetails.city}
+                            onChange={handleAddressChange}
+                            onBlur={(e) => {
+                              const error = validateAddressField("city", e.target.value);
+                              setAddressErrors({ ...addressErrors, city: error });
+                            }}
+                            className={`w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white ${
+                              addressErrors.city
+                                ? "border-red-500 dark:border-red-500"
+                                : "border-gray-300 dark:border-gray-600"
+                            }`}
+                          />
+                          {addressErrors.city && (
+                            <p className="text-red-500 text-xs mt-1">{addressErrors.city}</p>
+                          )}
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            name="states"
+                            placeholder="State *"
+                            value={addressDetails.states}
+                            onChange={handleAddressChange}
+                            onBlur={(e) => {
+                              const error = validateAddressField("states", e.target.value);
+                              setAddressErrors({ ...addressErrors, states: error });
+                            }}
+                            className={`w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white ${
+                              addressErrors.states
+                                ? "border-red-500 dark:border-red-500"
+                                : "border-gray-300 dark:border-gray-600"
+                            }`}
+                          />
+                          {addressErrors.states && (
+                            <p className="text-red-500 text-xs mt-1">{addressErrors.states}</p>
+                          )}
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            name="area"
+                            placeholder="Area *"
+                            value={addressDetails.area}
+                            onChange={handleAddressChange}
+                            onBlur={(e) => {
+                              const error = validateAddressField("area", e.target.value);
+                              setAddressErrors({ ...addressErrors, area: error });
+                            }}
+                            className={`w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white ${
+                              addressErrors.area
+                                ? "border-red-500 dark:border-red-500"
+                                : "border-gray-300 dark:border-gray-600"
+                            }`}
+                          />
+                          {addressErrors.area && (
+                            <p className="text-red-500 text-xs mt-1">{addressErrors.area}</p>
+                          )}
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            name="shipping"
+                            placeholder="Shipping Address *"
+                            value={addressDetails.shipping}
+                            onChange={handleAddressChange}
+                            onBlur={(e) => {
+                              const error = validateAddressField("shipping", e.target.value);
+                              setAddressErrors({ ...addressErrors, shipping: error });
+                            }}
+                            className={`w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white ${
+                              addressErrors.shipping
+                                ? "border-red-500 dark:border-red-500"
+                                : "border-gray-300 dark:border-gray-600"
+                            }`}
+                          />
+                          {addressErrors.shipping && (
+                            <p className="text-red-500 text-xs mt-1">{addressErrors.shipping}</p>
+                          )}
+                        </div>
                         <div className="flex justify-between">
                           <Button
                             onClick={handleAddAddress}
