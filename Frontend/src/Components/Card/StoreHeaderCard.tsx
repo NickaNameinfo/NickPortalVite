@@ -47,7 +47,7 @@ export const StoreHeaderCard = () => {
         <Image
           isZoomed
           alt="Here no Image"
-          className="w-full object-cover max-h-[85px] p-1"
+          className="w-full object-contain max-h-[85px] p-1"
           src={`${data?.data?.storeImage}`}
         />
       </div>

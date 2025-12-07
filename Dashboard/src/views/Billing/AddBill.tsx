@@ -571,7 +571,7 @@ const AddBill = () => {
                                     alt={product.name}
                                     width={40}
                                     height={40}
-                                    className="rounded object-cover"
+                                    className="rounded object-contain"
                                   />
                                 )}
                                 <span className="font-medium">

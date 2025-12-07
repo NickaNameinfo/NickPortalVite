@@ -174,6 +174,33 @@ export const StoreApi = createApi({
         method: "GET",
       }),
     }),
+    // Product Feedback endpoints
+    addProductFeedback: builder.mutation({
+      query: (body) => ({
+        url: `/productFeedback/create`,
+        method: "POST",
+        body,
+      }),
+    }),
+    getProductFeedbackById: builder.query({
+      query: (id) => ({
+        url: `/productFeedback/list/${id}`,
+        method: "GET",
+      }),
+    }),
+    updateProductFeedback: builder.mutation({
+      query: (body) => ({
+        url: `/productFeedback/update`,
+        method: "POST",
+        body,
+      }),
+    }),
+    deleteProductFeedback: builder.mutation({
+      query: (id) => ({
+        url: `/productFeedback/delete/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
@@ -199,5 +226,9 @@ export const {
   useAddOrderlistMutation,
   useAddPyamentMutation,
   useUpdateProductMutation,
+  useAddProductFeedbackMutation,
+  useGetProductFeedbackByIdQuery,
+  useUpdateProductFeedbackMutation,
+  useDeleteProductFeedbackMutation,
 } = StoreApi;
 export const { endpoints } = StoreApi;

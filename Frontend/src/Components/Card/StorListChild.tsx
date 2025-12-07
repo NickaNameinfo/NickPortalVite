@@ -31,7 +31,7 @@ export const StoreListChild = () => {
               shadow="md"
               width="100%"
               radius="lg"
-              className="w-full object-cover min-h-[170px]"
+              className="w-full object-contain min-h-[170px]"
               alt="Card background"
               src="https://nextui.org/images/hero-card-complete.jpeg"
             />

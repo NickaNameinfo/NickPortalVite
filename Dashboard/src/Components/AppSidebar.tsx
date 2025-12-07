@@ -78,7 +78,7 @@ export const AppSidebar = () => {
                 {/* <Image
                   isZoomed
                   alt="Here no Image"
-                  className="w-full object-cover max-h-[40px] min-w-[140px]"
+                  className="w-full object-contain max-h-[40px] min-w-[140px]"
                   src="https://nextui-docs-v2.vercel.app/images/album-cover.png"
                   // height={30}
                   // width={140}

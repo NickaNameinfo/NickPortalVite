@@ -20,7 +20,68 @@ export const RelatedProducts = ({
   popOverOnClose = null,
   lineHeight = 8,
 }) => {
+
   const dispatch = useAppDispatch();
+
+  // Helper function to get the display price
+  const getDisplayPrice = () => {
+    const product = item?.product || item;
+    
+    // If sizeUnitSizeMap exists, use the first size's price
+    if (product?.sizeUnitSizeMap) {
+      try {
+        const parsed = typeof product.sizeUnitSizeMap === 'string' 
+          ? JSON.parse(product.sizeUnitSizeMap) 
+          : product.sizeUnitSizeMap;
+        
+        const sizes = Object.keys(parsed);
+        if (sizes.length > 0) {
+          const firstSize = sizes[0];
+          const sizeData = parsed[firstSize];
+          const sizePrice = Number(sizeData?.total) || Number(sizeData?.grandTotal) || Number(sizeData?.price) || 0;
+          if (sizePrice > 0) {
+            return sizePrice;
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to parse sizeUnitSizeMap:', e);
+      }
+    }
+    
+    // Fallback to product price, then item price
+    return Number(product?.total) || Number(product?.price) || Number(item?.price) || 0;
+  };
+
+  // Helper function to get the display unit size
+  const getDisplayUnitSize = () => {
+    const product = item?.product || item;
+    
+    // If sizeUnitSizeMap exists, use the first size's unitSize
+    if (product?.sizeUnitSizeMap) {
+      try {
+        const parsed = typeof product.sizeUnitSizeMap === 'string' 
+          ? JSON.parse(product.sizeUnitSizeMap) 
+          : product.sizeUnitSizeMap;
+        
+        const sizes = Object.keys(parsed);
+        if (sizes.length > 0) {
+          const firstSize = sizes[0];
+          const sizeData = parsed[firstSize];
+          if (sizeData?.unitSize) {
+            return sizeData.unitSize;
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to parse sizeUnitSizeMap:', e);
+      }
+    }
+    
+    // Fallback to product unitSize, then item unitSize
+    return product?.unitSize || item?.unitSize || item?.quantity || '';
+  };
+
+  const displayPrice = getDisplayPrice();
+  const displayUnitSize = getDisplayUnitSize();
   return (
     <>
       <Card
@@ -47,7 +108,7 @@ export const RelatedProducts = ({
                 shadow="md"
                 width="100%"
                 radius="lg"
-                className={`w-full object-cover  ${from !== "ProductView"
+                className={`w-full object-contain  ${from !== "ProductView"
                   ? "min-h-[176px] max-h-[176px]"
                   : "min-h-[50px] max-h-[100px]"
                   }`}
@@ -79,10 +140,10 @@ export const RelatedProducts = ({
             
             <div className="w-full flex justify-between mt-3 mb-3">
               <p className="font-normal text-sm  Pricecolor">
-                {item?.quantity ? item?.quantity : item?.unitSize}
+                {displayUnitSize}
               </p>
               <p className="font-normal text-sm  TextMaincolor">
-                Rs : {item?.price}
+                Rs : {displayPrice}
               </p>
             </div>
           </div>

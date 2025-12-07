@@ -42,6 +42,8 @@ import {
   useGetStoresByIdQuery,
   useGetStoresQuery,
   useAddOrderMutation,
+  useAddProductFeedbackMutation,
+  useGetProductFeedbackByIdQuery,
 } from "../../views/pages/Store/Service.mjs";
 import {
   onRefreshCart,
@@ -67,7 +69,12 @@ export const ProductDetail = (props: ProductDetailProps) => {
   const [selectedSize, setSelectedSize] = React.useState<string>("");
   const [selectedWeight, setSelectedWeight] = React.useState<string>("");
   const [currentPrice, setCurrentPrice] = React.useState<number>(0);
+  const [currentStock, setCurrentStock] = React.useState<number>(0);
+  const [currentDiscount, setCurrentDiscount] = React.useState<number>(0);
+  const [originalPrice, setOriginalPrice] = React.useState<number>(0);
   const [sizeUnitSizeMap, setSizeUnitSizeMap] = React.useState<Record<string, { unitSize: string; qty: string; price: string; discount: string; discountPer: string; total: string; grandTotal: string }> | null>(null);
+  const [feedback, setFeedback] = React.useState<string>("");
+  const [rating, setRating] = React.useState<number>(0);
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
   const notify = (value) => toast(value);
   const MySwal = withReactContent(Swal);
@@ -95,8 +102,21 @@ export const ProductDetail = (props: ProductDetailProps) => {
 
   const [addCart] = useAddCartMutation();
   const [updateCart] = useUpdateCartMutation();
+  const [addProductFeedback] = useAddProductFeedbackMutation();
   const dispatch = useAppDispatch();
   const [index, setIndex] = React.useState(-1);
+  const [productImageIndex, setProductImageIndex] = React.useState(-1);
+  
+  // Get product ID for feedback
+  const productIdForFeedback = props?.item?.product?.id || props?.item?.id;
+  
+  // Get feedback by product ID (optional - to show existing feedbacks)
+  const {
+    data: productFeedbackData,
+    refetch: refetchFeedback,
+  } = useGetProductFeedbackByIdQuery(productIdForFeedback, { 
+    skip: !productIdForFeedback 
+  });
 
   // Parse sizeUnitSizeMap and set initial price
   React.useEffect(() => {
@@ -120,44 +140,72 @@ export const ProductDetail = (props: ProductDetailProps) => {
         if (sizeToSelect && parsed[sizeToSelect]) {
           setSelectedSize(sizeToSelect);
           const sizeData = parsed[sizeToSelect];
-          const sizePrice = Number(sizeData.price) || Number(sizeData.total) || Number(sizeData.grandTotal) || 0;
+          // Prioritize total/grandTotal (discounted price) over price
+          const sizePrice = Number(sizeData.total) || Number(sizeData.grandTotal) || Number(sizeData.price) || 0;
           if (sizePrice > 0) {
             setCurrentPrice(sizePrice);
           } else {
-            const initialPrice = props?.item?.price || product?.total || product?.price || 0;
+            // Fallback: prioritize product price over item price (item.price can be 0)
+            const initialPrice = product?.total || product?.price || props?.item?.price || 0;
             setCurrentPrice(Number(initialPrice));
           }
         } else {
           // Set initial price if no sizes available
-          const initialPrice = props?.item?.price || product?.total || product?.price || 0;
+          // Fallback: prioritize product price over item price (item.price can be 0)
+          const initialPrice = product?.total || product?.price || props?.item?.price || 0;
           setCurrentPrice(Number(initialPrice));
         }
       } catch (e) {
         console.warn('Failed to parse sizeUnitSizeMap:', e);
         setSizeUnitSizeMap(null);
-        const initialPrice = props?.item?.price || product?.total || product?.price || 0;
+        // Fallback: prioritize product price over item price (item.price can be 0)
+        const initialPrice = product?.total || product?.price || props?.item?.price || 0;
+        const initialOriginalPrice = product?.price || product?.total || props?.item?.price || 0;
         setCurrentPrice(Number(initialPrice));
+        setOriginalPrice(Number(initialOriginalPrice));
+        setCurrentDiscount(Number(product?.discountPer) || 0);
+        setCurrentStock(Number(product?.unitSize) || 0);
       }
     } else {
       // Set initial price if no sizeUnitSizeMap
-      const initialPrice = props?.item?.price || product?.total || product?.price || 0;
+      // Fallback: prioritize product price over item price (item.price can be 0)
+      const initialPrice = product?.total || product?.price || props?.item?.price || 0;
+      const initialOriginalPrice = product?.price || product?.total || props?.item?.price || 0;
       setCurrentPrice(Number(initialPrice));
+      setOriginalPrice(Number(initialOriginalPrice));
+      setCurrentDiscount(Number(product?.discountPer) || 0);
+      setCurrentStock(Number(product?.unitSize) || 0);
     }
   }, [props?.item, cart?.data?.size]);
 
-  // Update price when size changes
+  // Update price, discount, and stock when size changes
   React.useEffect(() => {
     if (selectedSize && sizeUnitSizeMap && sizeUnitSizeMap[selectedSize]) {
       const sizeData = sizeUnitSizeMap[selectedSize];
-      const sizePrice = Number(sizeData.price) || Number(sizeData.total) || Number(sizeData.grandTotal) || 0;
+      const product = props?.item?.product || props?.item;
+      
+      // Prioritize total/grandTotal (discounted price) over price
+      const sizePrice = Number(sizeData.total) || Number(sizeData.grandTotal) || Number(sizeData.price) || 0;
+      const sizeOriginalPrice = Number(sizeData.price) || Number(product?.price) || Number(product?.total) || 0;
+      const sizeDiscount = Number(sizeData.discountPer) || Number(sizeData.discount) || 0;
+      const sizeStock = Number(sizeData.unitSize) || 0;
+      
       if (sizePrice > 0) {
         setCurrentPrice(sizePrice);
+        setOriginalPrice(sizeOriginalPrice);
+        setCurrentDiscount(sizeDiscount);
+        setCurrentStock(sizeStock);
       }
     } else if (!selectedSize) {
       // Reset to original price when size is cleared
       const product = props?.item?.product || props?.item;
-      const originalPrice = props?.item?.price || product?.total || product?.price || 0;
+      // Fallback: prioritize product price over item price (item.price can be 0)
+      const originalPrice = product?.total || product?.price || props?.item?.price || 0;
+      const originalOriginalPrice = product?.price || product?.total || props?.item?.price || 0;
       setCurrentPrice(Number(originalPrice));
+      setOriginalPrice(Number(originalOriginalPrice));
+      setCurrentDiscount(Number(product?.discountPer) || 0);
+      setCurrentStock(Number(product?.unitSize) || 0);
     }
   }, [selectedSize, sizeUnitSizeMap, props?.item]);
 
@@ -169,7 +217,9 @@ export const ProductDetail = (props: ProductDetailProps) => {
 
   const handleAddCart = async (type) => {
     // Use current price (which may be updated based on size selection)
-    const priceToUse = currentPrice > 0 ? currentPrice : (Number(props?.item?.price) || Number(props?.item?.product?.total) || Number(props?.item?.product?.price) || 0);
+    // Fallback: prioritize product price over item price (item.price can be 0)
+    const product = props?.item?.product || props?.item;
+    const priceToUse = currentPrice > 0 ? currentPrice : (Number(product?.total) || Number(product?.price) || Number(props?.item?.price) || 0);
     
     let tempCartValue = {
       productId: props?.item?.product?.id
@@ -264,6 +314,51 @@ export const ProductDetail = (props: ProductDetailProps) => {
       });
     }
   };
+
+  const handleSubmitFeedback = async () => {
+    if (!userId) {
+      toast.error("Please login to submit feedback!");
+      return;
+    }
+
+    if (!feedback || feedback.trim() === "") {
+      toast.error("Please enter your feedback");
+      return;
+    }
+
+    if (rating === 0) {
+      toast.error("Please select a rating");
+      return;
+    }
+
+    try {
+      const product = props?.item?.product || props?.item;
+      const feedbackData = {
+        customerId: userId,
+        productId: productIdForFeedback,
+        vendorId: product?.createdType === "Vendor" ? product?.createdId : null,
+        storeId: product?.createdType === "Store" ? product?.createdId : (props?.item?.supplierId || null),
+        feedBack: feedback.trim(),
+        rating: rating,
+        customizedMessage: feedback.trim(),
+      };
+
+      const result = await addProductFeedback(feedbackData).unwrap();
+      
+      if (result?.success) {
+        toast.success("Feedback submitted successfully!");
+        setFeedback("");
+        setRating(0);
+        refetchFeedback();
+      } else {
+        toast.error("Failed to submit feedback. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      toast.error(error?.data?.msg || "Failed to submit feedback. Please try again.");
+    }
+  };
+
   return (
     <>
       <Modal
@@ -308,7 +403,13 @@ export const ProductDetail = (props: ProductDetailProps) => {
                           src={`${props?.item?.product?.photo ?? props?.item?.photo}`}
                           width="100%"
                           radius="lg"
-                          className="w-full object-cover md:h-[222px] xm:h-[150px] mm:h-[150px]  ml:h-[150px]"
+                          className="w-full object-contain md:h-[222px] xm:h-[150px] mm:h-[150px]  ml:h-[150px] cursor-pointer hover:opacity-90 transition-opacity"
+                          onClick={() => {
+                            const imageUrl = props?.item?.product?.photo ?? props?.item?.photo;
+                            if (imageUrl) {
+                              setProductImageIndex(0);
+                            }
+                          }}
                         />
                       </CardBody>
                     </Card>
@@ -320,16 +421,29 @@ export const ProductDetail = (props: ProductDetailProps) => {
                           ? props?.item?.product?.name
                           : props?.item?.name}
                       </h2>
-                      <p className="text-slate-300 text-lg line-through font-normal">
-                        Rs : {props?.item?.product?.price}
-                      </p>
-                      <div className="flex justify-between items-center">
-                        <p className="text-black text-lg font-normal">
-                          Rs: {currentPrice > 0 ? currentPrice : (props?.item?.product?.total || props?.item?.price || 0)}{" "}
-                          <span style={{ color: "black", fontSize: "10px" }}>
-                            ({props?.item?.product?.qty ? props?.item?.product?.qty : props?.item?.product?.unitSize})
+                      {/* Discount Badge */}
+                      {currentDiscount > 0 && (
+                        <div className="mb-2">
+                          <span className="inline-block px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded">
+                            {currentDiscount.toFixed(0)}% OFF
                           </span>
-                        </p>
+                        </div>
+                      )}
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <p className="text-black text-lg font-normal">
+                            Rs: {currentPrice > 0 ? currentPrice.toFixed(0) : (() => {
+                              const product = props?.item?.product || props?.item;
+                              return product?.total || product?.price || props?.item?.price || 0;
+                            })()}
+                          </p>
+                          {/* Show original price with strikethrough if there's a discount */}
+                          {currentDiscount > 0 && originalPrice > currentPrice && (
+                            <p className="text-gray-400 text-sm line-through">
+                              Rs: {originalPrice.toFixed(0)}
+                            </p>
+                          )}
+                        </div>
                         <div className="text-sm">
                           <small
                             style={{
@@ -337,9 +451,9 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               paddingLeft: "10px",
                             }}
                           >
-                            {selectedSize && sizeUnitSizeMap && sizeUnitSizeMap[selectedSize] 
+                            {currentStock > 0 ? currentStock : (selectedSize && sizeUnitSizeMap && sizeUnitSizeMap[selectedSize] 
                               ? sizeUnitSizeMap[selectedSize].unitSize 
-                              : (props?.item?.product?.unitSize ? props?.item?.product?.unitSize : props?.item?.product?.qty)}
+                              : (props?.item?.product?.unitSize ? props?.item?.product?.unitSize : props?.item?.product?.qty) || 0)}
                           </small>{" "}
                           Stocks
                         </div>
@@ -362,7 +476,21 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               return (
                                 <button
                                   key={size}
-                                  onClick={() => setSelectedSize(size)}
+                                  onClick={() => {
+                                    setSelectedSize(size);
+                                    // Update price, discount, and stock when size is selected
+                                    const sizePrice = Number(sizeData.total) || Number(sizeData.grandTotal) || Number(sizeData.price) || 0;
+                                    const sizeOriginalPrice = Number(sizeData.price) || 0;
+                                    const sizeDiscount = Number(sizeData.discountPer) || Number(sizeData.discount) || 0;
+                                    const sizeStock = Number(sizeData.unitSize) || 0;
+                                    
+                                    if (sizePrice > 0) {
+                                      setCurrentPrice(sizePrice);
+                                      setOriginalPrice(sizeOriginalPrice);
+                                      setCurrentDiscount(sizeDiscount);
+                                      setCurrentStock(sizeStock);
+                                    }
+                                  }}
                                   className={`
                                     px-4 py-2 rounded border-2 transition-all text-sm
                                     ${isSelected 
@@ -534,7 +662,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                       </span>
                       <Image
                         isZoomed
-                        className="w-full object-cover md:h-[222px] xm:h-[150px] mm:h-[145px] ml:h-[145px]"
+                        className="w-full object-contain md:h-[222px] xm:h-[150px] mm:h-[145px] ml:h-[145px]"
                         height={300}
                         alt="Here no Image"
                         src="https://nicknameinfotech.com/img/new-logo.png"
@@ -721,15 +849,46 @@ export const ProductDetail = (props: ProductDetailProps) => {
                         <Card className="min-h-[170px]">
                           <CardBody>
                             <h2 className="font-bold my-2">Write your feedback</h2>
+                            <div className="mb-3">
+                              <p className="text-sm font-medium mb-2">Rating:</p>
+                              <div className="flex space-x-2">
+                                {[1, 2, 3, 4, 5].map((starValue) => (
+                                  <button
+                                    key={starValue}
+                                    type="button"
+                                    onClick={() => setRating(starValue)}
+                                    className="focus:outline-none"
+                                  >
+                                    <svg
+                                      className={`w-8 h-8 ${
+                                        starValue <= rating
+                                          ? "text-yellow-400 fill-current"
+                                          : "text-gray-300"
+                                      }`}
+                                      fill="currentColor"
+                                      viewBox="0 0 20 20"
+                                    >
+                                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                  </button>
+                                ))}
+                              </div>
+                              {rating > 0 && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Selected: {rating} star{rating !== 1 ? "s" : ""}
+                                </p>
+                              )}
+                            </div>
                             <Textarea
                               classNames={{
                                 base: "max-w-[100%]",
                                 input: "resize-y min-h-[120px]",
                               }}
-                              placeholder="Enter your details"
-                              onChange={(e) => setCustomization(e.target.value)}
+                              placeholder="Enter your feedback"
+                              value={feedback}
+                              onChange={(e) => setFeedback(e.target.value)}
                               errorMessage={
-                                !customization
+                                !feedback || feedback.trim() === ""
                                   ? "Please enter your feedback"
                                   : null
                               }
@@ -737,16 +896,10 @@ export const ProductDetail = (props: ProductDetailProps) => {
                             <div className="flex justify-end mt-2">
                               <Button
                                 variant="ghost"
-                                color={!cart?.data?.qty ? "default" : "success"}
-                                disabled={!cart?.data?.qty}
-                                className={!cart?.data?.qty ? "cursor-not-allowed mr-3" : "mr-3"}
-                                onClick={() => {
-                                  if (userId) {
-                                    handleAddOrder();
-                                  } else {
-                                    toast.error("Please login to place order!");
-                                  }
-                                }}
+                                color={!feedback || rating === 0 ? "default" : "success"}
+                                disabled={!feedback || feedback.trim() === "" || rating === 0}
+                                className={(!feedback || rating === 0) ? "cursor-not-allowed mr-3" : "mr-3"}
+                                onClick={handleSubmitFeedback}
                               >Submit Feedback</Button>
                             </div>
                           </CardBody>
@@ -763,6 +916,18 @@ export const ProductDetail = (props: ProductDetailProps) => {
                 slides={slides}
                 open={index >= 0}
                 close={() => setIndex(-1)}
+              />
+              <Lightbox
+                index={productImageIndex}
+                slides={[
+                  {
+                    src: props?.item?.product?.photo ?? props?.item?.photo ?? "",
+                    width: 3840,
+                    height: 3840,
+                  },
+                ]}
+                open={productImageIndex >= 0}
+                close={() => setProductImageIndex(-1)}
               />
             </>
           )}

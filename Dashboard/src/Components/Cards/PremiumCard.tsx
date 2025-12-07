@@ -121,7 +121,7 @@ export const PremiumCard = ({ item = null }) => {
             shadow="md"
             width="100%"
             radius="lg"
-            className="w-full object-cover min-h-[176px]"
+            className="w-full object-contain min-h-[176px]"
             src={`${infoData?.baseApi}/${item?.product?.photo}`}
           />
         </CardBody>

@@ -2390,7 +2390,7 @@ video {
   stroke: hsl(var(--nextui-default-300) / 0.5);
 }
 
-.object-cover {
+.object-contain {
   -o-object-fit: cover;
      object-fit: cover;
 }

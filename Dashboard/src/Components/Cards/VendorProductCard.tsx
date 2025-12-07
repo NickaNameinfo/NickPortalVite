@@ -35,7 +35,7 @@ export const VendorProductCard = () => {
                 shadow="md"
                 width="100%"
                 radius="lg"
-                className="w-full object-cover h-[112px]"
+                className="w-full object-contain h-[112px]"
                 alt="Card background"
                 src="https://nextui.org/images/hero-card-complete.jpeg"
               />
@@ -128,7 +128,7 @@ export const VendorProductCard = () => {
                 shadow="md"
                 width="100%"
                 radius="lg"
-                className="w-full object-cover h-[112px]"
+                className="w-full object-contain h-[112px]"
                 alt="Card background"
                 src="https://nextui.org/images/hero-card-complete.jpeg"
               />
@@ -221,7 +221,7 @@ export const VendorProductCard = () => {
                 shadow="md"
                 width="100%"
                 radius="lg"
-                className="w-full object-cover h-[112px]"
+                className="w-full object-contain h-[112px]"
                 alt="Card background"
                 src="https://nextui.org/images/hero-card-complete.jpeg"
               />
@@ -314,7 +314,7 @@ export const VendorProductCard = () => {
                 shadow="md"
                 width="100%"
                 radius="lg"
-                className="w-full object-cover h-[112px]"
+                className="w-full object-contain h-[112px]"
                 alt="Card background"
                 src="https://nextui.org/images/hero-card-complete.jpeg"
               />
@@ -407,7 +407,7 @@ export const VendorProductCard = () => {
                 shadow="md"
                 width="100%"
                 radius="lg"
-                className="w-full object-cover h-[112px]"
+                className="w-full object-contain h-[112px]"
                 alt="Card background"
                 src="https://nextui.org/images/hero-card-complete.jpeg"
               />
@@ -500,7 +500,7 @@ export const VendorProductCard = () => {
                 shadow="md"
                 width="100%"
                 radius="lg"
-                className="w-full object-cover h-[112px]"
+                className="w-full object-contain h-[112px]"
                 alt="Card background"
                 src="https://nextui.org/images/hero-card-complete.jpeg"
               />

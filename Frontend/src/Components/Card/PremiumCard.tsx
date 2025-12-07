@@ -211,7 +211,7 @@ export const PremiumCard = ({
               shadow="md"
               width="100%"
               radius="lg"
-              className={`w-full object-cover cursor-pointer ${from !== "ProductView"
+              className={`w-full object-contain cursor-pointer ${from !== "ProductView"
                   ? "min-h-[176px] max-h-[176px]"
                   : "min-h-[50px] max-h-[50px]"
                 }`}

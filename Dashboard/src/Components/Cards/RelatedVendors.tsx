@@ -48,7 +48,7 @@ export const RelatedVendors = ({
               shadow="md"
               width="100%"
               radius="lg"
-              className={`w-full object-cover  ${
+              className={`w-full object-contain  ${
                 from !== "ProductView"
                   ? "min-h-[176px] max-h-[176px]"
                   : "min-h-[50px] max-h-[100px]"

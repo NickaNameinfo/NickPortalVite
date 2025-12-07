@@ -29,7 +29,7 @@ export const RelatedVendors = () => {
               shadow="md"
               width="100%"
               radius="lg"
-              className="w-full object-cover min-h-[176px]"
+              className="w-full object-contain min-h-[176px]"
               src="https://app.requestly.io/delay/1000/https://nextui.org/images/hero-card-complete.jpeg"
             />
           </CardBody>

@@ -101,7 +101,7 @@ export const ProductViewCard = ({ item = null }) => {
               shadow="md"
               width={250}
               radius="lg"
-              className="w-full object-cover min-h-[176px] max-h-[176px]"
+              className="w-full object-contain min-h-[176px] max-h-[176px]"
               src={`${item?.photo}`}
               height={250}
             />

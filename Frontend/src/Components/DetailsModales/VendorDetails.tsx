@@ -66,7 +66,7 @@ export const VendorDetails = (props: VendorDetailsProps) => {
                           src={`${infoData.baseApi}/${data?.data?.[0]?.vendorImage}`}
                           width="100%"
                           radius="lg"
-                          className="w-full object-cover md:h-[222px] xm:h-[150px] mm:h-[150px]  ml:h-[150px]"
+                          className="w-full object-contain md:h-[222px] xm:h-[150px] mm:h-[150px]  ml:h-[150px]"
                         />
                       </CardBody>
                     </Card>
@@ -155,7 +155,7 @@ export const VendorDetails = (props: VendorDetailsProps) => {
                       </span>
                       <Image
                         isZoomed
-                        className="w-full object-cover md:h-[222px] xm:h-[150px] mm:h-[145px] ml:h-[145px]"
+                        className="w-full object-contain md:h-[222px] xm:h-[150px] mm:h-[145px] ml:h-[145px]"
                         height={300}
                         alt="Here no Image"
                         src="https://nextui-docs-v2.vercel.app/images/hero-card-complete.jpeg"

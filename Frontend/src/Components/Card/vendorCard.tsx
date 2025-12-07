@@ -18,7 +18,7 @@ export const VendorCard = ({ item = null }) => {
               isZoomed
               alt="Here no Image"
               width="100%"
-              className="w-full object-cover"
+              className="w-full object-contain"
               src={`${infoData.baseApi}/${item.vendorImage}`}
             />
           ) : (

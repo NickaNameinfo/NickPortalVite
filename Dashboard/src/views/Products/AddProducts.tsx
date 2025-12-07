@@ -71,6 +71,7 @@ const AddProducts = () => {
   const [uploadfile] = useUploadFileMutation();
   const { productId } = useParams();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [selectedFileName, setSelectedFileName] = React.useState<string>("No file selected (file size exceeds 500KB)");
   let tempFormData = watch();
 
   const {
@@ -194,6 +195,8 @@ const AddProducts = () => {
       setValue("size", productData?.data?.size || "");
       setValue("weight", productData?.data?.weight || "");
       setValue("unitSize", productData?.data?.unitSize || "");
+      // Reset file name when editing
+      setSelectedFileName(productData?.data?.photo ? "Current photo (click to change)" : "No file selected");
       // Check if size management is enabled (has sizeUnitSizeMap with multiple entries)
       if (productData?.data?.sizeUnitSizeMap) {
         try {
@@ -1375,13 +1378,14 @@ const AddProducts = () => {
 
                   <div className="flex">
                     <Controller
-                      name="photo" // Changed to reflect a text input
+                      name="photo"
                       control={control}
                       render={({ field }) => (
                         <div style={{ position: "relative", width: "100%" }}>
                           <input
                             type="file"
                             id="file"
+                            accept="image/*"
                             style={{
                               opacity: 0,
                               position: "absolute",
@@ -1389,16 +1393,18 @@ const AddProducts = () => {
                               width: "100%",
                             }}
                             onChange={(e) => {
-                              const file = e.target.files[0];
-                              if (file && file.size > 500 * 1024) { // 500KB limit
-                                alert("File size exceeds 500KB. Please select a smaller file.");
-                                e.target.value = ''; // Clear the input
-                                document.getElementById("fileLabel").innerText = "No file selected";
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                if (file.size > 500 * 1024) { // 500KB limit
+                                  alert("File size exceeds 500KB. Please select a smaller file.");
+                                  e.target.value = ''; // Clear the input
+                                  setSelectedFileName("No file selected");
+                                } else {
+                                  field.onChange(file); // Update form state with selected file
+                                  setSelectedFileName(file.name);
+                                }
                               } else {
-                                field.onChange(file); // Update form state with selected file
-                                document.getElementById("fileLabel").innerText = file
-                                  ? file.name
-                                  : "No file selected"; // Update label dynamically
+                                setSelectedFileName("No file selected");
                               }
                             }}
                           />
@@ -1413,19 +1419,27 @@ const AddProducts = () => {
                               textAlign: "center",
                               cursor: "pointer",
                               fontSize: "14px",
+                              transition: "all 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = "rgba(128, 128, 128, 0.1)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = "transparent";
                             }}
                           >
                             Choose File
                           </label>
                           <span
-                            id="fileLabel"
                             style={{
                               marginLeft: "10px",
                               textAlign: "start",
                               fontSize: "12px",
+                              color: selectedFileName === "No file selected" ? "#666" : "#000",
+                              fontWeight: selectedFileName !== "No file selected" ? "500" : "normal",
                             }}
                           >
-                            No file selected
+                            {selectedFileName}
                           </span>
                         </div>
                       )}

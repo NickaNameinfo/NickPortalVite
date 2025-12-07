@@ -124,7 +124,7 @@ const Dashboard = () => {
               radius="lg"
               width="100%"
               alt={item.title}
-              className="w-full object-cover h-[140px]"
+              className="w-full object-contain h-[140px]"
               src={item.img}
             />
           </CardBody>

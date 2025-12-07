@@ -52,7 +52,7 @@ export const VendorHeaderCard = ({ item = null }) => {
             <Image
               isZoomed
               alt="Here no Image"
-              className="w-full object-cover max-h-[85px] p-1"
+              className="w-full object-contain max-h-[85px] p-1"
               src={`${infoData.baseApi}/${item?.vendorImage}`}
             />
           </div>

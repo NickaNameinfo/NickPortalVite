@@ -249,7 +249,7 @@ const ViewBill = () => {
                               alt={product.productName || product.name || `Product ${index + 1}`}
                               width={20}
                               height={10}
-                              className="rounded object-cover"
+                              className="rounded object-contain"
                             />
                           )}
                           <div>
