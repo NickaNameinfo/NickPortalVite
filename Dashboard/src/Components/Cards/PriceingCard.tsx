@@ -16,8 +16,6 @@ import InputNextUI from "../Common/Input/input";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import {
   useAddSubcriptionMutation,
-  useGetSubcriptionByCustomerIDQuery,
-  useUpdatesubscriptionMutation,
 } from "../../views/Subscriptions/Service.mjs";
 import { useAppSelector } from "../../Common/hooks";
 
@@ -36,13 +34,26 @@ function PriceingCard({ item = null, subscription = null }) {
     id: currentUserId,
     subscriptionType: subscription.key ? subscription.key : null,
   };
-  const { data, error, refetch } =
-    useGetSubcriptionByCustomerIDQuery(tempValues, { skip: !tempValues });
+
   const currentloginDetails = useAppSelector(
     (state) => state.globalConfig.currentloginDetails
   );
+
+  // Get current subscription from currentloginDetails
+  const currentSubscription = React.useMemo(() => {
+    if (currentloginDetails?.data?.subscriptions && Array.isArray(currentloginDetails.data.subscriptions)) {
+      // Find the subscription that matches the current subscription type and is active
+      const activeSubscription = currentloginDetails.data.subscriptions.find(
+        (sub: any) => sub.subscriptionType === subscription?.key && sub.status === "1"
+      );
+      return activeSubscription || null;
+    }
+    return null;
+  }, [currentloginDetails, subscription?.key]);
+
+  // Use currentSubscription if available, otherwise fall back to data from query
+  const subscriptionData = currentSubscription;
   const [addSubCription] = useAddSubcriptionMutation();
-  const [updatesubscription] = useUpdatesubscriptionMutation();
   const [scriptLoaded, setScriptLoaded] = React.useState(false);
 
   // Razorpay script loading logic (kept as is)
@@ -138,12 +149,10 @@ function PriceingCard({ item = null, subscription = null }) {
       subscriptionPlan: item.key,
       customerId: currentUserId,
       status: 1,
-      id: data?.data?.id,
       freeCount: 0,
       paymentId: paymentId,
     };
     let result = await addSubCription(tempApiValue);
-    refetch();
   };
 
   // Helper functions for price calculation and plan styling
@@ -192,7 +201,7 @@ function PriceingCard({ item = null, subscription = null }) {
   return (
     <div>
       <Card
-        className={`max-w-[400px] border-2 ${planStyles.borderClass} ${data?.data?.subscriptionPlan === item.key ? "bg-stripe-gradient" : ""
+        className={`max-w-[400px] border-2 ${planStyles.borderClass} ${subscriptionData?.subscriptionPlan === item.key ? "bg-stripe-gradient" : ""
           }`}
       >
         {/* CardHeader: Plan Name, Status, and Billing Info */}
@@ -206,13 +215,13 @@ function PriceingCard({ item = null, subscription = null }) {
               )}
               <p className="text-xl font-bold">{item.name} {(item.key === "PL1_002" ? <span className="text-red-500 text-base">( 1 - 100 Products)</span> : item.key === "PL1_003" ? <span className="text-red-500 text-base">( 1 - 200 Products)</span> : item.key === "PL1_004" || item.key === "PL1_005" ? <span className="text-red-500 text-base"> ( Above 200 Products) </span> : "")}<span className="text-red-500 text-base"></span></p>
               <p className="text-small text-default-500">Billed Annually <span className="text-red-500 text-base">(Yearly)</span></p>
-              {data?.data?.subscriptionPlan === item.key && (
+              {subscriptionData?.subscriptionPlan === item.key && (
                 <p className="text-small text-red-500 mt-1">
-                  Current Plan Items : {data?.data?.subscriptionCount}
+                  Current Plan Items : {subscriptionData?.subscriptionCount || 0}
                 </p>
               )}
             </div>
-            {data?.data?.subscriptionPlan === item.key && (
+            {subscriptionData?.subscriptionPlan === item.key && (
               <Chip color="warning" variant="dot" className="ml-4">Current Plan</Chip>
             )}
           </div>

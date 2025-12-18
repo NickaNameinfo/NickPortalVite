@@ -72,7 +72,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
   const [currentStock, setCurrentStock] = React.useState<number>(0);
   const [currentDiscount, setCurrentDiscount] = React.useState<number>(0);
   const [originalPrice, setOriginalPrice] = React.useState<number>(0);
-  const [sizeUnitSizeMap, setSizeUnitSizeMap] = React.useState<Record<string, { unitSize: string; qty: string; price: string; discount: string; discountPer: string; total: string; grandTotal: string }> | null>(null);
+  const [sizeUnitSizeMap, setSizeUnitSizeMap] = React.useState<Record<string, { unitSize: string; qty: string; price: string; discount: string; discount: string; total: string; grandTotal: string }> | null>(null);
   const [feedback, setFeedback] = React.useState<string>("");
   const [rating, setRating] = React.useState<number>(0);
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
@@ -163,7 +163,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
         const initialOriginalPrice = product?.price || product?.total || props?.item?.price || 0;
         setCurrentPrice(Number(initialPrice));
         setOriginalPrice(Number(initialOriginalPrice));
-        setCurrentDiscount(Number(product?.discountPer) || 0);
+        setCurrentDiscount(Number(product?.discount) || 0);
         setCurrentStock(Number(product?.unitSize) || 0);
       }
     } else {
@@ -173,7 +173,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
       const initialOriginalPrice = product?.price || product?.total || props?.item?.price || 0;
       setCurrentPrice(Number(initialPrice));
       setOriginalPrice(Number(initialOriginalPrice));
-      setCurrentDiscount(Number(product?.discountPer) || 0);
+      setCurrentDiscount(Number(product?.discount) || 0);
       setCurrentStock(Number(product?.unitSize) || 0);
     }
   }, [props?.item, cart?.data?.size]);
@@ -187,7 +187,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
       // Prioritize total/grandTotal (discounted price) over price
       const sizePrice = Number(sizeData.total) || Number(sizeData.grandTotal) || Number(sizeData.price) || 0;
       const sizeOriginalPrice = Number(sizeData.price) || Number(product?.price) || Number(product?.total) || 0;
-      const sizeDiscount = Number(sizeData.discountPer) || Number(sizeData.discount) || 0;
+      const sizeDiscount = Number(sizeData.discount) || Number(sizeData.discount) || 0;
       const sizeStock = Number(sizeData.unitSize) || 0;
       
       if (sizePrice > 0) {
@@ -204,7 +204,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
       const originalOriginalPrice = product?.price || product?.total || props?.item?.price || 0;
       setCurrentPrice(Number(originalPrice));
       setOriginalPrice(Number(originalOriginalPrice));
-      setCurrentDiscount(Number(product?.discountPer) || 0);
+      setCurrentDiscount(Number(product?.discount) || 0);
       setCurrentStock(Number(product?.unitSize) || 0);
     }
   }, [selectedSize, sizeUnitSizeMap, props?.item]);
@@ -423,13 +423,13 @@ export const ProductDetail = (props: ProductDetailProps) => {
                       </h2>
                       {/* Discount Badge */}
                       {currentDiscount > 0 && (
-                        <div className="mb-2">
-                          <span className="inline-block px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded">
+                        <div className="my-2">
+                          <span className="inline-block px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded border border-red-300">
                             {currentDiscount.toFixed(0)}% OFF
                           </span>
                         </div>
                       )}
-                      <div className="flex justify-between items-center">
+                      <div className="flex justify-between items-center mt-2">
                         <div className="flex items-center gap-2">
                           <p className="text-black text-lg font-normal">
                             Rs: {currentPrice > 0 ? currentPrice.toFixed(0) : (() => {
@@ -481,7 +481,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                                     // Update price, discount, and stock when size is selected
                                     const sizePrice = Number(sizeData.total) || Number(sizeData.grandTotal) || Number(sizeData.price) || 0;
                                     const sizeOriginalPrice = Number(sizeData.price) || 0;
-                                    const sizeDiscount = Number(sizeData.discountPer) || Number(sizeData.discount) || 0;
+                                    const sizeDiscount = Number(sizeData.discount) || Number(sizeData.discount) || 0;
                                     const sizeStock = Number(sizeData.unitSize) || 0;
                                     
                                     if (sizePrice > 0) {

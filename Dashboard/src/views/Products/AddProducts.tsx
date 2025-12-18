@@ -14,6 +14,11 @@ import {
   DropdownTrigger,
   Image,
   Input,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
   RadioGroup,
   Select,
   SelectItem,
@@ -37,12 +42,13 @@ import { useUploadFileMutation } from "../../Service.mjs"
 import { useGetCategoriesQuery } from "../Categories/Service.mjs";
 import { getCookie } from "../.././JsFiles//CommonFunction.mjs";
 import InputNextUI from "../../Components/Common/Input/input";
-import { infoData } from "../../configData";
-import { useGetSubcriptionByCustomerIDQuery } from "../Subscriptions/Service.mjs";
 import { useGetVendorsProductByIdQuery } from "../VendorProducts/Service.mjs";
 import { useGetStoresProductByIDQuery } from "../Store/Service.mjs";
 import { SubscriptionExpiredModal } from "../../Components/SubscriptionExpiredModal";
 import { CustomRadio } from "../../Components/CustomRadio";
+import JsBarcode from "jsbarcode";
+import { useGetStoresByIDQuery } from "../Store/Service.mjs";
+import { useAppSelector } from "../../Common/hooks";
 
 const AddProducts = () => {
   const {
@@ -57,6 +63,8 @@ const AddProducts = () => {
   const currentVendorUserId = getCookie("vendorId");
   const navigate = useNavigate();
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = React.useState(false);
+  const [isBarcodeModalOpen, setIsBarcodeModalOpen] = React.useState(false);
+  const [barcodeCount, setBarcodeCount] = React.useState<number>(1);
   const [enableSizeManagement, setEnableSizeManagement] = React.useState<boolean>(false);
   const [sizeUnitSizeMap, setSizeUnitSizeMap] = React.useState<Record<string, { unitSize: string; qty: string; price: string; discount: string; discountPer: string; total: string; grandTotal: string }>>({});
   const [sizeEntries, setSizeEntries] = React.useState<Array<{ size: string; unitSize: string; qty: string; price: string; discount: string; discountPer: string; total: string; grandTotal: string; id: string }>>([]);
@@ -73,7 +81,13 @@ const AddProducts = () => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [selectedFileName, setSelectedFileName] = React.useState<string>("No file selected (file size exceeds 500KB)");
   let tempFormData = watch();
+  const { data: storeData, error: storeError, refetch: storeRefetch } = useGetStoresByIDQuery(
+    Number(currentStoreUserId), { skip: !currentStoreUserId }
+  );
 
+  const currentloginDetails = useAppSelector(
+    (state) => state.globalConfig.currentloginDetails
+  );
   const {
     data: categoryData,
     error: categoryerror,
@@ -84,48 +98,24 @@ const AddProducts = () => {
     ? currentStoreUserId
     : currentVendorUserId;
 
-  // let sellingProductValues = {
-  //   id: currentUserId,
-  //   subscriptionType: "Plan0",
-  // };
+  // Get subscription data from currentloginDetails
+  const ecommerceSubscription = React.useMemo(() => {
+    return currentloginDetails?.data?.subscriptions?.find(
+      (sub: any) => sub.subscriptionType === "Plan1" && sub.status === "1"
+    );
+  }, [currentloginDetails]);
 
-  // const {
-  //   data: sellingProductValuesData,
-  //   error: sellingProductValuesError,
-  //   refetch: sellingProductValuesRefetch,
-  // } = useGetSubcriptionByCustomerIDQuery(sellingProductValues, { skip: !currentUserId });
+  const customizeSubscription = React.useMemo(() => {
+    return currentloginDetails?.data?.subscriptions?.find(
+      (sub: any) => sub.subscriptionType === "Plan2" && sub.status === "1"
+    );
+  }, [currentloginDetails]);
 
-  let tempEcommereceValues = {
-    id: currentUserId,
-    subscriptionType: "Plan1",
-  };
-  const {
-    data: ecommereceSubcriptionData,
-    error,
-    refetch,
-  } = useGetSubcriptionByCustomerIDQuery(tempEcommereceValues, { skip: !currentUserId, refetchOnMountOrArgChange: true });
-
-  let isBookingValues = {
-    id: currentUserId,
-    subscriptionType: "Plan3",
-  };
-
-  const {
-    data: isBooking,
-    error: isBookingError,
-    refetch: isBookingRefetch,
-  } = useGetSubcriptionByCustomerIDQuery(isBookingValues, { skip: !currentUserId, refetchOnMountOrArgChange: true });
-
-  let temCustomizeValues = {
-    id: currentUserId,
-    subscriptionType: "Plan2",
-  };
-
-  const {
-    data: customizeSubcriptionData,
-    error: customizeError,
-    refetch: customizeRefetch,
-  } = useGetSubcriptionByCustomerIDQuery(temCustomizeValues, { skip: !currentUserId, refetchOnMountOrArgChange: true });
+  const bookingSubscription = React.useMemo(() => {
+    return currentloginDetails?.data?.subscriptions?.find(
+      (sub: any) => sub.subscriptionType === "Plan3" && sub.status === "1"
+    );
+  }, [currentloginDetails]);
 
   const {
     data: vendorProducts,
@@ -135,7 +125,7 @@ const AddProducts = () => {
 
   const {
     data: storeProducts,
-    error: storeError,
+    error: storeProductsError,
     refetch: stroeRefetch,
   } = useGetStoresProductByIDQuery(Number(currentStoreUserId), { skip: !currentStoreUserId, refetchOnMountOrArgChange: true });
 
@@ -149,8 +139,6 @@ const AddProducts = () => {
     setValue("paymentMode", ["1", "2", "3"]);
   }, []);
 
-
-  console.log(tempFormData, "tempFormData34")
 
   React.useEffect(() => {
     if (!productId) {
@@ -321,7 +309,7 @@ const AddProducts = () => {
       paymentMode: String(tempFormData?.paymentMode || ""),
       isEnableCustomize: Number(tempFormData?.isEnableCustomize) ? "1" : "0",
       isEnableEcommerce: Number(tempFormData?.isEnableEcommerce) ? "1" : "0",
-      isBooking: Number(isBooking?.data?.isBooking) ? "1" : "0",
+      isBooking: bookingSubscription ? "1" : "0",
       photo: fileResult?.data?.fileUrl,
       serviceType: tempFormData?.serviceType || "Product",
       unitSize: unitSizeForSize,
@@ -379,6 +367,262 @@ const AddProducts = () => {
     setIsLoading(false);
   };
 
+  const handlePrintBarcode = (count: number) => {
+    if (!productId || !productData?.data) return;
+    
+    const productIdStr = String(productId);
+    const productName = productData.data.name || "Product";
+    const productColor = productData.data.color || "N/A";
+    const currentStoreName = storeData?.data?.storeName || storeData?.data?.storename || "STORE";
+    
+    // Determine if we should use sizeEntries or single product data
+    const useSizeEntries = enableSizeManagement && sizeEntries.length > 0;
+    const entriesToPrint = useSizeEntries ? sizeEntries : [{
+      size: productData.data.size || "N/A",
+      price: productData.data.price || productData.data.total || "0",
+      unitSize: productData.data.unitSize || String(count),
+      id: productIdStr
+    }];
+    
+    const printWindow = window.open('', '_blank');
+    
+    if (!printWindow) {
+      alert('Please allow popups to print barcodes');
+      return;
+    }
+
+    let htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Barcode Print</title>
+          <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.12.1/dist/JsBarcode.all.min.js"></script>
+          <style>
+            @media print {
+              @page {
+                margin: 5mm;
+                size: A4;
+              }
+              body {
+                margin: 0;
+                padding: 0;
+              }
+              .label-container {
+                page-break-inside: avoid;
+              }
+            }
+            body {
+              font-family: Arial, sans-serif;
+              padding: 10px;
+              background: white;
+            }
+            .label-container {
+              width: 90mm;
+              height: 55mm;
+              border: 1px solid #000;
+              margin: 5mm;
+              padding: 8px;
+              display: inline-block;
+              vertical-align: top;
+              box-sizing: border-box;
+              position: relative;
+              background: white;
+            }
+            .label-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-start;
+              margin-bottom: 8px;
+            }
+            .label-left {
+              text-align: left;
+            }
+            .label-right {
+              text-align: right;
+            }
+            .label-title {
+              font-size: 18px;
+              font-weight: bold;
+              line-height: 1.2;
+              margin: 0;
+            }
+            .label-number {
+              font-size: 14px;
+              font-weight: normal;
+              margin-top: 2px;
+            }
+            .barcode-section {
+              position: relative;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 8px 0;
+              min-height: 100px;
+            }
+            .side-number {
+              writing-mode: vertical-rl;
+              text-orientation: mixed;
+              font-size: 14px;
+              font-weight: bold;
+              padding: 0 5px;
+              height: 100px;
+              display: flex;
+              align-items: center;
+            }
+            .side-number-left {
+              transform: rotate(180deg);
+            }
+            .barcode-wrapper {
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+            }
+            .barcode-value {
+              font-size: 12px;
+              font-weight: bold;
+              margin-top: 5px;
+              letter-spacing: 1px;
+            }
+            .product-code {
+              font-size: 11px;
+              margin-top: 3px;
+              font-weight: normal;
+            }
+            .label-footer {
+              display: flex;
+              justify-content: space-between;
+              margin-top: 8px;
+              font-size: 11px;
+            }
+            .footer-column {
+              flex: 1;
+              text-align: left;
+            }
+            .footer-label {
+              font-weight: bold;
+              font-size: 10px;
+              margin-bottom: 2px;
+            }
+            .footer-value {
+              font-size: 11px;
+            }
+            canvas {
+              max-width: 100%;
+              height: auto;
+              image-rendering: crisp-edges;
+            }
+          </style>
+        </head>
+        <body>
+    `;
+
+    // Generate labels - if sizeEntries exist, create labels for each size
+    const labelsToGenerate: Array<{ size: string; price: string; unitSize: string; productId: string }> = [];
+    
+    if (useSizeEntries) {
+      // For each size entry, generate labels based on unitSize (count) multiplied by count input
+      entriesToPrint.forEach((entry) => {
+        const unitSizeCount = Number(entry.unitSize) || 1;
+        const labelsPerSize = count * unitSizeCount; // Count input * unitSize = total labels for this size
+        for (let j = 0; j < labelsPerSize; j++) {
+          labelsToGenerate.push({
+            size: entry.size.toUpperCase(),
+            price: entry.price,
+            unitSize: entry.unitSize,
+            productId: productIdStr
+          });
+        }
+      });
+    } else {
+      // Single product - generate labels based on count
+      for (let i = 0; i < count; i++) {
+        labelsToGenerate.push({
+          size: entriesToPrint[0].size.toUpperCase(),
+          price: entriesToPrint[0].price,
+          unitSize: entriesToPrint[0].unitSize || String(count),
+          productId: productIdStr
+        });
+      }
+    }
+
+    // Generate HTML for all labels
+    labelsToGenerate.forEach((label, i) => {
+      const leftSideNumber = label.productId.slice(-4) || "0000";
+      const rightSideNumber = label.productId.padStart(8, '0') || "00000000";
+      
+      htmlContent += `
+        <div class="label-container">
+          <div class="label-header">
+            <div class="label-left">
+              <div class="label-title">${productName}</div>
+              <div class="label-number">${label.productId}</div>
+            </div>
+            <div class="label-right">
+              <div class="label-title">${currentStoreName}</div>
+            </div>
+          </div>
+          <div class="barcode-section">
+            <div class="side-number side-number-left">${leftSideNumber}</div>
+            <div class="barcode-wrapper">
+              <canvas id="barcode-${i}"></canvas>
+              <div class="barcode-value">${label.productId}</div>
+            </div>
+            <div class="side-number">${rightSideNumber}</div>
+          </div>
+          <div class="label-footer">
+            <div class="footer-column">
+              <div class="footer-label">M.R.P. ₹ :-</div>
+              <div class="footer-value">${Math.round(Number(label.price))}</div>
+            </div>
+            <div class="footer-column">
+              <div class="footer-label">COLOUR</div>
+              <div class="footer-value">${productColor}</div>
+            </div>
+            <div class="footer-column">
+              <div class="footer-label">SIZE</div>
+              <div class="footer-value">${label.size}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    htmlContent += `
+          <script>
+            window.onload = function() {
+              const labels = ${JSON.stringify(labelsToGenerate)};
+              labels.forEach(function(label, i) {
+                const canvas = document.getElementById("barcode-" + i);
+                if (canvas && typeof JsBarcode !== 'undefined') {
+                  try {
+                    JsBarcode(canvas, label.productId, {
+                      format: "CODE128",
+                      width: 2.5,
+                      height: 70,
+                      displayValue: false,
+                      margin: 5,
+                      background: "#ffffff",
+                      lineColor: "#000000",
+                    });
+                  } catch (error) {
+                    console.error("Error generating barcode:", error);
+                  }
+                }
+              });
+              setTimeout(function() {
+                window.print();
+              }, 800);
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
+
   return (
     <div className="mx-3">
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -415,13 +659,27 @@ const AddProducts = () => {
             <Chip variant="flat" color="primary">
               Total Ecommerce Subscription
             </Chip>
-            <p className="mt-2">Total : <Chip variant="flat" color="success" size="sm">{ecommereceSubcriptionData?.data?.subscriptionCount ?? 0}</Chip> Used : <Chip variant="flat" color="danger" size="sm">{filteredEcommereceData?.length ?? 0}</Chip></p>
+            <p className="mt-2">Total : <Chip variant="flat" color="success" size="sm">
+              {(() => {
+                const ecommerceSubscription = currentloginDetails?.data?.subscriptions?.find(
+                  (sub: any) => sub.subscriptionType === "Plan1" && sub.status === "1"
+                );
+                return ecommerceSubscription?.subscriptionCount ?? 0;
+              })()}
+            </Chip> Used : <Chip variant="flat" color="danger" size="sm">{filteredEcommereceData?.length ?? 0}</Chip></p>
           </div>
           <div className="text-center">
             <Chip variant="flat" color="danger">
               Total Customize Subscription
             </Chip>
-            <p className="mt-2">Total : <Chip variant="flat" color="success" size="sm">{customizeSubcriptionData?.data?.subscriptionCount ?? 0}</Chip> Used : <Chip variant="flat" color="danger" size="sm">{filteredCustomizeData?.length ?? 0}</Chip></p>
+            <p className="mt-2">Total : <Chip variant="flat" color="success" size="sm">
+              {(() => {
+                const customizeSubscription = currentloginDetails?.data?.subscriptions?.find(
+                  (sub: any) => sub.subscriptionType === "Plan2" && sub.status === "1"
+                );
+                return customizeSubscription?.subscriptionCount ?? 0;
+              })()}
+            </Chip> Used : <Chip variant="flat" color="danger" size="sm">{filteredCustomizeData?.length ?? 0}</Chip></p>
           </div>
           {/* <div className="text-center">
             <Chip variant="flat" color="warning">
@@ -429,7 +687,7 @@ const AddProducts = () => {
             </Chip>
             <p className="mt-2">Total : <Chip variant="flat" color="success" size="sm">{productAddCount ?? 0}</Chip> Used : <Chip variant="flat" color="danger" size="sm">{productListValues?.length ?? 0}</Chip></p>
           </div> */}
-          <div className="text-center">
+          <div className="text-center flex gap-2">
             <Button
               color="primary"
               type="submit"
@@ -440,6 +698,38 @@ const AddProducts = () => {
             >
               {isLoading ? "...Updating" : productId ? "Update Product" : "Add Product"}
             </Button>
+            {productId && (
+              <div className="flex items-center gap-2">
+                <Button
+                  color="secondary"
+                  size="md"
+                  onClick={() => setIsBarcodeModalOpen(true)}
+                >
+                  Print Barcode
+                </Button>
+                {(() => {
+                  // Find subscription matching PL1_005 and Plan1
+                  const matchingSubscription = currentloginDetails?.data?.subscriptions?.find(
+                    (sub: any) => 
+                      sub.subscriptionPlan === "PL1_005" && 
+                      sub.subscriptionType === "Plan1" &&
+                      sub.status === "1"
+                  );
+                  
+                  return matchingSubscription ? (
+                    <Chip 
+                      size="sm" 
+                      variant="flat" 
+                      color="primary"
+                      className="text-xs"
+                    >
+                      Plan: {matchingSubscription.subscriptionPlan} 
+                      ({matchingSubscription.subscriptionCount} items)
+                    </Chip>
+                  ) : null;
+                })()}
+              </div>
+            )}
           </div>
         </div>
         <div>
@@ -771,24 +1061,15 @@ const AddProducts = () => {
                             field.onChange(e.target.checked ? "1" : "0")
                           } // Update value on change
                           isDisabled={
-                            !isBooking?.data
-                              ?.subscriptionCount ||
+                            !bookingSubscription?.subscriptionCount ||
                             String(productData?.data?.serviceType) === "Service" ||
-                            Number(
-                              isBooking?.data
-                                ?.subscriptionCount
-                            ) -
-                            isBooking?.length <=
-                            0
+                            Number(bookingSubscription?.subscriptionCount) <= 0
                           }
                         >
                           Enable booking
                           <span className="ml-2">
                             <Chip variant="flat" color="primary">
-                              {Number(
-                                isBooking?.data
-                                  ?.subscriptionCount
-                              ) - isBooking?.length}
+                              {Number(bookingSubscription?.subscriptionCount ?? 0)}
                             </Chip>
                           </span>
                         </Checkbox>
@@ -954,9 +1235,15 @@ const AddProducts = () => {
                             <SelectItem key="m" value="m">M</SelectItem>
                             <SelectItem key="l" value="l">L</SelectItem>
                             <SelectItem key="xl" value="xl">XL</SelectItem>
-                            <SelectItem key="xxl" value="xxl">XXL</SelectItem>
-                            <SelectItem key="xxxl" value="xxxl">XXXL</SelectItem>
-                            <SelectItem key="xxxxl" value="xxxxl">XXXXL</SelectItem>
+                            <SelectItem key="2lx" value="2lx">2LX</SelectItem>
+                            <SelectItem key="3lx" value="3lx">3LX</SelectItem>
+                            <SelectItem key="4lx" value="4lx">4LX</SelectItem>
+                            <SelectItem key="5lx" value="5lx">5LX</SelectItem>
+                            <SelectItem key="6lx" value="6lx">6LX</SelectItem>
+                            <SelectItem key="7lx" value="7lx">7LX</SelectItem>
+                            <SelectItem key="8lx" value="8lx">8LX</SelectItem>
+                            <SelectItem key="9lx" value="9lx">9LX</SelectItem>
+                            <SelectItem key="10lx" value="10lx">10LX</SelectItem>
                           </Select>
                           <Input
                             type="text"
@@ -1490,13 +1777,9 @@ const AddProducts = () => {
                               field.onChange(e.target.checked ? "1" : "0")
                             } // Update value on change
                             isDisabled={
-                              !ecommereceSubcriptionData?.data
-                                ?.subscriptionCount ||
+                              !ecommerceSubscription?.subscriptionCount ||
                               String(productData?.data?.isEnableEcommerce) === "1" ||
-                              Number(
-                                ecommereceSubcriptionData?.data
-                                  ?.subscriptionCount
-                              ) -
+                              Number(ecommerceSubscription?.subscriptionCount) -
                               filteredEcommereceData?.length <=
                               0
                             }
@@ -1504,10 +1787,7 @@ const AddProducts = () => {
                             Enable Ecommerce
                             <span className="ml-2">
                               <Chip variant="flat" color="primary">
-                                {Number(
-                                  ecommereceSubcriptionData?.data
-                                    ?.subscriptionCount
-                                ) - filteredEcommereceData?.length}
+                                {Number(ecommerceSubscription?.subscriptionCount ?? 0) - filteredEcommereceData?.length}
                               </Chip>
                             </span>
                           </Checkbox>
@@ -1529,14 +1809,10 @@ const AddProducts = () => {
                                 field.onChange(e.target.checked ? "1" : "0")
                               } // Update value on change
                               isDisabled={
-                                !customizeSubcriptionData?.data
-                                  ?.subscriptionCount ||
+                                !customizeSubscription?.subscriptionCount ||
                                 String(productData?.data?.isEnableCustomize) ===
                                 "1" ||
-                                Number(
-                                  customizeSubcriptionData?.data
-                                    ?.subscriptionCount
-                                ) -
+                                Number(customizeSubscription?.subscriptionCount) -
                                 filteredCustomizeData?.length <=
                                 0
                               }
@@ -1544,10 +1820,7 @@ const AddProducts = () => {
                               Enable Customize{" "}
                               <span>
                                 <Chip variant="flat" color="primary">
-                                  {Number(
-                                    customizeSubcriptionData?.data
-                                      ?.subscriptionCount
-                                  ) - filteredCustomizeData?.length}
+                                  {Number(customizeSubscription?.subscriptionCount ?? 0) - filteredCustomizeData?.length}
                                 </Chip>
                               </span>
                             </Checkbox>
@@ -1565,7 +1838,206 @@ const AddProducts = () => {
         isOpen={isSubscriptionModalOpen}
         onClose={() => setIsSubscriptionModalOpen(false)}
       />
+      <Modal 
+        isOpen={isBarcodeModalOpen} 
+        onOpenChange={setIsBarcodeModalOpen}
+        placement="center"
+        size="lg"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Print Barcode
+              </ModalHeader>
+              <ModalBody>
+                <div className="flex flex-col gap-4">
+                  <div>
+                    <Input
+                      type="number"
+                      label="Count"
+                      placeholder="Enter number of barcodes to print"
+                      value={String(barcodeCount)}
+                      onChange={(e) => setBarcodeCount(Number(e.target.value) || 1)}
+                      min={1}
+                      size="sm"
+                    />
+                  </div>
+                  {productId && productData?.data && (
+                    <div className="flex flex-col items-center gap-4 p-4">
+                      <div className="text-sm font-semibold">Barcode Preview</div>
+                      {enableSizeManagement && sizeEntries.length > 0 ? (
+                        <div className="flex flex-col gap-4 w-full">
+                          {sizeEntries.map((entry, index) => (
+                            <BarcodePreview 
+                              key={entry.id || index}
+                              productData={productData.data} 
+                              storeData={storeData?.data}
+                              sizeEntry={entry}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <BarcodePreview 
+                          productData={productData.data} 
+                          storeData={storeData?.data}
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button 
+                  color="primary" 
+                  onPress={() => {
+                    handlePrintBarcode(barcodeCount);
+                    onClose();
+                  }}
+                >
+                  Print {barcodeCount} Barcode{barcodeCount > 1 ? 's' : ''}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 };
+
+// Barcode Preview Component with Label Design
+const BarcodePreview = ({ productData, storeData, sizeEntry }: { productData: any; storeData?: any; sizeEntry?: any }) => {
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const productIdStr = String(productData?.id || "");
+  const productName = productData?.name || "Product";
+  // Use sizeEntry data if available, otherwise use productData
+  const productMRP = sizeEntry?.price || productData?.price || productData?.total || "0";
+  const productSize = sizeEntry?.size ? sizeEntry.size.toUpperCase() : (productData?.size || "N/A");
+  const productColor = productData?.color || "N/A";
+  const unitSize = sizeEntry?.unitSize || productData?.unitSize || "0";
+  const currentStoreName = storeData?.storeName || storeData?.storename || "STORE";
+  
+  // Generate side numbers
+  const leftSideNumber = productIdStr.slice(-4) || "0000";
+  const rightSideNumber = productIdStr.padStart(8, '0') || "00000000";
+
+  React.useEffect(() => {
+    if (canvasRef.current && productIdStr) {
+      try {
+        // Clear canvas first
+        const ctx = canvasRef.current.getContext('2d');
+        if (ctx) {
+          ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        }
+        
+        JsBarcode(canvasRef.current, productIdStr, {
+          format: "CODE128",
+          width: 2.5,
+          height: 70,
+          displayValue: false,
+          margin: 5,
+          background: "#ffffff",
+          lineColor: "#000000",
+        });
+      } catch (error) {
+        console.error("Error generating barcode:", error);
+      }
+    }
+  }, [productIdStr]);
+
+  return (
+    <div className="flex flex-col items-center">
+      <div 
+        className="bg-white border-2 border-black p-3"
+        style={{
+          width: '90mm',
+          height: '65mm',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {/* Header Section */}
+        <div className="flex justify-between items-start mb-2" style={{ fontSize: '14px' }}>
+          <div className="text-left">
+            <div className="font-bold text-lg leading-tight">{productName}</div>
+            <div className="text-sm mt-1">{productIdStr}</div>
+          </div>
+          <div className="text-right">
+            <div className="font-bold text-lg">{currentStoreName}</div>
+          </div>
+        </div>
+
+        {/* Barcode Section */}
+        <div className="flex items-center justify-center my-2" style={{ minHeight: '100px', position: 'relative' }}>
+          {/* Left Side Number */}
+          <div 
+            className="font-bold text-sm"
+            style={{
+              writingMode: 'vertical-rl',
+              textOrientation: 'mixed',
+              transform: 'rotate(180deg)',
+              padding: '0 5px',
+              height: '100px',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            {leftSideNumber}
+          </div>
+
+          {/* Barcode */}
+          <div className="flex-1 flex flex-col items-center">
+            <canvas 
+              ref={canvasRef} 
+              style={{ 
+                maxWidth: '100%',
+                height: 'auto',
+                imageRendering: 'crisp-edges'
+              }}
+            />
+            <div className="text-xs font-bold mt-1" style={{ letterSpacing: '1px' }}>
+              {productIdStr}
+            </div>
+          </div>
+
+          {/* Right Side Number */}
+          <div 
+            className="font-bold text-sm"
+            style={{
+              writingMode: 'vertical-rl',
+              textOrientation: 'mixed',
+              padding: '0 5px',
+              height: '100px',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            {rightSideNumber}
+          </div>
+        </div>
+
+        {/* Footer Section */}
+        <div className="flex justify-between mt-2 text-xs">
+          <div className="text-left">
+            <div className="font-bold text-xs mb-1">M.R.P. ₹ :-</div>
+            <div className="text-sm">{Math.round(Number(productMRP))}</div>
+          </div>
+          <div className="text-center">
+            <div className="font-bold text-xs mb-1">COLOUR</div>
+            <div className="text-sm">{productColor}</div>
+          </div>
+          <div className="text-right">
+            <div className="font-bold text-xs mb-1">SIZE</div>
+            <div className="text-sm">{productSize}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default AddProducts;

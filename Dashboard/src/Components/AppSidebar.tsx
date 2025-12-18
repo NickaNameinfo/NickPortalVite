@@ -25,7 +25,30 @@ export const AppSidebar = () => {
     (state) => state.globalConfig.isOpenCartModal
   );
   
+  const currentloginDetails = useAppSelector(
+    (state) => state.globalConfig.currentloginDetails
+  );
+  
   const navigate = useNavigate();
+
+  // Filter navigation items based on subscription validation for Billing
+  const filteredNav = React.useMemo(() => {
+    return _nav.filter((item: any) => {
+      // If it's the Billing menu item, validate subscription
+      if (item.key === "Billing") {
+        // Check if user has matching subscription (PL1_005 and Plan1)
+        const hasValidSubscription = currentloginDetails?.data?.subscriptions?.some(
+          (sub: any) => 
+            sub.subscriptionPlan === "PL1_005" && 
+            sub.subscriptionType === "Plan1" &&
+            sub.status === "1"
+        );
+        return hasValidSubscription === true;
+      }
+      // Show all other menu items
+      return true;
+    });
+  }, [currentloginDetails]);
 
   const itemClasses = {
     title: "font-normal text-sm text-black ms-1",
@@ -96,7 +119,7 @@ export const AppSidebar = () => {
           <div className="h-full px-3 pb-4 pt-0 overflow-y-auto custom-scrollbar">
             <div className="scroll-content h-fit left-0 top-0 transition-transform z-40">
               <ul role="list" className="space-y-2 font-medium list-disc">
-                {_nav?.map((result: any) =>
+                {filteredNav?.map((result: any) =>
                   result?.menuType === "single" ? (
                     result?.["key"] === "LogOut" ? (
                       <li className="bg-white rounded-xl cursor-pointer">

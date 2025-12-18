@@ -14,6 +14,9 @@ const AddProducts = React.lazy(
 const ProductsList = React.lazy(
   () => import("../src/views/Products/ProductsList")
 );
+const ScanBarcode = React.lazy(
+  () => import("../src/views/Products/ScanBarcode")
+);
 const AddStores = React.lazy(() => import("../src/views/Store/AddStore"));
 const EditStores = React.lazy(() => import("../src/views/Store/AddStore"));
 const CustomersList = React.lazy(() => import("../src/views/Customers"));
@@ -51,6 +54,7 @@ const routes = [
     element: AddProducts,
   },
   { path: "/ProductsList", name: "ProductsList", element: ProductsList },
+  { path: "/ScanBarcode", name: "ScanBarcode", element: ScanBarcode },
   { path: "/AddStock", name: "AddStock", element: AddStock },
   { path: "/Stores/Add", name: "AddStores", element: AddStores },
   { path: "/Stores/Edit/:itemId", name: "EditStores", element: EditStores },

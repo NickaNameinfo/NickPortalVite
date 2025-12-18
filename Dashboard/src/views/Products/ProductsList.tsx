@@ -100,12 +100,24 @@ const ProductsList = () => {
     React.useEffect(() => {
       if (canvasRef.current) {
         try {
+          // Clear canvas first
+          const ctx = canvasRef.current.getContext('2d');
+          if (ctx) {
+            ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+          }
+          
           JsBarcode(canvasRef.current, productIdStr, {
             format: "CODE128",
-            width: 2,
-            height: 50,
+            width: 3, // Increased for better mobile scanning
+            height: 80, // Increased for better visibility
             displayValue: true,
-            fontSize: 12,
+            fontSize: 16, // Increased font size
+            margin: 10, // Quiet zones for better scanning
+            background: "#ffffff",
+            lineColor: "#000000",
+            textAlign: "center",
+            textPosition: "bottom",
+            textMargin: 5,
           });
         } catch (error) {
           console.error("Error generating barcode:", error);
@@ -114,14 +126,21 @@ const ProductsList = () => {
     }, [productIdStr]);
 
     return (
-      <div className="flex justify-center">
-        <canvas ref={canvasRef} className="max-w-full h-auto" />
+      <div className="flex justify-center bg-white p-2 rounded">
+        <canvas 
+          ref={canvasRef} 
+          className="max-w-full h-auto"
+          style={{ 
+            minWidth: '150px',
+            maxWidth: '100%',
+            imageRendering: 'crisp-edges'
+          }}
+        />
       </div>
     );
   });
 
   const renderCell = React.useCallback((data, columnKey) => {
-    console.log(data, "asdfa7s09df7")
     switch (columnKey) {
       case "product":
         return <p>{data?.product?.name ? data?.product?.name :  data?.name}</p>;
@@ -393,6 +412,14 @@ const ProductsList = () => {
         <h2 className="text-2xl font-bold">Products</h2>
         <div className="flex gap-2">
           <Button
+            color="secondary"
+            onClick={() => nativegate("/ScanBarcode")}
+            size="md"
+            variant="flat"
+          >
+            Scan Barcode
+          </Button>
+          {/* <Button
             color="success"
             onClick={handleDownloadPDF}
             size="md"
@@ -402,7 +429,7 @@ const ProductsList = () => {
             {selectedKeys === "all" || selectedKeys.size > 0 
               ? `Download PDF (${selectedKeys === "all" ? "All" : selectedKeys.size})`
               : "Select Products to Download"}
-          </Button>
+          </Button> */}
           <Button
             color="primary"
             onClick={() => nativegate("/AddProducts")}

@@ -25,6 +25,8 @@ function App() {
   const dispatch = useAppDispatch();
   const { data, error, refetch } = useGetUserQuery(id, { skip: !id });
 
+  console.log(data, "data in app");
+
   // React.useEffect(() => {
   //   refetch();
   // }, [id]);

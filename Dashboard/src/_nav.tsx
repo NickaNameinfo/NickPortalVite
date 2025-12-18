@@ -284,9 +284,9 @@ export const _nav = [
     ? [
         {
           menuType: "single",
-          name: "Billing (Only for subscribed stores)",
+          name: "Billing",
           key: "Billing",
-          // link: "/Billing/List",
+          link: "/Billing/List",
           icons: <IconHome />,
         },
       ]
