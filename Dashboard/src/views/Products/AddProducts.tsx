@@ -72,6 +72,42 @@ const AddProducts = () => {
   const [newUnitSize, setNewUnitSize] = React.useState<string>("");
   const [newPrice, setNewPrice] = React.useState<string>("");
   const [newDiscount, setNewDiscount] = React.useState<string>("");
+  const [customSizes, setCustomSizes] = React.useState<string[]>([]);
+  const sizeInputRef = React.useRef<string>(""); // Ref to preserve value during blur
+
+  // Base size options for autocomplete
+  const baseSizeOptions = React.useMemo(() => [
+    "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90", "95",
+    "xs", "s", "m", "l", "xl", "2lx", "3lx", "4lx", "5lx", "6lx", "7lx", "8lx", "9lx", "10lx"
+  ], []);
+
+  // Helper function to check if a size exists (case-insensitive)
+  const sizeExists = React.useCallback((size: string, sizeList: string[]) => {
+    const normalizedSize = size.trim().toLowerCase();
+    return sizeList.some(s => s.trim().toLowerCase() === normalizedSize);
+  }, []);
+
+  // Combined size options (base + custom sizes)
+  const sizeOptions = React.useMemo(() => {
+    const combined = [...baseSizeOptions];
+    // Add custom sizes that aren't already in the base list
+    customSizes.forEach(customSize => {
+      const trimmed = customSize.trim();
+      if (trimmed && 
+          !sizeExists(trimmed, baseSizeOptions) && 
+          !sizeExists(trimmed, combined)) {
+        combined.push(trimmed);
+      }
+    });
+    // Sort: numbers first, then letters, then custom sizes
+    return combined.sort((a, b) => {
+      const aNum = !isNaN(Number(a));
+      const bNum = !isNaN(Number(b));
+      if (aNum && !bNum) return -1;
+      if (!aNum && bNum) return 1;
+      return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+    });
+  }, [baseSizeOptions, customSizes, sizeExists]);
   const [addProducts] = useAddProductMutation();
   const [addStoreProducts] = useAddStoreProductMutation();
   const [addVendorProducts] = useAddVendorProductMutation();
@@ -1218,52 +1254,117 @@ const AddProducts = () => {
                         <h4 className="text-sm font-semibold mb-2">Size, Unit Size & Price Management</h4>
 
                         <div className="flex gap-2 mb-3">
-                          <Select
+                          <Autocomplete
                             label="Select Size"
                             variant="bordered"
                             size="sm"
-                            selectedKeys={newSize ? [newSize] : []}
-                            onSelectionChange={(keys) => {
-                              const selectedSize = Array.from(keys)[0] as string;
-                              setNewSize(selectedSize || "");
+                            selectedKey={newSize || null}
+                            inputValue={newSize}
+                            onSelectionChange={(key) => {
+                              const selectedValue = key ? String(key) : "";
+                              const trimmedValue = selectedValue.trim();
+                              
+                              if (trimmedValue) {
+                                setNewSize(trimmedValue);
+                                sizeInputRef.current = trimmedValue; // Update ref too
+                                
+                                // If it's a custom value not in the base list, add it to custom sizes
+                                if (!sizeExists(trimmedValue, baseSizeOptions) && 
+                                    !sizeExists(trimmedValue, customSizes)) {
+                                  setCustomSizes(prev => {
+                                    // Check again to avoid duplicates
+                                    if (!sizeExists(trimmedValue, prev)) {
+                                      return [...prev, trimmedValue];
+                                    }
+                                    return prev;
+                                  });
+                                }
+                              } else {
+                                setNewSize("");
+                                sizeInputRef.current = "";
+                              }
                             }}
-                            placeholder="Select Size"
+                            onInputChange={(value) => {
+                              // Allow typing custom values - update state as user types
+                              // Also update ref to preserve value during blur
+                              sizeInputRef.current = value;
+                              setNewSize(value);
+                            }}
+                            placeholder="Type to search, select, or add new size"
                             className="flex-1"
+                            allowsCustomValue={true}
+                            defaultFilter={(textValue, inputValue) => {
+                              if (inputValue === "") return true;
+                              const searchValue = inputValue.toLowerCase();
+                              const itemValue = String(textValue).toLowerCase();
+                              return itemValue.includes(searchValue);
+                            }}
+                            defaultItems={sizeOptions.map((size) => ({
+                              key: size,
+                              value: size,
+                              label: size.toUpperCase(),
+                            }))}
+                            listboxProps={{
+                              emptyContent: newSize && newSize.trim() !== "" && 
+                                !sizeExists(newSize.trim(), sizeOptions)
+                                ? `Press Enter or click outside to add "${newSize.trim()}" as new size`
+                                : "No sizes found"
+                            }}
+                            onKeyDown={(e) => {
+                              // Allow Enter key to add custom value
+                              if (e.key === "Enter" && newSize && newSize.trim() !== "") {
+                                const trimmedSize = newSize.trim();
+                                // Check if it's a new custom size
+                                if (!sizeExists(trimmedSize, baseSizeOptions) && 
+                                    !sizeExists(trimmedSize, customSizes)) {
+                                  e.preventDefault();
+                                  setCustomSizes(prev => {
+                                    // Double-check to avoid duplicates
+                                    if (!sizeExists(trimmedSize, prev)) {
+                                      return [...prev, trimmedSize];
+                                    }
+                                    return prev;
+                                  });
+                                }
+                                // Always set the trimmed value
+                                setNewSize(trimmedSize);
+                                sizeInputRef.current = trimmedSize; // Update ref too
+                              }
+                            }}
+                            onBlur={(e) => {
+                              // Use the ref value which is more reliable during blur
+                              const currentValue = sizeInputRef.current || newSize;
+                              
+                              if (currentValue && currentValue.trim() !== "") {
+                                const trimmedSize = currentValue.trim();
+                                
+                                // Check if it's a new custom size and add it
+                                if (!sizeExists(trimmedSize, baseSizeOptions) && 
+                                    !sizeExists(trimmedSize, customSizes)) {
+                                  setCustomSizes(prev => {
+                                    // Double-check to avoid duplicates
+                                    if (!sizeExists(trimmedSize, prev)) {
+                                      return [...prev, trimmedSize];
+                                    }
+                                    return prev;
+                                  });
+                                }
+                                
+                                // Always preserve the trimmed value (don't clear it)
+                                // Use setTimeout to ensure it happens after the blur event
+                                setTimeout(() => {
+                                  setNewSize(trimmedSize);
+                                  sizeInputRef.current = trimmedSize;
+                                }, 0);
+                              }
+                            }}
                           >
-                          
-                            <SelectItem key="10" value="10">10</SelectItem>
-                            <SelectItem key="15" value="15">15</SelectItem>
-                            <SelectItem key="20" value="20">20</SelectItem>
-                            <SelectItem key="25" value="25">25</SelectItem>
-                            <SelectItem key="30" value="30">30</SelectItem>
-                            <SelectItem key="35" value="35">35</SelectItem>
-                            <SelectItem key="40" value="40">40</SelectItem>
-                            <SelectItem key="45" value="45">45</SelectItem>
-                            <SelectItem key="50" value="50">50</SelectItem>
-                            <SelectItem key="55" value="55">55</SelectItem>
-                            <SelectItem key="60" value="60">60</SelectItem>
-                            <SelectItem key="65" value="65">65</SelectItem>
-                            <SelectItem key="70" value="70">70</SelectItem>
-                            <SelectItem key="75" value="75">75</SelectItem>
-                            <SelectItem key="80" value="80">80</SelectItem>
-                            <SelectItem key="85" value="85">85</SelectItem>
-                            <SelectItem key="90" value="90">90</SelectItem>
-                            <SelectItem key="95" value="95">95</SelectItem>
-                            <SelectItem key="xs" value="xs">XS</SelectItem>
-                            <SelectItem key="s" value="s">S</SelectItem>
-                            <SelectItem key="m" value="m">M</SelectItem>
-                            <SelectItem key="l" value="l">L</SelectItem>
-                            <SelectItem key="xl" value="xl">XL</SelectItem>
-                            <SelectItem key="2lx" value="2lx">2LX</SelectItem>
-                            <SelectItem key="3lx" value="3lx">3LX</SelectItem>
-                            <SelectItem key="4lx" value="4lx">4LX</SelectItem>
-                            <SelectItem key="5lx" value="5lx">5LX</SelectItem>
-                            <SelectItem key="6lx" value="6lx">6LX</SelectItem>
-                            <SelectItem key="7lx" value="7lx">7LX</SelectItem>
-                            <SelectItem key="8lx" value="8lx">8LX</SelectItem>
-                            <SelectItem key="9lx" value="9lx">9LX</SelectItem>
-                            <SelectItem key="10lx" value="10lx">10LX</SelectItem>
-                          </Select>
+                            {(size) => (
+                              <AutocompleteItem key={size.key} value={size.value}>
+                                {size.label}
+                              </AutocompleteItem>
+                            )}
+                          </Autocomplete>
                           <Input
                             type="text"
                             label="Unit Size"
@@ -1292,6 +1393,20 @@ const AddProducts = () => {
                             size="lg"
                             onClick={() => {
                               if (newSize && newUnitSize && newPrice) {
+                                const trimmedSize = newSize.trim();
+                                
+                                // If it's a custom size not in base list, ensure it's added to custom sizes
+                                if (trimmedSize && 
+                                    !sizeExists(trimmedSize, baseSizeOptions) && 
+                                    !sizeExists(trimmedSize, customSizes)) {
+                                  setCustomSizes(prev => {
+                                    if (!sizeExists(trimmedSize, prev)) {
+                                      return [...prev, trimmedSize];
+                                    }
+                                    return prev;
+                                  });
+                                }
+                                
                                 // Calculate discount values
                                 const price = Number(newPrice) || 0;
                                 const discount = Number(newDiscount) || 0;
@@ -1300,8 +1415,8 @@ const AddProducts = () => {
                                 const qty = Number(newUnitSize) || 0;
                                 const total = discountedPrice * qty;
 
-                                // Check if size already exists
-                                const existingIndex = sizeEntries.findIndex(entry => entry.size === newSize);
+                                // Check if size already exists (use trimmed size)
+                                const existingIndex = sizeEntries.findIndex(entry => entry.size === trimmedSize);
                                 if (existingIndex >= 0) {
                                   // Update existing entry
                                   const updated = [...sizeEntries];
@@ -1317,9 +1432,9 @@ const AddProducts = () => {
                                   };
                                   setSizeEntries(updated);
                                 } else {
-                                  // Add new entry
+                                  // Add new entry (use trimmed size)
                                   const newEntry = {
-                                    size: newSize,
+                                    size: trimmedSize,
                                     unitSize: newUnitSize,
                                     qty: newUnitSize, // Quantity same as unitSize initially
                                     price: newPrice,
@@ -1331,10 +1446,10 @@ const AddProducts = () => {
                                   };
                                   setSizeEntries([...sizeEntries, newEntry]);
                                 }
-                                // Update the map
+                                // Update the map (use trimmed size)
                                 setSizeUnitSizeMap(prev => ({
                                   ...prev,
-                                  [newSize]: {
+                                  [trimmedSize]: {
                                     unitSize: newUnitSize,
                                     qty: newUnitSize,
                                     price: newPrice,
