@@ -43,12 +43,13 @@ interface InputFieldProps {
   defaultValue?:any | string;
 }
 
-const InputNextUI = (props: InputFieldProps) => {
+const InputNextUI = React.forwardRef<HTMLInputElement, InputFieldProps>((props, ref) => {
   return (
     <>
       {/* <div className="w-100"> */}
         <Input
           {...props}
+          ref={ref}
           classNames={{
             label:
               "text-black/60 dark:text-white/60",
@@ -86,6 +87,9 @@ const InputNextUI = (props: InputFieldProps) => {
       {/* </div> */}
     </>
   );
-};
+});
+
+// Set display name for better debugging
+InputNextUI.displayName = "InputNextUI";
 
 export default InputNextUI;

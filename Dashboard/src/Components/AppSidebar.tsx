@@ -14,7 +14,7 @@ import * as React from "react";
 import { IconHome } from "./Icons";
 import { _nav } from "../_nav";
 import { Link, useNavigate } from "react-router-dom";
-import { eraseCookie } from "../JsFiles/CommonFunction.mjs";
+import { logout } from "../utils/authUtils.mjs";
 import { BuyCard } from "./Cards/BuyCard";
 import { useAppSelector } from "../Common/hooks";
 export const AppSidebar = () => {
@@ -57,13 +57,8 @@ export const AppSidebar = () => {
   };
 
   const handleLogOut = () => {
-    eraseCookie("token");
-    eraseCookie("role");
-    eraseCookie("id");
-    eraseCookie("vendorId");
-    eraseCookie("storeId");
-    eraseCookie("plan");
-    navigate("/");
+    // Use centralized logout utility
+    logout(navigate);
   };
 
   return (

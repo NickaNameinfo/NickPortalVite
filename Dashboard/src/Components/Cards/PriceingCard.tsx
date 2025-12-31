@@ -18,10 +18,11 @@ import {
   useAddSubcriptionMutation,
 } from "../../views/Subscriptions/Service.mjs";
 import { useAppSelector } from "../../Common/hooks";
+import { infoData } from "../../configData";
 
 function PriceingCard({ item = null, subscription = null }) {
   const [formData, setFormData] = React.useState({
-    itemCount: item.defaultValue,
+    itemCount: item?.defaultValue || 1,
   });
   const currentStoreUserId = getCookie("storeId");
   const currentVendorUserId = getCookie("vendorId");
@@ -71,10 +72,18 @@ function PriceingCard({ item = null, subscription = null }) {
   }, []);
 
   const onHandleFormData = (name, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    // Convert value to number if it's a string (for number inputs)
+    const numValue = typeof value === 'string' ? parseFloat(value) || 0 : Number(value) || 0;
+    console.log('[PriceingCard] onHandleFormData called:', { name, value, numValue, type: typeof value });
+    
+    setFormData((prev) => {
+      const newData = {
+        ...prev,
+        [name]: numValue > 0 ? numValue : 1, // Ensure minimum value of 1
+      };
+      console.log('[PriceingCard] FormData updated:', newData);
+      return newData;
+    });
   };
   // Payment and subscription logic (kept as is for brevity)
   const handleSubmit = async () => {
@@ -109,7 +118,7 @@ function PriceingCard({ item = null, subscription = null }) {
       const amountInPaisa = Math.round(amountInRupees * 100);
 
       const options = {
-        key: "rzp_live_RgPc8rKEOZbHgf",
+        key: infoData.razorpayKey,
         amount: amountInPaisa,
         currency: "INR",
         name: "Nickname Infotech",
@@ -142,8 +151,19 @@ function PriceingCard({ item = null, subscription = null }) {
   };
 
   const afterPaymentSuccess = async (formData, amountInPaisa, paymentId) => {
+    // Use itemCount from formData, with fallbacks for fixed plans
+    const subscriptionCount = item?.key === "PL1_002" 
+      ? 100 
+      : item?.key === "PL1_003" 
+      ? 200 
+      : formData?.itemCount 
+      ? Number(formData.itemCount) 
+      : item?.defaultValue 
+      ? Number(item.defaultValue) 
+      : 200;
+    
     let tempApiValue = {
-      subscriptionCount: formData?.[item.key] ? Number(formData?.[item.key]) : item?.key === "PL1_002" ? 100 : formData?.itemCount ? formData?.itemCount : 200,
+      subscriptionCount: subscriptionCount,
       subscriptionPrice: amountInPaisa,
       subscriptionType: subscription.key,
       subscriptionPlan: item.key,
@@ -152,6 +172,7 @@ function PriceingCard({ item = null, subscription = null }) {
       freeCount: 0,
       paymentId: paymentId,
     };
+    console.log('[PriceingCard] Submitting subscription:', tempApiValue);
     let result = await addSubCription(tempApiValue);
   };
 
@@ -247,12 +268,13 @@ function PriceingCard({ item = null, subscription = null }) {
           {!isFixedPlan && (
             <div className="mb-4" style={{ boxShadow: "0px 0px 13px 0px #d5d5d5" }}>
               <InputNextUI
-                onChange={(value) => onHandleFormData(item.key, value)}
+                onChange={(value) => onHandleFormData("itemCount", value)}
                 label={item?.label || "Enter number of item"}
                 size="md"
                 type="number"
                 min={1}
-                defaultValue={item?.defaultValue || 1}
+                value={formData.itemCount?.toString() || item?.defaultValue?.toString() || "1"}
+                placeholder={item?.defaultValue?.toString() || "1"}
               />
             </div>
           )}

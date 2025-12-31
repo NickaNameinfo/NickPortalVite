@@ -42,6 +42,8 @@ import {
   useAddOrderlistMutation,
   useUpdateProductMutation
 } from "../../views/pages/Store/Service.mjs";
+import { useGetProductsByIdQuery } from "../../views/pages/Product/Service.mjs";
+import { getAuthHeaders } from "../../utils/authHelper.mjs";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import { infoData } from "../../configData";
 import withReactContent from "sweetalert2-react-content";
@@ -242,11 +244,13 @@ export const BuyCard = (props: any) => {
   // Helper function to update product unitSize (size-specific or default)
   const updateProductUnitSize = async (productId: number, quantity: number, size?: string) => {
     try {
+      // Use authenticated headers for API call
+      const headers = getAuthHeaders();
       const productResponse = await fetch(
         `${infoData.baseApi}/product/getProductById/${productId}`,
         {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
+          headers: headers,
         }
       );
 
@@ -361,7 +365,7 @@ export const BuyCard = (props: any) => {
   const razorpayHandleSubmit = async (amountInRupees, apiParams, paymentResult) => {
     try {
       const options = {
-        key: "rzp_live_RgPc8rKEOZbHgf",
+        key: infoData.razorpayKey,
         amount: paymentResult?.data?.amount,
         currency: paymentResult?.data?.currency,
         order_id: paymentResult?.data?.id,

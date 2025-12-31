@@ -3,14 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { AppContent, AppSidebar } from "../Components";
 import { getCookie } from "../JsFiles/CommonFunction.mjs";
 import { ToastContainer } from "react-toastify";
+import { useDisableRightClick } from "../utils/rightClickHandler";
 const DefaultLayout = () => {
   const navigate = useNavigate();
-  const token = getCookie("token")
+  // Check both token cookies
+  const token = getCookie("token") || getCookie("XSRF-token");
+  
+  // Disable right-click for security (can be configured via environment variable)
+  const disableRightClick = import.meta.env.VITE_DISABLE_RIGHT_CLICK !== 'false';
+  useDisableRightClick(disableRightClick, false);
+  
   React.useEffect(() => {
     if (!token) {
+      console.log('[DefaultLayout] No token found, redirecting to login');
       navigate("/");
     } 
-  }, [token]);
+  }, [token, navigate]);
 
   return (
     <div>

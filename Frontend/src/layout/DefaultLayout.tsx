@@ -2,8 +2,13 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { AppContent, AppFooter, AppHeader, AppSidebar } from "../Components";
 import { ToastContainer } from "react-toastify";
+import { useDisableRightClick } from "../utils/rightClickHandler";
 
 const DefaultLayout = () => {
+  // Disable right-click for security (can be configured via environment variable)
+  const disableRightClick = import.meta.env.VITE_DISABLE_RIGHT_CLICK !== 'false';
+  useDisableRightClick(disableRightClick, false);
+  
   return (
     <div>
 

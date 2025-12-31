@@ -1230,6 +1230,25 @@ const AddProducts = () => {
                             placeholder="Select Size"
                             className="flex-1"
                           >
+                          
+                            <SelectItem key="10" value="10">10</SelectItem>
+                            <SelectItem key="15" value="15">15</SelectItem>
+                            <SelectItem key="20" value="20">20</SelectItem>
+                            <SelectItem key="25" value="25">25</SelectItem>
+                            <SelectItem key="30" value="30">30</SelectItem>
+                            <SelectItem key="35" value="35">35</SelectItem>
+                            <SelectItem key="40" value="40">40</SelectItem>
+                            <SelectItem key="45" value="45">45</SelectItem>
+                            <SelectItem key="50" value="50">50</SelectItem>
+                            <SelectItem key="55" value="55">55</SelectItem>
+                            <SelectItem key="60" value="60">60</SelectItem>
+                            <SelectItem key="65" value="65">65</SelectItem>
+                            <SelectItem key="70" value="70">70</SelectItem>
+                            <SelectItem key="75" value="75">75</SelectItem>
+                            <SelectItem key="80" value="80">80</SelectItem>
+                            <SelectItem key="85" value="85">85</SelectItem>
+                            <SelectItem key="90" value="90">90</SelectItem>
+                            <SelectItem key="95" value="95">95</SelectItem>
                             <SelectItem key="xs" value="xs">XS</SelectItem>
                             <SelectItem key="s" value="s">S</SelectItem>
                             <SelectItem key="m" value="m">M</SelectItem>

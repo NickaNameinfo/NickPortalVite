@@ -27,6 +27,7 @@ import { getCookie } from "../../JsFiles/CommonFunction.mjs";
 import InputNextUI from "../../Components/Common/Input/input";
 import TeaxtareaNextUI from "../../Components/Common/Input/Textarea";
 import { infoData } from "../../configData";
+import { getAuthHeaders } from "../../utils/authHelper.mjs";
 
 interface SelectedProduct {
   id: number;
@@ -229,12 +230,13 @@ const AddBill = () => {
   // Helper function to update product unitSize (size-specific or default)
   const updateProductUnitSize = async (productId: number, quantity: number, size?: string) => {
     try {
-      // Fetch current product data
+      // Fetch current product data with authentication
+      const headers = getAuthHeaders();
       const productResponse = await fetch(
         `${infoData.baseApi}/product/getProductById/${productId}`,
         {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
+          headers: headers,
         }
       );
 

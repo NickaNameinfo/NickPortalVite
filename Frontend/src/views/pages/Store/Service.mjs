@@ -1,9 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { infoData } from "../../../configData";
+import { prepareHeaders } from "../../../utils/authHelper.mjs";
+
 const axiosBaseQuery = fetchBaseQuery({
   baseUrl: infoData.baseApi, // Set your base URL
-  prepareHeaders: (headers) => {
-    return headers;
+  prepareHeaders: (headers, { getState }) => {
+    return prepareHeaders(headers, { getState });
   },
 });
 

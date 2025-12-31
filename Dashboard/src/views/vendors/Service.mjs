@@ -1,17 +1,7 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { infoData } from "../../configData";
-import { getCookie } from "../../JsFiles/CommonFunction.mjs";
-const axiosBaseQuery = fetchBaseQuery({
-  baseUrl: infoData.baseApi, // Set your base URL
-  prepareHeaders: (headers, { getState }) => {
-    const token = getCookie("token"); // Assuming getCookie is a function to retrieve the token from cookies
-    if (token) {
-      headers.set("Authorization", `${token}`);
-    }
-    return headers;
-  },
-});
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createBaseQuery } from "../../utils/baseQuery.mjs";
 
+const axiosBaseQuery = createBaseQuery();
 export const VendorApi = createApi({
   reducerPath: "VendorApi",
   baseQuery: axiosBaseQuery,

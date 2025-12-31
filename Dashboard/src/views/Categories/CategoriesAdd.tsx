@@ -19,6 +19,7 @@ const CategoriesAdd = () => {
   const {
     handleSubmit,
     control,
+    reset,
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ const CategoriesAdd = () => {
     if (result?.data) {
       setRefresh(true);
       refetch();
+      reset();
     } else {
       alert(result?.error?.data?.message);
     }

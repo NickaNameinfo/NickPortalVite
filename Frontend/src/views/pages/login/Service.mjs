@@ -1,9 +1,16 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { infoData } from "../../../configData";
+import { prepareHeaders } from "../../../utils/authHelper.mjs";
+
+// Note: Login and Register endpoints don't require auth, but other endpoints do
 const axiosBaseQuery = fetchBaseQuery({
   baseUrl: infoData.baseApi, // Set your base URL
-  prepareHeaders: (headers) => {
-    return headers;
+  prepareHeaders: (headers, { getState, endpoint }) => {
+    // Skip auth for login/register endpoints
+    if (endpoint === 'Login' || endpoint === 'register') {
+      return headers;
+    }
+    return prepareHeaders(headers, { getState });
   },
 });
 

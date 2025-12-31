@@ -143,7 +143,7 @@ export const AppHeader = () => {
     eraseCookie("storeId");
     eraseCookie("plan");
     dispatch(updateLoginDetails(null));
-    location.reload();
+    window.location.reload();
   };
 
   React.useEffect(() => {

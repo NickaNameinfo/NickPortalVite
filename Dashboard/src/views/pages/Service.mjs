@@ -1,12 +1,7 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { infoData } from "../../configData";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createBaseQuery } from "../../utils/baseQuery.mjs";
 
-const axiosBaseQuery = fetchBaseQuery({
-  baseUrl: infoData.baseApi, // Set your base URL
-  prepareHeaders: (headers) => {
-    return headers;
-  },
-});
+const axiosBaseQuery = createBaseQuery();
 
 export const AuthApi = createApi({
   reducerPath: "AuthApi",
