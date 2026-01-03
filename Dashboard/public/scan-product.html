@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scan Product Barcode</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    #reader {
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      border: 3px solid #667eea;
+    }
+
+    .status {
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .status.connected {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status.disconnected {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .status.scanning {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+
+    .last-scanned {
+      background: #e7f3ff;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .last-scanned-label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 5px;
+    }
+
+    .last-scanned-value {
+      font-size: 18px;
+      font-weight: bold;
+      color: #667eea;
+      font-family: monospace;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    .btn-secondary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .info strong {
+      color: #333;
+    }
+
+    .connection-info {
+      margin-top: 15px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    /* Permission Dialog Styles */
+    .permission-dialog {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .permission-dialog.show {
+      display: flex;
+    }
+
+    .permission-dialog-content {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .permission-dialog-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .permission-dialog-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    .permission-dialog-message {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .permission-dialog-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .permission-dialog-buttons button {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-allow {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-allow:hover {
+      background: #5568d3;
+    }
+
+    .btn-cancel {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-cancel:hover {
+      background: #5a6268;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📱 Scan Product Barcode</h1>
+    <p class="subtitle">Point camera at product barcode</p>
+
+    <div id="status" class="status disconnected">
+      <span id="status-icon">🔴</span>
+      <span id="status-text">Connecting...</span>
+    </div>
+
+    <div id="reader"></div>
+
+    <div class="last-scanned" id="lastScanned" style="display: none;">
+      <div class="last-scanned-label">Last Scanned:</div>
+      <div class="last-scanned-value" id="lastScannedValue">-</div>
+    </div>
+
+    <div class="controls">
+      <button class="btn-primary" id="startBtn" onclick="startScanning()">Start Scanner</button>
+      <button class="btn-secondary" id="stopBtn" onclick="stopScanning()" disabled>Stop Scanner</button>
+    </div>
+
+    <div class="info">
+      <strong>Instructions:</strong><br>
+      1. Click "Start Scanner" to begin<br>
+      2. Point camera at product barcode<br>
+      3. Barcode will be sent to laptop automatically<br>
+      4. Make sure laptop is on the same Wi-Fi network
+    </div>
+
+    <div class="connection-info">
+      <strong>Server:</strong> <span id="serverUrl">http://localhost:3001</span><br>
+      <strong>Status:</strong> <span id="connectionStatus">Disconnected</span>
+    </div>
+  </div>
+
+  <!-- Camera Permission Dialog -->
+  <div id="permissionDialog" class="permission-dialog">
+    <div class="permission-dialog-content">
+      <div class="permission-dialog-icon">📷</div>
+      <div class="permission-dialog-title">Camera Permission Required</div>
+      <div class="permission-dialog-message">
+        This app needs access to your camera to scan barcodes.<br><br>
+        <strong>Click "Allow Camera" to grant permission.</strong><br><br>
+        If permission was previously denied, you may need to:<br>
+        1. Click the camera icon in your browser's address bar<br>
+        2. Allow camera access<br>
+        3. Refresh this page
+      </div>
+      <div class="permission-dialog-buttons">
+        <button class="btn-allow" onclick="requestCameraPermission()">Allow Camera</button>
+        <button class="btn-cancel" onclick="closePermissionDialog()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let html5QrCode;
+    let socket;
+    let isScanning = false;
+    let lastScannedBarcode = "";
+
+    // Get server URL - update this to your WebSocket server IP/domain
+    // For same device: http://localhost:3001
+    // For network: http://YOUR-LAPTOP-IP:3001
+    const serverUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:3001'
+      : `http://${window.location.hostname}:3001`;
+
+    document.getElementById('serverUrl').textContent = serverUrl;
+
+    // Initialize Socket.IO
+    function initSocket() {
+      socket = io(serverUrl, {
+        transports: ['websocket', 'polling'],
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionAttempts: 5
+      });
+
+      socket.on('connect', () => {
+        console.log('Connected to server');
+        updateStatus('connected', '🟢 Connected to server');
+        document.getElementById('connectionStatus').textContent = 'Connected';
+      });
+
+      socket.on('disconnect', () => {
+        console.log('Disconnected from server');
+        updateStatus('disconnected', '🔴 Disconnected');
+        document.getElementById('connectionStatus').textContent = 'Disconnected';
+      });
+
+      socket.on('connect_error', (error) => {
+        console.error('Connection error:', error);
+        updateStatus('disconnected', '🔴 Connection failed');
+        document.getElementById('connectionStatus').textContent = 'Connection failed';
+      });
+    }
+
+    function updateStatus(type, text) {
+      const statusEl = document.getElementById('status');
+      const statusText = document.getElementById('status-text');
+      
+      statusEl.className = `status ${type}`;
+      statusText.textContent = text;
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+      console.log("Scanned:", decodedText);
+
+      // Avoid duplicate scans
+      if (decodedText === lastScannedBarcode) {
+        return;
+      }
+
+      lastScannedBarcode = decodedText;
+
+      // Show last scanned
+      document.getElementById('lastScanned').style.display = 'block';
+      document.getElementById('lastScannedValue').textContent = decodedText;
+
+      // Send to server
+      if (socket && socket.connected) {
+        socket.emit("scan-product", decodedText);
+        updateStatus('scanning', '✅ Barcode sent: ' + decodedText);
+        
+        // Reset status after 2 seconds
+        setTimeout(() => {
+          if (isScanning) {
+            updateStatus('scanning', '🟡 Scanning...');
+          }
+        }, 2000);
+      } else {
+        updateStatus('disconnected', '❌ Not connected - barcode not sent');
+      }
+    }
+
+    function onScanFailure(error) {
+      // Ignore scan failures (camera might be adjusting)
+    }
+
+    // Check camera permission
+    async function checkCameraPermission() {
+      try {
+        // Check if browser supports getSettings
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          // Try to get camera stream to check permission
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          // If successful, stop the stream immediately (we just wanted to check)
+          stream.getTracks().forEach(track => track.stop());
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.log('Camera permission check:', error.name);
+        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+          return false;
+        }
+        // Other errors might be device not found, etc.
+        return null;
+      }
+    }
+
+    // Show permission dialog
+    function showPermissionDialog() {
+      const dialog = document.getElementById('permissionDialog');
+      dialog.classList.add('show');
+    }
+
+    // Close permission dialog
+    function closePermissionDialog() {
+      const dialog = document.getElementById('permissionDialog');
+      dialog.classList.remove('show');
+    }
+
+    // Request camera permission
+    async function requestCameraPermission() {
+      closePermissionDialog();
+      updateStatus('scanning', '🟡 Requesting camera permission...');
+      
+      try {
+        // Request camera permission
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { 
+            facingMode: "environment" 
+          } 
+        });
+        
+        // Permission granted, stop the test stream
+        stream.getTracks().forEach(track => track.stop());
+        
+        // Now start the actual scanner
+        updateStatus('scanning', '🟡 Starting scanner...');
+        await startScanner();
+      } catch (error) {
+        console.error("Camera permission error:", error);
+        let errorMessage = "Camera access denied.";
+        let statusMessage = "❌ Camera error";
+        
+        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+          errorMessage = "Camera permission was denied.\n\nPlease:\n1. Click the camera icon in your browser's address bar\n2. Allow camera access\n3. Refresh this page and try again";
+          statusMessage = "❌ Permission denied - Check browser settings";
+        } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+          errorMessage = "No camera found. Please connect a camera device.";
+          statusMessage = "❌ No camera found";
+        } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+          errorMessage = "Camera is already in use by another application. Please close other apps using the camera.";
+          statusMessage = "❌ Camera in use";
+        } else if (error.name === 'OverconstrainedError') {
+          errorMessage = "Camera does not support the required settings. Trying alternative settings...";
+          statusMessage = "🟡 Trying alternative camera...";
+          // Try without facingMode constraint
+          try {
+            const stream2 = await navigator.mediaDevices.getUserMedia({ video: true });
+            stream2.getTracks().forEach(track => track.stop());
+            await startScanner();
+            return;
+          } catch (e) {
+            errorMessage = `Camera error: ${e.message || e.name}`;
+          }
+        } else {
+          errorMessage = `Camera error: ${error.message || error.name}`;
+        }
+        
+        updateStatus('disconnected', statusMessage);
+        alert(errorMessage);
+      }
+    }
+
+    // Start scanner (internal function)
+    async function startScanner() {
+      if (isScanning) return;
+
+      html5QrCode = new Html5Qrcode("reader");
+
+      html5QrCode.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 }
+        },
+        onScanSuccess,
+        onScanFailure
+      ).then(() => {
+        isScanning = true;
+        document.getElementById('startBtn').disabled = true;
+        document.getElementById('stopBtn').disabled = false;
+        updateStatus('scanning', '🟡 Scanning...');
+      }).catch((err) => {
+        console.error("Error starting scanner:", err);
+        let errorMessage = "Failed to start camera.";
+        
+        if (err.name === 'NotAllowedError' || err.message.includes('permission')) {
+          errorMessage = "Camera permission denied. Please allow camera access.";
+          showPermissionDialog();
+        } else if (err.message.includes('not found') || err.message.includes('No camera')) {
+          errorMessage = "No camera found. Please connect a camera device.";
+        } else {
+          errorMessage = `Camera error: ${err.message || err.name}`;
+        }
+        
+        updateStatus('disconnected', '❌ ' + errorMessage);
+        alert(errorMessage);
+      });
+    }
+
+    // Public function called by button
+    async function startScanning() {
+      if (isScanning) return;
+
+      // Check if browser supports camera API
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Your browser does not support camera access. Please use a modern browser like Chrome, Firefox, or Safari.");
+        updateStatus('disconnected', '❌ Browser not supported');
+        return;
+      }
+
+      // Check camera permission first
+      updateStatus('scanning', '🟡 Checking camera permission...');
+      
+      try {
+        const hasPermission = await checkCameraPermission();
+        
+        if (hasPermission === false) {
+          // Permission denied, show dialog
+          updateStatus('disconnected', '🔴 Camera permission required');
+          showPermissionDialog();
+          return;
+        } else if (hasPermission === null) {
+          // Unknown state (might be device not found), try to start anyway
+          updateStatus('scanning', '🟡 Starting camera...');
+          await startScanner();
+          return;
+        }
+        
+        // Permission granted, start scanner
+        updateStatus('scanning', '🟡 Starting camera...');
+        await startScanner();
+      } catch (error) {
+        console.error("Permission check error:", error);
+        // If check fails, show dialog to request permission
+        updateStatus('disconnected', '🔴 Camera permission required');
+        showPermissionDialog();
+      }
+    }
+
+    function stopScanning() {
+      if (!isScanning || !html5QrCode) return;
+
+      html5QrCode.stop().then(() => {
+        html5QrCode.clear();
+        isScanning = false;
+        document.getElementById('startBtn').disabled = false;
+        document.getElementById('stopBtn').disabled = true;
+        updateStatus('connected', '🟢 Scanner stopped');
+      }).catch((err) => {
+        console.error("Error stopping scanner:", err);
+      });
+    }
+
+    // Initialize on page load
+    window.addEventListener('load', () => {
+      initSocket();
+    });
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      if (isScanning && html5QrCode) {
+        stopScanning();
+      }
+      if (socket) {
+        socket.disconnect();
+      }
+    });
+  </script>
+</body>
+</html>
+

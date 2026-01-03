@@ -14,6 +14,7 @@ import { useAppDispatch } from "./Common/hooks.js";
 import { updateLoginDetails } from "./Common/globalSlice.js";
 import { useGetUserQuery } from "./Service.mjs";
 import { debugAuth } from "./utils/authDebug.mjs";
+import { useDisableRightClick } from "./utils/rightClickHandler";
 import "react-toastify/dist/ReactToastify.css";
 const loading = (
   <div className="pt-3 text-center">
@@ -22,6 +23,10 @@ const loading = (
 );
 
 function App() {
+  // Disable developer tools and right-click globally for security
+  // Can be disabled via environment variable: VITE_DISABLE_RIGHT_CLICK=false
+  const disableDevTools = import.meta.env.VITE_DISABLE_RIGHT_CLICK !== 'false';
+  useDisableRightClick(disableDevTools, false);
   const dispatch = useAppDispatch();
   
   // Use state to track id and token so they update when cookies change (especially after refresh)

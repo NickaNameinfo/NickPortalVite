@@ -6,6 +6,67 @@
     <meta name="viewport"/>
     <title>Nickname Infotech</title>
     <link href="./output.css" rel="stylesheet" />
+    <!-- Developer Tools Protection -->
+    <script>
+      // Early DevTools detection and blocking
+      (function() {
+        'use strict';
+        
+        // Disable right-click context menu
+        document.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+          return false;
+        }, true);
+        
+        // Block F12 and common DevTools shortcuts (but allow copy-paste)
+        document.addEventListener('keydown', function(e) {
+          // F12
+          if (e.key === 'F12') {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          }
+          // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+K (but allow Ctrl+Shift+C for copy)
+          if (e.ctrlKey && e.shiftKey && ['I', 'J', 'K', 'i', 'j', 'k'].includes(e.key)) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          }
+          // Ctrl+U (View Source)
+          if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          }
+          // Allow Ctrl+C (copy) and Ctrl+V (paste) and Ctrl+X (cut)
+          if (e.ctrlKey && ['C', 'c', 'V', 'v', 'X', 'x', 'A', 'a'].includes(e.key)) {
+            // Allow copy, paste, cut, and select all
+            return true;
+          }
+        }, true);
+        
+        // Detect DevTools opening (basic detection)
+        let devtools = {open: false};
+        const element = new Image();
+        Object.defineProperty(element, 'id', {
+          get: function() {
+            devtools.open = true;
+            // Optionally redirect or show warning
+            // window.location.href = '/';
+          }
+        });
+        
+        // setInterval(function() {
+        //   devtools.open = false;
+        //   // console.clear();
+        //   console.log(element);
+        //   if (devtools.open) {
+        //     // DevTools detected - can take action here
+        //     // console.clear();
+        //   }
+        // }, 1000);
+      })();
+    </script>
   </head>
   <body>
     <div id="root" style="height: 100vh"></div>

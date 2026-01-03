@@ -410,6 +410,7 @@ const AddProducts = () => {
     const productName = productData.data.name || "Product";
     const productColor = productData.data.color || "N/A";
     const currentStoreName = storeData?.data?.storeName || storeData?.data?.storename || "STORE";
+    const gstNumber = storeData?.data?.GSTNo || storeData?.data?.gstNo || "";
     
     // Determine if we should use sizeEntries or single product data
     const useSizeEntries = enableSizeManagement && sizeEntries.length > 0;
@@ -436,8 +437,8 @@ const AddProducts = () => {
           <style>
             @media print {
               @page {
-                margin: 5mm;
-                size: A4;
+                margin: 0;
+                size: 50mm 25mm;
               }
               body {
                 margin: 0;
@@ -445,63 +446,110 @@ const AddProducts = () => {
               }
               .label-container {
                 page-break-inside: avoid;
+                page-break-after: always;
+                width: 50mm;
+                height: 25mm;
+                margin: 0;
+                padding: 1.5mm;
+                border: none;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                box-sizing: border-box;
+                position: relative;
+                background: white;
+              }
+              .label-container:first-child {
+                page-break-before: auto;
+              }
+              .label-container:not(:first-child) {
+                page-break-before: always;
+              }
+              .barcode-section {
+                page-break-inside: avoid;
+                break-inside: avoid;
+                flex: 1;
+              }
+              .label-footer {
+                display: flex !important;
+                visibility: visible !important;
+                align-items: flex-end !important;
+                margin-top: auto !important;
+              }
+              .footer-value {
+                display: block !important;
+                visibility: visible !important;
+              }
+              .gst-section {
+                display: block !important;
+                visibility: visible !important;
+                text-align: center !important;
               }
             }
             body {
               font-family: Arial, sans-serif;
-              padding: 10px;
+              padding: 0;
+              margin: 0;
               background: white;
             }
+            .barcode-section-wrapper {
+              display: block;
+              width: 100%;
+            }
             .label-container {
-              width: 90mm;
-              height: 55mm;
-              border: 1px solid #000;
-              margin: 5mm;
-              padding: 8px;
-              display: inline-block;
-              vertical-align: top;
+              width: 50mm;
+              height: 25mm;
+              border: none;
+              margin: 0;
+              padding: 1.5mm;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
               box-sizing: border-box;
               position: relative;
               background: white;
             }
             .label-header {
               display: flex;
-              justify-content: space-between;
+              justify-content: center;
               align-items: flex-start;
-              margin-bottom: 8px;
+              margin-bottom: 0.5mm;
+              flex-shrink: 0;
             }
             .label-left {
-              text-align: left;
+              text-align: center;
             }
             .label-right {
               text-align: right;
             }
             .label-title {
-              font-size: 18px;
+              font-size: 7px;
               font-weight: bold;
-              line-height: 1.2;
+              line-height: 1.1;
               margin: 0;
             }
             .label-number {
-              font-size: 14px;
+              font-size: 6px;
               font-weight: normal;
-              margin-top: 2px;
+              margin-top: 0.5px;
             }
             .barcode-section {
               position: relative;
               display: flex;
               align-items: center;
               justify-content: center;
-              margin: 8px 0;
-              min-height: 100px;
+              margin: 1mm 0;
+              padding: 0.5mm 0;
+              flex: 1;
+              min-height: 9mm;
             }
             .side-number {
               writing-mode: vertical-rl;
               text-orientation: mixed;
-              font-size: 14px;
+              font-size: 7px;
               font-weight: bold;
-              padding: 0 5px;
-              height: 100px;
+              padding: 0 1px;
+              height: 10mm;
               display: flex;
               align-items: center;
             }
@@ -509,48 +557,73 @@ const AddProducts = () => {
               transform: rotate(180deg);
             }
             .barcode-wrapper {
-              flex: 1;
+              width: 80%;
+              max-width: 80%;
               display: flex;
               flex-direction: column;
               align-items: center;
+              justify-content: center;
             }
             .barcode-value {
-              font-size: 12px;
+              font-size: 6px;
               font-weight: bold;
-              margin-top: 5px;
-              letter-spacing: 1px;
+              margin-top: 0.5px;
+              letter-spacing: 0.3px;
             }
             .product-code {
-              font-size: 11px;
-              margin-top: 3px;
+              font-size: 5px;
+              margin-top: 0.5px;
               font-weight: normal;
             }
             .label-footer {
               display: flex;
               justify-content: space-between;
-              margin-top: 8px;
-              font-size: 11px;
+              align-items: flex-end;
+              margin-top: auto;
+              margin-bottom: 0.5mm;
+              padding-bottom: 0;
+              font-size: 7px;
+              line-height: 1.2;
+              flex-shrink: 0;
+            }
+            .gst-section {
+              text-align: center;
+              font-size: 6px;
+              font-weight: bold;
+              margin-top: 0;
+              margin-bottom: 0;
+              padding: 0;
+              flex-shrink: 0;
             }
             .footer-column {
               flex: 1;
-              text-align: left;
+              text-align: center;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
             }
             .footer-label {
               font-weight: bold;
-              font-size: 10px;
-              margin-bottom: 2px;
+              font-size: 6px;
+              margin-bottom: 0.5px;
+              white-space: nowrap;
             }
             .footer-value {
-              font-size: 11px;
+              font-size: 7px;
+              font-weight: normal;
+              white-space: nowrap;
             }
             canvas {
+              width: 100%;
               max-width: 100%;
               height: auto;
+              max-height: 9mm;
               image-rendering: crisp-edges;
             }
           </style>
         </head>
         <body>
+          <div class="barcode-section-wrapper">
     `;
 
     // Generate labels - if sizeEntries exist, create labels for each size
@@ -591,20 +664,15 @@ const AddProducts = () => {
         <div class="label-container">
           <div class="label-header">
             <div class="label-left">
-              <div class="label-title">${productName}</div>
-              <div class="label-number">${label.productId}</div>
-            </div>
-            <div class="label-right">
               <div class="label-title">${currentStoreName}</div>
+              <div class="label-number">${label.productId}</div>
             </div>
           </div>
           <div class="barcode-section">
-            <div class="side-number side-number-left">${leftSideNumber}</div>
             <div class="barcode-wrapper">
               <canvas id="barcode-${i}"></canvas>
               <div class="barcode-value">${label.productId}</div>
             </div>
-            <div class="side-number">${rightSideNumber}</div>
           </div>
           <div class="label-footer">
             <div class="footer-column">
@@ -612,19 +680,17 @@ const AddProducts = () => {
               <div class="footer-value">${Math.round(Number(label.price))}</div>
             </div>
             <div class="footer-column">
-              <div class="footer-label">COLOUR</div>
-              <div class="footer-value">${productColor}</div>
-            </div>
-            <div class="footer-column">
               <div class="footer-label">SIZE</div>
               <div class="footer-value">${label.size}</div>
             </div>
           </div>
+          <div class="gst-section">GST: ${gstNumber || 'N/A'}</div>
         </div>
       `;
     });
 
     htmlContent += `
+          </div>
           <script>
             window.onload = function() {
               const labels = ${JSON.stringify(labelsToGenerate)};
@@ -634,10 +700,10 @@ const AddProducts = () => {
                   try {
                     JsBarcode(canvas, label.productId, {
                       format: "CODE128",
-                      width: 2.5,
-                      height: 70,
+                      width: 1,
+                      height: 30,
                       displayValue: false,
-                      margin: 5,
+                      margin: 2,
                       background: "#ffffff",
                       lineColor: "#000000",
                     });

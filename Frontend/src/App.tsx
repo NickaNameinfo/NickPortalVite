@@ -8,6 +8,7 @@ import { useGetUserQuery } from "./Service.mjs";
 import { useAppDispatch } from "./Components/Common/hooks.js";
 import { onUpdateStoreList, updateLoginDetails } from "./Components/Common/globalSlice.js";
 import { useGetStoresQuery } from "./views/pages/Store/Service.mjs";
+import { useDisableRightClick } from "./utils/rightClickHandler";
 import "react-toastify/dist/ReactToastify.css";
 import 'sweetalert2/src/sweetalert2.scss'
 import "yet-another-react-lightbox/styles.css";
@@ -20,6 +21,10 @@ const loading = (
 );
 
 function App() {
+  // Disable developer tools and right-click globally for security
+  // Can be disabled via environment variable: VITE_DISABLE_RIGHT_CLICK=false
+  const disableDevTools = import.meta.env.VITE_DISABLE_RIGHT_CLICK !== 'false';
+  useDisableRightClick(disableDevTools, false);
   const id = getCookie("id");
   const dispatch = useAppDispatch();
   const { data, error, refetch } = useGetUserQuery(id);

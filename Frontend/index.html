@@ -5,6 +5,62 @@
     <link rel="icon" type="image/svg+xml" href="./src/assets/logo.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nickname Infotech</title>
+    <!-- Developer Tools Protection -->
+    <script>
+      // Early DevTools detection and blocking
+      (function() {
+        'use strict';
+        
+        // Disable right-click context menu
+        document.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+          return false;
+        }, true);
+        
+        // Block F12 and common DevTools shortcuts
+        document.addEventListener('keydown', function(e) {
+          // F12
+          if (e.key === 'F12') {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          }
+          // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+          if (e.ctrlKey && e.shiftKey && ['I', 'J', 'C', 'K', 'i', 'j', 'c', 'k'].includes(e.key)) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          }
+          // Ctrl+U (View Source)
+          if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          }
+        }, true);
+        
+        // Detect DevTools opening (basic detection)
+        let devtools = {open: false};
+        const element = new Image();
+        Object.defineProperty(element, 'id', {
+          get: function() {
+            devtools.open = true;
+            // Optionally redirect or show warning
+            // window.location.href = '/';
+          }
+        });
+        
+        setInterval(function() {
+          devtools.open = false;
+          console.clear();
+          console.log(element);
+          if (devtools.open) {
+            // DevTools detected - can take action here
+            // console.clear();
+          }
+        }, 1000);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
