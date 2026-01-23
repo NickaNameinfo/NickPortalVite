@@ -1267,7 +1267,7 @@ export const BuyCard = (props: any) => {
                             </div>
                           </div>
                           <div className="flex  justify-between items-center mx-3 w-full">
-                            <div className="w-2/4 m-1 items-center flex">
+                            {/* <div className="w-2/4 m-1 items-center flex">
                               <Radio
                                 value="3"
                                 size="sm"
@@ -1277,7 +1277,7 @@ export const BuyCard = (props: any) => {
                                 Cash on Delivery
                               </Radio>
                               <Tooltip content={"Cash on Delivery means you can pay the amount at the time of delivery."} showArrow className="w-80"><span><IconInfo fill="#FF0000" width={15} className={"mr-2"} /></span></Tooltip>
-                            </div>
+                            </div> */}
                             <div className="w-2/4 m-1 items-center flex">
                               <Radio
                                 value="4"

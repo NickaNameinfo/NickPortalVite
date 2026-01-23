@@ -106,16 +106,48 @@ export const ProductDetail = (props: ProductDetailProps) => {
   const dispatch = useAppDispatch();
   const [index, setIndex] = React.useState(-1);
   const [productImageIndex, setProductImageIndex] = React.useState(-1);
-  
+
+  // Get product photos for gallery
+  const product = props?.item?.product || props?.item;
+  const productPhotos = React.useMemo(() => {
+    const photos: Array<{ src: string; width: number; height: number }> = [];
+
+    // Add main photo first
+    const mainPhoto = product?.photo || props?.item?.photo;
+    if (mainPhoto) {
+      photos.push({
+        src: mainPhoto,
+        width: 3840,
+        height: 3840,
+      });
+    }
+
+    // Add sub photos (productphotos)
+    if (product?.productphotos && Array.isArray(product.productphotos)) {
+      product.productphotos.forEach((photo: any) => {
+        const imgUrl = photo?.imgUrl || photo?.url || photo;
+        if (imgUrl && typeof imgUrl === 'string') {
+          photos.push({
+            src: imgUrl,
+            width: 3840,
+            height: 3840,
+          });
+        }
+      });
+    }
+
+    return photos;
+  }, [product, props?.item]);
+
   // Get product ID for feedback
   const productIdForFeedback = props?.item?.product?.id || props?.item?.id;
-  
+
   // Get feedback by product ID (optional - to show existing feedbacks)
   const {
     data: productFeedbackData,
     refetch: refetchFeedback,
-  } = useGetProductFeedbackByIdQuery(productIdForFeedback, { 
-    skip: !productIdForFeedback 
+  } = useGetProductFeedbackByIdQuery(productIdForFeedback, {
+    skip: !productIdForFeedback
   });
 
   // Parse sizeUnitSizeMap and set initial price
@@ -123,20 +155,20 @@ export const ProductDetail = (props: ProductDetailProps) => {
     const product = props?.item?.product || props?.item;
     if (product?.sizeUnitSizeMap) {
       try {
-        const parsed = typeof product.sizeUnitSizeMap === 'string' 
-          ? JSON.parse(product.sizeUnitSizeMap) 
+        const parsed = typeof product.sizeUnitSizeMap === 'string'
+          ? JSON.parse(product.sizeUnitSizeMap)
           : product.sizeUnitSizeMap;
         setSizeUnitSizeMap(parsed);
-        
+
         // Check if product is already in cart and has a size
         const cartSize = cart?.data?.size;
         let sizeToSelect = cartSize;
-        
+
         // If no size in cart, use first size as default
         if (!sizeToSelect || !parsed[sizeToSelect]) {
           sizeToSelect = Object.keys(parsed)[0];
         }
-        
+
         if (sizeToSelect && parsed[sizeToSelect]) {
           setSelectedSize(sizeToSelect);
           const sizeData = parsed[sizeToSelect];
@@ -183,13 +215,13 @@ export const ProductDetail = (props: ProductDetailProps) => {
     if (selectedSize && sizeUnitSizeMap && sizeUnitSizeMap[selectedSize]) {
       const sizeData = sizeUnitSizeMap[selectedSize];
       const product = props?.item?.product || props?.item;
-      
+
       // Prioritize total/grandTotal (discounted price) over price
       const sizePrice = Number(sizeData.total) || Number(sizeData.grandTotal) || Number(sizeData.price) || 0;
       const sizeOriginalPrice = Number(sizeData.price) || Number(product?.price) || Number(product?.total) || 0;
       const sizeDiscount = Number(sizeData.discount) || Number(sizeData.discount) || 0;
       const sizeStock = Number(sizeData.unitSize) || 0;
-      
+
       if (sizePrice > 0) {
         setCurrentPrice(sizePrice);
         setOriginalPrice(sizeOriginalPrice);
@@ -220,7 +252,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
     // Fallback: prioritize product price over item price (item.price can be 0)
     const product = props?.item?.product || props?.item;
     const priceToUse = currentPrice > 0 ? currentPrice : (Number(product?.total) || Number(product?.price) || Number(props?.item?.price) || 0);
-    
+
     let tempCartValue = {
       productId: props?.item?.product?.id
         ? props?.item?.product?.id
@@ -344,7 +376,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
       };
 
       const result = await addProductFeedback(feedbackData).unwrap();
-      
+
       if (result?.success) {
         toast.success("Feedback submitted successfully!");
         setFeedback("");
@@ -405,14 +437,42 @@ export const ProductDetail = (props: ProductDetailProps) => {
                           radius="lg"
                           className="w-full object-contain md:h-[222px] xm:h-[150px] mm:h-[150px]  ml:h-[150px] cursor-pointer hover:opacity-90 transition-opacity"
                           onClick={() => {
-                            const imageUrl = props?.item?.product?.photo ?? props?.item?.photo;
-                            if (imageUrl) {
+                            if (productPhotos.length > 0) {
                               setProductImageIndex(0);
                             }
                           }}
                         />
                       </CardBody>
                     </Card>
+                    {/* Product Photos Thumbnail Gallery */}
+                    {productPhotos.length > 1 && (
+                      <div className="mt-2 flex gap-2 overflow-x-auto pb-2 justify-center items-center">
+                        {productPhotos.slice(0, 5).map((photo, idx) => (
+                          <div
+                            key={idx}
+                            className="flex-shrink-0 cursor-pointer border-2 rounded-lg overflow-hidden hover:border-blue-500 transition-colors flex items-center justify-center"
+                            style={{
+                              borderColor: productImageIndex === idx ? '#3b82f6' : '#e5e7eb',
+                            }}
+                            onClick={() => setProductImageIndex(idx)}
+                          >
+                            <Image
+                              alt={`Product photo ${idx + 1}`}
+                              src={photo.src}
+                              width={30}
+                              height={30}
+                              className="object-cover"
+                              radius="sm"
+                            />
+                          </div>
+                        ))}
+                        {productPhotos.length > 5 && (
+                          <div className="flex-shrink-0 flex items-center justify-center w-[30px] h-[30px] border-2 border-dashed border-gray-300 rounded-lg text-xs text-gray-500">
+                            +{productPhotos.length - 5}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div className="sm:px-2 xl:col-span-1 lg:col-span-1 md:order-3 xm:order-3 mm:order-3 ml:order-3 md:col-span-2 xm:col-span-2 mm:col-span-2 ml:col-span-2 ">
                     <div className="">
@@ -451,8 +511,8 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               paddingLeft: "10px",
                             }}
                           >
-                            {currentStock > 0 ? currentStock : (selectedSize && sizeUnitSizeMap && sizeUnitSizeMap[selectedSize] 
-                              ? sizeUnitSizeMap[selectedSize].unitSize 
+                            {currentStock > 0 ? currentStock : (selectedSize && sizeUnitSizeMap && sizeUnitSizeMap[selectedSize]
+                              ? sizeUnitSizeMap[selectedSize].unitSize
                               : (props?.item?.product?.unitSize ? props?.item?.product?.unitSize : props?.item?.product?.qty) || 0)}
                           </small>{" "}
                           Stocks
@@ -472,7 +532,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                               const sizeData = sizeUnitSizeMap[size];
                               const isSelected = selectedSize === size;
                               const unitSize = sizeData.unitSize || "";
-                              
+
                               return (
                                 <button
                                   key={size}
@@ -483,7 +543,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                                     const sizeOriginalPrice = Number(sizeData.price) || 0;
                                     const sizeDiscount = Number(sizeData.discount) || Number(sizeData.discount) || 0;
                                     const sizeStock = Number(sizeData.unitSize) || 0;
-                                    
+
                                     if (sizePrice > 0) {
                                       setCurrentPrice(sizePrice);
                                       setOriginalPrice(sizeOriginalPrice);
@@ -493,8 +553,8 @@ export const ProductDetail = (props: ProductDetailProps) => {
                                   }}
                                   className={`
                                     px-4 py-2 rounded border-2 transition-all text-sm
-                                    ${isSelected 
-                                      ? 'border-blue-600 bg-blue-50 text-black font-medium' 
+                                    ${isSelected
+                                      ? 'border-blue-600 bg-blue-50 text-black font-medium'
                                       : 'border-dashed border-gray-300 bg-white text-black hover:border-gray-400'
                                     }
                                     min-w-[80px] text-center
@@ -669,6 +729,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
                       />
                     </div>
                   </div>
+
                 </div>
 
                 <div className="grid grid-cols-2">
@@ -860,11 +921,10 @@ export const ProductDetail = (props: ProductDetailProps) => {
                                     className="focus:outline-none"
                                   >
                                     <svg
-                                      className={`w-8 h-8 ${
-                                        starValue <= rating
+                                      className={`w-8 h-8 ${starValue <= rating
                                           ? "text-yellow-400 fill-current"
                                           : "text-gray-300"
-                                      }`}
+                                        }`}
                                       fill="currentColor"
                                       viewBox="0 0 20 20"
                                     >
@@ -919,13 +979,7 @@ export const ProductDetail = (props: ProductDetailProps) => {
               />
               <Lightbox
                 index={productImageIndex}
-                slides={[
-                  {
-                    src: props?.item?.product?.photo ?? props?.item?.photo ?? "",
-                    width: 3840,
-                    height: 3840,
-                  },
-                ]}
+                slides={productPhotos}
                 open={productImageIndex >= 0}
                 close={() => setProductImageIndex(-1)}
               />

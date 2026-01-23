@@ -96,15 +96,23 @@ export const ProductViewCard = ({ item = null }) => {
             <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
               {item?.discount} %
             </span>
-            <Image
-              alt="Here no Image"
-              shadow="md"
-              width={250}
-              radius="lg"
-              className="w-full object-contain min-h-[176px] max-h-[176px]"
-              src={`${item?.photo}`}
-              height={250}
-            />
+            <div className="relative">
+              <Image
+                alt="Here no Image"
+                shadow="md"
+                width={250}
+                radius="lg"
+                className="w-full object-contain min-h-[176px] max-h-[176px]"
+                src={`${item?.photo}`}
+                height={250}
+              />
+              {/* Show indicator if product has multiple photos */}
+              {item?.product?.productphotos && Array.isArray(item.product.productphotos) && item.product.productphotos.length > 0 && (
+                <span className="absolute top-2 right-2 bg-black/60 text-white text-xs font-medium px-2 py-1 rounded-full z-10">
+                  {item.product.productphotos.length + 1} photos
+                </span>
+              )}
+            </div>
           </CardBody>
         </Card>
       </PopoverTrigger>

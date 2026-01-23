@@ -54,9 +54,38 @@ export const PremiumCard = ({
   const [selectedWeight, setSelectedWeight] = React.useState<string>("");
   const [currentPrice, setCurrentPrice] = React.useState<number>(0);
   const [sizeUnitSizeMap, setSizeUnitSizeMap] = React.useState<Record<string, { unitSize: string; qty: string; price: string; discount: string; discountPer: string; total: string; grandTotal: string }> | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = React.useState<number>(0);
 
   const onRefresh = useAppSelector((state) => state.globalConfig.onRefreshCart);
   const productItem = item.product ? item.product : item;
+  
+  // Get all product photos (main + sub photos)
+  const allProductPhotos = React.useMemo(() => {
+    const photos: string[] = [];
+    
+    // Add main photo first
+    const mainPhoto = productItem?.photo;
+    if (mainPhoto) {
+      photos.push(mainPhoto);
+    }
+    
+    // Add sub photos (productphotos)
+    if (productItem?.productphotos && Array.isArray(productItem.productphotos)) {
+      productItem.productphotos.forEach((photo: any) => {
+        const imgUrl = photo?.imgUrl || photo?.url || photo;
+        if (imgUrl && typeof imgUrl === 'string') {
+          photos.push(imgUrl);
+        }
+      });
+    }
+    
+    return photos;
+  }, [productItem]);
+  
+  // Reset selected image index when product changes
+  React.useEffect(() => {
+    setSelectedImageIndex(0);
+  }, [productItem?.id]);
   const userId = getCookie("id");
   const { id } = useParams();
   const [addCart] = useAddCartMutation();
@@ -73,20 +102,20 @@ export const PremiumCard = ({
   React.useEffect(() => {
     if (productItem?.sizeUnitSizeMap) {
       try {
-        const parsed = typeof productItem.sizeUnitSizeMap === 'string' 
-          ? JSON.parse(productItem.sizeUnitSizeMap) 
+        const parsed = typeof productItem.sizeUnitSizeMap === 'string'
+          ? JSON.parse(productItem.sizeUnitSizeMap)
           : productItem.sizeUnitSizeMap;
         setSizeUnitSizeMap(parsed);
-        
+
         // Check if product is already in cart and has a size
         const cartSize = data?.data?.size;
         let sizeToSelect = cartSize;
-        
+
         // If no size in cart, use first size as default
         if (!sizeToSelect || !parsed[sizeToSelect]) {
           sizeToSelect = Object.keys(parsed)[0];
         }
-        
+
         if (sizeToSelect && parsed[sizeToSelect]) {
           setSelectedSize(sizeToSelect);
           const sizeData = parsed[sizeToSelect];
@@ -138,7 +167,7 @@ export const PremiumCard = ({
   const handleAddCart = async (type) => {
     // Use current price (which may be updated based on size selection)
     const priceToUse = currentPrice > 0 ? currentPrice : (Number(item?.price) || Number(productItem?.total) || Number(productItem?.price) || 0);
-    
+
     let tempCartValue = {
       productId: productItem?.id,
       name: productItem?.name,
@@ -150,8 +179,8 @@ export const PremiumCard = ({
           ? Number(data?.data?.qty) + 1
           : Number(data?.data?.qty) - 1
         : 1,
-      unitSize: selectedSize && sizeUnitSizeMap && sizeUnitSizeMap[selectedSize] 
-        ? sizeUnitSizeMap[selectedSize].unitSize 
+      unitSize: selectedSize && sizeUnitSizeMap && sizeUnitSizeMap[selectedSize]
+        ? sizeUnitSizeMap[selectedSize].unitSize
         : productItem?.unitSize,
       photo: productItem?.photo ? productItem?.photo : item?.photo,
       storeId: id,
@@ -192,32 +221,83 @@ export const PremiumCard = ({
         {!isHideImage && (
           <CardBody
             className="overflow-visible p-0 relative"
-            onClick={() => {
+          >
+            <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
+              {productItem?.discount ? productItem?.discount : item?.discount} %
+            </span>
+
+              <div className="relative flex gap-2">
+                <div className="flex-1" onClick={() => {
+                  dispatch(
+                    onUpdateProductDetailsModal({
+                      isOpen: true,
+                      item: item,
+                    })
+                  );
+                }}>
+                  <Image
+                    isZoomed
+                    alt="Here no Image"
+                    shadow="md"
+                    width="100%"
+                    radius="lg"
+                    className={`w-full object-contain cursor-pointer ${from !== "ProductView"
+                      ? "min-h-[176px] max-h-[176px]"
+                      : "min-h-[50px] max-h-[50px]"
+                    }`}
+                    src={allProductPhotos[selectedImageIndex] || productItem?.photo}
+                  />
+                </div>
+                {/* Show small thumbnail images on the right side */}
+                {allProductPhotos.length > 1 && (
+                  <div className="flex flex-col gap-1.5">
+                    {allProductPhotos.slice(0, 4).map((imgUrl: string, idx: number) => {
+                      const isSelected = selectedImageIndex === idx;
+                      return (
+                        <div
+                          key={idx}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedImageIndex(idx);
+                          }}
+                          className={`flex-shrink-0 border rounded overflow-hidden cursor-pointer transition-all ${
+                            isSelected 
+                              ? 'border-blue-500 border-2' 
+                              : 'border-gray-200 hover:border-gray-400'
+                          }`}
+                        >
+                          <Image
+                            alt={`Product photo ${idx + 1}`}
+                            src={imgUrl}
+                            width={from !== "ProductView" ? 50 : 30}
+                            height={from !== "ProductView" ? 50 : 30}
+                            className="object-cover"
+                            radius="sm"
+                          />
+                        </div>
+                      );
+                    })}
+                    {allProductPhotos.length > 4 && (
+                      <div className="flex-shrink-0 flex items-center justify-center border border-gray-200 rounded bg-gray-100 text-xs text-gray-600 font-medium"
+                        style={{
+                          width: from !== "ProductView" ? 50 : 30,
+                          height: from !== "ProductView" ? 50 : 30,
+                        }}
+                      >
+                        +{allProductPhotos.length - 4}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            <div className="font-semibold text-base mt-2 TextMaincolor" onClick={() => {
               dispatch(
                 onUpdateProductDetailsModal({
                   isOpen: true,
                   item: item,
                 })
               );
-            }}
-          >
-            <span className="bg-slate-700 z-50 absolute text-white text-xs font-medium px-2.5 py-1 rounded-ss-xl rounded-ee-xl dark:bg-gray-700 dark:text-gray-300">
-              {productItem?.discount ? productItem?.discount : item?.discount} %
-            </span>
-
-            <Image
-              isZoomed
-              alt="Here no Image"
-              shadow="md"
-              width="100%"
-              radius="lg"
-              className={`w-full object-contain cursor-pointer ${from !== "ProductView"
-                  ? "min-h-[176px] max-h-[176px]"
-                  : "min-h-[50px] max-h-[50px]"
-                }`}
-              src={`${productItem?.photo}`}
-            />
-            <div className="font-semibold text-base mt-2 TextMaincolor">
+            }}>
               <p className="truncate">{productItem?.name}</p>
             </div>
             <div className="w-full flex justify-between mt-2">
@@ -234,8 +314,8 @@ export const PremiumCard = ({
                     paddingLeft: "10px",
                   }}
                 >
-                  {selectedSize && sizeUnitSizeMap && sizeUnitSizeMap[selectedSize] 
-                    ? sizeUnitSizeMap[selectedSize].unitSize 
+                  {selectedSize && sizeUnitSizeMap && sizeUnitSizeMap[selectedSize]
+                    ? sizeUnitSizeMap[selectedSize].unitSize
                     : productItem?.unitSize}
                 </small>{" "}
                 Stocks
@@ -255,15 +335,15 @@ export const PremiumCard = ({
                     const sizeData = sizeUnitSizeMap[size];
                     const isSelected = selectedSize === size;
                     const unitSize = sizeData.unitSize || "";
-                    
+
                     return (
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
                         className={`
                           px-3 py-1.5 rounded border-2 transition-all text-xs
-                          ${isSelected 
-                            ? 'border-blue-600 bg-blue-50 text-black font-medium' 
+                          ${isSelected
+                            ? 'border-blue-600 bg-blue-50 text-black font-medium'
                             : 'border-dashed border-gray-300 bg-white text-black hover:border-gray-400'
                           }
                           min-w-[20px] text-center
@@ -311,7 +391,7 @@ export const PremiumCard = ({
 
         <CardFooter className="p-0">
           <div className="grid grid-cols-1 w-full">
-            
+
             <div className="w-full flex justify-around pb-3">
               <div className="PrimiumCardFooterBg rounded-lg flex w-full justify-around items-center">
                 <div className="PrimiumCardFooterBg rounded-lg flex w-full justify-around items-center">
