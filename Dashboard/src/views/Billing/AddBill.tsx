@@ -24,6 +24,11 @@ import { useAddBillMutation } from "./Service.mjs";
 import { useGetStoresProductByIDQuery } from "../Store/Service.mjs";
 import { useUpdateProductMutation } from "../Products/Service.mjs";
 import { getCookie } from "../../JsFiles/CommonFunction.mjs";
+import {
+  useGetAllInvoiceFormatsQuery,
+  useGetStoreInvoiceFormatQuery,
+  useGetVendorInvoiceFormatQuery,
+} from "../InvoiceFormats/Service.mjs";
 import InputNextUI from "../../Components/Common/Input/input";
 import TeaxtareaNextUI from "../../Components/Common/Input/Textarea";
 import { infoData } from "../../configData";
@@ -78,6 +83,68 @@ const AddBill = () => {
   } = useGetStoresProductByIDQuery(Number(storeId), { skip: !storeId, refetchOnMountOrArgChange: true });
 
   const products = productsData?.data || [];
+
+  // Fetch invoice formats
+  const { data: allFormatsData } = useGetAllInvoiceFormatsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  // Get assigned format for store/vendor
+  const { data: storeFormatData } = useGetStoreInvoiceFormatQuery(storeId || "", {
+    skip: !storeId,
+    refetchOnMountOrArgChange: true,
+  });
+
+  const { data: vendorFormatData } = useGetVendorInvoiceFormatQuery(vendorId || "", {
+    skip: !vendorId,
+    refetchOnMountOrArgChange: true,
+  });
+
+  // Get assigned format
+  const assignedFormatId = React.useMemo(() => {
+    if (storeFormatData?.data?.formatId) return storeFormatData.data.formatId;
+    if (vendorFormatData?.data?.formatId) return vendorFormatData.data.formatId;
+    return null; // No format assigned
+  }, [storeFormatData, vendorFormatData]);
+
+  // Get assigned format details for display
+  const assignedFormat = React.useMemo(() => {
+    if (!assignedFormatId) return null;
+    return allFormatsData?.data?.find((f: any) => f.id === assignedFormatId);
+  }, [assignedFormatId, allFormatsData]);
+
+  // Get default format
+  const defaultFormat = React.useMemo(() => {
+    return allFormatsData?.data?.find((f: any) => f.isDefault);
+  }, [allFormatsData]);
+
+  // State for format selection type
+  const [formatSelectionType, setFormatSelectionType] = React.useState<"assigned" | "default">(
+    assignedFormatId ? "assigned" : "default"
+  );
+
+  // Get the selected format ID based on selection type
+  const selectedFormatId = React.useMemo(() => {
+    if (formatSelectionType === "assigned" && assignedFormatId) {
+      return assignedFormatId;
+    } else if (formatSelectionType === "default" && defaultFormat) {
+      return defaultFormat.id;
+    }
+    return null;
+  }, [formatSelectionType, assignedFormatId, defaultFormat]);
+
+  // Get the selected format details for display
+  const selectedFormat = React.useMemo(() => {
+    if (!selectedFormatId) return null;
+    return allFormatsData?.data?.find((f: any) => f.id === selectedFormatId);
+  }, [selectedFormatId, allFormatsData]);
+
+  // Set the invoice format ID in the form when selected format changes
+  React.useEffect(() => {
+    if (selectedFormatId) {
+      setValue("invoiceFormatId", selectedFormatId);
+    }
+  }, [selectedFormatId, setValue]);
 
   const handleAddProduct = () => {
     if (!selectedProductId) return;
@@ -225,35 +292,6 @@ const AddBill = () => {
 
   const sizeOptions = ["xs", "s", "m", "l", "xl", "xxl", "xxxl", "xxxxl"];
 
-  // WebSocket connection for barcode scanning
-  React.useEffect(() => {
-    // Connect to WebSocket server
-    websocketClient.connect({
-      onConnected: () => {
-        console.log('[AddBill] WebSocket connected');
-        setIsWebSocketConnected(true);
-      },
-      onDisconnected: () => {
-        console.log('[AddBill] WebSocket disconnected');
-        setIsWebSocketConnected(false);
-      },
-      onBarcodeReceived: (barcode: string) => {
-        console.log('[AddBill] Barcode received:', barcode);
-        setLastScannedBarcode(barcode);
-        handleBarcodeScanned(barcode);
-      },
-      onError: (error) => {
-        console.error('[AddBill] WebSocket error:', error);
-        setIsWebSocketConnected(false);
-      }
-    });
-
-    // Cleanup on unmount
-    return () => {
-      websocketClient.disconnect();
-    };
-  }, []);
-
   // Handle barcode scanned - find and add product automatically
   const handleBarcodeScanned = React.useCallback((barcode: string) => {
     if (!barcode || barcode.trim() === '') return;
@@ -395,6 +433,39 @@ const AddBill = () => {
       fetchProductById();
     }
   }, [products]);
+
+  // WebSocket connection for barcode scanning
+  React.useEffect(() => {
+    console.log('[AddBill] Setting up WebSocket connection...');
+    
+    // Connect to WebSocket server
+    websocketClient.connect({
+      onConnected: () => {
+        console.log('[AddBill] WebSocket connected successfully');
+        setIsWebSocketConnected(true);
+      },
+      onDisconnected: () => {
+        console.log('[AddBill] WebSocket disconnected');
+        setIsWebSocketConnected(false);
+      },
+      onBarcodeReceived: (barcode: string) => {
+        console.log('[AddBill] ✅ Barcode received from WebSocket:', barcode);
+        setLastScannedBarcode(barcode);
+        // Call handleBarcodeScanned with the received barcode
+        handleBarcodeScanned(barcode);
+      },
+      onError: (error) => {
+        console.error('[AddBill] WebSocket error:', error);
+        setIsWebSocketConnected(false);
+      }
+    });
+
+    // Cleanup on unmount
+    return () => {
+      console.log('[AddBill] Cleaning up WebSocket connection');
+      websocketClient.disconnect();
+    };
+  }, [handleBarcodeScanned]);
 
   const handleOpenScanner = () => {
     const scannerUrl = '/scan-product.html';
@@ -592,6 +663,8 @@ const AddBill = () => {
       customerName: data.customerName || "",
       customerEmail: data.customerEmail || "",
       customerPhone: data.customerPhone || "",
+      invoiceType: data.invoiceType || "Invoice", // DC, Invoice, or Quotation
+      invoiceFormatId: selectedFormatId,
       products: selectedProducts.map((p) => ({
         quantity: p.quantity,
         price: p.price,
@@ -1015,6 +1088,127 @@ const AddBill = () => {
                       />
                     )}
                   />
+                  
+                  {/* Invoice Type Selection */}
+                  <Controller
+                    name="invoiceType"
+                    control={control}
+                    rules={{ required: "Invoice type is required" }}
+                    defaultValue="Invoice"
+                    render={({ field }) => (
+                      <Select
+                        label="Invoice Type"
+                        placeholder="Select invoice type"
+                        selectedKeys={field.value ? new Set([field.value]) : new Set(["Invoice"])}
+                        onSelectionChange={(keys) => {
+                          const selectedValue = Array.from(keys)[0] as string;
+                          field.onChange(selectedValue);
+                        }}
+                        isRequired
+                        isInvalid={!!errors.invoiceType}
+                        errorMessage={errors.invoiceType?.message as string}
+                        classNames={{
+                          label: "group-data-[filled=true]:-translate-y-3",
+                          trigger: [
+                            "bg-transparent",
+                            "border-1",
+                            "text-default-500",
+                            "transition-opacity",
+                            "data-[hover=true]:bg-transparent",
+                          ],
+                        }}
+                      >
+                        <SelectItem key="DC" value="DC">
+                          DC (Delivery Challan)
+                        </SelectItem>
+                        <SelectItem key="Invoice" value="Invoice">
+                          Invoice
+                        </SelectItem>
+                        <SelectItem key="Quotation" value="Quotation">
+                          Quotation
+                        </SelectItem>
+                      </Select>
+                    )}
+                  />
+                  
+                  {/* Invoice Format Selection */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-default-700">
+                      Invoice Format
+                    </label>
+                    
+                    {/* Format Type Selection */}
+                    <div className="flex gap-4 mb-3">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="formatType"
+                          value="assigned"
+                          checked={formatSelectionType === "assigned"}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormatSelectionType("assigned");
+                            }
+                          }}
+                          disabled={!assignedFormatId}
+                          className="w-4 h-4 text-primary"
+                        />
+                        <span className={`text-sm ${!assignedFormatId ? 'text-default-400' : 'text-default-700'}`}>
+                          Assigned Format
+                        </span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="formatType"
+                          value="default"
+                          checked={formatSelectionType === "default"}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormatSelectionType("default");
+                            }
+                          }}
+                          disabled={!defaultFormat}
+                          className="w-4 h-4 text-primary"
+                        />
+                        <span className={`text-sm ${!defaultFormat ? 'text-default-400' : 'text-default-700'}`}>
+                          Default Format
+                        </span>
+                      </label>
+                    </div>
+
+                    {/* Selected Format Display */}
+                    {selectedFormat ? (
+                      <div className="p-3 bg-default-50 rounded-lg border border-default-200">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium text-default-900">
+                              {selectedFormat.name}
+                            </p>
+                            {selectedFormat.description && (
+                              <p className="text-xs text-default-500 mt-1">
+                                {selectedFormat.description}
+                              </p>
+                            )}
+                            <p className="text-xs text-default-400 mt-1">
+                              {formatSelectionType === "assigned" ? "Using assigned format" : "Using default format"}
+                            </p>
+                          </div>
+                          {selectedFormat.isDefault && (
+                            <Chip size="sm" color="warning" variant="flat">
+                              Default
+                            </Chip>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-warning-50 rounded-lg border border-warning-200">
+                        <p className="text-sm text-warning-700">
+                          ⚠️ No invoice format available. Please contact admin to assign an invoice format.
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </CardBody>
             </Card>

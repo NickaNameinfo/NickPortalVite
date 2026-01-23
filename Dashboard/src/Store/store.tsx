@@ -11,6 +11,9 @@ import {SucriptioniApi} from "../views/Subscriptions/Service.mjs";
 import {GlobalApi} from "../Service.mjs"
 import globalConfigSlice from "../Common/globalSlice"
 import { BillingApi } from "../views/Billing/Service.mjs";
+import { InventoryApi } from "../views/Inventory/Service.mjs";
+import { SettingsApi } from "../views/Settings/Service.mjs";
+import { InvoiceFormatsApi } from "../views/InvoiceFormats/Service.mjs";
 export const store = configureStore({
   reducer: {
     [VendorApi.reducerPath]: VendorApi.reducer,
@@ -23,6 +26,9 @@ export const store = configureStore({
     [GlobalApi.reducerPath]: GlobalApi.reducer,
     [SucriptioniApi.reducerPath]: SucriptioniApi.reducer,
     [BillingApi.reducerPath]: BillingApi.reducer,
+    [InventoryApi.reducerPath]: InventoryApi.reducer,
+    [SettingsApi.reducerPath]: SettingsApi.reducer,
+    [InvoiceFormatsApi.reducerPath]: InvoiceFormatsApi.reducer,
     globalConfig: globalConfigSlice,
   },
   middleware: (getDefaultMiddleware) =>
@@ -36,7 +42,10 @@ export const store = configureStore({
       StoreApi.middleware,
       GlobalApi.middleware,
       SucriptioniApi.middleware,
-      BillingApi.middleware
+      BillingApi.middleware,
+      InventoryApi.middleware,
+      SettingsApi.middleware,
+      InvoiceFormatsApi.middleware
     ),
 });
 setupListeners(store.dispatch);

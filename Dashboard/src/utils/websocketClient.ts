@@ -25,15 +25,7 @@ class WebSocketClient {
     } else if (import.meta.env.VITE_WS_URL) {
       this.wsUrl = import.meta.env.VITE_WS_URL;
     } else {
-      // Default: WebSocket server runs on port 3001
-      // For production, construct from current hostname
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        this.wsUrl = "http://localhost:3001";
-      } else {
-        // Use wss:// for HTTPS sites, ws:// for HTTP
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        this.wsUrl = `${protocol}//${window.location.hostname}:3001`;
-      }
+      this.wsUrl = `https://nicknameinfo.net`;
     }
   }
 
@@ -42,8 +34,18 @@ class WebSocketClient {
    */
   connect(callbacks?: WebSocketCallbacks): void {
     if (this.socket?.connected) {
-      console.log("[WebSocket] Already connected");
+      console.log("[WebSocket] Already connected, updating callbacks");
+      if (callbacks) {
+        this.callbacks = { ...this.callbacks, ...callbacks };
+      }
       return;
+    }
+
+    // Disconnect existing socket if any
+    if (this.socket) {
+      this.socket.removeAllListeners();
+      this.socket.disconnect();
+      this.socket = null;
     }
 
     if (callbacks) {
@@ -60,26 +62,72 @@ class WebSocketClient {
     });
 
     this.socket.on("connect", () => {
-      console.log("[WebSocket] Connected to server");
+      console.log("[WebSocket] ✅ Connected to server:", this.wsUrl);
       this.isConnected = true;
       this.callbacks.onConnected?.();
     });
 
-    this.socket.on("product-barcode", (barcode: string) => {
-      console.log("[WebSocket] Received barcode:", barcode);
-      if (barcode && barcode.trim() !== "") {
-        this.callbacks.onBarcodeReceived?.(barcode.trim());
+    // Helper function to extract barcode from string or object
+    const extractBarcode = (data: any): string | null => {
+      if (!data) return null;
+      
+      // If it's already a string, return it
+      if (typeof data === 'string') {
+        return data.trim();
+      }
+      
+      // If it's an object, try to get barcode property
+      if (typeof data === 'object' && data !== null) {
+        if (data.barcode && typeof data.barcode === 'string') {
+          return data.barcode.trim();
+        }
+        // If barcode is a number, convert to string
+        if (data.barcode && typeof data.barcode === 'number') {
+          return data.barcode.toString().trim();
+        }
+      }
+      
+      return null;
+    };
+
+    // Listen for barcode events (support both event names for compatibility)
+    this.socket.on("product-barcode", (data: any) => {
+      console.log("[WebSocket] 📦 Received barcode (product-barcode):", data);
+      const barcode = extractBarcode(data);
+      if (barcode && barcode !== "") {
+        console.log("[WebSocket] Calling onBarcodeReceived callback with:", barcode);
+        this.callbacks.onBarcodeReceived?.(barcode);
+      } else {
+        console.warn("[WebSocket] Invalid barcode data received:", data);
       }
     });
 
+    // Also listen for scan-product event (from mobile scanner)
+    // Note: Server should broadcast scan-product events to all clients
+    this.socket.on("scan-product", (data: any) => {
+      console.log("[WebSocket] 📱 Received barcode (scan-product):", data);
+      const barcode = extractBarcode(data);
+      if (barcode && barcode !== "") {
+        console.log("[WebSocket] Calling onBarcodeReceived callback with:", barcode);
+        this.callbacks.onBarcodeReceived?.(barcode);
+      } else {
+        console.warn("[WebSocket] Invalid barcode data received:", data);
+      }
+    });
+
+    // Listen for any other events for debugging
+    this.socket.onAny((eventName, ...args) => {
+      console.log("[WebSocket] 🔔 Received event:", eventName, args);
+    });
+
     this.socket.on("disconnect", () => {
-      console.log("[WebSocket] Disconnected from server");
+      console.log("[WebSocket] ❌ Disconnected from server");
       this.isConnected = false;
       this.callbacks.onDisconnected?.();
     });
 
     this.socket.on("connect_error", (error: Error) => {
-      console.error("[WebSocket] Connection error:", error);
+      console.error("[WebSocket] ❌ Connection error:", error);
       this.isConnected = false;
       this.callbacks.onError?.(error);
     });

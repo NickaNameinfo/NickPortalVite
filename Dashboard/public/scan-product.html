@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scan Product Barcode</title>
-  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <style>
     * {
@@ -314,13 +314,14 @@
     <div class="permission-dialog-content">
       <div class="permission-dialog-icon">📷</div>
       <div class="permission-dialog-title">Camera Permission Required</div>
-      <div class="permission-dialog-message">
+      <div class="permission-dialog-message" id="permissionDialogMessage">
         This app needs access to your camera to scan barcodes.<br><br>
         <strong>Click "Allow Camera" to grant permission.</strong><br><br>
         If permission was previously denied, you may need to:<br>
         1. Click the camera icon in your browser's address bar<br>
         2. Allow camera access<br>
-        3. Refresh this page
+        3. Refresh this page<br><br>
+        <strong>Note:</strong> Please use a modern browser like Chrome, Firefox, or Safari for best results.
       </div>
       <div class="permission-dialog-buttons">
         <button class="btn-allow" onclick="requestCameraPermission()">Allow Camera</button>
@@ -335,14 +336,33 @@
     let isScanning = false;
     let lastScannedBarcode = "";
 
-    // Get server URL - update this to your WebSocket server IP/domain
-    // For same device: http://localhost:3001
-    // For network: http://YOUR-LAPTOP-IP:3001
-    const serverUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      ? 'http://localhost:3001'
-      : `http://${window.location.hostname}:3001`;
+    // Get server URL - automatically detect from current page URL for local development
+    // Falls back to production URL if needed
+    function getServerUrl() {
+      return `https://nicknameinfo.net`;
+    }
 
+    const serverUrl = getServerUrl();
     document.getElementById('serverUrl').textContent = serverUrl;
+
+    // Wait for Html5Qrcode library to load
+    window.addEventListener('load', () => {
+      // Check if library is already loaded
+      if (window.Html5Qrcode) {
+        console.log('Html5Qrcode library already loaded');
+        return;
+      }
+
+      // Wait for library to load (it's loaded via script tag)
+      const checkLibrary = () => {
+        if (window.Html5Qrcode) {
+          console.log('Html5Qrcode library loaded');
+        } else {
+          setTimeout(checkLibrary, 100);
+        }
+      };
+      checkLibrary();
+    });
 
     // Initialize Socket.IO
     function initSocket() {
@@ -439,6 +459,34 @@
     // Show permission dialog
     function showPermissionDialog() {
       const dialog = document.getElementById('permissionDialog');
+      const messageEl = document.getElementById('permissionDialogMessage');
+      
+      // Customize message based on browser support
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        if (messageEl) {
+          messageEl.innerHTML = `
+            Your browser may not fully support camera access.<br><br>
+            <strong>Please try:</strong><br>
+            1. Use a modern browser like Chrome, Firefox, or Safari<br>
+            2. Make sure you're using HTTPS or localhost<br>
+            3. Check browser settings for camera permissions<br>
+            4. Try refreshing the page<br><br>
+            <strong>Click "Allow Camera" to attempt camera access anyway.</strong>
+          `;
+        }
+      } else {
+        if (messageEl) {
+          messageEl.innerHTML = `
+            This app needs access to your camera to scan barcodes.<br><br>
+            <strong>Click "Allow Camera" to grant permission.</strong><br><br>
+            If permission was previously denied, you may need to:<br>
+            1. Click the camera icon in your browser's address bar<br>
+            2. Allow camera access<br>
+            3. Refresh this page
+          `;
+        }
+      }
+      
       dialog.classList.add('show');
     }
 
@@ -452,6 +500,14 @@
     async function requestCameraPermission() {
       closePermissionDialog();
       updateStatus('scanning', '🟡 Requesting camera permission...');
+      
+      // Check if browser supports camera API
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        const errorMessage = "Your browser does not support camera access.\n\nPlease:\n1. Use a modern browser like Chrome, Firefox, or Safari\n2. Make sure you're using HTTPS or localhost\n3. Check if your browser supports camera access";
+        updateStatus('disconnected', '❌ Browser not supported');
+        alert(errorMessage);
+        return;
+      }
       
       try {
         // Request camera permission
@@ -475,6 +531,10 @@
         if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
           errorMessage = "Camera permission was denied.\n\nPlease:\n1. Click the camera icon in your browser's address bar\n2. Allow camera access\n3. Refresh this page and try again";
           statusMessage = "❌ Permission denied - Check browser settings";
+          // Show dialog again with instructions
+          setTimeout(() => {
+            showPermissionDialog();
+          }, 1000);
         } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
           errorMessage = "No camera found. Please connect a camera device.";
           statusMessage = "❌ No camera found";
@@ -506,6 +566,38 @@
     async function startScanner() {
       if (isScanning) return;
 
+      // Check if library is loaded
+      if (!window.Html5Qrcode) {
+        updateStatus('disconnected', '❌ Scanner library not loaded');
+        alert('Scanner library is loading. Please wait a moment and try again.');
+        return;
+      }
+
+      // Wait a bit to ensure DOM is ready
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      const readerElement = document.getElementById('reader');
+      if (!readerElement) {
+        updateStatus('disconnected', '❌ Scanner container not found');
+        alert('Scanner container not found');
+        return;
+      }
+
+      // Clear any existing scanner instance
+      if (html5QrCode) {
+        try {
+          await html5QrCode.stop();
+          await html5QrCode.clear();
+        } catch (e) {
+          console.warn('Error clearing previous scanner:', e);
+        }
+        html5QrCode = null;
+      }
+
+      // Clear the container content (scanner will render into it)
+      readerElement.innerHTML = '';
+
+      const Html5Qrcode = window.Html5Qrcode;
       html5QrCode = new Html5Qrcode("reader");
 
       html5QrCode.start(
@@ -521,21 +613,68 @@
         document.getElementById('startBtn').disabled = true;
         document.getElementById('stopBtn').disabled = false;
         updateStatus('scanning', '🟡 Scanning...');
-      }).catch((err) => {
+      }).catch(async (err) => {
         console.error("Error starting scanner:", err);
+        console.error("Error details:", {
+          name: err.name,
+          message: err.message,
+          stack: err.stack
+        });
+        
         let errorMessage = "Failed to start camera.";
         
-        if (err.name === 'NotAllowedError' || err.message.includes('permission')) {
+        if (err.name === 'NotAllowedError' || err.message?.includes('permission')) {
           errorMessage = "Camera permission denied. Please allow camera access.";
           showPermissionDialog();
-        } else if (err.message.includes('not found') || err.message.includes('No camera')) {
+        } else if (err.message?.includes('not found') || err.message?.includes('No camera')) {
           errorMessage = "No camera found. Please connect a camera device.";
+        } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+          errorMessage = "Camera is already in use by another application.";
+        } else if (err.name === 'OverconstrainedError') {
+          // Try without facingMode constraint
+          try {
+            // Clear previous instance
+            if (html5QrCode) {
+              try {
+                await html5QrCode.stop();
+                await html5QrCode.clear();
+              } catch (e) {
+                // Ignore cleanup errors
+              }
+              html5QrCode = null;
+            }
+
+            readerElement.innerHTML = '';
+            html5QrCode = new Html5Qrcode("reader");
+            
+            await html5QrCode.start(
+              { facingMode: "user" },
+              {
+                fps: 10,
+                qrbox: { width: 250, height: 250 }
+              },
+              onScanSuccess,
+              onScanFailure
+            );
+            
+            isScanning = true;
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+            updateStatus('scanning', '🟡 Scanning...');
+            return; // Success with fallback
+          } catch (retryErr) {
+            console.error('Retry error:', retryErr);
+            errorMessage = `Camera error: ${retryErr.message || retryErr.name || 'Unknown error'}`;
+          }
         } else {
-          errorMessage = `Camera error: ${err.message || err.name}`;
+          errorMessage = `Camera error: ${err.message || err.name || 'Unknown error'}`;
         }
         
         updateStatus('disconnected', '❌ ' + errorMessage);
         alert(errorMessage);
+        
+        // Clean up failed instance
+        html5QrCode = null;
       });
     }
 
@@ -543,10 +682,18 @@
     async function startScanning() {
       if (isScanning) return;
 
+      // Check if library is loaded
+      if (!window.Html5Qrcode) {
+        updateStatus('disconnected', '❌ Scanner library not loaded');
+        alert('Scanner library is loading. Please wait a moment and try again.');
+        return;
+      }
+
       // Check if browser supports camera API
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert("Your browser does not support camera access. Please use a modern browser like Chrome, Firefox, or Safari.");
-        updateStatus('disconnected', '❌ Browser not supported');
+        // Instead of alert, show permission dialog with helpful message
+        updateStatus('disconnected', '🔴 Camera access required');
+        showPermissionDialog();
         return;
       }
 
@@ -579,18 +726,27 @@
       }
     }
 
-    function stopScanning() {
+    async function stopScanning() {
       if (!isScanning || !html5QrCode) return;
 
-      html5QrCode.stop().then(() => {
-        html5QrCode.clear();
+      try {
+        await html5QrCode.stop();
+        await html5QrCode.clear();
+        html5QrCode = null;
         isScanning = false;
+        lastScannedBarcode = ""; // Clear to allow re-scanning
         document.getElementById('startBtn').disabled = false;
         document.getElementById('stopBtn').disabled = true;
         updateStatus('connected', '🟢 Scanner stopped');
-      }).catch((err) => {
+      } catch (err) {
         console.error("Error stopping scanner:", err);
-      });
+        // Force cleanup even if stop fails
+        isScanning = false;
+        html5QrCode = null;
+        document.getElementById('startBtn').disabled = false;
+        document.getElementById('stopBtn').disabled = true;
+        updateStatus('connected', '🟢 Scanner stopped');
+      }
     }
 
     // Initialize on page load
@@ -599,9 +755,14 @@
     });
 
     // Cleanup on page unload
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener('beforeunload', async () => {
       if (isScanning && html5QrCode) {
-        stopScanning();
+        try {
+          await html5QrCode.stop();
+          await html5QrCode.clear();
+        } catch (e) {
+          // Ignore cleanup errors
+        }
       }
       if (socket) {
         socket.disconnect();

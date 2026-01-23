@@ -23,6 +23,39 @@ export const createBaseQuery = () => {
       prepareHeaders: (headers, api) => {
         return prepareHeaders(headers, api);
       },
+      // Custom fetch function to handle FormData correctly
+      fetchFn: async (input, init) => {
+        // Check if body is FormData
+        const body = init?.body || args?.body;
+        const isFormData = body instanceof FormData;
+        
+        if (isFormData) {
+          // For FormData, use native fetch directly to preserve multipart/form-data
+          const url = typeof input === 'string' ? input : input.url;
+          const fullUrl = url.startsWith('http') ? url : `${infoData.baseApi}${url}`;
+          
+          // Get headers from prepareHeaders
+          const headers = new Headers();
+          prepareHeaders(headers, { arg: args, endpoint: api?.endpoint });
+          
+          // Don't set Content-Type for FormData - browser will set it with boundary
+          if (headers.has('Content-Type')) {
+            headers.delete('Content-Type');
+          }
+          
+          // Make the request with FormData - return Response object directly
+          // RTK Query will handle the response parsing
+          return fetch(fullUrl, {
+            method: args?.method || init?.method || 'POST',
+            headers: headers,
+            body: body, // Use FormData directly
+            credentials: 'include', // Include cookies
+          });
+        }
+        
+        // For non-FormData, use default fetch
+        return fetch(input, init);
+      },
     });
 
     // Execute the query

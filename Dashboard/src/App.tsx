@@ -13,6 +13,11 @@ import { getCookie } from "./JsFiles/CommonFunction.mjs";
 import { useAppDispatch } from "./Common/hooks.js";
 import { updateLoginDetails } from "./Common/globalSlice.js";
 import { useGetUserQuery } from "./Service.mjs";
+import { 
+  useGetSubUserMenuPermissionsQuery,
+  useGetStoreMenuPermissionsQuery,
+  useGetSubUserByIdQuery
+} from "./views/Settings/Service.mjs";
 import { debugAuth } from "./utils/authDebug.mjs";
 import { useDisableRightClick } from "./utils/rightClickHandler";
 import "react-toastify/dist/ReactToastify.css";
@@ -64,34 +69,152 @@ function App() {
     return () => clearInterval(interval);
   }, [id, token]);
   
-  const { data, error, refetch } = useGetUserQuery(id, { skip: !id });
-
-  console.log('[App] State:', {
-    id: id || '❌',
-    token: token ? '✅' : '❌',
-    hasData: !!data,
-    cookies: {
-      id: getCookie("id") || '❌',
-      token: getCookie("token") || '❌',
-      xsrf: getCookie("XSRF-token") || '❌',
-    }
+  // Check if user is a sub-user from cookie (set during login)
+  const isSubUserFromCookie = getCookie("isSubUser") === "true";
+  
+  // Use appropriate query based on whether user is a sub-user
+  const { data: userData, error: userError, refetch: refetchUser } = useGetUserQuery(id, { 
+    skip: !id || isSubUserFromCookie 
+  });
+  
+  const { data: subUserData, error: subUserError, refetch: refetchSubUser } = useGetSubUserByIdQuery(id, {
+    skip: !id || !isSubUserFromCookie,
+    refetchOnMountOrArgChange: true,
   });
 
-  // Refetch when id becomes available
+  // Use the appropriate data source
+  const data = isSubUserFromCookie ? subUserData : userData;
+  const error = isSubUserFromCookie ? subUserError : userError;
+  const refetch = isSubUserFromCookie ? refetchSubUser : refetchUser;
+
+  // Get user role and IDs
+  const currentRole = getCookie("role");
+  const storeId = getCookie("storeId");
+  const vendorId = getCookie("vendorId");
+  const isSubUser = isSubUserFromCookie || data?.data?.isSubUser || false;
+  const subUserId = data?.data?.id;
+
+  // Fetch store menu permissions for store users (role 3) or vendors (role 2) who are NOT sub-users
+  const shouldFetchStorePermissions = !isSubUser && (currentRole === "2" || currentRole === "3") && !!storeId;
+  
+  // Fetch menu permissions for stores/vendors
+  const { 
+    data: storeMenuPermissionsData, 
+    isLoading: isLoadingStorePermissions,
+    error: storePermissionsError,
+    refetch: refetchStoreMenuPermissions 
+  } = useGetStoreMenuPermissionsQuery(storeId, {
+    skip: !shouldFetchStorePermissions,
+    refetchOnMountOrArgChange: true,
+  });
+
+  // Fetch menu permissions for sub-users (role 2 or 3) who are marked as sub-users
+  const shouldFetchSubUserPermissions = isSubUser && (currentRole === "2" || currentRole === "3") && !!subUserId;
+  
+  // Fetch menu permissions for sub-users
+  const { 
+    data: subUserMenuPermissionsData, 
+    isLoading: isLoadingSubUserPermissions,
+    error: subUserPermissionsError,
+    refetch: refetchSubUserMenuPermissions 
+  } = useGetSubUserMenuPermissionsQuery(subUserId, {
+    skip: !shouldFetchSubUserPermissions,
+    refetchOnMountOrArgChange: true,
+  });
+
+  // Debug logging
+  React.useEffect(() => {
+    if (shouldFetchStorePermissions) {
+      console.log('[App] Fetching store menu permissions:', {
+        storeId,
+        currentRole,
+        isLoadingStorePermissions,
+        hasPermissions: !!storeMenuPermissionsData,
+        error: storePermissionsError,
+      });
+    }
+    if (shouldFetchSubUserPermissions) {
+      console.log('[App] Fetching sub-user menu permissions:', {
+        subUserId,
+        isSubUser,
+        currentRole,
+        isLoadingSubUserPermissions,
+        hasPermissions: !!subUserMenuPermissionsData,
+        error: subUserPermissionsError,
+      });
+    }
+  }, [
+    shouldFetchStorePermissions, storeId, currentRole, isLoadingStorePermissions, 
+    storeMenuPermissionsData, storePermissionsError,
+    shouldFetchSubUserPermissions, subUserId, isSubUser, isLoadingSubUserPermissions,
+    subUserMenuPermissionsData, subUserPermissionsError
+  ]);
+
+
+  // Refetch when id becomes available (only once, not on every refetch change)
   React.useEffect(() => {
     if (id) {
       console.log('[App] ID available, refetching user data');
       refetch();
     }
-  }, [id, refetch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]); // Only depend on id, not refetch to avoid infinite loops
 
-  // Update Redux store when data is received
+  // Update Redux store when user data is received
   React.useEffect(() => {
     if (data?.data) {
       console.log('[App] User data received, updating Redux store');
       dispatch(updateLoginDetails(data));
     }
   }, [data, dispatch]);
+
+  // Update Redux store when store/vendor menu permissions are received
+  React.useEffect(() => {
+    if (storeMenuPermissionsData?.data && data?.data && !isSubUser) {
+      console.log('[App] Store/Vendor menu permissions received, updating Redux store');
+      const updatedData = {
+        ...data,
+        data: {
+          ...data.data,
+          menuPermissions: storeMenuPermissionsData.data,
+        },
+      };
+      console.log('[App] Merging store/vendor menu permissions:', storeMenuPermissionsData.data);
+      dispatch(updateLoginDetails(updatedData));
+    }
+  }, [storeMenuPermissionsData, data, isSubUser, dispatch]);
+
+  // Update Redux store when sub-user menu permissions are received
+  React.useEffect(() => {
+    if (subUserMenuPermissionsData?.data && data?.data && isSubUser) {
+      console.log('[App] Sub-user menu permissions received, updating Redux store');
+      const updatedData = {
+        ...data,
+        data: {
+          ...data.data,
+          menuPermissions: subUserMenuPermissionsData.data,
+        },
+      };
+      console.log('[App] Merging sub-user menu permissions:', subUserMenuPermissionsData.data);
+      dispatch(updateLoginDetails(updatedData));
+    }
+  }, [subUserMenuPermissionsData, data, isSubUser, dispatch]);
+
+  // Refetch store menu permissions when store ID changes
+  React.useEffect(() => {
+    if (!isSubUser && storeId && (currentRole === "2" || currentRole === "3")) {
+      console.log('[App] Store/Vendor detected, fetching menu permissions for store ID:', storeId);
+      refetchStoreMenuPermissions();
+    }
+  }, [isSubUser, storeId, currentRole, refetchStoreMenuPermissions]);
+
+  // Refetch sub-user menu permissions when sub-user ID changes
+  React.useEffect(() => {
+    if (isSubUser && subUserId) {
+      console.log('[App] Sub-user detected, fetching menu permissions for ID:', subUserId);
+      refetchSubUserMenuPermissions();
+    }
+  }, [isSubUser, subUserId, refetchSubUserMenuPermissions]);
   // // Watch for cookie changes (especially after login)
   // React.useEffect(() => {
   //   const checkToken = () => {

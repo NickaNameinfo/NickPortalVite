@@ -41,6 +41,7 @@ const Login = () => {
       const vendorId = userData?.vendorId;
       const storeId = userData?.storeId;
       const plan = userData?.plan;
+      const isSubUser = userData?.isSubUser || user?.isSubUser || userData?.user?.isSubUser || false;
       
       console.log('[Authenticate] User data extraction:', {
         role: role || '❌',
@@ -48,6 +49,7 @@ const Login = () => {
         vendorId: vendorId || '❌',
         storeId: storeId || '❌',
         plan: plan || '❌',
+        isSubUser: isSubUser || '❌',
       });
       
       if (role !== undefined && role !== null) {
@@ -65,6 +67,8 @@ const Login = () => {
       if (plan) {
         setCookie("plan", plan.toString(), expirationMinutes);
       }
+      // Store isSubUser flag in cookie to determine which API endpoint to use
+      setCookie("isSubUser", isSubUser ? "true" : "false", expirationMinutes);
       
       next();
     }

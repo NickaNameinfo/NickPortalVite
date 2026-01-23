@@ -34,6 +34,7 @@ const Subscriptions = () => {
       key: "Plan1",
       name: "Convert to E-Commerce",
       commingSoon: false,
+      billingCycle: "Yearly",
       plans: [
         {
           name: "Starter",
@@ -73,6 +74,7 @@ const Subscriptions = () => {
           label: "Enter number of item",
           price: 38,
           defaultValue: 1,
+          billingCycle: "Yearly",
         },
         {
           name: "Standard",
@@ -111,6 +113,7 @@ const Subscriptions = () => {
           ),
           price: 2799,
           defaultValue: "1 - 100",
+          billingCycle: "Yearly",
         },
         {
           name: "Premium",
@@ -150,6 +153,7 @@ const Subscriptions = () => {
           label: "Enter number of item",
           price: 3799,
           defaultValue: "100 - 200",
+          billingCycle: "Yearly",
         },
         {
           name: "Customized",
@@ -190,6 +194,7 @@ const Subscriptions = () => {
           price: 17,
           basePrice: 3799,
           defaultValue: 1,
+          billingCycle: "Yearly",
         },
         {
           name: "Premium with Billing",
@@ -238,6 +243,64 @@ const Subscriptions = () => {
           price: 17,
           basePrice: 9999,
           defaultValue: 1,
+          billingCycle: "Yearly",
+        },
+        {
+          name: "Inventory Management",
+          key: "PL1_006",
+          discription: (
+            <div>
+              <p className="text-md font-semibold mb-2">Key Features:</p>
+              <ul className="space-y-2 text-small">
+                {/* Based on the image, the features are: */}
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Billing</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Barcode Generation</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Products</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Inbound/Outbound</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Vendors</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Clients</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Categories</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Cutomized Invoice Design</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Inventory Summary</span>
+                </li>
+                <li className="flex items-center gap-2 text-default-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>Unlimited Inventory Reports</span>
+                </li>
+              </ul>
+            </div>
+          ),
+          label: "Enter number of item",
+          price: 4999,
+          basePrice: 4999,
+          defaultValue: 1,
+          billingCycle: "Monthly",
         },
       ],
     },
@@ -284,6 +347,7 @@ const Subscriptions = () => {
           label: "Enter number of item",
           price: 9,
           defaultValue: 1,
+          billingCycle: "Yearly",
         }
       ],
     },
@@ -322,6 +386,7 @@ const Subscriptions = () => {
           label: "Enter number of item",
           price: 1999,
           defaultValue: 1,
+          billingCycle: "Yearly",
         }
       ],
     },

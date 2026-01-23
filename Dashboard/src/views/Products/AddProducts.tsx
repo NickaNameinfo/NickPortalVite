@@ -37,6 +37,7 @@ import {
   useAddVendorProductMutation,
   useGetProductsByIdQuery,
   useUpdateProductMutation,
+  useUploadProductPhotosMutation,
 } from "./Service.mjs";
 import { useUploadFileMutation } from "../../Service.mjs"
 import { useGetCategoriesQuery } from "../Categories/Service.mjs";
@@ -46,6 +47,7 @@ import { useGetVendorsProductByIdQuery } from "../VendorProducts/Service.mjs";
 import { useGetStoresProductByIDQuery } from "../Store/Service.mjs";
 import { SubscriptionExpiredModal } from "../../Components/SubscriptionExpiredModal";
 import { CustomRadio } from "../../Components/CustomRadio";
+import CategoryModal from "../../Components/CategoryModal";
 import JsBarcode from "jsbarcode";
 import { useGetStoresByIDQuery } from "../Store/Service.mjs";
 import { useAppSelector } from "../../Common/hooks";
@@ -64,6 +66,7 @@ const AddProducts = () => {
   const navigate = useNavigate();
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = React.useState(false);
   const [isBarcodeModalOpen, setIsBarcodeModalOpen] = React.useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = React.useState(false);
   const [barcodeCount, setBarcodeCount] = React.useState<number>(1);
   const [enableSizeManagement, setEnableSizeManagement] = React.useState<boolean>(false);
   const [sizeUnitSizeMap, setSizeUnitSizeMap] = React.useState<Record<string, { unitSize: string; qty: string; price: string; discount: string; discountPer: string; total: string; grandTotal: string }>>({});
@@ -113,9 +116,12 @@ const AddProducts = () => {
   const [addVendorProducts] = useAddVendorProductMutation();
   const [updateProducts] = useUpdateProductMutation();
   const [uploadfile] = useUploadFileMutation();
+  const [uploadProductPhotos] = useUploadProductPhotosMutation();
   const { productId } = useParams();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [selectedFileName, setSelectedFileName] = React.useState<string>("No file selected (file size exceeds 500KB)");
+  const [subImages, setSubImages] = React.useState<Array<{ file: File; preview: string }>>([]); // Array of sub-image files with previews
+  const [existingSubImages, setExistingSubImages] = React.useState<string[]>([]); // Existing sub-image URLs from API
   let tempFormData = watch();
   const { data: storeData, error: storeError, refetch: storeRefetch } = useGetStoresByIDQuery(
     Number(currentStoreUserId), { skip: !currentStoreUserId }
@@ -202,6 +208,9 @@ const AddProducts = () => {
       setNewSize("");
       setNewUnitSize("");
       setNewPrice("");
+      // Reset sub-images
+      setSubImages([]);
+      setExistingSubImages([]);
     }
 
   }, [productId, reset]);
@@ -221,6 +230,40 @@ const AddProducts = () => {
       setValue("unitSize", productData?.data?.unitSize || "");
       // Reset file name when editing
       setSelectedFileName(productData?.data?.photo ? "Current photo (click to change)" : "No file selected");
+      // Load existing sub-images if they exist (from API)
+      // Check productphotos (lowercase array from API), productPhotos (camelCase), and subImages for backward compatibility
+      let existingPhotos: string[] = [];
+      
+      // Check productphotos array (from API response - lowercase)
+      if (productData?.data?.productphotos && Array.isArray(productData.data.productphotos)) {
+        existingPhotos = productData.data.productphotos
+          .map((photo: any) => photo?.imgUrl || photo?.url || photo)
+          .filter((url: any) => url && typeof url === 'string');
+      }
+      
+      // Fallback to productPhotos or subImages if productphotos not found
+      if (existingPhotos.length === 0) {
+        const subImagesData = productData?.data?.productPhotos || productData?.data?.subImages;
+        if (subImagesData) {
+          try {
+            const parsed = typeof subImagesData === 'string'
+              ? JSON.parse(subImagesData)
+              : subImagesData;
+            if (Array.isArray(parsed)) {
+              existingPhotos = parsed.map((item: any) => {
+                // Handle both string URLs and objects with imgUrl
+                return typeof item === 'string' ? item : (item?.imgUrl || item?.url || item);
+              }).filter((url: any) => url && typeof url === 'string');
+            }
+          } catch (e) {
+            console.error("Error parsing productPhotos/subImages:", e);
+          }
+        }
+      }
+      
+      setExistingSubImages(existingPhotos);
+      // Reset new sub-images when editing
+      setSubImages([]);
       // Check if size management is enabled (has sizeUnitSizeMap with multiple entries)
       if (productData?.data?.sizeUnitSizeMap) {
         try {
@@ -300,6 +343,9 @@ const AddProducts = () => {
   );
   // const productAddCount = sellingProductValuesData?.data?.subscriptionCount + sellingProductValuesData?.data?.freeCount
 
+  console.log(subImages, "subImages24534532");
+
+  
   const onSubmit = async (data: any) => {
     setIsLoading(true);
     const formData = new FormData();
@@ -315,10 +361,61 @@ const AddProducts = () => {
     formData.append("storeName", currentStoreUserId ? currentStoreUserId : currentVendorUserId);
     if (!data.photo) {
       alert("Please select image");
+      setIsLoading(false);
       return;
     }
     let fileResult = await uploadfile(formData);
-    if (!fileResult?.data?.success && !productId) return;
+    console.log("Main image upload response:", fileResult);
+    if (!fileResult?.data?.success && !productId) {
+      setIsLoading(false);
+      return;
+    }
+
+    // Upload sub-images if any are selected
+    const uploadedSubImageUrls: string[] = [];
+    
+    // Keep existing sub-images if editing (only if they haven't been removed)
+    if (productId && existingSubImages.length > 0) {
+      uploadedSubImageUrls.push(...existingSubImages);
+    }
+    
+
+    // Upload new sub-images
+    if (subImages.length > 0) {
+      console.log(`Starting upload of ${subImages.length} sub-images...`);
+      for (const subImage of subImages) {
+        const subFormData = new FormData();
+        subFormData.append("file", subImage.file);
+        subFormData.append("storeName", currentStoreUserId ? currentStoreUserId : currentVendorUserId);
+        
+        try {
+          // Use same pattern as main image upload (without .unwrap() first, then check structure)
+          const subFileResult = await uploadfile(subFormData);
+          console.log("Sub-image upload response (raw):", subFileResult);
+          
+          // Match the main image response structure: fileResult?.data?.fileUrl
+          // Also check if it's already unwrapped
+          const responseData = subFileResult?.data || subFileResult;
+          const fileUrl = responseData?.fileUrl || responseData?.data?.fileUrl;
+          const isSuccess = responseData?.success || subFileResult?.data?.success;
+          
+          console.log("Extracted fileUrl:", fileUrl, "isSuccess:", isSuccess);
+          
+          if (isSuccess && fileUrl) {
+            console.log("Adding file URL to array:", fileUrl);
+            uploadedSubImageUrls.push(fileUrl);
+          } else {
+            console.warn("Upload response missing fileUrl or success flag. Response:", subFileResult);
+          }
+        } catch (error) {
+          console.error("Error uploading sub-image:", error);
+          // Continue with other uploads even if one fails
+        }
+      }
+    }
+    
+    console.log("Final uploadedSubImageUrls:", uploadedSubImageUrls);
+
     // Calculate total unitSize from all size entries if size management is enabled, or use default unitSize
     let unitSizeForSize: string;
     let defaultPrice: string;
@@ -347,6 +444,7 @@ const AddProducts = () => {
       isEnableEcommerce: Number(tempFormData?.isEnableEcommerce) ? "1" : "0",
       isBooking: bookingSubscription ? "1" : "0",
       photo: fileResult?.data?.fileUrl,
+      // Note: productPhotos are now handled separately via /upload-photos endpoint
       serviceType: tempFormData?.serviceType || "Product",
       unitSize: unitSizeForSize,
       qty : tempFormData?.qty || "0",
@@ -357,47 +455,80 @@ const AddProducts = () => {
     if (!productId) {
       const result = await addProducts(apiParams).unwrap();
       if (result?.success) {
+        const newProductId = result.data?.id;
+        
         // Use unitSize from the selected size, or fallback to qty
         const storeUnitSize = unitSizeForSize || result.data?.qty;
         const tempStoreValueAPI = {
           supplierId: currentStoreUserId
             ? currentStoreUserId
             : currentVendorUserId,
-          productId: result.data?.id,
+          productId: newProductId,
           unitSize: storeUnitSize,
           buyerPrice: result.data?.total,
         };
+        
+        let storeResult;
         if (currentStoreUserId) {
-          const storeResult = await addStoreProducts(
-            tempStoreValueAPI
-          ).unwrap();
-          if (storeResult) {
-            navigate("/ProductsList");
-          }
+          storeResult = await addStoreProducts(tempStoreValueAPI).unwrap();
         } else {
-          const vendorResult = await addVendorProducts(
-            tempStoreValueAPI
-          ).unwrap();
-          if (vendorResult) {
-            navigate("/ProductsList");
+          storeResult = await addVendorProducts(tempStoreValueAPI).unwrap();
+        }
+        
+        if (storeResult && newProductId) {
+          // Upload product photos using the new /upload-photos endpoint
+          if (uploadedSubImageUrls.length > 0) {
+            try {
+              const photoUploadResult = await uploadProductPhotos({
+                productId: newProductId,
+                productPhotos: uploadedSubImageUrls, // Send as array (backend accepts array or JSON string)
+              }).unwrap();
+              console.log("Product photos uploaded successfully:", photoUploadResult);
+            } catch (photoError: any) {
+              console.error("Error uploading product photos:", photoError);
+              // Don't block navigation if photo upload fails
+              alert(photoError?.data?.message || "Product created but failed to upload some photos. Please try again.");
+            }
           }
+          
+          navigate("/ProductsList");
+          setIsLoading(false);
         }
       }
     } else {
       setValue("id", productData?.data?.id);
       const result = await updateProducts(apiParams).unwrap();
+      const updatedProductId = apiParams?.id || productData?.data?.id;
+      
       // Use unitSize from the selected size, or fallback to qty
       const storeUnitSize = unitSizeForSize || apiParams?.qty;
       const storeResult = await addStoreProducts({
         supplierId: currentStoreUserId
           ? currentStoreUserId
           : currentVendorUserId,
-        productId: apiParams?.id,
+        productId: updatedProductId,
         unitSize: storeUnitSize,
         buyerPrice: apiParams?.total,
       }).unwrap();
-      if (storeResult) {
+      
+      if (storeResult && updatedProductId) {
+        // Upload product photos using the new /upload-photos endpoint
+        if (uploadedSubImageUrls.length > 0) {
+          try {
+            const photoUploadResult = await uploadProductPhotos({
+              productId: updatedProductId,
+              productPhotos: uploadedSubImageUrls, // Send as array (backend accepts array or JSON string)
+            }).unwrap();
+            console.log("Product photos uploaded successfully:", photoUploadResult);
+          } catch (photoError: any) {
+            console.error("Error uploading product photos:", photoError);
+            // Don't block navigation if photo upload fails
+            alert(photoError?.data?.message || "Product updated but failed to upload some photos. Please try again.");
+          }
+        }
+        
         navigate("/ProductsList");
+        setIsLoading(false);
       }
     }
     setIsLoading(false);
@@ -855,48 +986,60 @@ const AddProducts = () => {
           {
             tempFormData?.serviceType === "Service" ?
               <div className="grid grid-cols-2 gap-4 mb-2">
-                <Controller
-                  name="categoryId" // Changed to reflect a text input
-                  control={control}
-                  rules={{ required: "Please select value" }}
-                  render={({ field }) => (
-                    <Autocomplete
-                      isInvalid={errors?.["categoryId"] ? true : false}
-                      color={errors?.["categoryId"] ? "danger" : "default"}
-                      listboxProps={{
-                        itemClasses: {
-                          base: [
-                            "rounded-md",
-                            "text-default-500",
-                            "transition-opacity",
-                            "data-[hover=true]:text-foreground",
-                            "data-[hover=true]:bg-default-100",
-                            "dark:data-[hover=true]:bg-default-50",
-                            "data-[selectable=true]:focus:bg-default-50",
-                            "data-[pressed=true]:opacity-90",
-                            "data-[focus-visible=true]:ring-default-500",
-                            "shadow-none",
-                            // "border-1",
-                          ],
-                        },
-                      }}
-                      label="Select Category"
-                      variant="faded"
-                      size="sm"
-                      onSelectionChange={(selectedKey) => {
-                        const valueToSave = selectedKey === null ? null : Number(selectedKey);
-                        field.onChange(valueToSave); // Updates the form state
-                      }}
-                      selectedKey={String(tempFormData?.categoryId)}
-                    >
-                      {categoryData?.data?.map((item) => (
-                        <AutocompleteItem key={String(item.id)} value={String(item.id)}>
-                          {item.name}
-                        </AutocompleteItem>
-                      ))}
-                    </Autocomplete>
-                  )}
-                />
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1">
+                    <Controller
+                      name="categoryId" // Changed to reflect a text input
+                      control={control}
+                      rules={{ required: "Please select value" }}
+                      render={({ field }) => (
+                        <Autocomplete
+                          isInvalid={errors?.["categoryId"] ? true : false}
+                          color={errors?.["categoryId"] ? "danger" : "default"}
+                          listboxProps={{
+                            itemClasses: {
+                              base: [
+                                "rounded-md",
+                                "text-default-500",
+                                "transition-opacity",
+                                "data-[hover=true]:text-foreground",
+                                "data-[hover=true]:bg-default-100",
+                                "dark:data-[hover=true]:bg-default-50",
+                                "data-[selectable=true]:focus:bg-default-50",
+                                "data-[pressed=true]:opacity-90",
+                                "data-[focus-visible=true]:ring-default-500",
+                                "shadow-none",
+                                // "border-1",
+                              ],
+                            },
+                          }}
+                          label="Select Category"
+                          variant="faded"
+                          size="sm"
+                          onSelectionChange={(selectedKey) => {
+                            const valueToSave = selectedKey === null ? null : Number(selectedKey);
+                            field.onChange(valueToSave); // Updates the form state
+                          }}
+                          selectedKey={String(tempFormData?.categoryId)}
+                        >
+                          {categoryData?.data?.map((item) => (
+                            <AutocompleteItem key={String(item.id)} value={String(item.id)}>
+                              {item.name}
+                            </AutocompleteItem>
+                          ))}
+                        </Autocomplete>
+                      )}
+                    />
+                  </div>
+                  <Button
+                    color="success"
+                    variant="flat"
+                    size="sm"
+                    onPress={() => setIsCategoryModalOpen(true)}
+                  >
+                    + Add
+                  </Button>
+                </div>
                 <Controller
                   name="status" // Changed to reflect a text input
                   control={control}
@@ -1060,70 +1203,72 @@ const AddProducts = () => {
                   )}
                 />
 
-                <div className="flex">
-                  <Controller
-                    name="photo" // Changed to reflect a text input
-                    control={control}
-                    render={({ field }) => (
-                      <div style={{ position: "relative", width: "100%" }}>
-                        <input
-                          type="file"
-                          id="file"
-                          style={{
-                            opacity: 0,
-                            position: "absolute",
-                            zIndex: -1,
-                            width: "100%",
-                          }}
-                          onChange={(e) => {
-                            const file = e.target.files[0];
-                            if (file && file.size > 500 * 1024) { // 500KB limit
-                              alert("File size exceeds 500KB. Please select a smaller file.");
-                              e.target.value = ''; // Clear the input
-                              document.getElementById("fileLabel").innerText = "No file selected";
-                            } else {
-                              field.onChange(file); // Update form state with selected file
-                              document.getElementById("fileLabel").innerText = file
-                                ? file.name
-                                : "No file selected"; // Update label dynamically
-                            }
-                          }}
-                        />
-                        <label
-                          htmlFor="file"
-                          style={{
-                            border: "1px solid rgba(128, 128, 128, 0.3)",
-                            borderRadius: "7px",
-                            padding: "10px",
-                            width: "100%",
-                            display: "inline-block",
-                            textAlign: "center",
-                            cursor: "pointer",
-                            fontSize: "14px",
-                          }}
-                        >
-                          Choose File
-                        </label>
-                        <span
-                          id="fileLabel"
-                          style={{
-                            marginLeft: "10px",
-                            textAlign: "start",
-                            fontSize: "12px",
-                          }}
-                        >
-                          No file selected
-                        </span>
-                      </div>
-                    )}
-                  />
-                  {/* {productData?.data?.photo && ( */}
-                  <Image
-                    src={`${productData?.data?.photo}`}
-                    className="h-20 ml-2"
-                    width={100}
-                  />
-                  {/* )} */}
+                <div className="flex flex-col gap-4">
+                  <div className="flex">
+                    <Controller
+                      name="photo" // Changed to reflect a text input
+                      control={control}
+                      render={({ field }) => (
+                        <div style={{ position: "relative", width: "100%" }}>
+                          <input
+                            type="file"
+                            id="file"
+                            style={{
+                              opacity: 0,
+                              position: "absolute",
+                              zIndex: -1,
+                              width: "100%",
+                            }}
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+                              if (file && file.size > 500 * 1024) { // 500KB limit
+                                alert("File size exceeds 500KB. Please select a smaller file.");
+                                e.target.value = ''; // Clear the input
+                                document.getElementById("fileLabel").innerText = "No file selected";
+                              } else {
+                                field.onChange(file); // Update form state with selected file
+                                document.getElementById("fileLabel").innerText = file
+                                  ? file.name
+                                  : "No file selected"; // Update label dynamically
+                              }
+                            }}
+                          />
+                          <label
+                            htmlFor="file"
+                            style={{
+                              border: "1px solid rgba(128, 128, 128, 0.3)",
+                              borderRadius: "7px",
+                              padding: "10px",
+                              width: "100%",
+                              display: "inline-block",
+                              textAlign: "center",
+                              cursor: "pointer",
+                              fontSize: "14px",
+                            }}
+                          >
+                            Choose Main Image
+                          </label>
+                          <span
+                            id="fileLabel"
+                            style={{
+                              marginLeft: "10px",
+                              textAlign: "start",
+                              fontSize: "12px",
+                            }}
+                          >
+                            No file selected
+                          </span>
+                        </div>
+                      )}
+                    />
+                    {/* {productData?.data?.photo && ( */}
+                    <Image
+                      src={`${productData?.data?.photo}`}
+                      className="h-20 ml-2"
+                      width={100}
+                    />
+                    {/* )} */}
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 mb-2">
                   <Controller
@@ -1182,49 +1327,61 @@ const AddProducts = () => {
               </div>
               : <>
                 <div className="grid grid-cols-2 gap-4 mb-2">
-                  <Controller
-                    name="categoryId" // Changed to reflect a text input
-                    control={control}
-                    rules={{ required: "Please select value" }}
-                    render={({ field }) => (
-                      <Autocomplete
-                        isRequired={true}
-                        isInvalid={errors?.["categoryId"] ? true : false}
-                        color={errors?.["categoryId"] ? "danger" : "default"}
-                        listboxProps={{
-                          itemClasses: {
-                            base: [
-                              "rounded-md",
-                              "text-default-500",
-                              "transition-opacity",
-                              "data-[hover=true]:text-foreground",
-                              "data-[hover=true]:bg-default-100",
-                              "dark:data-[hover=true]:bg-default-50",
-                              "data-[selectable=true]:focus:bg-default-50",
-                              "data-[pressed=true]:opacity-90",
-                              "data-[focus-visible=true]:ring-default-500",
-                              "shadow-none",
-                              // "border-1",
-                            ],
-                          },
-                        }}
-                        label="Select Category"
-                        variant="faded"
-                        size="sm"
-                        onSelectionChange={(selectedKey) => {
-                          const valueToSave = selectedKey === null ? null : Number(selectedKey);
-                          field.onChange(valueToSave); // Updates the form state
-                        }}
-                        selectedKey={String(tempFormData?.categoryId)}
-                      >
-                        {categoryData?.data?.map((item) => (
-                          <AutocompleteItem key={String(item.id)} value={String(item.id)}>
-                            {item.name}
-                          </AutocompleteItem>
-                        ))}
-                      </Autocomplete>
-                    )}
-                  />
+                  <div className="flex gap-2 items-end">
+                    <div className="flex-1">
+                      <Controller
+                        name="categoryId" // Changed to reflect a text input
+                        control={control}
+                        rules={{ required: "Please select value" }}
+                        render={({ field }) => (
+                          <Autocomplete
+                            isRequired={true}
+                            isInvalid={errors?.["categoryId"] ? true : false}
+                            color={errors?.["categoryId"] ? "danger" : "default"}
+                            listboxProps={{
+                              itemClasses: {
+                                base: [
+                                  "rounded-md",
+                                  "text-default-500",
+                                  "transition-opacity",
+                                  "data-[hover=true]:text-foreground",
+                                  "data-[hover=true]:bg-default-100",
+                                  "dark:data-[hover=true]:bg-default-50",
+                                  "data-[selectable=true]:focus:bg-default-50",
+                                  "data-[pressed=true]:opacity-90",
+                                  "data-[focus-visible=true]:ring-default-500",
+                                  "shadow-none",
+                                  // "border-1",
+                                ],
+                              },
+                            }}
+                            label="Select Category"
+                            variant="faded"
+                            size="sm"
+                            onSelectionChange={(selectedKey) => {
+                              const valueToSave = selectedKey === null ? null : Number(selectedKey);
+                              field.onChange(valueToSave); // Updates the form state
+                            }}
+                            selectedKey={String(tempFormData?.categoryId)}
+                          >
+                            {categoryData?.data?.map((item) => (
+                              <AutocompleteItem key={String(item.id)} value={String(item.id)}>
+                                {item.name}
+                              </AutocompleteItem>
+                            ))}
+                          </Autocomplete>
+                        )}
+                      />
+                    </div>
+                    <Button
+                      color="success"
+                      variant="flat"
+                      size="sm"
+                      onPress={() => setIsCategoryModalOpen(true)}
+                    >
+                      + Add
+                    </Button>
+                  </div>
                   <Controller
                     name="status" // Changed to reflect a text input
                     control={control}
@@ -1939,6 +2096,173 @@ const AddProducts = () => {
                     />
                     {/* )} */}
                   </div>
+                  {/* Sub Images Upload Section */}
+                  <div className="flex flex-col gap-2 mt-2">
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm font-medium">Product Photos</label>
+                      <input
+                        type="file"
+                        id="subImagesService"
+                        accept="image/*"
+                        multiple
+                        style={{ display: "none" }}
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files || []);
+                          if (files.length === 0) return;
+
+                          // Check total image limit (existing + current + new)
+                          const currentTotal = existingSubImages.length + subImages.length;
+                          const maxImages = 3;
+                          
+                          if (currentTotal >= maxImages) {
+                            alert(`Maximum ${maxImages} product photos allowed. Please remove some images before adding new ones.`);
+                            e.target.value = '';
+                            return;
+                          }
+
+                          // Calculate how many new images can be added
+                          const remainingSlots = maxImages - currentTotal;
+                          const filesToAdd = files.slice(0, remainingSlots);
+                          
+                          if (files.length > remainingSlots) {
+                            alert(`You can only add ${remainingSlots} more image(s). Maximum ${maxImages} product photos allowed.`);
+                          }
+
+                          // Validate file sizes
+                          const invalidFiles = filesToAdd.filter(file => file.size > 500 * 1024);
+                          if (invalidFiles.length > 0) {
+                            alert(`${invalidFiles.length} file(s) exceed 500KB limit. Please select smaller files.`);
+                            e.target.value = '';
+                            return;
+                          }
+
+                          // Create preview URLs and add to subImages
+                          const newSubImages = filesToAdd.map(file => ({
+                            file,
+                            preview: URL.createObjectURL(file)
+                          }));
+
+                          setSubImages(prev => [...prev, ...newSubImages]);
+                          e.target.value = ''; // Clear the input
+                        }}
+                      />
+                      <Button
+                        color="secondary"
+                        variant="flat"
+                        size="sm"
+                        isDisabled={existingSubImages.length + subImages.length >= 3}
+                        onClick={() => {
+                          if (existingSubImages.length + subImages.length >= 3) {
+                            alert("Maximum 3 product photos allowed. Please remove some images before adding new ones.");
+                            return;
+                          }
+                          document.getElementById("subImagesService")?.click();
+                        }}
+                      >
+                        + Add Product Photos
+                        {existingSubImages.length + subImages.length > 0 && (
+                          <span className="ml-1 text-xs">
+                            ({existingSubImages.length + subImages.length}/3)
+                          </span>
+                        )}
+                      </Button>
+                    </div>
+
+                    {/* Display Selected Sub Images (New) */}
+                    {subImages.length > 0 && (
+                      <div className="mt-2">
+                        <p className="text-xs text-gray-500 mb-2">Selected Images (will be uploaded on save):</p>
+                        <div className="grid grid-cols-4 gap-3">
+                          {subImages.map((subImage, index) => (
+                            <div key={index} className="relative group">
+                              <Image
+                                src={subImage.preview}
+                                alt={`Sub image ${index + 1}`}
+                                className="w-full h-24 object-cover rounded-lg border"
+                                width={100}
+                                height={100}
+                              />
+                              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 text-center">
+                                {(subImage.file.size / 1024).toFixed(1)} KB
+                              </div>
+                              <Button
+                                color="danger"
+                                size="sm"
+                                variant="flat"
+                                isIconOnly
+                                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => {
+                                  // Revoke object URL to prevent memory leak
+                                  URL.revokeObjectURL(subImage.preview);
+                                  setSubImages(prev => prev.filter((_, i) => i !== index));
+                                }}
+                              >
+                                <svg
+                                  width={16}
+                                  height={16}
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M18 6L6 18M6 6L18 18"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                  />
+                                </svg>
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Display Existing Sub Images (from API) */}
+                    {existingSubImages.length > 0 && (
+                      <div className="mt-2">
+                        <p className="text-xs text-gray-500 mb-2">Existing Images:</p>
+                        <div className="grid grid-cols-4 gap-3">
+                          {existingSubImages.map((imageUrl, index) => (
+                            <div key={index} className="relative group">
+                              <Image
+                                src={imageUrl}
+                                alt={`Existing sub image ${index + 1}`}
+                                className="w-full h-24 object-cover rounded-lg border"
+                                width={100}
+                                height={100}
+                              />
+                              <Button
+                                color="danger"
+                                size="sm"
+                                variant="flat"
+                                isIconOnly
+                                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => {
+                                  setExistingSubImages(prev => prev.filter((_, i) => i !== index));
+                                }}
+                              >
+                                <svg
+                                  width={16}
+                                  height={16}
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M18 6L6 18M6 6L18 18"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                  />
+                                </svg>
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 mb-2">
                   <Controller
@@ -2105,6 +2429,18 @@ const AddProducts = () => {
           )}
         </ModalContent>
       </Modal>
+
+      {/* Category Modal */}
+      <CategoryModal
+        isOpen={isCategoryModalOpen}
+        onOpenChange={setIsCategoryModalOpen}
+        selectedCategoryId={tempFormData?.categoryId}
+        onCategorySelect={(categoryId) => {
+          setValue("categoryId", categoryId);
+          categoryrefetch(); // Refetch categories to update the list
+        }}
+        label="Manage Categories"
+      />
     </div>
   );
 };

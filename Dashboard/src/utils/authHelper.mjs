@@ -104,18 +104,49 @@ const PUBLIC_ENDPOINT_NAMES = ['Login', 'Register'];
  * @returns {Headers} Headers with authentication
  */
 export const prepareHeaders = (headers, api) => {
-  // Always set Content-Type
-  if (!headers.has("Content-Type")) {
+  // Extract URL from api.arg (the query function result)
+  const url = api?.arg?.url || '';
+  
+  // Check if this is a file upload endpoint
+  const isUploadEndpoint = url.includes('/upload-file') || url.includes('/upload');
+  
+  // Check if body is FormData - if so, don't set Content-Type
+  // Browser will automatically set it with boundary parameter for multipart/form-data
+  const body = api?.arg?.body;
+  
+  // Multiple ways to detect FormData (in case instanceof doesn't work in some contexts)
+  const isFormData = body instanceof FormData || 
+                    (body && typeof body === 'object' && body.constructor?.name === 'FormData') ||
+                    (body && typeof body.append === 'function' && typeof body.get === 'function');
+  
+  // Debug logging for FormData detection
+  if ((isFormData || isUploadEndpoint) && typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+    console.log('[Auth] FormData/Upload detection:', {
+      isFormData,
+      isUploadEndpoint,
+      url,
+      bodyType: typeof body,
+      constructorName: body?.constructor?.name,
+      hasAppend: typeof body?.append === 'function',
+    });
+  }
+  
+  // Only set Content-Type if it's NOT FormData and NOT upload endpoint
+  // Don't modify Content-Type here - it needs the boundary parameter for FormData
+  if (isFormData || isUploadEndpoint) {
+    // Remove Content-Type if it was set, let browser set it with boundary
+    if (headers.has("Content-Type")) {
+      headers.delete("Content-Type");
+    }
+    // Don't set any Content-Type - browser will set multipart/form-data with boundary automatically
+  } else if (!headers.has("Content-Type")) {
+    // Only set Content-Type for non-FormData requests
     headers.set("Content-Type", "application/json");
   }
   
   // Extract endpoint name from RTK Query api object
   // api structure: { getState, endpoint, type, forced, arg, extra }
   const endpoint = api?.endpoint;
-  
-  // Extract URL from api.arg (the query function result)
-  // arg structure: { url, method, body, ... }
-  const url = api?.arg?.url || '';
   
   // Check if this is a public endpoint by name
   // RTK Query endpoint names match the exported hook names (e.g., 'Login', 'Register')

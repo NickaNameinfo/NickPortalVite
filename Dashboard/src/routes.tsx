@@ -37,6 +37,16 @@ const YourOrders = React.lazy(() => import("../src/views/Orders/index"));
 const AddBill = React.lazy(() => import("../src/views/Billing/AddBill"));
 const BillsList = React.lazy(() => import("../src/views/Billing/BillsList"));
 const ViewBill = React.lazy(() => import("../src/views/Billing/ViewBill"));
+const InboundInventory = React.lazy(() => import("../src/views/Inventory/Inbound"));
+const PurchaseList = React.lazy(() => import("../src/views/Inventory/PurchaseList"));
+const AddClient = React.lazy(() => import("../src/views/Inventory/Clients/AddClient"));
+const ClientList = React.lazy(() => import("../src/views/Inventory/Clients/ClientList"));
+const AddClientProduct = React.lazy(() => import("../src/views/Inventory/ClientProducts/AddClientProduct"));
+const ClientProductsList = React.lazy(() => import("../src/views/Inventory/ClientProducts/ClientProductsList"));
+const InventorySummary = React.lazy(() => import("../src/views/Inventory/Summary"));
+const Settings = React.lazy(() => import("../src/views/Settings"));
+const Reports = React.lazy(() => import("../src/views/Reports"));
+const InvoiceFormats = React.lazy(() => import("../src/views/InvoiceFormats"));
 
 const routes = [
   { path: "/", exact: false, name: "Home" },
@@ -74,6 +84,18 @@ const routes = [
   { path: "/Billing/Add", name: "AddBill", element: AddBill },
   { path: "/Billing/List", name: "BillsList", element: BillsList },
   { path: "/Billing/View/:id", name: "ViewBill", element: ViewBill },
+  { path: "/Inventory/Inbound", name: "Inbound Inventory", element: InboundInventory },
+  { path: "/Inventory/PurchaseList", name: "Purchase List", element: PurchaseList },
+  { path: "/Inventory/Clients/Add", name: "Add Client", element: AddClient },
+  { path: "/Inventory/Clients/Add/:id", name: "Edit Client", element: AddClient },
+  { path: "/Inventory/Clients/List", name: "Client List", element: ClientList },
+  { path: "/Inventory/ClientProducts/Add", name: "Add Client Product", element: AddClientProduct },
+  { path: "/Inventory/ClientProducts/Add/:productId", name: "Edit Client Product", element: AddClientProduct },
+  { path: "/Inventory/ClientProducts/List", name: "Client Products List", element: ClientProductsList },
+  { path: "/Inventory/Summary", name: "Inventory Summary", element: InventorySummary },
+  { path: "/Settings", name: "Settings", element: Settings },
+  { path: "/Reports", name: "Reports", element: Reports },
+  { path: "/InvoiceFormats", name: "Invoice Formats", element: InvoiceFormats },
 ];
 
 export default routes;

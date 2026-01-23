@@ -47,6 +47,13 @@ export const ProductsApi = createApi({
         method: "GET",
       }),
     }),
+    uploadProductPhotos: builder.mutation({
+      query: (body) => ({
+        url: `/product/upload-photos`,
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -56,6 +63,7 @@ export const {
   useAddStoreProductMutation,
   useAddVendorProductMutation,
   useGetProductsByIdQuery,
-  useUpdateProductMutation
+  useUpdateProductMutation,
+  useUploadProductPhotosMutation
 } = ProductsApi;
 export const { endpoints } = ProductsApi;
