@@ -7,7 +7,7 @@ import {
   RadioGroup,
   useDisclosure,
 } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   EyeFilledIcon,
   EyeSlashFilledIcon,
@@ -50,6 +50,7 @@ export const Register = () => {
   const [addStores] = useAddStoreMutation();
   const [updateUser] = useUpdateUserMutation();
   const [addVendors] = useAddVendorsMutation();
+  
   const onSubmit = async () => {
     try {
       let tempApiValue = {
@@ -78,7 +79,10 @@ export const Register = () => {
             let userResult = await updateUser(tempAPIUserData);
             if (userResult?.data?.success) {
               dispatch(onOpenResigter(false));
-              // window.open("https://nicknameportal.shop/Admin/", "_blank");
+              // Small delay to ensure registration modal closes first
+             alert('We have received your registration and will contact you shortly.')
+            } else {
+              console.error('User update failed:', userResult);
             }
           }
         } else if (result?.data?.user?.role === "2") {
@@ -102,7 +106,9 @@ export const Register = () => {
             let userResult = await updateUser(tempAPIUserData);
             if (userResult?.data?.success) {
               dispatch(onOpenResigter(false));
-              window.open("https://nicknameportal.shop/Admin/", "_blank");
+              alert('We have received your registration and will contact you shortly.')
+            } else {
+              console.error('User update failed:', userResult);
             }
           }
         } else {

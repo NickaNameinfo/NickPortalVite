@@ -119,7 +119,8 @@ const StoreList = () => {
           renderCell={renderCell}
           columns={columns}
           tableItems={data?.["data"]}
-          isStatusFilter={false}
+          isStatusFilter={true}
+          showColumnsFilter={false}
         />
       )}
     </div>

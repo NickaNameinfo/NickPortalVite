@@ -122,32 +122,27 @@ const CustomersOrderList = () => {
           <p>{paymentOption[user.paymentmethod]}</p>
         );
       case "deliveryAddress":
-        // Get the deliveryAddress string
-        const fullAddressString = user.deliveryAddress;
-        // Split the string by comma and trim whitespace from each part
-        const parts = fullAddressString.split(',').map(part => part.trim());
-        const addressParts = [
-          parts[0],       // e.g., '26'
-          parts[1],       // e.g., 'Arul'
-          parts[6],       // e.g., 'chennai'
-          parts[7],       // e.g., 'chennai'
-        ];
+        // Get the full deliveryAddress string
+        const fullAddressString = user.deliveryAddress || '';
+        
+        // Display the full address
+        const address = fullAddressString;
 
-        // Join the selected address parts into a clean address string
-        const address = addressParts.filter(Boolean).join(', ');
-
-        // The date is the 11th element (index 10): 2025-11-06T14:40:03.000Z
-        const dateString = parts[10];
-
-        // Format the date to a more readable, date-only format
+        // Get the delivery date from the order object, not from parsing the address
         let deliveryDate = '';
-        if (dateString) {
+        const dateToUse = user.deliverydate || user.cutomerDeliveryDate;
+        
+        if (dateToUse) {
           try {
             // Create a Date object
-            const dateObject = new Date(dateString);
-            // Format it as YYYY-MM-DD (or use 'en-US' for MM/DD/YYYY if preferred)
-            deliveryDate = dateObject.toLocaleDateString('en-CA');
-            // Alternative: deliveryDate = dateObject.toDateString(); // e.g., "Wed Nov 06 2025"
+            const dateObject = new Date(dateToUse);
+            // Check if date is valid
+            if (!isNaN(dateObject.getTime())) {
+              // Format it as YYYY-MM-DD
+              deliveryDate = dateObject.toLocaleDateString('en-CA');
+            } else {
+              deliveryDate = 'Invalid Date';
+            }
           } catch (e) {
             console.error("Error formatting date:", e);
             deliveryDate = 'Invalid Date';
@@ -155,11 +150,16 @@ const CustomersOrderList = () => {
         }
 
         return (
-          <p>
-            <span className="text-primary">Address: </span>{address}
-            <br />
-            <span className="text-danger">Date:</span> {deliveryDate}
-          </p>
+          <div className="max-w-xs">
+            <p className="break-words">
+              <span className="text-primary">Address: </span>{address}
+            </p>
+            {deliveryDate && (
+              <p className="mt-1">
+                <span className="text-danger">Date:</span> {deliveryDate}
+              </p>
+            )}
+          </div>
         );
       case "productIds":
         return (

@@ -35,6 +35,8 @@ interface TableProps {
   selectionMode?: "single" | "multiple" | "none";
   selectedKeys?: any;
   onSelectionChange?: (keys: any) => void;
+  showColumnsFilter?: boolean;
+  excludeStatuses?: string[];
 }
 
 export const TableList = (props: TableProps) => {
@@ -80,7 +82,11 @@ export const TableList = (props: TableProps) => {
     // Build options array
     const options = [{ name: "All", id: "all" }];
     
-    // Add common statuses if they exist in data
+    // Get excluded statuses (default to empty array)
+    const excludeStatuses = props?.excludeStatuses || [];
+    
+    // Add common statuses if they exist in data and are not excluded
+    // Always include "active" and "inactive" if not excluded (for filtering purposes)
     const commonStatuses = [
       { name: "Active", id: "active" },
       { name: "Inactive", id: "inactive" },
@@ -91,14 +97,21 @@ export const TableList = (props: TableProps) => {
     ];
     
     commonStatuses.forEach(status => {
-      if (uniqueStatuses.has(status.id)) {
+      // Always include "active" and "inactive" if not excluded, even if not in data
+      // Other statuses only if they exist in data
+      const shouldInclude = (status.id === "active" || status.id === "inactive") 
+        ? !excludeStatuses.includes(status.id)
+        : uniqueStatuses.has(status.id) && !excludeStatuses.includes(status.id);
+      
+      if (shouldInclude) {
         options.push(status);
       }
     });
     
-    // Add any other unique statuses found
+    // Add any other unique statuses found (excluding specified ones)
     uniqueStatuses.forEach(status => {
-      if (!["all", "active", "inactive", "processing", "shipping", "delivered", "cancelled"].includes(status)) {
+      if (!["all", "active", "inactive", "processing", "shipping", "delivered", "cancelled"].includes(status) && 
+          !excludeStatuses.includes(status)) {
         options.push({ 
           name: status.charAt(0).toUpperCase() + status.slice(1), 
           id: status 
@@ -107,7 +120,7 @@ export const TableList = (props: TableProps) => {
     });
     
     return options;
-  }, [props?.tableItems]);
+  }, [props?.tableItems, props?.excludeStatuses]);
 
   const headerColumns = React.useMemo(() => {
     // if (visibleColumns === "all") return columns;
@@ -141,6 +154,11 @@ export const TableList = (props: TableProps) => {
           user?.["paymentmethod"]?.toString(),
           user?.["deliveryAddress"],
           user?.["size"],
+          user?.["storename"],
+          user?.["storeaddress"],
+          user?.["ownername"],
+          user?.["phone"],
+          user?.["email"],
         ].filter(Boolean).map((field) => String(field).toLowerCase());
         
         return searchableFields.some((field) => field.includes(searchLower));
@@ -152,27 +170,38 @@ export const TableList = (props: TableProps) => {
       statusFilterArray.length > 0
     ) {
       filteredUsers = filteredUsers.filter((user: any) => {
-        const userStatus = user?.status || user?.product?.status;
+        // Get status from user or product, handling undefined/null
+        let userStatus = user?.status;
+        if (userStatus === undefined || userStatus === null) {
+          userStatus = user?.product?.status;
+        }
+        
+        // Handle null/undefined/empty status
+        if (userStatus === null || userStatus === undefined || userStatus === "") {
+          return false;
+        }
+        
+        // Convert to string for consistent comparison, but preserve numeric checks
+        const statusStr = String(userStatus).trim();
+        const statusNum = !isNaN(Number(statusStr)) ? Number(statusStr) : null;
         
         // Handle numeric status (1 = active, 0 = inactive)
-        if (userStatus === "1" || userStatus === 1) {
-          return statusFilterArray.includes("active");
-        }
-        if (userStatus === "0" || userStatus === 0) {
-          return statusFilterArray.includes("inactive");
+        if (statusNum !== null) {
+          if (statusNum === 1) {
+            return statusFilterArray.includes("active");
+          }
+          if (statusNum === 0) {
+            return statusFilterArray.includes("inactive");
+          }
         }
         
         // Handle string status (processing, shipping, delivered, cancelled, etc.)
-        if (userStatus) {
-          const statusValue = String(userStatus).toLowerCase();
-          // Check if the status matches any selected filter
-          return statusFilterArray.some((filterStatus) => {
-            const filterLower = String(filterStatus).toLowerCase();
-            return statusValue === filterLower || statusValue.includes(filterLower);
-          });
-        }
-        
-        return false;
+        const statusValue = statusStr.toLowerCase();
+        // Check if the status matches any selected filter
+        return statusFilterArray.some((filterStatus) => {
+          const filterLower = String(filterStatus).toLowerCase();
+          return statusValue === filterLower || statusValue.includes(filterLower);
+        });
       });
     }
 
@@ -294,31 +323,33 @@ export const TableList = (props: TableProps) => {
                   ))}
                 </DropdownMenu>
               </Dropdown>
-              <Dropdown>
-                <DropdownTrigger className="hidden sm:flex">
-                  <Button
-                    endContent={<ChevronDownIcon className="text-small" />}
-                    variant="flat"
-                    size="md"
+              {props.showColumnsFilter !== false && (
+                <Dropdown>
+                  <DropdownTrigger className="hidden sm:flex">
+                    <Button
+                      endContent={<ChevronDownIcon className="text-small" />}
+                      variant="flat"
+                      size="md"
+                    >
+                      Columns
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    disallowEmptySelection
+                    aria-label="Table Columns"
+                    closeOnSelect={false}
+                    selectedKeys={visibleColumns}
+                    selectionMode="multiple"
+                    onSelectionChange={setVisibleColumns}
                   >
-                    Columns
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu
-                  disallowEmptySelection
-                  aria-label="Table Columns"
-                  closeOnSelect={false}
-                  selectedKeys={visibleColumns}
-                  selectionMode="multiple"
-                  onSelectionChange={setVisibleColumns}
-                >
-                  {props.columns.map((column: any) => (
-                    <DropdownItem key={column.uid} className="capitalize">
-                      {capitalize(column.name)}
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              </Dropdown>
+                    {props.columns.map((column: any) => (
+                      <DropdownItem key={column.id || column.uid} className="capitalize">
+                        {capitalize(column.name)}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
+              )}
             </div>
           )}
         </div>
@@ -327,7 +358,7 @@ export const TableList = (props: TableProps) => {
             <span className="flex me-5">
               <p className="font-semibold text-default-700 "> Total</p>
               <p className=" text-default-700 font-semibold ms-1">
-                {props?.tableItems?.length}
+                {filteredItems.length}
               </p>
             </span>
             <div className="">
@@ -393,7 +424,7 @@ export const TableList = (props: TableProps) => {
     statusFilter,
     visibleColumns,
     onRowsPerPageChange,
-    props?.tableItems?.length,
+    filteredItems.length,
     onSearchChange,
     hasSearchFilter,
   ]);
